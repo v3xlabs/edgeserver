@@ -1,0 +1,10 @@
+version: "3"
+services:
+    scylla:
+        image: "scylladb/scylla"
+        command: "--smp 1"
+        ports:
+            - "9042:9042"
+        volumes:
+            - "./data:/var/lib/scylla"
+        restart: always
