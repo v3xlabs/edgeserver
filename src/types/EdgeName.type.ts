@@ -1,4 +1,4 @@
 export type EdgeName = {
-    host: string; // HTTP Location
+    site_id: string;
     cid: string; // IPFS Location
 }
