@@ -41,6 +41,7 @@ const consoleLog = (color: string, message: LogMessage) => {
     let stringMessage: string;
     stringMessage = typeof message !== 'string' ? inspect(message, false, 3) : message;
 
+    // yes, very much readable good code, 11/10 would recommend, passionatepeople code quality
     // eslint-disable-next-line no-console
     console.log(
         stringMessage
