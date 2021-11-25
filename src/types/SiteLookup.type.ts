@@ -1,4 +1,4 @@
 export type SiteLookup = {
     host: string
-    site_id: string;
+    site_id: Long;
 };

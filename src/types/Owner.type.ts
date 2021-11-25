@@ -1,3 +1,3 @@
 export type Owner = {
-    user_id: number;
+    user_id: Long;
 }

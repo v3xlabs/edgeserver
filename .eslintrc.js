@@ -22,6 +22,7 @@ module.exports = {
         "camelCase": true,
         "pascalCase": true
       }
-    }]
+    }],
+    "quotes": ["error", "single", { "allowTemplateLiterals": true }]
   }
 }
