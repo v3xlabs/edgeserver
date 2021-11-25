@@ -13,7 +13,7 @@ export const NextHandler: (_function: (request: Request, response: Response) => 
         let result = await _function(request, response);
         if (typeof result == 'undefined') return;
 
-        log.debug('Reject: ' + JSON.stringify(result));
+        log.network('Reject: ' + JSON.stringify(result));
         response.status(result.status);
         response.type('text/plain');
         response.send(result.text + '\n' + VersionFooter);
