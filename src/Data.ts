@@ -1,9 +1,10 @@
-import { ScylloClient } from "scyllo";
-import { EdgeName } from "./types/EdgeName.type";
-import { Owner } from "./types/Owner.type";
-import { OwnerSiteLookup } from "./types/OwnerSiteLookup.type";
-import { Site } from "./types/Site.type";
-import { SiteLookup } from "./types/SiteLookup.type";
+import { ScylloClient } from 'scyllo';
+import { EdgeName } from './types/EdgeName.type';
+import { Owner } from './types/Owner.type';
+import { OwnerSiteLookup } from './types/OwnerSiteLookup.type';
+import { Site } from './types/Site.type';
+import { SiteLookup } from './types/SiteLookup.type';
+import { log } from './util/logging';
 
 export const DB = new ScylloClient<{
     // Get a list of all the stored data by SiteID
@@ -25,13 +26,13 @@ export const DB = new ScylloClient<{
 });
 
 export const initDB = async () => {
-    console.log('Awaiting Connection');
+    log.database('Awaiting Connection');
     await DB.awaitConnection();
 
     await DB.createKeyspace('ipfssignal');
     await DB.useKeyspace('ipfssignal');
 
-    console.log('Ensuring Tables');
+    log.database('Ensuring Tables');
     await DB.createTable('edgenames', true, {
         cid: {
             type: 'text'

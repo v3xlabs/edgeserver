@@ -23,6 +23,8 @@ module.exports = {
         "pascalCase": true
       }
     }],
-    "quotes": ["error", "single", { "allowTemplateLiterals": true }]
+    "quotes": ["error", "single", { "allowTemplateLiterals": true }],
+    "unicorn/no-nested-ternary": "off",
+    "no-console": "error"
   }
 }

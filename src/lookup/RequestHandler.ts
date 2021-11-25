@@ -3,9 +3,10 @@ import { DomainNotFound, EmptyDirectory, FileNotFound } from '../presets/RejectM
 import { NextHandler } from './NextHandler';
 import { request as httpRequest } from 'node:http';
 import { join } from 'node:path';
+import { log } from '../util/logging';
 
 export const handleRequest = NextHandler(async (request, response) => {
-    console.log('Incomming request at ' + request.hostname + ' ' + request.path);
+    log.network('Incomming request at ' + request.hostname + ' ' + request.path);
 
     // Lookup the site by hostname from the database
     const a = await DB.selectOneFrom('sitelookup', ['site_id'], { host: request.hostname });
@@ -51,7 +52,7 @@ export const handleRequest = NextHandler(async (request, response) => {
             // Find the index.html
             let fileFound = false;
             for (let item of fileData['Objects'][localCID]['Links']) {
-                
+
                 // If name is empty, assume its a spread file
                 if (item['Name'].length === 0) {
                     break;
@@ -83,7 +84,7 @@ export const handleRequest = NextHandler(async (request, response) => {
         });
     });
     contentRequest.on('error', (error) => {
-        console.log(error);
+        log.error(error);
     });
     contentRequest.end();
 });
