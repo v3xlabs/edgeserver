@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "repository": "git@github.com:lvkdotsh/ipedge.git",
   "author": "lucemans <luc@lucemans.nl>",
-  "license": "MIT",
+  "license": "GPL-3.0",
   "dependencies": {
     "@typescript-eslint/eslint-plugin": "^5.4.0",
     "@typescript-eslint/parser": "^5.4.0",
