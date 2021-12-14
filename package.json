@@ -5,6 +5,7 @@
   "author": "lucemans <luc@lucemans.nl>",
   "license": "GPL-3.0",
   "dependencies": {
+    "@lvksh/logger": "^1.4.0",
     "@typescript-eslint/eslint-plugin": "^5.4.0",
     "@typescript-eslint/parser": "^5.4.0",
     "dotenv": "^10.0.0",
