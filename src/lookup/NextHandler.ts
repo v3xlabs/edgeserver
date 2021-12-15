@@ -11,7 +11,7 @@ export const NextHandler: (_function: (request: Request, response: Response) => 
     return async (request, response, next) => {
         
         let result = await _function(request, response);
-        if (typeof result == 'undefined') return;
+        if (typeof result == 'undefined') return next();
 
         log.network(result);
         response.status(result.status);

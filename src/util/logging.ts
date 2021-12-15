@@ -1,5 +1,5 @@
-import { createLogger } from "@lvksh/logger";
-import chalk from "chalk";
+import { createLogger } from '@lvksh/logger';
+import chalk from 'chalk';
 
 export const log = createLogger({
     debug: {

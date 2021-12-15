@@ -1,4 +1,5 @@
 import { ScylloClient } from 'scyllo';
+import { AuthKey } from './types/AuthKey.type';
 import { EdgeName } from './types/EdgeName.type';
 import { Owner } from './types/Owner.type';
 import { OwnerSiteLookup } from './types/OwnerSiteLookup.type';
@@ -16,7 +17,9 @@ export const DB = new ScylloClient<{
     // Get the site belonging to a domain
     sitelookup: SiteLookup,
     // Get the sites belonging to an owner
-    ownersitelookup: OwnerSiteLookup
+    ownersitelookup: OwnerSiteLookup,
+    // Get authorization
+    keys: AuthKey
 }>({
     client: {
         contactPoints: [process.env.DB_IP || 'localhost:9042'],
@@ -63,4 +66,8 @@ export const initDB = async () => {
         owner_id: { type: 'bigint' },
         site_id: { type: 'bigint' }
     }, 'owner_id', ['site_id']);
+    await DB.createTable('keys', true, {
+        key: { type: 'text' },
+        owner_id: { type : 'bigint' }
+    }, 'key');
 };
