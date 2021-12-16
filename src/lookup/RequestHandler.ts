@@ -1,90 +1,124 @@
 import { DB } from '../Data';
-import { DomainNotFound, EmptyDirectory, FileNotFound } from '../presets/RejectMessages';
+import {
+    DomainNotFound,
+    EmptyDirectory,
+    FileNotFound,
+} from '../presets/RejectMessages';
 import { NextHandler } from './NextHandler';
 import { request as httpRequest } from 'node:http';
-import { join } from 'node:path';
+import { join, basename } from 'node:path';
 import { log } from '../util/logging';
+import { create } from 'ipfs-http-client';
 
 export const handleRequest = NextHandler(async (request, response) => {
-    log.network('Incomming request at ' + request.hostname + ' ' + request.path);
+    log.network(
+        'Incomming request at ' + request.hostname + ' ' + request.path
+    );
 
     // Lookup the site by hostname from the database
-    const a = await DB.selectOneFrom('sitelookup', ['site_id'], { host: request.hostname });
+    const a = await DB.selectOneFrom('sitelookup', ['site_id'], {
+        host: request.hostname,
+    });
 
     // Reject if the host does not exist
     if (!a) return DomainNotFound(request.hostname + request.path);
 
-    const b = await DB.selectOneFrom('edgenames', ['cid'], { site_id: a.site_id });
-
-    // Verify if file exists on IPFS node
-    const fileData = await new Promise<Object>((accept, reject) => {
-        const preparedURL = (process.env.IPFS_API || 'http://127.0.0.1:5001') + '/api/v0/file/ls?arg=' + (join(b.cid, request.path));
-        var existsRequest = httpRequest({
-            method: 'post',
-            host: '127.0.0.1',
-            port: 5001,
-            path: '/api/v0/file/ls?arg=' + (join(b.cid, request.path))
-        }, (incomming) => {
-            let data = '';
-            incomming.on('data', (chunk) => {
-                data += chunk;
-            });
-            incomming.on('end', () => {
-                accept(JSON.parse(data));
-            });
-        });
-        existsRequest.end();
+    const b = await DB.selectOneFrom('edgenames', ['cid'], {
+        site_id: a.site_id,
     });
 
-    // If not exists return
-    if (fileData['Type'] == 'error') return FileNotFound(request.hostname + request.path);
+    const ipfs = create({
+        url: 'http://localhost:5001',
+    });
+
+    // Verify if file exists on IPFS node
+    // const fileData = await ipfs.resolve(join(b.cid));
+    // log.debug({fileData});
+    let ogFeds = await ipfs.resolve(join(b.cid, request.path));
+    log.debug({ ogFeds });
+
+    // // If not exists return
+    // if (fileData.type !== 'file' && fileData.type !== 'directory')
+    //     return FileNotFound(request.hostname + request.path);
 
     // If directory
     let optionalSuffix = '';
-    if (fileData['Objects']) {
-        const localCID = Object.keys(fileData['Objects'])[0];
-        if (!fileData['Objects'][localCID]) {
-            return { status: 500, text: 'file not there...' };
-        }
+    const abc = await ipfs.files.stat(ogFeds, {});
+    log.debug(abc);
 
-        if (fileData['Objects'][localCID]['Type'] == 'Directory') {
-
-            // Find the index.html
-            let fileFound = false;
-            for (let item of fileData['Objects'][localCID]['Links']) {
-
-                // If name is empty, assume its a spread file
-                if (item['Name'].length === 0) {
-                    break;
-                }
-
-                // Check if file is index.html
-                if (item['Name'] == 'index.html' && item['Type'] == 'File') {
-                    optionalSuffix = 'index.html';
-                    fileFound = true;
-                    break;
-                }
-            }
-
-            // If no index.html found throw
-            if (!fileFound) return EmptyDirectory(request.hostname + request.path);
+    let feds = ogFeds;
+    if (abc.type === 'directory') {
+        try {
+            const feds2 = await ipfs.resolve(
+                join(b.cid, request.path, 'index.html')
+            );
+            optionalSuffix = 'index.html';
+            log.debug(feds2);
+            feds = feds2;
+        } catch (error) {
+            log.debug('No index.html found', error);
         }
     }
+    // const f =
+    // if (fileData.type === 'directory') {
+    //     const localCID = Object.keys(fileData['Objects'])[0];
+    //     if (!fileData['Objects'][localCID]) {
+    //         return { status: 500, text: 'file not there...' };
+    //     }
+
+    //     if (fileData['Objects'][localCID]['Type'] == 'Directory') {
+    //         // Find the index.html
+    //         let fileFound = false;
+    //         for (let item of fileData['Objects'][localCID]['Links']) {
+    //             // If name is empty, assume its a spread file
+    //             if (item['Name'].length === 0) {
+    //                 break;
+    //             }
+
+    //             // Check if file is index.html
+    //             if (item['Name'] == 'index.html' && item['Type'] == 'File') {
+    //                 optionalSuffix = 'index.html';
+    //                 fileFound = true;
+    //                 break;
+    //             }
+    //         }
+
+    //         // If no index.html found throw
+    //         if (!fileFound)
+    //             return EmptyDirectory(request.hostname + request.path);
+    //     }
+    // }
+
+    const mimeType = basename(join(request.path, optionalSuffix));
+    log.debug({ mimeType });
+
+    // Setup headers
+    response.contentType(mimeType);
+    response.setHeader('Cache-Control', 'max-age=60');
+    response.setHeader('x-ipfs-path', '/ipfs/' + abc.cid.toString());
 
     // Fetch file from IPFS Endpoint
-    var contentRequest = httpRequest(join(process.env.IPFS_IP || 'http://127.0.0.1:8080', 'ipfs', b.cid, request.path, optionalSuffix), (incomming) => {
-        for (const a of Object.keys(incomming.headers)) {
-            response.setHeader(a, incomming.headers[a]);
-        }
-        incomming.on('data', (chunk) => {
-            response.write(chunk);
+    await new Promise<void>((accept) => {
+        var contentRequest = httpRequest(
+            join(process.env.IPFS_IP || 'http://127.0.0.1:8080', feds),
+            (incomming) => {
+                // for (const a of Object.keys(incomming.headers)) {
+                //     if (a.toLowerCase() === 'content-type') continue;
+                //     response.setHeader(a, incomming.headers[a]);
+                // }
+                incomming.on('data', (chunk) => {
+                    response.write(chunk);
+                });
+                incomming.on('end', () => {
+                    accept();
+                });
+            }
+        );
+        contentRequest.on('error', (error) => {
+            log.error(error);
         });
-        incomming.on('end', () => {
-            response.send();
-        });
+        contentRequest.end();
     });
-    contentRequest.on('error', (error) => {
-        log.error(error);
-    });
-    contentRequest.end();
+    response.end();
+    return 0;
 });

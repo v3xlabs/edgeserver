@@ -1,8 +1,9 @@
-import { RequestHandler, Router } from 'express';
+import { ErrorRequestHandler, RequestHandler, Router } from 'express';
 import { useYup } from 'use-yup';
 import { log } from '../../util/logging';
 import { GET } from './create';
 import * as yup from 'yup';
+import { VersionFooter } from '../../presets/RejectMessages';
 
 export const KeyRouter = Router();
 
@@ -14,8 +15,8 @@ const useAuth: (handler: RequestHandler) => RequestHandler =
         handler(request, response, next);
     };
 
-export const CreateQuery = yup.object({
-    account: yup.number(),
+export const CreateQuery = yup.object().shape({
+    account: yup.number().required(),
 });
 
 KeyRouter.get(
@@ -23,3 +24,13 @@ KeyRouter.get(
     useYup(CreateQuery, (request) => request.query),
     useAuth(GET)
 );
+
+const errorHandler: ErrorRequestHandler = (error, request, response, next) => {
+    if (error) {
+        response.status(500);
+        response.type('text/plain');
+        response.send(error.toString() + '\n' + VersionFooter);
+    }
+};
+
+KeyRouter.use(errorHandler);
