@@ -95,7 +95,9 @@ export const handleRequest = NextHandler(async (request, response) => {
     // Setup headers
     response.contentType(mimeType);
     response.setHeader('Cache-Control', 'max-age=60');
-    response.setHeader('x-ipfs-path', '/ipfs/' + abc.cid.toString());
+    if (process.env.ADD_HEADER) {
+        response.setHeader('x-ipfs-path', '/ipfs/' + abc.cid.toString());
+    }
 
     // Fetch file from IPFS Endpoint
     await new Promise<void>((accept) => {
