@@ -60,7 +60,7 @@ DeploymentRouter.put(
         rmSync(file.tempFilePath);
 
         const f = create({
-            url: 'http://localhost:5001',
+            url: process.env.IPFS_API || 'http://localhost:5001',
         });
 
         const handPath = 'sites/'+site.site_id;
