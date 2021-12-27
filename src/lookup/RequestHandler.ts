@@ -28,7 +28,7 @@ export const handleRequest = NextHandler(async (request, response) => {
     });
 
     const ipfs = create({
-        url: 'http://localhost:5001',
+        url: process.env.IPFS_API || 'http://localhost:5001',
     });
 
     // Verify if file exists on IPFS node
