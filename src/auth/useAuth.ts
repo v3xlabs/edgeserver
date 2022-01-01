@@ -20,6 +20,8 @@ export const useAuth: RequestHandler = NextHandler(
             auth = auth.slice(0, Math.max(0, 'Bearer '.length));
         }
 
+        log.debug('Validating ' + auth);
+
         const decoded = decode(auth) as { account: string; value: number };
 
         if (!decoded) return NoPermission();
@@ -36,7 +38,7 @@ export const useAuth: RequestHandler = NextHandler(
         if (key.owner_id.toString() !== decoded.account) return NoPermission();
 
         request.auth = {
-            user_id: key.owner_id
+            user_id: key.owner_id,
         };
         log.network('Verified Auth for user ' + key.owner_id);
     }
