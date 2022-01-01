@@ -63,7 +63,7 @@ DeploymentRouter.put(
             url: process.env.IPFS_API || 'http://localhost:5001',
         });
 
-        const handPath = 'sites/'+site.site_id;
+        const handPath = 'sites/' + site.site_id;
 
         try {
             await f.files.rm('/' + handPath, { recursive: true });
@@ -89,10 +89,9 @@ DeploymentRouter.put(
             log.debug('Failed to delete folder');
         }
 
-        await DB.insertInto('edgenames', {
+        await DB.update('sites', {
             cid: out.cid.toString(),
-            site_id: Long.fromString(id),
-        });
+        }, { site_id: Long.fromString(id) });
 
         // log.debug({c});
         // const fe = f.addAll(globSource('tmp/test', '**/*'));

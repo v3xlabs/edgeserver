@@ -1,8 +1,6 @@
 import { DB } from '../Data';
 import {
-    DomainNotFound,
-    EmptyDirectory,
-    FileNotFound,
+    DomainNotFound
 } from '../presets/RejectMessages';
 import { NextHandler } from './NextHandler';
 import { request as httpRequest } from 'node:http';
@@ -16,30 +14,20 @@ export const handleRequest = NextHandler(async (request, response) => {
     );
 
     // Lookup the site by hostname from the database
-    const a = await DB.selectOneFrom('sitelookup', ['site_id'], {
+    const a = await DB.selectOneFrom('sites', ['site_id', 'cid'], {
         host: request.hostname,
     });
 
     // Reject if the host does not exist
     if (!a) return DomainNotFound(request.hostname + request.path);
 
-    const b = await DB.selectOneFrom('edgenames', ['cid'], {
-        site_id: a.site_id,
-    });
-
     const ipfs = create({
         url: process.env.IPFS_API || 'http://localhost:5001',
     });
 
     // Verify if file exists on IPFS node
-    // const fileData = await ipfs.resolve(join(b.cid));
-    // log.debug({fileData});
-    let ogFeds = await ipfs.resolve(join(b.cid, request.path));
+    let ogFeds = await ipfs.resolve(join(a.cid, request.path));
     log.debug({ ogFeds });
-
-    // // If not exists return
-    // if (fileData.type !== 'file' && fileData.type !== 'directory')
-    //     return FileNotFound(request.hostname + request.path);
 
     // If directory
     let optionalSuffix = '';
@@ -50,7 +38,7 @@ export const handleRequest = NextHandler(async (request, response) => {
     if (abc.type === 'directory') {
         try {
             const feds2 = await ipfs.resolve(
-                join(b.cid, request.path, 'index.html')
+                join(a.cid, request.path, 'index.html')
             );
             optionalSuffix = 'index.html';
             log.debug(feds2);
@@ -59,35 +47,6 @@ export const handleRequest = NextHandler(async (request, response) => {
             log.debug('No index.html found', error);
         }
     }
-    // const f =
-    // if (fileData.type === 'directory') {
-    //     const localCID = Object.keys(fileData['Objects'])[0];
-    //     if (!fileData['Objects'][localCID]) {
-    //         return { status: 500, text: 'file not there...' };
-    //     }
-
-    //     if (fileData['Objects'][localCID]['Type'] == 'Directory') {
-    //         // Find the index.html
-    //         let fileFound = false;
-    //         for (let item of fileData['Objects'][localCID]['Links']) {
-    //             // If name is empty, assume its a spread file
-    //             if (item['Name'].length === 0) {
-    //                 break;
-    //             }
-
-    //             // Check if file is index.html
-    //             if (item['Name'] == 'index.html' && item['Type'] == 'File') {
-    //                 optionalSuffix = 'index.html';
-    //                 fileFound = true;
-    //                 break;
-    //             }
-    //         }
-
-    //         // If no index.html found throw
-    //         if (!fileFound)
-    //             return EmptyDirectory(request.hostname + request.path);
-    //     }
-    // }
 
     const mimeType = basename(join(request.path, optionalSuffix));
     log.debug({ mimeType });

@@ -1,6 +1,5 @@
 import { ErrorRequestHandler, RequestHandler, Router } from 'express';
 import { useYup } from 'use-yup';
-import { log } from '../../util/logging';
 import { GET } from './create';
 import * as yup from 'yup';
 import { VersionFooter } from '../../presets/RejectMessages';

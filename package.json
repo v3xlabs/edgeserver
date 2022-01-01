@@ -23,7 +23,7 @@
     "ipfs-only-hash": "^4.0.0",
     "jsonwebtoken": "^8.5.1",
     "node-fetch": "^3.1.0",
-    "scyllo": "^0.9.5",
+    "scyllo": "0.9.8",
     "typescript": "^4.5.2",
     "unzipper": "^0.10.11",
     "use-yup": "^1.1.0",

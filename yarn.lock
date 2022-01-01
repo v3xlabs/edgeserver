@@ -298,6 +298,11 @@
   resolved "https://registry.yarnpkg.com/@lvksh/logger/-/logger-1.4.1.tgz#79012d1ea31f57f63128e30d5bbbd720f131ca48"
   integrity sha512-/6sLm8oWY1JeHTaRqTubFF2sVJo8KLUHTF1QM9Q9S21mlG0ew/PLL50S9sLoP1VT5qJ3y7D2mgSw0O74mhe/XA==
 
+"@lvksh/logger@^1.4.4":
+  version "1.5.2"
+  resolved "https://registry.yarnpkg.com/@lvksh/logger/-/logger-1.5.2.tgz#4bdf255edf008a4e746596f1e574b77807c629fb"
+  integrity sha512-BpzPz2y0K4y/u8yeOIwYKrsRgRJmPsA7RLdllLJ8kMes7up8o/xKf+9LKHul4uvZYd4xR4YoK+3MYDGwEMTOBg==
+
 "@multiformats/base-x@^4.0.1":
   version "4.0.1"
   resolved "https://registry.yarnpkg.com/@multiformats/base-x/-/base-x-4.0.1.tgz#95ff0fa58711789d53aefb2590a8b7a4e715d121"
@@ -3312,11 +3317,12 @@ safe-regex@^2.1.1:
   resolved "https://registry.yarnpkg.com/safer-buffer/-/safer-buffer-2.1.2.tgz#44fa161b0187b9549dd84bb91802f9bd8385cd6a"
   integrity sha512-YZo3K82SD7Riyi0E1EQPojLz7kpepnSQI9IyPbHHg1XXXevb5dJI7tpyN2ADxGcQbHG7vcyRHk0cbwqcQriUtg==
 
-scyllo@^0.9.5:
-  version "0.9.5"
-  resolved "https://registry.yarnpkg.com/scyllo/-/scyllo-0.9.5.tgz#11d045b545b7e7323d47f838c9ba699159bd8009"
-  integrity sha512-RejRnYO8gAmGAWf4I5DqQgYF7Bu2oRBkQi4ZCHxqx7NeVL9YqiI3CXrwAT0bZq9AK3IGxwG4OvnlWZdzgc0UQA==
+scyllo@0.9.8:
+  version "0.9.8"
+  resolved "https://registry.yarnpkg.com/scyllo/-/scyllo-0.9.8.tgz#e35c8045b2bcbbfdbfd6ebef5e1598daf0c3706a"
+  integrity sha512-NEgP6feeWaUDBnCpXmApNerjUKN8ur84jpYEYCgfI6o8VjGX9FS0utkIYun3yBTkeu4DXs1uYOicDavjhEKsnw==
   dependencies:
+    "@lvksh/logger" "^1.4.4"
     cassandra-driver "^4.6.3"
 
 "semver@2 || 3 || 4 || 5", semver@^5.6.0:
