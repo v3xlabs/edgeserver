@@ -16,11 +16,9 @@ export const useAuth: RequestHandler = NextHandler(
         if (!request.headers.authorization) return NoPermission();
         let auth = request.headers.authorization;
 
-        if (auth.toLowerCase().startsWith('Bearer ')) {
-            auth = auth.slice(0, Math.max(0, 'Bearer '.length));
+        if (auth.toLowerCase().startsWith('bearer ')) {
+            auth = auth.slice('Bearer '.length);
         }
-
-        log.debug('Validating ' + auth);
 
         const decoded = decode(auth) as { account: string; value: number };
 
