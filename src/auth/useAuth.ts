@@ -14,7 +14,11 @@ export type AuthRequest = Request & {
 export const useAuth: RequestHandler = NextHandler(
     async (request: AuthRequest, response) => {
         if (!request.headers.authorization) return NoPermission();
-        const auth = request.headers.authorization;
+        let auth = request.headers.authorization;
+
+        if (auth.toLowerCase().startsWith('Bearer ')) {
+            auth = auth.slice(0, Math.max(0, 'Bearer '.length));
+        }
 
         const decoded = decode(auth) as { account: string; value: number };
 
