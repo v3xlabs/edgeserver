@@ -15,6 +15,7 @@ export const DB = new ScylloClient<{
     client: {
         contactPoints: [process.env.DB_IP || 'localhost:9042'],
         localDataCenter: process.env.DB_DATACENTER || 'datacenter1',
+        keyspace: 'system'
     },
     debug: false,
 });
@@ -23,8 +24,7 @@ export const initDB = async () => {
     log.database('Awaiting Connection');
     await DB.awaitConnection();
 
-    await DB.createKeyspace('ipfssignal');
-    await DB.useKeyspace('ipfssignal');
+    await DB.useKeyspace('ipfssignal', true);
 
     log.database('Ensuring Tables');
     await DB.createTable(
@@ -41,7 +41,7 @@ export const initDB = async () => {
         'sites',
         true,
         {
-            host: { type: 'text' },
+            host: {type: ''},
             owner: { type: 'bigint' },
             site_id: { type: 'bigint' },
             cid: { type: 'text' },

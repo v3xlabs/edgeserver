@@ -1,12 +1,57 @@
 import { DB } from '../Data';
-import {
-    DomainNotFound
-} from '../presets/RejectMessages';
+import { DomainNotFound, FileNotFound } from '../presets/RejectMessages';
 import { NextHandler } from './NextHandler';
 import { request as httpRequest } from 'node:http';
 import { join, basename } from 'node:path';
 import { log } from '../util/logging';
-import { create } from 'ipfs-http-client';
+import { create, IPFSHTTPClient } from 'ipfs-http-client';
+import { StatResult } from 'ipfs-core-types/src/files';
+
+const resolveFile = async (
+    ipfs: IPFSHTTPClient,
+    prefixPath: string,
+    path: string
+): Promise<{ fileType: string; path: string } | undefined> => {
+    if (path.length === 0) return undefined;
+
+    let fileAtPath = await ipfs.resolve(join(prefixPath, path));
+    log.debug('fileAtPath', fileAtPath);
+
+    try {
+        const ipfsFile = await ipfs.files.stat(join(prefixPath, path), {});
+        if (ipfsFile && ipfsFile.type === 'file') {
+            return {
+                fileType: basename(path),
+                path: fileAtPath,
+            };
+        }
+
+        if (ipfsFile.type === 'directory') {
+            try {
+                const indexInFolderPath = join(prefixPath, path, 'index.html');
+                const indexInFolder = await ipfs.resolve(indexInFolderPath);
+                log.debug('indexInFolder', indexInFolder);
+                if (indexInFolder) {
+                    const ipfsIndexInFolder = await ipfs.files.stat(indexInFolderPath, {});
+                    log.debug('ipfsIndexInFolder', indexInFolder);
+                    if (
+                        ipfsIndexInFolder &&
+                        ipfsIndexInFolder.type === 'file'
+                    ) {
+                        return {
+                            fileType: basename(indexInFolderPath),
+                            path: 'indexInFolder',
+                        };
+                    }
+                }
+            } catch (error) {
+                log.debug('No index.html found', error);
+            }
+        }
+    } catch {}
+
+    return await resolveFile(ipfs, prefixPath, join(path, '../'));
+};
 
 export const handleRequest = NextHandler(async (request, response) => {
     log.network(
@@ -26,42 +71,25 @@ export const handleRequest = NextHandler(async (request, response) => {
     });
 
     // Verify if file exists on IPFS node
-    let ogFeds = await ipfs.resolve(join(a.cid, request.path));
-    log.debug({ ogFeds });
+    const nextPath = await resolveFile(ipfs, a.cid, request.path);
 
-    // If directory
-    let optionalSuffix = '';
-    const abc = await ipfs.files.stat(ogFeds, {});
-    log.debug(abc);
+    if (!nextPath || nextPath.path.length === 0)
+        return FileNotFound(request.path);
 
-    let feds = ogFeds;
-    if (abc.type === 'directory') {
-        try {
-            const feds2 = await ipfs.resolve(
-                join(a.cid, request.path, 'index.html')
-            );
-            optionalSuffix = 'index.html';
-            log.debug(feds2);
-            feds = feds2;
-        } catch (error) {
-            log.debug('No index.html found', error);
-        }
-    }
-
-    const mimeType = basename(join(request.path, optionalSuffix));
+    const mimeType = nextPath.fileType;
     log.debug({ mimeType });
 
     // Setup headers
     response.contentType(mimeType);
     response.setHeader('Cache-Control', 'max-age=60');
     if (process.env.ADD_HEADER) {
-        response.setHeader('x-ipfs-path', '/ipfs/' + abc.cid.toString());
+        response.setHeader('x-ipfs-path', nextPath.path);
     }
 
     // Fetch file from IPFS Endpoint
     await new Promise<void>((accept) => {
         var contentRequest = httpRequest(
-            join(process.env.IPFS_IP || 'http://127.0.0.1:8080', feds),
+            join(process.env.IPFS_IP || 'http://127.0.0.1:8080', nextPath.path),
             (incomming) => {
                 // for (const a of Object.keys(incomming.headers)) {
                 //     if (a.toLowerCase() === 'content-type') continue;
@@ -77,6 +105,8 @@ export const handleRequest = NextHandler(async (request, response) => {
         );
         contentRequest.on('error', (error) => {
             log.error(error);
+            response.write('oops');
+            response.end();
         });
         contentRequest.end();
     });
