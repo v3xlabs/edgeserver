@@ -41,7 +41,7 @@ export const initDB = async () => {
         'sites',
         true,
         {
-            host: {type: ''},
+            host: {type: 'text'},
             owner: { type: 'bigint' },
             site_id: { type: 'bigint' },
             cid: { type: 'text' },
