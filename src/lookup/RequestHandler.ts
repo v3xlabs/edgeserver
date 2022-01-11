@@ -10,15 +10,19 @@ import { StatResult } from 'ipfs-core-types/src/files';
 const resolveFile = async (
     ipfs: IPFSHTTPClient,
     prefixPath: string,
-    path: string
+    path: string,
+    index = 0
 ): Promise<{ fileType: string; path: string } | undefined> => {
-    if (path.length === 0) return undefined;
+    if (path.length < 2) return undefined;
+    if (index > 10) return undefined;
 
-    let fileAtPath = await ipfs.resolve(join(prefixPath, path));
-    log.debug('fileAtPath', fileAtPath);
+    log.debug('resolving', path);
 
     try {
-        const ipfsFile = await ipfs.files.stat(join(prefixPath, path), {});
+        let fileAtPath = await ipfs.resolve(join(prefixPath, path));
+        log.debug('fileAtPath', fileAtPath);
+
+        const ipfsFile = await ipfs.files.stat(fileAtPath, {});
         if (ipfsFile && ipfsFile.type === 'file') {
             return {
                 fileType: basename(path),
@@ -32,7 +36,10 @@ const resolveFile = async (
                 const indexInFolder = await ipfs.resolve(indexInFolderPath);
                 log.debug('indexInFolder', indexInFolder);
                 if (indexInFolder) {
-                    const ipfsIndexInFolder = await ipfs.files.stat(indexInFolderPath, {});
+                    const ipfsIndexInFolder = await ipfs.files.stat(
+                        indexInFolder,
+                        {}
+                    );
                     log.debug('ipfsIndexInFolder', indexInFolder);
                     if (
                         ipfsIndexInFolder &&
@@ -40,7 +47,7 @@ const resolveFile = async (
                     ) {
                         return {
                             fileType: basename(indexInFolderPath),
-                            path: 'indexInFolder',
+                            path: indexInFolder,
                         };
                     }
                 }
@@ -50,7 +57,8 @@ const resolveFile = async (
         }
     } catch {}
 
-    return await resolveFile(ipfs, prefixPath, join(path, '../'));
+    log.debug('shortening to', join(path, '../'));
+    return await resolveFile(ipfs, prefixPath, join(path, '../'), index - 1);
 };
 
 export const handleRequest = NextHandler(async (request, response) => {
