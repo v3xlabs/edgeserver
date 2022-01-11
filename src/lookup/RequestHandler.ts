@@ -13,7 +13,6 @@ const resolveFile = async (
     path: string,
     index = 0
 ): Promise<{ fileType: string; path: string } | undefined> => {
-    if (path.length < 2) return undefined;
     if (index > 10) return undefined;
 
     log.debug('resolving', path);
@@ -56,6 +55,8 @@ const resolveFile = async (
             }
         }
     } catch {}
+
+    if (path.length < 2) return undefined;
 
     log.debug('shortening to', join(path, '../'));
     return await resolveFile(ipfs, prefixPath, join(path, '../'), index - 1);
