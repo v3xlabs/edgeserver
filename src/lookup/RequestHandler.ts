@@ -1,65 +1,71 @@
 import { DB } from '../Data';
 import { DomainNotFound, FileNotFound } from '../presets/RejectMessages';
 import { NextHandler } from './NextHandler';
-import { request as httpRequest } from 'node:http';
-import { join, basename } from 'node:path';
 import { log } from '../util/logging';
-import { create, IPFSHTTPClient } from 'ipfs-http-client';
-import { StatResult } from 'ipfs-core-types/src/files';
+import axios from 'axios';
+import { finished } from 'node:stream/promises';
+import { join } from 'node:path';
 
-const resolveFile = async (
-    ipfs: IPFSHTTPClient,
-    prefixPath: string,
-    path: string,
-    index = 0
-): Promise<{ fileType: string; path: string } | undefined> => {
-    if (index > 10) return undefined;
+const traverseFolderUntilExists = async (bucket_name: string, path: string) => {
+    if (path == '/') return;
 
-    log.debug('resolving', path);
+    const data = await axios.get(
+        'http://localhost:8000/buckets/' + bucket_name + '/exists?path=' + path
+    );
 
-    try {
-        let fileAtPath = await ipfs.resolve(join(prefixPath, path));
-        log.debug('fileAtPath', fileAtPath);
+    if (data.status == 200 && data.data.type == 'directory') return path;
 
-        const ipfsFile = await ipfs.files.stat(fileAtPath, {});
-        if (ipfsFile && ipfsFile.type === 'file') {
-            return {
-                fileType: basename(path),
-                path: fileAtPath,
-            };
-        }
+    return traverseFolderUntilExists(bucket_name, join(path, '..'));
+};
 
-        if (ipfsFile.type === 'directory') {
-            try {
-                const indexInFolderPath = join(prefixPath, path, 'index.html');
-                const indexInFolder = await ipfs.resolve(indexInFolderPath);
-                log.debug('indexInFolder', indexInFolder);
-                if (indexInFolder) {
-                    const ipfsIndexInFolder = await ipfs.files.stat(
-                        indexInFolder,
-                        {}
-                    );
-                    log.debug('ipfsIndexInFolder', indexInFolder);
-                    if (
-                        ipfsIndexInFolder &&
-                        ipfsIndexInFolder.type === 'file'
-                    ) {
-                        return {
-                            fileType: basename(indexInFolderPath),
-                            path: indexInFolder,
-                        };
-                    }
-                }
-            } catch (error) {
-                log.debug('No index.html found', error);
+const getFileOrIndex = async (cid: string, path: string) => {
+    const f = await Promise.allSettled([
+        axios.get(
+            'http://localhost:8000/buckets/' + cid + '/exists?path=' + path,
+            {
+                validateStatus: (status) => true
             }
-        }
-    } catch {}
+        ),
+        axios.get(
+            'http://localhost:8000/buckets/' + cid + '/get?path=' + path,
+            {
+                method: 'get',
+                responseType: 'stream',
+                validateStatus: (status) => true,
+            }
+        ),
+    ]);
 
-    if (path.length < 2) return undefined;
+    // If either error, reject
+    if (f[0].status == 'rejected') return;
+    if (f[1].status == 'rejected') return;
 
-    log.debug('shortening to', join(path, '../'));
-    return await resolveFile(ipfs, prefixPath, join(path, '../'), index - 1);
+    log.debug(f[0].value.status.toString());
+
+    //
+    if (f[0].value.status == 200 && f[0].value.data.type !== 'directory') return f[1].value;
+
+    let index_ = 0;
+
+    while (path.length > 1) {
+        if (index_ > 0)
+            path = join(path, '..');
+
+        log.debug('shipping index i guess ', path);
+        const index = await axios.get(
+            'http://localhost:8000/buckets/' +
+            cid +
+            '/get?path=' +
+            join(path, '.', 'index.html'),
+            {
+                method: 'get',
+                responseType: 'stream',
+                validateStatus: (status) => true,
+            }
+        );
+        if (index.status == 200) return index;
+        index_++;
+    }
 };
 
 export const handleRequest = NextHandler(async (request, response) => {
@@ -75,50 +81,25 @@ export const handleRequest = NextHandler(async (request, response) => {
     // Reject if the host does not exist
     if (!a) return DomainNotFound(request.hostname + request.path);
 
-    const ipfs = create({
-        url: process.env.IPFS_API || 'http://localhost:5001',
-    });
+    const path = request.path == '/' ? '/index.html' : request.path;
 
     // Verify if file exists on IPFS node
-    const nextPath = await resolveFile(ipfs, a.cid, request.path);
+    const fa = await getFileOrIndex(a.cid, path);
+    if (!fa) return FileNotFound(request.path);
 
-    if (!nextPath || nextPath.path.length === 0)
-        return FileNotFound(request.path);
+    if (fa.status == 201) return DomainNotFound(request.hostname);
+    if (fa.status == 404) return FileNotFound(request.path);
+    if (fa.status != 200) return DomainNotFound(request.hostname);
 
-    const mimeType = nextPath.fileType;
-    log.debug({ mimeType });
-
-    // Setup headers
-    response.contentType(mimeType);
+    // log.debug(f.ok);
+    // if (!f.ok) return;
     response.setHeader('Cache-Control', 'max-age=60');
-    if (process.env.ADD_HEADER) {
-        response.setHeader('x-ipfs-path', nextPath.path);
-    }
+    log.debug(fa.headers['content-type']);
+    response.type(fa.headers['content-type']);
 
-    // Fetch file from IPFS Endpoint
-    await new Promise<void>((accept) => {
-        var contentRequest = httpRequest(
-            join(process.env.IPFS_IP || 'http://127.0.0.1:8080', nextPath.path),
-            (incomming) => {
-                // for (const a of Object.keys(incomming.headers)) {
-                //     if (a.toLowerCase() === 'content-type') continue;
-                //     response.setHeader(a, incomming.headers[a]);
-                // }
-                incomming.on('data', (chunk) => {
-                    response.write(chunk);
-                });
-                incomming.on('end', () => {
-                    accept();
-                });
-            }
-        );
-        contentRequest.on('error', (error) => {
-            log.error(error);
-            response.write('oops');
-            response.end();
-        });
-        contentRequest.end();
-    });
+    await fa.data.pipe(response);
+    await finished(fa.data);
+
     response.end();
     return 0;
 });
