@@ -1,4 +1,4 @@
 export type AuthKey = {
     key: string;
-    owner_id: Long;
+    owner_id: BigInt;
 };

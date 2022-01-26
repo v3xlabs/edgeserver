@@ -1,10 +1,11 @@
+import axios from 'axios';
+import { join } from 'node:path';
+import { finished } from 'node:stream/promises';
+
 import { DB } from '../Data';
 import { DomainNotFound, FileNotFound } from '../presets/RejectMessages';
-import { NextHandler } from './NextHandler';
 import { log } from '../util/logging';
-import axios from 'axios';
-import { finished } from 'node:stream/promises';
-import { join } from 'node:path';
+import { NextHandler } from './NextHandler';
 
 const traverseFolderUntilExists = async (bucket_name: string, path: string) => {
     if (path == '/') return;
@@ -23,7 +24,7 @@ const getFileOrIndex = async (cid: string, path: string) => {
         axios.get(
             'http://localhost:8000/buckets/' + cid + '/exists?path=' + path,
             {
-                validateStatus: (status) => true
+                validateStatus: (status) => true,
             }
         ),
         axios.get(
@@ -37,33 +38,36 @@ const getFileOrIndex = async (cid: string, path: string) => {
     ]);
 
     // If either error, reject
-    if (f[0].status == 'rejected') return;
-    if (f[1].status == 'rejected') return;
+    if (f.at(0).status == 'rejected') return;
 
-    log.debug(f[0].value.status.toString());
+    if (f.at(1).status == 'rejected') return;
+
+    log.debug(f.at(0).value.status.toString());
 
     //
-    if (f[0].value.status == 200 && f[0].value.data.type !== 'directory') return f[1].value;
+    if (f.at(0).value.status == 200 && f.at(0).value.data.type !== 'directory')
+        return f.at(1).value;
 
     let index_ = 0;
 
     while (path.length > 1) {
-        if (index_ > 0)
-            path = join(path, '..');
+        if (index_ > 0) path = join(path, '..');
 
         log.debug('shipping index i guess ', path);
         const index = await axios.get(
             'http://localhost:8000/buckets/' +
-            cid +
-            '/get?path=' +
-            join(path, '.', 'index.html'),
+                cid +
+                '/get?path=' +
+                join(path, '.', 'index.html'),
             {
                 method: 'get',
                 responseType: 'stream',
                 validateStatus: (status) => true,
             }
         );
+
         if (index.status == 200) return index;
+
         index_++;
     }
 };
@@ -85,10 +89,13 @@ export const handleRequest = NextHandler(async (request, response) => {
 
     // Verify if file exists on IPFS node
     const fa = await getFileOrIndex(a.cid, path);
+
     if (!fa) return FileNotFound(request.path);
 
     if (fa.status == 201) return DomainNotFound(request.hostname);
+
     if (fa.status == 404) return FileNotFound(request.path);
+
     if (fa.status != 200) return DomainNotFound(request.hostname);
 
     // log.debug(f.ok);
@@ -101,5 +108,6 @@ export const handleRequest = NextHandler(async (request, response) => {
     await finished(fa.data);
 
     response.end();
+
     return 0;
 });

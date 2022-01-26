@@ -1,3 +1,3 @@
 export type Owner = {
-    user_id: Long;
-}
+    user_id: BigInt;
+};

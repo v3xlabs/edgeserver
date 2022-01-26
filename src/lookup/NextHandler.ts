@@ -1,4 +1,5 @@
-import { Request, Response, RequestHandler } from 'express';
+import { Request, RequestHandler, Response } from 'express';
+
 import { VersionFooter } from '../presets/RejectMessages';
 import { log } from '../util/logging';
 
@@ -15,9 +16,12 @@ export const NextHandler: (
 ) => RequestHandler = (_function) => {
     return async (request, response, next) => {
         try {
-            let result = await _function(request, response);
+            const result = await _function(request, response);
+
             if (typeof result == 'undefined') return next();
+
             if (result === 0) return;
+
             log.network(result);
             response.status(result.status);
             response.type('text/plain');

@@ -1,18 +1,19 @@
+import axios from 'axios';
 import { Router } from 'express';
-import { AuthRequest, useAuth } from '../../auth/useAuth';
-import { log } from '../../util/logging';
 import fileUpload, { UploadedFile } from 'express-fileupload';
-import { Extract } from 'unzipper';
+import FormData from 'form-data';
+import Long from 'long';
 import { createReadStream, rmSync } from 'node:fs';
+import { statSync } from 'node:fs';
+import { readdir, rm } from 'node:fs/promises';
+import { join, normalize } from 'node:path';
+import { Extract } from 'unzipper';
 import { useYup, UseYupRequest } from 'use-yup';
 import * as yup from 'yup';
+
+import { AuthRequest, useAuth } from '../../auth/useAuth';
 import { DB } from '../../Data';
-import Long from 'long';
-import { rm, readdir } from 'node:fs/promises';
-import { statSync } from 'node:fs';
-import axios from 'axios';
-import FormData from 'form-data';
-import { join, normalize } from 'node:path';
+import { log } from '../../util/logging';
 
 export const DeploymentRouter = Router();
 
@@ -39,6 +40,7 @@ const createBucket = async () => {
 const uploadFile = async (bucket_name: string, path: string, file: string) => {
     const f = createReadStream(file);
     const formData = new FormData();
+
     formData.append('file', f);
 
     await axios.post(
@@ -59,8 +61,10 @@ const uploadDirectory = async (
     log.debug({ bucket_name, prefix, path });
 
     const list = await readdir(path);
+
     for (const entry of list) {
         const data = statSync(join(path, entry));
+
         if (data.isDirectory()) {
             log.debug('dir ' + entry);
             // await axios.get(
@@ -75,6 +79,7 @@ const uploadDirectory = async (
                 join(path, entry)
             );
         }
+
         if (data.isFile()) {
             log.debug('file', entry);
             await uploadFile(
@@ -101,15 +106,18 @@ DeploymentRouter.put(
 
         if (!site) return '';
 
-        const files = request.files;
+        const { files } = request;
 
         if (!files) return '';
+
         if (!Object.keys(files).includes('data')) return '';
 
         const file = files['data'] as UploadedFile;
+
         log.debug({ file });
 
         const feee = createReadStream(file.tempFilePath);
+
         feee.pipe(Extract({ path: 'tmp/test' }));
 
         await new Promise<void>((accept) => {
@@ -122,6 +130,7 @@ DeploymentRouter.put(
 
         // create bucket
         const cid = await createBucket();
+
         log.database('fff', cid);
 
         await new Promise<void>((accept) => setTimeout(accept, 1000));

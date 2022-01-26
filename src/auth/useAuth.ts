@@ -1,5 +1,6 @@
-import { Request, RequestHandler, Response } from 'express';
-import { decode, verify } from 'jsonwebtoken';
+import { Request, RequestHandler } from 'express';
+import { decode } from 'jsonwebtoken';
+
 import { DB } from '../Data';
 import { NextHandler } from '../lookup/NextHandler';
 import { Malformat, NoPermission } from '../presets/RejectMessages';
@@ -7,13 +8,14 @@ import { log } from '../util/logging';
 
 export type AuthRequest = Request & {
     auth: {
-        user_id: Long;
+        user_id: BigInt;
     };
 };
 
 export const useAuth: RequestHandler = NextHandler(
     async (request: AuthRequest, response) => {
         if (!request.headers.authorization) return NoPermission();
+
         let auth = request.headers.authorization;
 
         if (auth.toLowerCase().startsWith('bearer ')) {
@@ -23,7 +25,9 @@ export const useAuth: RequestHandler = NextHandler(
         const decoded = decode(auth) as { account: string; value: number };
 
         if (!decoded) return NoPermission();
+
         if (!decoded['account']) return Malformat();
+
         if (!decoded['value']) return Malformat();
 
         // if (verify(auth, process.env.SIGNAL_MASTER)) return Malformat();
@@ -33,6 +37,7 @@ export const useAuth: RequestHandler = NextHandler(
         });
 
         if (!key) return NoPermission();
+
         if (key.owner_id.toString() !== decoded.account) return NoPermission();
 
         request.auth = {

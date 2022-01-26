@@ -9,5 +9,6 @@ export const createKey = async (account: string) => {
         },
         process.env.SIGNAL_MASTER
     );
+
     return { key, random };
 };

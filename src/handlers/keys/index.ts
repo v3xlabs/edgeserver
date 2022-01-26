@@ -1,16 +1,19 @@
 import { ErrorRequestHandler, RequestHandler, Router } from 'express';
 import { useYup } from 'use-yup';
-import { GET } from './create';
 import * as yup from 'yup';
+
 import { VersionFooter } from '../../presets/RejectMessages';
+import { GET } from './create';
 
 export const KeyRouter = Router();
 
 const useAuth: (handler: RequestHandler) => RequestHandler =
     (handler) => (request, response, next) => {
         if (!request.headers.authorization) return next();
+
         if (request.headers.authorization !== process.env.SIGNAL_MASTER)
             return next();
+
         handler(request, response, next);
     };
 

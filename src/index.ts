@@ -1,11 +1,12 @@
-import Express from 'express';
 import { config } from 'dotenv';
+import Express from 'express';
+
+import { useHost } from './auth/useHost';
 import { initDB } from './Data';
+import { DeploymentRouter } from './handlers/deployments';
+import { KeyRouter } from './handlers/keys';
 import { handleRequest } from './lookup/RequestHandler';
 import { log } from './util/logging';
-import { KeyRouter } from './handlers/keys';
-import { DeploymentRouter } from './handlers/deployments';
-import { useHost } from './auth/useHost';
 
 config();
 

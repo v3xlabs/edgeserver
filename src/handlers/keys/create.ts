@@ -1,10 +1,11 @@
-import { RequestHandler } from 'express';
-import { createKey } from '../../auth/createKey';
-import { UseYupRequest } from 'use-yup';
-import { CreateQuery } from './';
-import { log } from '../../util/logging';
-import { DB } from '../../Data';
 import { types } from 'cassandra-driver';
+import { RequestHandler } from 'express';
+import { UseYupRequest } from 'use-yup';
+
+import { createKey } from '../../auth/createKey';
+import { DB } from '../../Data';
+import { log } from '../../util/logging';
+import { CreateQuery } from './';
 
 export const GET: RequestHandler = async (
     request: UseYupRequest<typeof CreateQuery>,
@@ -15,8 +16,10 @@ export const GET: RequestHandler = async (
     const user = await DB.selectOneFrom('owners', ['user_id'], {
         user_id: types.Long.fromNumber(request.yupData.account),
     });
+
     if (!user) {
         response.status(400).send('User does not exist');
+
         return;
     }
 

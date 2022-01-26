@@ -1,4 +1,5 @@
 import { ScylloClient } from 'scyllo';
+
 import { AuthKey } from './types/AuthKey.type';
 import { Owner } from './types/Owner.type';
 import { Site } from './types/Site.type';
@@ -15,7 +16,7 @@ export const DB = new ScylloClient<{
     client: {
         contactPoints: [process.env.DB_IP || 'localhost:9042'],
         localDataCenter: process.env.DB_DATACENTER || 'datacenter1',
-        keyspace: 'system'
+        keyspace: 'system',
     },
     debug: false,
 });
@@ -41,7 +42,7 @@ export const initDB = async () => {
         'sites',
         true,
         {
-            host: {type: 'text'},
+            host: { type: 'text' },
             owner: { type: 'bigint' },
             site_id: { type: 'bigint' },
             cid: { type: 'text' },
