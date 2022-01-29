@@ -4,6 +4,7 @@ import { finished } from 'node:stream/promises';
 
 import { DB } from '../Data';
 import { DomainNotFound, FileNotFound } from '../presets/RejectMessages';
+import { Globals } from '../util/Globals';
 import { log } from '../util/logging';
 import { NextHandler } from './NextHandler';
 
@@ -11,7 +12,11 @@ const traverseFolderUntilExists = async (bucket_name: string, path: string) => {
     if (path == '/') return;
 
     const data = await axios.get(
-        'http://localhost:8000/buckets/' + bucket_name + '/exists?path=' + path
+        Globals.SIGNALFS_HOST +
+            '/buckets/' +
+            bucket_name +
+            '/exists?path=' +
+            path
     );
 
     if (data.status == 200 && data.data.type == 'directory') return path;
@@ -22,13 +27,13 @@ const traverseFolderUntilExists = async (bucket_name: string, path: string) => {
 const getFileOrIndex = async (cid: string, path: string) => {
     const f = await Promise.allSettled([
         axios.get(
-            'http://localhost:8000/buckets/' + cid + '/exists?path=' + path,
+            Globals.SIGNALFS_HOST + '/buckets/' + cid + '/exists?path=' + path,
             {
                 validateStatus: (status) => true,
             }
         ),
         axios.get(
-            'http://localhost:8000/buckets/' + cid + '/get?path=' + path,
+            Globals.SIGNALFS_HOST + '/buckets/' + cid + '/get?path=' + path,
             {
                 method: 'get',
                 responseType: 'stream',
@@ -55,7 +60,8 @@ const getFileOrIndex = async (cid: string, path: string) => {
 
         log.debug('shipping index i guess ', path);
         const index = await axios.get(
-            'http://localhost:8000/buckets/' +
+            Globals.SIGNALFS_HOST +
+                '/buckets/' +
                 cid +
                 '/get?path=' +
                 join(path, '.', 'index.html'),

@@ -13,6 +13,7 @@ import * as yup from 'yup';
 
 import { AuthRequest, useAuth } from '../../auth/useAuth';
 import { DB } from '../../Data';
+import { Globals } from '../../util/Globals';
 import { log } from '../../util/logging';
 
 export const DeploymentRouter = Router();
@@ -29,7 +30,7 @@ const SiteQuery = yup.object({
 });
 
 const createBucket = async () => {
-    const request = await axios.post('http://localhost:8000/buckets', {
+    const request = await axios.post(Globals.SIGNALFS_HOST + '/buckets', {
         validateStatus: false,
     });
 
@@ -44,7 +45,7 @@ const uploadFile = async (bucket_name: string, path: string, file: string) => {
     formData.append('file', f);
 
     await axios.post(
-        'http://localhost:8000/buckets/' + bucket_name + '/put?path=' + path,
+        Globals.SIGNALFS_HOST + '/buckets/' + bucket_name + '/put?path=' + path,
         formData,
         {
             headers: formData.getHeaders(),
@@ -101,12 +102,12 @@ DeploymentRouter.put(
     ) => {
         const id = request.yupData.site;
         const site = await DB.selectOneFrom('sites', ['site_id'], {
-            site_id: Long.fromString(id),
+            site_id: id,
         });
 
         if (!site) return '';
 
-        const { files } = request;
+        const { files, auth } = request;
 
         if (!files) return '';
 
@@ -164,7 +165,7 @@ DeploymentRouter.put(
             {
                 cid: cid,
             },
-            { site_id: Long.fromString(id) }
+            { site_id: id }
         );
 
         // log.debug({c});
@@ -174,7 +175,7 @@ DeploymentRouter.put(
         //     log.debug({ file });
         // }
 
-        response.send('Hello ' + request.auth.user_id + ' ' + cid);
+        response.send('Hello ' + auth.user_id + ' ' + cid);
         // response.send('hi');
     }
 );
