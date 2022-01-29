@@ -15,5 +15,7 @@
     "env": {
         "node": true
     },
-    "rules": {}
+    "rules": {
+        "prefer-at": "off"
+    }
 }

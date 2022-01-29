@@ -25,7 +25,7 @@ const traverseFolderUntilExists = async (bucket_name: string, path: string) => {
 };
 
 const getFileOrIndex = async (cid: string, path: string) => {
-    const f = await Promise.allSettled([
+    const [existsRequest, getRequest] = await Promise.allSettled([
         axios.get(
             Globals.SIGNALFS_HOST + '/buckets/' + cid + '/exists?path=' + path,
             {
@@ -43,15 +43,18 @@ const getFileOrIndex = async (cid: string, path: string) => {
     ]);
 
     // If either error, reject
-    if (f.at(0).status == 'rejected') return;
+    if (existsRequest.status == 'rejected') return;
 
-    if (f.at(1).status == 'rejected') return;
+    if (getRequest.status == 'rejected') return;
 
-    log.debug(f.at(0).value.status.toString());
+    log.debug(existsRequest.value.status.toString());
 
     //
-    if (f.at(0).value.status == 200 && f.at(0).value.data.type !== 'directory')
-        return f.at(1).value;
+    if (
+        existsRequest.value.status == 200 &&
+        existsRequest.value.data.type !== 'directory'
+    )
+        return getRequest.value;
 
     let index_ = 0;
 
