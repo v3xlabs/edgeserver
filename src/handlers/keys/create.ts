@@ -14,7 +14,7 @@ export const GET: RequestHandler = async (
     log.debug(request.yupData);
     // Verify the user exists
     const user = await DB.selectOneFrom('owners', ['user_id'], {
-        user_id: types.Long.fromNumber(request.yupData.account),
+        user_id: BigInt(request.yupData.account),
     });
 
     if (!user) {
@@ -31,7 +31,7 @@ export const GET: RequestHandler = async (
     // Push key to DB
     DB.insertInto('keys', {
         key: key.random.toString(),
-        owner_id: types.Long.fromNumber(user.user_id.toNumber()),
+        owner_id: user.user_id,
     });
 
     // Send key back to user
