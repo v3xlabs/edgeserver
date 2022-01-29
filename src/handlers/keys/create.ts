@@ -31,7 +31,7 @@ export const GET: RequestHandler = async (
     // Push key to DB
     DB.insertInto('keys', {
         key: key.random.toString(),
-        owner_id: BigInt(user.user_id.toString()),
+        owner_id: user.user_id.toString(),
     });
 
     // Send key back to user

@@ -1,3 +1,3 @@
 export type Owner = {
-    user_id: BigInt;
+    user_id: string;
 };

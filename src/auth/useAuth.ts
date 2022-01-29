@@ -8,7 +8,7 @@ import { log } from '../util/logging';
 
 export type AuthRequest = Request & {
     auth: {
-        user_id: BigInt;
+        user_id: string;
     };
 };
 
