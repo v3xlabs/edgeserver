@@ -1,58 +1,54 @@
-import * as Sentry from '@sentry/node';
-import * as Tracing from '@sentry/tracing';
+import { startTransaction } from '@sentry/node';
+import { Transaction } from '@sentry/types';
 import { config } from 'dotenv';
-import Express from 'express';
+import { fastify } from 'fastify';
+import { fastifyRequestContextPlugin } from 'fastify-request-context';
 
-import { useHost } from './auth/useHost';
-import { initDB } from './Data';
-import { DeploymentRouter } from './handlers/deployments';
-import { KeyRouter } from './handlers/keys';
-import { handleRequest } from './lookup/RequestHandler';
+import { initDB } from './database';
+import { GenericRoute } from './routes/generic';
+import { GenericStorage } from './storage/GenericStorage';
+import { SignalStorage } from './storage/SignalFS';
 import { log } from './util/logging';
+import { setupSentry } from './util/sentry/setupSentry';
+import { setupLogger } from './util/setupLogger';
 
 config();
-
-export const shouldSentry = !!process.env.SENTRY_DSN;
 
 export const Globals = {
     SIGNALFS_HOST: process.env.SIGNALFS_IP || '0.0.0.0:8000',
 };
 
+export const StorageBackend: GenericStorage = new SignalStorage();
+
 (async () => {
-    const app = Express();
+    const server = fastify();
+
+    setupLogger(server, log);
 
     /* Initiate Error Handling */
-    if (shouldSentry) {
-        log.lifecycle('Initializing Sentry for environment ' + 'dev-luc');
-        Sentry.init({
-            dsn: process.env.SENTRY_DSN,
-            tracesSampleRate: 1,
-            environment: 'dev-luc',
-            integrations: [
-                new Sentry.Integrations.Http({ tracing: true }),
-                new Tracing.Integrations.Express({
-                    // to trace all requests to the default router
-                    app,
-                    // alternatively, you can specify the routes you want to trace:
-                    // router: someRouter,
-                }),
-            ],
-        });
-    }
+    setupSentry();
 
     await initDB();
 
     log.lifecycle('Starting Express');
 
-    app.use(Sentry.Handlers.requestHandler());
+    // server.register((server ))
 
-    app.use('/keys', useHost(KeyRouter));
-    app.use('/deployments', useHost(DeploymentRouter));
-    app.use(handleRequest);
+    // server.register(fastifyRequestContextPlugin, {
+    //     hook: 'preValidation',
+    //     defaultStoreValues: {
+    //         transaction: undefined as Transaction,
+    //     },
+    // });
 
-    app.use(Sentry.Handlers.errorHandler());
+    server.register(GenericRoute);
+    // app.use('/keys', useHost(KeyRouter));
+    // app.use('/deployments', useHost(DeploymentRouter));
+    // app.use(handleRequest);
 
-    app.listen(1234, () => {
+    // app.use(Sentry.Handlers.errorHandler());
+
+    server.listen(1234, '0.0.0.0', () => {
         log.lifecycle('Done ✨');
     });
 })();

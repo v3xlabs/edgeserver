@@ -5,7 +5,7 @@ import { Request, RequestHandler, Response } from 'express';
 
 import { shouldSentry } from '..';
 import { RejectReason, RejectReasons } from '../net/RejectResponse';
-import { log } from '../util/logging';
+import { log } from '../../util/logging';
 
 export const NextHandler: (
     _function: (

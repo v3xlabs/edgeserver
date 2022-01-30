@@ -7,7 +7,7 @@ import { finished } from 'node:stream/promises';
 import { Globals } from '..';
 import { DB } from '../Data';
 import { RejectReason } from '../net/RejectResponse';
-import { log } from '../util/logging';
+import { log } from '../../util/logging';
 import { NextHandler } from './NextHandler';
 
 const traverseFolderUntilExists = async (bucket_name: string, path: string) => {

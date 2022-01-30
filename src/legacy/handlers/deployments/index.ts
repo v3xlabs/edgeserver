@@ -11,10 +11,10 @@ import { Extract } from 'unzipper';
 import { useYup, UseYupRequest } from 'use-yup';
 import * as yup from 'yup';
 
-import { Globals } from '../..';
+import { Globals } from '../../..';
 import { AuthRequest, useAuth } from '../../auth/useAuth';
-import { DB } from '../../Data';
-import { log } from '../../util/logging';
+import { DB } from '../../../database';
+import { log } from '../../../util/logging';
 
 export const DeploymentRouter = Router();
 

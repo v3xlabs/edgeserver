@@ -4,7 +4,7 @@ import { decode } from 'jsonwebtoken';
 import { DB } from '../Data';
 import { NextHandler } from '../lookup/NextHandler';
 import { RejectReason, RejectReasons } from '../net/RejectResponse';
-import { log } from '../util/logging';
+import { log } from '../../util/logging';
 
 export type AuthRequest = Request & {
     auth: {

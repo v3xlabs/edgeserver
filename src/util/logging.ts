@@ -32,5 +32,5 @@ export const log = createLogger(
             divider: chalk.rgb(0, 255, 255)` | `,
         },
     },
-    { padding: 'PREPEND', paddingChar: chalk.black`x`, exclude: [] }
+    { padding: 'PREPEND', paddingChar: chalk.black` `, exclude: [] }
 );

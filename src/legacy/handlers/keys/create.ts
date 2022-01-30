@@ -3,9 +3,9 @@ import { RequestHandler } from 'express';
 import { UseYupRequest } from 'use-yup';
 
 import { createKey } from '../../auth/createKey';
-import { DB } from '../../Data';
-import { log } from '../../util/logging';
-import { CreateQuery } from './';
+import { DB } from '../../../database';
+import { log } from '../../../util/logging';
+import { CreateQuery } from '.';
 
 export const GET: RequestHandler = async (
     request: UseYupRequest<typeof CreateQuery>,
