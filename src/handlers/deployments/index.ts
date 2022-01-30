@@ -11,9 +11,9 @@ import { Extract } from 'unzipper';
 import { useYup, UseYupRequest } from 'use-yup';
 import * as yup from 'yup';
 
+import { Globals } from '../..';
 import { AuthRequest, useAuth } from '../../auth/useAuth';
 import { DB } from '../../Data';
-import { Globals } from '../../util/Globals';
 import { log } from '../../util/logging';
 
 export const DeploymentRouter = Router();
@@ -125,9 +125,13 @@ DeploymentRouter.put(
             feee.on('close', accept);
         });
 
+        log.debug('finished extracting');
+
         await rm(file.tempFilePath);
 
         const handPath = 'sites/' + site.site_id;
+
+        log.debug('creating bucket');
 
         // create bucket
         const cid = await createBucket();

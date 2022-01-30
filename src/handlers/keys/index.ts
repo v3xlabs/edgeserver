@@ -2,7 +2,6 @@ import { ErrorRequestHandler, RequestHandler, Router } from 'express';
 import { useYup } from 'use-yup';
 import * as yup from 'yup';
 
-import { VersionFooter } from '../../presets/RejectMessages';
 import { GET } from './create';
 
 export const KeyRouter = Router();
@@ -31,7 +30,7 @@ const errorHandler: ErrorRequestHandler = (error, request, response, next) => {
     if (error) {
         response.status(500);
         response.type('text/plain');
-        response.send(error.toString() + '\n' + VersionFooter);
+        response.send(error.toString());
     }
 };
 

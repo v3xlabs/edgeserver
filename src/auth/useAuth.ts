@@ -3,7 +3,7 @@ import { decode } from 'jsonwebtoken';
 
 import { DB } from '../Data';
 import { NextHandler } from '../lookup/NextHandler';
-import { Malformat, NoPermission } from '../presets/RejectMessages';
+import { RejectReason, RejectReasons } from '../net/RejectResponse';
 import { log } from '../util/logging';
 
 export type AuthRequest = Request & {
@@ -14,7 +14,11 @@ export type AuthRequest = Request & {
 
 export const useAuth: RequestHandler = NextHandler(
     async (request: AuthRequest, response) => {
-        if (!request.headers.authorization) return NoPermission();
+        if (!request.headers.authorization)
+            throw new RejectReason(
+                'MALFORMAT',
+                'Authorization header was missing'
+            );
 
         let auth = request.headers.authorization;
 
@@ -24,11 +28,20 @@ export const useAuth: RequestHandler = NextHandler(
 
         const decoded = decode(auth) as { account: string; value: number };
 
-        if (!decoded) return NoPermission();
+        if (!decoded)
+            throw new RejectReason('FORBIDDEN', 'Incorrect decoded payload');
 
-        if (!decoded['account']) return Malformat();
+        if (!decoded['account'])
+            throw new RejectReason(
+                'FORBIDDEN',
+                'Key "acount" was missing from payload'
+            );
 
-        if (!decoded['value']) return Malformat();
+        if (!decoded['value'])
+            throw new RejectReason(
+                'FORBIDDEN',
+                'Key "value" was missing from payload'
+            );
 
         // if (verify(auth, process.env.SIGNAL_MASTER)) return Malformat();
 
@@ -36,9 +49,10 @@ export const useAuth: RequestHandler = NextHandler(
             key: decoded.value.toString(),
         });
 
-        if (!key) return NoPermission();
+        if (!key) throw new RejectReason('FORBIDDEN', 'Not owner of Site');
 
-        if (key.owner_id.toString() !== decoded.account) return NoPermission();
+        if (key.owner_id.toString() !== decoded.account)
+            throw new RejectReason('FORBIDDEN', 'Not owner of Site v2');
 
         request.auth = {
             user_id: key.owner_id,
