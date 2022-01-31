@@ -11,6 +11,8 @@ export type ResolveData = {
     path: string;
 };
 
+export type TraceFunction = (v: () => Promise<void>) => Promise<void>;
+
 export interface GenericStorage {
     get(bucket_name: string, path: string): Promise<FileData | undefined>;
     exists(
@@ -21,5 +23,12 @@ export interface GenericStorage {
         bucket_name: string,
         path: string
     ): Promise<ResolveData | undefined>;
-    put(bucket_name: string, path: string, write: Writable): Promise<void>;
+    put(bucket_name: string, path: string, write: Readable): Promise<void>;
+    createBucket(): Promise<string>;
+    uploadDirectory(
+        bucket_name: string,
+        prefix: string,
+        path: string,
+        traceHandler?: TraceFunction
+    ): Promise<void>;
 }

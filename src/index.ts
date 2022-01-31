@@ -6,6 +6,7 @@ import { fastify } from 'fastify';
 
 import { initDB } from './database';
 import { GenericRoute } from './routes/generic';
+import { CreateRoute } from './routes/protected/create';
 import { GenericStorage } from './storage/GenericStorage';
 import { SignalStorage } from './storage/SignalFS';
 import { log } from './util/logging';
@@ -13,6 +14,10 @@ import { setupSentry } from './util/sentry/setupSentry';
 import { setupLogger } from './util/setupLogger';
 
 config();
+
+const obfusicate = (value: string) => {
+    return '*'.repeat(value.length);
+};
 
 export const Globals = {
     SIGNALFS_HOST: process.env.SIGNALFS_IP || '0.0.0.0:8000',
@@ -32,7 +37,7 @@ export const StorageBackend: GenericStorage = new SignalStorage();
         'Starting the system with the following configuration',
         'ENVIRONMENT ' + chalk.gray(Globals.ENVIRONMENT),
         'SIGNALFS_HOST ' + chalk.gray(Globals.SIGNALFS_HOST),
-        'DB_IP ' + chalk.gray(Globals.DB_IP),
+        'DB_IP ' + chalk.gray(obfusicate(Globals.DB_IP)),
         'DB_DATACENTER ' + chalk.gray(Globals.DB_DATACENTER),
         'SIGNAL_MASTER ' +
             (Globals.SIGNAL_MASTER
@@ -40,7 +45,7 @@ export const StorageBackend: GenericStorage = new SignalStorage();
                 : chalk.red('MISSING')),
         'SENTRY_DSN ' +
             (Globals.SENTRY_DSN
-                ? chalk.gray(Globals.SENTRY_DSN)
+                ? chalk.gray(obfusicate(Globals.SENTRY_DSN))
                 : chalk.red('MISSING')),
         'SAMPLE RATE ' + chalk.gray(Globals.SENTRY_SAMPLE_RATE)
     );
@@ -67,6 +72,7 @@ export const StorageBackend: GenericStorage = new SignalStorage();
     // });
 
     server.register(GenericRoute);
+    server.register(CreateRoute, { prefix: '/deployments' });
     // app.use('/keys', useHost(KeyRouter));
     // app.use('/deployments', useHost(DeploymentRouter));
     // app.use(handleRequest);

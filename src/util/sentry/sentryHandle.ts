@@ -12,12 +12,14 @@ import { Transaction, TransactionContext } from '@sentry/types';
 import { FastifyReply, FastifyRequest } from 'fastify';
 import domain from 'node:domain';
 import http from 'node:http';
+import { boolean } from 'yup';
 
 import { log } from '../logging';
 
 type SentryHandleOptions = {
     dataConsent: ParseRequestOptions;
     transactionData: TransactionContext;
+    sample?: boolean;
 };
 
 export type Poof = {
@@ -26,6 +28,7 @@ export type Poof = {
 };
 
 export const sentryHandle = (options: SentryHandleOptions) => {
+    const { dataConsent, transactionData, sample = false } = options;
     const currentHub = getCurrentHub();
     const client = currentHub.getClient<NodeClient>();
 
@@ -51,7 +54,7 @@ export const sentryHandle = (options: SentryHandleOptions) => {
 
         currentHub.configureScope((scope) => {
             scope.addEventProcessor((event: Event) =>
-                parseRequest(event, request.raw, options.dataConsent)
+                parseRequest(event, request.raw, dataConsent)
             );
             const client = currentHub.getClient<NodeClient>();
 
@@ -65,7 +68,9 @@ export const sentryHandle = (options: SentryHandleOptions) => {
             }
         });
 
-        const transaction = startTransaction(options.transactionData);
+        const transaction = startTransaction(transactionData, {
+            sample: options.sample,
+        });
 
         response.raw.once('finish', () => {
             const client = currentHub.getClient<NodeClient>();
@@ -87,7 +92,6 @@ export const sentryHandle = (options: SentryHandleOptions) => {
         const result = await next(transaction);
 
         if (result) {
-            // transaction.parentSpanId;
             transaction.setTag('reject-reason', result.logMessages.toString());
             response.status(result.status);
             response.send();

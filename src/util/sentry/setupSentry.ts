@@ -11,6 +11,9 @@ export const setupSentry = () => {
     init({
         dsn: Globals.SENTRY_DSN,
         tracesSampleRate: Globals.SENTRY_SAMPLE_RATE,
+        tracesSampler: (context) => {
+            return context.sample ? true : Globals.SENTRY_SAMPLE_RATE;
+        },
         environment: Globals.ENVIRONMENT,
         integrations: [new Integrations.Http({ tracing: true })],
     });
