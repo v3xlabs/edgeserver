@@ -1,10 +1,9 @@
 import { addBreadcrumb } from '@sentry/node';
 import { FastifyPluginAsync } from 'fastify';
-import Multipart, { MultipartFile } from 'fastify-multipart';
-import { Writable } from 'form-data';
-import { createWriteStream } from 'node:fs';
+import Multipart from 'fastify-multipart';
 import { join } from 'node:path';
-import { pipeline } from 'node:stream/promises';
+import { PassThrough } from 'node:stream';
+import { finished, pipeline } from 'node:stream/promises';
 import { generateSunflake } from 'sunflake';
 import { Extract } from 'unzipper';
 
@@ -79,17 +78,17 @@ export const CreateRoute: FastifyPluginAsync<{}> = async (router) => {
                     message: 'Downloading file from ' + request.ip,
                 });
 
+                const transport = new PassThrough({});
+
+                transport.pipe(Extract({ path: 'tmp/' + temporary_name }));
+
                 // Download file and extract to path
                 await startAction(
                     transaction,
                     {
                         op: 'Download & Unzip',
                     },
-                    () =>
-                        pipeline(
-                            data.file,
-                            Extract({ path: 'tmp/' + temporary_name })
-                        )
+                    () => pipeline(data.file, transport)
                 );
 
                 const bucket_name = await startAction(
@@ -100,27 +99,22 @@ export const CreateRoute: FastifyPluginAsync<{}> = async (router) => {
                     StorageBackend.createBucket
                 );
 
+                await finished(transport);
+                // await new Promise<void>((accumulator) =>
+                //     setImmediate(accumulator)
+                // );
+
                 await startAction(
                     transaction,
                     {
-                        op: 'Upload Directory',
+                        op: 'Upload Files',
                     },
                     async (span) => {
                         await StorageBackend.uploadDirectory(
                             bucket_name,
                             '/',
-                            'tmp/' + temporary_name,
-                            async (run) => {
-                                await startAction(
-                                    span,
-                                    {
-                                        op: 'Upload File',
-                                    },
-                                    async () => {
-                                        await run();
-                                    }
-                                );
-                            }
+                            join('tmp', temporary_name),
+                            span
                         );
                     }
                 );

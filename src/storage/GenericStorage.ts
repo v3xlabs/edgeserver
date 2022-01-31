@@ -1,4 +1,5 @@
-import { Readable, Writable } from 'node:stream';
+import { Span } from '@sentry/types';
+import { Readable } from 'node:stream';
 
 export type FileData = {
     stream: Readable;
@@ -10,8 +11,6 @@ export type ResolveData = {
     file: FileData;
     path: string;
 };
-
-export type TraceFunction = (v: () => Promise<void>) => Promise<void>;
 
 export interface GenericStorage {
     get(bucket_name: string, path: string): Promise<FileData | undefined>;
@@ -29,6 +28,6 @@ export interface GenericStorage {
         bucket_name: string,
         prefix: string,
         path: string,
-        traceHandler?: TraceFunction
+        transaction?: Span
     ): Promise<void>;
 }

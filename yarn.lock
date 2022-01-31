@@ -300,10 +300,15 @@
   dependencies:
     multiformats "^9.5.4"
 
-"@lvksh/logger@^1.4.4", "@lvksh/logger@^1.5.2":
+"@lvksh/logger@^1.4.4":
   version "1.5.2"
   resolved "https://registry.yarnpkg.com/@lvksh/logger/-/logger-1.5.2.tgz#4bdf255edf008a4e746596f1e574b77807c629fb"
   integrity sha512-BpzPz2y0K4y/u8yeOIwYKrsRgRJmPsA7RLdllLJ8kMes7up8o/xKf+9LKHul4uvZYd4xR4YoK+3MYDGwEMTOBg==
+
+"@lvksh/logger@^1.6.0":
+  version "1.6.0"
+  resolved "https://registry.yarnpkg.com/@lvksh/logger/-/logger-1.6.0.tgz#87660ccb565c7824ba1700b60881e5a029dea1cb"
+  integrity sha512-qDF2tI+xAFjZ97K3q3wsy8zeBAmNkzUL6i9VWXuG0eGE/Ocw9N5JXlIGoyM7hBZJKAe6XTXbFE/8OpBezC2Wlw==
 
 "@multiformats/base-x@^4.0.1":
   version "4.0.1"

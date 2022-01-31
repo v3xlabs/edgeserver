@@ -1,19 +1,16 @@
-import { join } from '@sentry/utils';
+import { Span } from '@sentry/types';
 import axios from 'axios';
 import FormData from 'form-data';
 import { createReadStream } from 'node:fs';
 import { statSync } from 'node:fs';
 import { readdir, rm } from 'node:fs/promises';
+import { join } from 'node:path';
 import { Readable, Writable } from 'node:stream';
 
 import { Globals } from '..';
 import { log } from '../util/logging';
-import {
-    FileData,
-    GenericStorage,
-    ResolveData,
-    TraceFunction,
-} from './GenericStorage';
+import { startAction } from '../util/sentry/createChild';
+import { FileData, GenericStorage, ResolveData } from './GenericStorage';
 
 export class SignalStorage implements GenericStorage {
     async exists(
@@ -95,8 +92,7 @@ export class SignalStorage implements GenericStorage {
     async put(
         bucket_name: string,
         path: string,
-        write: Readable,
-        traceHandler?: TraceFunction
+        write: Readable
     ): Promise<void> {
         const f = write;
         const formData = new FormData();
@@ -132,31 +128,61 @@ export class SignalStorage implements GenericStorage {
         bucket_name: string,
         prefix: string,
         path: string,
-        traceHandler: TraceFunction = (v) => v()
+        transaction: Span
     ): Promise<void> {
-        const list = await readdir(path);
+        // Index
+        const file_names = await readdir(path, {
+            withFileTypes: true,
+            encoding: 'utf-8',
+        });
 
-        for (const entry of list) {
-            const data = statSync(join(path, entry));
+        // Sort it so files get uploaded first, then directories
+        const sorted_file_names = file_names.sort(
+            (a, b) => +b.isFile() - +a.isFile()
+        );
 
-            if (data.isDirectory()) {
-                await this.uploadDirectory(
-                    bucket_name,
-                    join(prefix, entry),
-                    join(path, entry),
-                    traceHandler
+        const actions: (Promise<unknown> | unknown)[] = [];
+
+        log.debug(sorted_file_names.length);
+
+        for (const entry of sorted_file_names) {
+            if (entry.isFile()) {
+                log.debug(path + entry.name);
+                actions.push(
+                    startAction(
+                        transaction,
+                        { op: 'Upload File', description: entry.name },
+                        () =>
+                            this.put(
+                                bucket_name,
+                                join(prefix, entry.name),
+                                createReadStream(join(path, entry.name))
+                            )
+                    )
                 );
             }
 
-            if (data.isFile()) {
-                await traceHandler(async () => {
-                    await this.put(
-                        bucket_name,
-                        join(prefix, entry),
-                        createReadStream(join(path, entry))
-                    );
-                });
+            if (entry.isDirectory()) {
+                actions.push(
+                    startAction(
+                        transaction,
+                        {
+                            op: 'Upload Directory',
+                            description: entry.name,
+                        },
+                        async (span) =>
+                            this.uploadDirectory(
+                                bucket_name,
+                                join(prefix, entry.name),
+                                join(path, entry.name),
+                                span
+                            )
+                    )
+                );
             }
         }
+
+        // Execute
+        await Promise.allSettled(actions);
     }
 }
