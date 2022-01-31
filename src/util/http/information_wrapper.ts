@@ -12,14 +12,14 @@ export type InformationData = Partial<{
     data_source: 'cached' | 'live';
 }>;
 
-export const informationWrap: <T, G>(
-    handler: (data: InformationData, ...passthrough: T[]) => Promise<G>
-) => (...passthrough: T[]) => Promise<G> = (handler) => {
-    return async (trans) => {
+export const informationWrap: <T extends H[], G, H>(
+    handler: (data: InformationData, ...passthrough: T) => Promise<G>
+) => (...passthrough: T) => Promise<G> = (handler) => {
+    return async (...trans) => {
         const data: InformationData = {};
 
         try {
-            return await handler(data, trans);
+            return await handler(data, ...trans);
         } finally {
             const addressData = data.domain + data.endpoint;
 

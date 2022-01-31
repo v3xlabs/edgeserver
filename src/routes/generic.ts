@@ -1,3 +1,4 @@
+import { Transaction } from '@sentry/types';
 import { FastifyPluginAsync } from 'fastify';
 import { createReadStream } from 'node:fs';
 import { join } from 'node:path';
@@ -32,7 +33,7 @@ export const GenericRoute: FastifyPluginAsync<{}> = async (router) => {
         handle(
             request,
             reply,
-            informationWrap(async (information, transaction) => {
+            informationWrap(async (information, transaction: Transaction) => {
                 transaction.setTag('signal-ip', request.ip);
                 information.domain = request.hostname;
                 information.endpoint = request.url;

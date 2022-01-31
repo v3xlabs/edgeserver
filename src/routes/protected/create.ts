@@ -1,11 +1,12 @@
 import { addBreadcrumb } from '@sentry/node';
 import { FastifyPluginAsync } from 'fastify';
 import Multipart from 'fastify-multipart';
+import { rm } from 'node:fs/promises';
 import { join } from 'node:path';
 import { PassThrough } from 'node:stream';
 import { finished, pipeline } from 'node:stream/promises';
 import { generateSunflake } from 'sunflake';
-import { Extract } from 'unzipper';
+import { Entry, Extract, Parse } from 'unzipper';
 
 import { StorageBackend } from '../..';
 import { DB } from '../../database';
@@ -49,7 +50,7 @@ export const CreateRoute: FastifyPluginAsync<{}> = async (router) => {
             },
         },
         (request, reply) => {
-            handle(request, reply, async (transaction) => {
+            handle(request, reply, async (transaction, registerCleanup) => {
                 const data = await request.file();
                 const temporary_name = generateSnowflake();
 
@@ -78,9 +79,14 @@ export const CreateRoute: FastifyPluginAsync<{}> = async (router) => {
                     message: 'Downloading file from ' + request.ip,
                 });
 
-                const transport = new PassThrough({});
+                registerCleanup(() => {
+                    rm(join('tmp', temporary_name), { recursive: true });
+                });
 
-                transport.pipe(Extract({ path: 'tmp/' + temporary_name }));
+                const strem = Extract({
+                    concurrency: 10,
+                    path: join('tmp', temporary_name),
+                });
 
                 // Download file and extract to path
                 await startAction(
@@ -88,7 +94,10 @@ export const CreateRoute: FastifyPluginAsync<{}> = async (router) => {
                     {
                         op: 'Download & Unzip',
                     },
-                    () => pipeline(data.file, transport)
+                    async () => {
+                        data.file.pipe(strem);
+                        await strem.promise();
+                    }
                 );
 
                 const bucket_name = await startAction(
@@ -98,11 +107,6 @@ export const CreateRoute: FastifyPluginAsync<{}> = async (router) => {
                     },
                     StorageBackend.createBucket
                 );
-
-                await finished(transport);
-                // await new Promise<void>((accumulator) =>
-                //     setImmediate(accumulator)
-                // );
 
                 await startAction(
                     transaction,

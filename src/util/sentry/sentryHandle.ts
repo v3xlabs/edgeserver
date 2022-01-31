@@ -48,7 +48,10 @@ export const sentryHandle = (options: SentryHandleOptions) => {
     return async function sentryRequestMiddleware(
         request: FastifyRequest,
         response: FastifyReply,
-        next: (transaction: Transaction) => Promise<void | Poof> | void | Poof
+        next: (
+            transaction: Transaction,
+            registerCleanup: (cleanup: () => void) => void
+        ) => Promise<void | Poof> | void | Poof
     ): Promise<void> {
         const currentHub = getCurrentHub();
 
@@ -89,13 +92,25 @@ export const sentryHandle = (options: SentryHandleOptions) => {
             transaction.finish();
         });
 
-        const result = await next(transaction);
+        const cleanupFunctions: (() => void)[] = [];
+        const registerCleanup = (fnc) => {
+            cleanupFunctions.push(fnc);
+        };
 
-        if (result) {
-            transaction.setTag('reject-reason', result.logMessages.toString());
-            response.status(result.status);
-            response.send();
-            log.ok(...result.logMessages);
+        try {
+            const result = await next(transaction, registerCleanup);
+
+            if (result) {
+                transaction.setTag(
+                    'reject-reason',
+                    result.logMessages.toString()
+                );
+                response.status(result.status);
+                response.send();
+                log.ok(...result.logMessages);
+            }
+        } finally {
+            for (const function_ of cleanupFunctions) function_();
         }
     };
 };
