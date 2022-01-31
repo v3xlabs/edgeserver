@@ -1,22 +1,21 @@
 import { addBreadcrumb } from '@sentry/node';
-import { FastifyPluginAsync } from 'fastify';
+import { FastifyPluginAsync, preHandlerHookHandler } from 'fastify';
 import Multipart from 'fastify-multipart';
 import { rm } from 'node:fs/promises';
 import { join } from 'node:path';
-import { PassThrough } from 'node:stream';
-import { finished, pipeline } from 'node:stream/promises';
 import { generateSunflake } from 'sunflake';
-import { Entry, Extract, Parse } from 'unzipper';
+import { Extract } from 'unzipper';
 
 import { StorageBackend } from '../..';
 import { DB } from '../../database';
+import { useAuth } from '../../util/http/useAuth';
 import { log } from '../../util/logging';
 import { startAction } from '../../util/sentry/createChild';
 import { sentryHandle } from '../../util/sentry/sentryHandle';
 
 const generateSnowflake = generateSunflake();
 
-export const CreateRoute: FastifyPluginAsync<{}> = async (router) => {
+export const CreateRoute: FastifyPluginAsync = async (router, options) => {
     const handle = sentryHandle({
         transactionData: {
             name: 'Upload',
@@ -35,14 +34,13 @@ export const CreateRoute: FastifyPluginAsync<{}> = async (router) => {
 
     router.register(Multipart);
 
-    router.put<{
-        Querystring: {
-            site: string;
-        };
-        Headers: {
-            authorization: string;
-        };
-    }>(
+    router.put<
+        typeof options & {
+            Querystring: {
+                site: string;
+            };
+        }
+    >(
         '/push',
         {
             schema: {
@@ -60,6 +58,12 @@ export const CreateRoute: FastifyPluginAsync<{}> = async (router) => {
         },
         (request, reply) => {
             handle(request, reply, async (transaction, registerCleanup) => {
+                // Check auth
+                const auth = await useAuth(request, reply);
+
+                if (auth instanceof Object) return auth;
+
+                // Do the rest
                 const data = await request.file();
                 const temporary_name = generateSnowflake();
 

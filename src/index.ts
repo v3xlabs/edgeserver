@@ -37,7 +37,7 @@ export const StorageBackend: GenericStorage = new SignalStorage();
         'Starting the system with the following configuration',
         'ENVIRONMENT ' + chalk.gray(Globals.ENVIRONMENT),
         'SIGNALFS_HOST ' + chalk.gray(Globals.SIGNALFS_HOST),
-        'DB_IP ' + chalk.gray(obfusicate(Globals.DB_IP)),
+        'DB_IP ' + chalk.gray(Globals.DB_IP),
         'DB_DATACENTER ' + chalk.gray(Globals.DB_DATACENTER),
         'SIGNAL_MASTER ' +
             (Globals.SIGNAL_MASTER
@@ -45,7 +45,7 @@ export const StorageBackend: GenericStorage = new SignalStorage();
                 : chalk.red('MISSING')),
         'SENTRY_DSN ' +
             (Globals.SENTRY_DSN
-                ? chalk.gray(obfusicate(Globals.SENTRY_DSN))
+                ? chalk.gray(Globals.SENTRY_DSN)
                 : chalk.red('MISSING')),
         'SAMPLE RATE ' + chalk.gray(Globals.SENTRY_SAMPLE_RATE)
     );
@@ -62,22 +62,8 @@ export const StorageBackend: GenericStorage = new SignalStorage();
 
     log.lifecycle('Starting Express');
 
-    // server.register((server ))
-
-    // server.register(fastifyRequestContextPlugin, {
-    //     hook: 'preValidation',
-    //     defaultStoreValues: {
-    //         transaction: undefined as Transaction,
-    //     },
-    // });
-
     server.register(GenericRoute);
     server.register(CreateRoute, { prefix: '/deployments' });
-    // app.use('/keys', useHost(KeyRouter));
-    // app.use('/deployments', useHost(DeploymentRouter));
-    // app.use(handleRequest);
-
-    // app.use(Sentry.Handlers.errorHandler());
 
     server.listen(1234, '0.0.0.0', () => {
         log.lifecycle('Done ✨');
