@@ -1,4 +1,5 @@
 import { sign } from 'jsonwebtoken';
+import { Globals } from '../..';
 
 export const createKey = async (account: string) => {
     const random = Math.round(Math.random() * 1_000_000);
@@ -7,7 +8,7 @@ export const createKey = async (account: string) => {
             account,
             value: random,
         },
-        process.env.SIGNAL_MASTER
+        Globals.SIGNAL_MASTER
     );
 
     return { key, random };

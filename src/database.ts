@@ -1,27 +1,37 @@
 import { ScylloClient } from 'scyllo';
 
+import { Globals } from '.';
 import { AuthKey } from './types/AuthKey.type';
 import { Owner } from './types/Owner.type';
 import { Site } from './types/Site.type';
 import { log } from './util/logging';
 
-export const DB = new ScylloClient<{
+export let DB: ScylloClient<{
     // Get a list of all the owners by OwnerID
     owners: Owner;
     // Get a list of all the sites
     sites: Site;
     // Get authorization
     keys: AuthKey;
-}>({
-    client: {
-        contactPoints: [process.env.DB_IP || 'localhost:9042'],
-        localDataCenter: process.env.DB_DATACENTER || 'datacenter1',
-        keyspace: 'system',
-    },
-    debug: false,
-});
+}>;
 
 export const initDB = async () => {
+    DB = new ScylloClient<{
+        // Get a list of all the owners by OwnerID
+        owners: Owner;
+        // Get a list of all the sites
+        sites: Site;
+        // Get authorization
+        keys: AuthKey;
+    }>({
+        client: {
+            contactPoints: [Globals.DB_IP || 'localhost:9042'],
+            localDataCenter: Globals.DB_DATACENTER || 'datacenter1',
+            keyspace: 'system',
+        },
+        debug: false,
+    });
+
     log.database('Awaiting Connection');
     await DB.awaitConnection();
 

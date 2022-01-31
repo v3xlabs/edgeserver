@@ -1,13 +1,17 @@
 import { init, Integrations } from '@sentry/node';
+import chalk from 'chalk';
 
+import { Globals } from '../..';
 import { log } from '../logging';
 
 export const setupSentry = () => {
-    log.lifecycle('Initializing Sentry for environment ' + 'dev-luc');
+    log.lifecycle(
+        'Initializing Sentry for environment ' + chalk.gray(Globals.ENVIRONMENT)
+    );
     init({
-        dsn: process.env.SENTRY_DSN,
-        tracesSampleRate: 1,
-        environment: 'dev-luc',
+        dsn: Globals.SENTRY_DSN,
+        tracesSampleRate: Globals.SENTRY_SAMPLE_RATE,
+        environment: Globals.ENVIRONMENT,
         integrations: [new Integrations.Http({ tracing: true })],
     });
 };

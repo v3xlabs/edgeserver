@@ -51,7 +51,11 @@ export const GenericRoute: FastifyPluginAsync<{}> = async (router) => {
 
                     child.setTag('cached_cid', !!cachedSite);
 
-                    if (cachedSite) return cachedSite;
+                    if (cachedSite) {
+                        log.ok('Loading from cache');
+
+                        return cachedSite;
+                    }
 
                     const liveSite = await DB.selectOneFrom(
                         'sites',
