@@ -58,5 +58,5 @@ export const useAuth: (
 
     log.network('Verified Auth for user ' + key.owner_id);
 
-    return key.owner_id;
+    return key.owner_id.toString();
 };

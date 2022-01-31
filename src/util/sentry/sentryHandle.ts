@@ -103,9 +103,9 @@ export const sentryHandle = (options: SentryHandleOptions) => {
             if (result) {
                 transaction.setTag(
                     'reject-reason',
-                    result.logMessages.toString()
+                    JSON.stringify(result.logMessages)
                 );
-                response.status(result.status);
+                response.status(result.status || 500);
                 response.send();
                 log.ok(...result.logMessages);
             }

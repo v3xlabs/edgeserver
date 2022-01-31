@@ -61,17 +61,13 @@ export const CreateRoute: FastifyPluginAsync = async (router, options) => {
                 // Check auth
                 const auth = await useAuth(request, reply);
 
-                if (auth instanceof Object) return auth;
+                if (typeof auth !== 'string') {
+                    return auth;
+                }
 
                 // Do the rest
                 const data = await request.file();
                 const temporary_name = generateSnowflake();
-
-                if (request.headers.authorization !== 'hi')
-                    return {
-                        status: 403,
-                        logMessages: ['Tried to log in without headers'],
-                    };
 
                 const site = await startAction(
                     transaction,

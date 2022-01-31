@@ -70,4 +70,6 @@ export const initDB = async () => {
         },
         'key'
     );
+
+    await DB.createIndex('keys', 'keys_by_owner', 'owner_id');
 };
