@@ -143,11 +143,8 @@ export class SignalStorage implements GenericStorage {
 
         const actions: (Promise<unknown> | unknown)[] = [];
 
-        log.debug(sorted_file_names.length);
-
         for (const entry of sorted_file_names) {
             if (entry.isFile()) {
-                log.debug(path + entry.name);
                 actions.push(
                     startAction(
                         transaction,
