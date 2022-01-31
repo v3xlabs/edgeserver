@@ -2,13 +2,11 @@ import { Span } from '@sentry/types';
 import axios from 'axios';
 import FormData from 'form-data';
 import { createReadStream } from 'node:fs';
-import { statSync } from 'node:fs';
-import { readdir, rm } from 'node:fs/promises';
+import { readdir } from 'node:fs/promises';
 import { join } from 'node:path';
-import { Readable, Writable } from 'node:stream';
+import { Readable } from 'node:stream';
 
 import { Globals } from '..';
-import { log } from '../util/logging';
 import { startAction } from '../util/sentry/createChild';
 import { FileData, GenericStorage, ResolveData } from './GenericStorage';
 

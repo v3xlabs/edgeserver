@@ -39,6 +39,9 @@ export const CreateRoute: FastifyPluginAsync<{}> = async (router) => {
         Querystring: {
             site: string;
         };
+        Headers: {
+            authorization: string;
+        };
     }>(
         '/push',
         {
@@ -46,6 +49,12 @@ export const CreateRoute: FastifyPluginAsync<{}> = async (router) => {
                 querystring: {
                     type: 'object',
                     properties: { site: { type: 'string' } },
+                    required: ['site'],
+                },
+                headers: {
+                    type: 'object',
+                    properties: { authorization: { type: 'string' } },
+                    required: ['authorization'],
                 },
             },
         },
@@ -53,6 +62,12 @@ export const CreateRoute: FastifyPluginAsync<{}> = async (router) => {
             handle(request, reply, async (transaction, registerCleanup) => {
                 const data = await request.file();
                 const temporary_name = generateSnowflake();
+
+                if (request.headers.authorization !== 'hi')
+                    return {
+                        status: 403,
+                        logMessages: ['Tried to log in without headers'],
+                    };
 
                 const site = await startAction(
                     transaction,
