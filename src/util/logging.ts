@@ -31,6 +31,19 @@ export const log = createLogger(
             label: chalk.rgb(0, 255, 255)`[DB]`,
             divider: chalk.rgb(0, 255, 255)` | `,
         },
+        settings: {
+            label: {
+                length: 0,
+                calculate: () => chalk.gray`     ⚙️ `,
+            },
+            divider: chalk.gray` | `,
+            newLine: '       ',
+            newLineEnd: '       ',
+        },
+        empty: {
+            label: '',
+            divider: '',
+        },
     },
-    { padding: 'PREPEND', paddingChar: chalk.black`x`, exclude: [] }
+    { padding: 'PREPEND', paddingChar: chalk.black` `, exclude: [] }
 );
