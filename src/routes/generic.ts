@@ -3,14 +3,12 @@ import { FastifyPluginAsync } from 'fastify';
 import { createReadStream } from 'node:fs';
 import { join } from 'node:path';
 import { normalize } from 'node:path';
-import { forEachChild } from 'typescript';
 
 import { StorageBackend } from '..';
 import { DB } from '../database';
 import { Site } from '../types/Site.type';
 import { getCache, updateCache } from '../util/cache/cache';
 import { informationWrap } from '../util/http/information_wrapper';
-import { log } from '../util/logging';
 import { startAction } from '../util/sentry/createChild';
 import { sentryHandle } from '../util/sentry/sentryHandle';
 
@@ -36,9 +34,11 @@ export const GenericRoute: FastifyPluginAsync<{}> = async (router) => {
             informationWrap(async (information, transaction: Transaction) => {
                 transaction.setTag('signal-ip', request.ip);
                 information.domain = request.hostname;
-                information.endpoint = request.url;
 
-                const path = normalize(request.url);
+                const pathname = new URL("http://ignore" + request.url).pathname;
+                information.endpoint = pathname;
+
+                const path = normalize(pathname);
 
                 const site_data = await startAction(
                     transaction,
@@ -94,7 +94,7 @@ export const GenericRoute: FastifyPluginAsync<{}> = async (router) => {
 
                 /* Set the path but try cached first if we can */
                 const cachedPath = getCache<string>(
-                    'resolve_' + site_data.cid + '_' + request.url
+                    'resolve_' + site_data.cid + '_' + path
                 );
 
                 /* Update the cachedPath in report */

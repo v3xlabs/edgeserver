@@ -1,5 +1,5 @@
 import { addBreadcrumb } from '@sentry/node';
-import { FastifyPluginAsync, preHandlerHookHandler } from 'fastify';
+import { FastifyPluginAsync } from 'fastify';
 import Multipart from 'fastify-multipart';
 import { rm } from 'node:fs/promises';
 import { join } from 'node:path';
