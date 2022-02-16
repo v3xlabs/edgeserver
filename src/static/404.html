@@ -21,6 +21,10 @@
         <div><a href="https://github.com/lvkdotsh/signal-edge" target="_blank">GITHUB</a> / <a href="https://github.com/lvkdotsh" target="_blank">LVKSH</a></div>
     </div>
     <style>
+        * {
+            box-sizing: border-box;
+        }
+
         html, body {
             background: #181618;
             font-family: 'Roboto', sans-serif;
@@ -30,6 +34,7 @@
             padding: 0;
             overflow: hidden;
         }
+        
         body {
             width: 100vw;
             height: 100vh;
@@ -37,7 +42,10 @@
             flex-direction: column;
             justify-content: stretch;
             align-items: center;
+            padding: 1rem;
+            text-align: center;
         }
+        
         .center {
             flex: 1;
             display: flex;
@@ -45,9 +53,11 @@
             align-items: center;
             flex-direction: column;
         }
+        
         .big-text {
             font-size: 5rem;
         }
+        
         .bottomtext {
             padding-bottom: 1rem;
             display: flex;
@@ -56,18 +66,23 @@
             align-items: center;
             gap: 0.5rem;
         }
+        
         .copyright {
             font-size: 1.4rem;
         }
+        
         .gradient-text {
             background: -webkit-linear-gradient(92.36deg, #00F0FF -54.44%, #0094FF 101.15%);
+            background-clip: text;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
+        
         .subtext {
             font-size: 1.4rem;
             margin-top: 1rem;
         }
+
         a {
             color: white;
             text-decoration: none;
