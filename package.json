@@ -30,7 +30,7 @@
         "ipfs-http-client": "^55.0.0",
         "ipfs-only-hash": "^4.0.0",
         "jsonwebtoken": "^8.5.1",
-        "node-fetch": "^2.6.1",
+        "node-fetch": "^2.6.7",
         "scyllo": "^1.2.0",
         "sunflake": "^0.4.1",
         "typescript": "^4.5.2",
