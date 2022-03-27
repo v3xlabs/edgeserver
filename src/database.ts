@@ -45,9 +45,13 @@ export const initDB = async () => {
             user_id: {
                 type: 'bigint',
             },
+            github_id: {
+                type: 'bigint',
+            },
         },
         'user_id'
     );
+    await DB.createIndex('owners', 'owners_by_github', 'github_id');
     await DB.createTable(
         'sites',
         true,
