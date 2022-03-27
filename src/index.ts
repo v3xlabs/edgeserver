@@ -1,10 +1,9 @@
-import { startTransaction } from '@sentry/node';
-import { Transaction } from '@sentry/types';
 import chalk from 'chalk';
 import { config } from 'dotenv';
 import { fastify } from 'fastify';
 
 import { initDB } from './database';
+import { ApiRoute } from './routes/api';
 import { GenericRoute } from './routes/generic';
 import { CreateRoute } from './routes/protected/create';
 import { GenericStorage } from './storage/GenericStorage';
@@ -41,7 +40,7 @@ export const StorageBackend: GenericStorage = new SignalStorage();
         'DB_DATACENTER ' + chalk.gray(Globals.DB_DATACENTER),
         'SIGNAL_MASTER ' +
             (Globals.SIGNAL_MASTER
-                ? chalk.gray('*'.repeat(Globals.SIGNAL_MASTER.length))
+                ? chalk.gray(obfusicate(Globals.SIGNAL_MASTER))
                 : chalk.red('MISSING')),
         'SENTRY_DSN ' +
             (Globals.SENTRY_DSN
@@ -62,8 +61,9 @@ export const StorageBackend: GenericStorage = new SignalStorage();
 
     log.lifecycle('Starting Express');
 
-    server.register(GenericRoute);
     server.register(CreateRoute, { prefix: '/deployments' });
+    server.register(ApiRoute, { prefix: '/api' });
+    server.register(GenericRoute);
 
     server.listen(1234, '0.0.0.0', () => {
         log.lifecycle('Done ✨');
