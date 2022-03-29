@@ -1,8 +1,10 @@
 import { FastifyPluginAsync } from 'fastify';
 
+import { CACHE, getCache } from '../../cache';
 import { getAccessToken, getUserData } from '../../services/github';
 import {
     createUserFromGithub,
+    getLoginSessionByState,
     getUserByGithub,
     signToken,
 } from '../../services/user';
@@ -54,7 +56,7 @@ export const OAuthRoute: FastifyPluginAsync = async (router, options) => {
         },
         (request, reply) => {
             handle(request, reply, async (transaction, registerCleanup) => {
-                const { code } = request.query;
+                const { code, state } = request.query;
 
                 const access_token = await getAccessToken(code);
 
@@ -64,9 +66,16 @@ export const OAuthRoute: FastifyPluginAsync = async (router, options) => {
                     (await getUserByGithub(github_user_data.id.toString())) ||
                     (await createUserFromGithub(github_user_data));
 
-                const token = signToken(user.user_id);
+                // const token = signToken(user.user_id);
+                // get the psk from code,
+                const psk = getLoginSessionByState(state);
 
-                reply.send('Token: ' + token);
+                // set the `cli-stage-code` to `user_id`
+                await getCache();
+                console.log(user.user_id);
+                CACHE.set('sedge-auth-link-' + psk, user.user_id.toString());
+
+                reply.send('You can close this screen now');
             });
         }
     );

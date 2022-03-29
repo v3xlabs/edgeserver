@@ -1,7 +1,11 @@
 import BuildUrl from 'build-url';
 import { FastifyPluginAsync } from 'fastify';
 
+import { CACHE, getCache } from '../../cache';
+import { setPSKfromState, signToken } from '../../services/user';
+import { log } from '../../util/logging';
 import { sentryHandle } from '../../util/sentry/sentryHandle';
+import { generateSnowflake } from '.';
 
 export const LoginRoute: FastifyPluginAsync = async (router, options) => {
     const handle = sentryHandle({
@@ -35,136 +39,83 @@ export const LoginRoute: FastifyPluginAsync = async (router, options) => {
         });
     });
 
-    /*
-    router.put<
-        typeof options & {
-            Querystring: {
-                site: string;
-            };
-        }
-    >(
-        '/push',
+    const handle2 = sentryHandle({
+        transactionData: {
+            name: 'Login Status',
+            op: 'login-status',
+        },
+        sample: true,
+        dataConsent: {
+            ip: true,
+            request: true,
+            serverName: true,
+            transaction: true,
+            user: true,
+            version: true,
+        },
+    });
+
+    router.get<{
+        Params: {
+            psk: string;
+        };
+    }>(
+        '/status/:psk',
         {
             schema: {
-                querystring: {
+                params: {
                     type: 'object',
-                    properties: { site: { type: 'string' } },
-                    required: ['site'],
-                },
-                headers: {
-                    type: 'object',
-                    properties: { authorization: { type: 'string' } },
-                    required: ['authorization'],
+                    properties: {
+                        psk: { type: 'string' },
+                    },
+                    required: ['psk'],
                 },
             },
         },
         (request, reply) => {
-            handle(request, reply, async (transaction, registerCleanup) => {
-                // Check auth
-                const auth = await useAuth(request, reply);
+            handle2(request, reply, async (transaction, registerCleanup) => {
+                await getCache();
+                log.debug(request.params.psk);
+                const user_id = await CACHE.get(
+                    'sedge-auth-link-' + request.params.psk
+                );
 
-                if (typeof auth !== 'string') {
-                    return auth;
+                log.debug(user_id);
+
+                if (!user_id) {
+                    reply.status(401).send({ error: 'Unauthorized' });
+
+                    return;
                 }
 
-                // Do the rest
-                const data = await request.file();
-                const temporary_name = generateSnowflake();
-
-                const site = await startAction(
-                    transaction,
-                    {
-                        op: 'getSiteById',
-                    },
-                    async () => {
-                        return await DB.selectOneFrom('sites', ['site_id'], {
-                            site_id: request.query.site,
-                        });
-                    }
-                );
-
-                if (!site)
-                    return {
-                        status: 404,
-                        logMessages: [
-                            'Unable to find site ' + request.query.site,
-                        ],
-                    };
-
-                log.ok('Downloading file...');
-                addBreadcrumb({
-                    message: 'Downloading file from ' + request.ip,
-                });
-
-                registerCleanup(() => {
-                    rm(join('tmp', temporary_name), { recursive: true });
-                });
-
-                const strem = Extract({
-                    concurrency: 10,
-                    path: join('tmp', temporary_name),
-                });
-
-                // Download file and extract to path
-                await startAction(
-                    transaction,
-                    {
-                        op: 'Download & Unzip',
-                    },
-                    async () => {
-                        data.file.pipe(strem);
-                        await strem.promise();
-                    }
-                );
-
-                const bucket_name = await startAction(
-                    transaction,
-                    {
-                        op: 'Create Bucket',
-                    },
-                    StorageBackend.createBucket
-                );
-
-                await startAction(
-                    transaction,
-                    {
-                        op: 'Upload Files',
-                    },
-                    async (span) => {
-                        await StorageBackend.uploadDirectory(
-                            bucket_name,
-                            '/',
-                            join('tmp', temporary_name),
-                            span
-                        );
-                    }
-                );
-
-                await startAction(
-                    transaction,
-                    {
-                        op: 'Update DB',
-                    },
-                    async () => {
-                        await DB.update(
-                            'sites',
-                            {
-                                cid: bucket_name,
-                            },
-                            { site_id: site.site_id }
-                        );
-                    }
-                );
-
-                return {
-                    status: 200,
-                    logMessages: [
-                        'Successfully uploaded site',
-                        'SiteID: ' + site.site_id,
-                        'Bucket: ' + bucket_name,
-                    ],
-                };
+                reply.send({ token: signToken(user_id) });
             });
         }
-    );*/
+    );
+
+    const handle3 = sentryHandle({
+        transactionData: {
+            name: 'Request Login Status',
+            op: 'Request login-status',
+        },
+        sample: true,
+        dataConsent: {
+            ip: true,
+            request: true,
+            serverName: true,
+            transaction: true,
+            user: true,
+            version: true,
+        },
+    });
+
+    router.post('/', (request, reply) => {
+        handle3(request, reply, async (transaction, registerCleanup) => {
+            const psk = generateSnowflake();
+            const code = generateSnowflake();
+
+            setPSKfromState(code, psk);
+            reply.send({ psk, code });
+        });
+    });
 };
