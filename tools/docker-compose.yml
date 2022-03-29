@@ -1,10 +1,14 @@
 version: "3"
 services:
-    scylla:
+    scyllo:
         image: "scylladb/scylla"
-        command: "--smp 1"
+        command: "--smp 1 --skip-wait-for-gossip-to-settle 0"
         ports:
-            - "9042:9042"
+            - "9043:9042"
         volumes:
             - "./data:/var/lib/scylla"
         restart: always
+    redis:
+        image: "redis"
+        ports:
+            - "6379:6379"
