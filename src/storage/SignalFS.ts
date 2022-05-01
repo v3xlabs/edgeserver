@@ -131,7 +131,7 @@ export class SignalStorage implements GenericStorage {
         // Index
         const file_names = await readdir(path, {
             withFileTypes: true,
-            encoding: 'utf-8',
+            encoding: 'utf8',
         });
 
         // Sort it so files get uploaded first, then directories

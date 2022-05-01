@@ -19,7 +19,7 @@ type useAuthReturn =
 export const useAuth: (
     request: FastifyRequest,
     reply: FastifyReply
-) => Promise<Poof | string> = async (request, reply) => {
+) => Promise<Poof | string> = async (request, _reply) => {
     let auth = request.headers.authorization;
 
     if (auth.toLowerCase().startsWith('bearer ')) {

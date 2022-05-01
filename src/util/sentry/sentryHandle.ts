@@ -1,6 +1,5 @@
 import { LogMethodInput } from '@lvksh/logger';
 import {
-    addBreadcrumb,
     Event,
     getCurrentHub,
     NodeClient,
@@ -10,9 +9,6 @@ import { parseRequest, ParseRequestOptions } from '@sentry/node/dist/handlers';
 import { isAutoSessionTrackingEnabled } from '@sentry/node/dist/sdk';
 import { Transaction, TransactionContext } from '@sentry/types';
 import { FastifyReply, FastifyRequest } from 'fastify';
-import domain from 'node:domain';
-import http from 'node:http';
-import { boolean } from 'yup';
 
 import { log } from '../logging';
 

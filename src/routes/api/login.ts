@@ -24,20 +24,41 @@ export const LoginRoute: FastifyPluginAsync = async (router, options) => {
         },
     });
 
-    router.get('/', (request, reply) => {
-        handle(request, reply, async (transaction, registerCleanup) => {
-            const url = BuildUrl('https://github.com/login/oauth/authorize', {
-                queryParams: {
-                    client_id: process.env.GITHUB_ID,
-                    // redirect_uri: 'http://127.0.0.1:1234/api/oauth/github',
-                    scope: 'user:user,user:email',
-                    state: '5',
+    router.get<{
+        Querystring: {
+            code: string;
+        };
+    }>(
+        '/',
+        {
+            schema: {
+                querystring: {
+                    type: 'object',
+                    properties: {
+                        code: { type: 'string' },
+                    },
+                    required: ['code'],
                 },
-            });
+            },
+        },
+        (request, reply) => {
+            handle(request, reply, async (transaction, registerCleanup) => {
+                const url = BuildUrl(
+                    'https://github.com/login/oauth/authorize',
+                    {
+                        queryParams: {
+                            client_id: process.env.GITHUB_ID,
+                            // redirect_uri: 'http://127.0.0.1:1234/api/oauth/github',
+                            scope: 'user:user,user:email',
+                            state: request.query.code,
+                        },
+                    }
+                );
 
-            reply.redirect(307, url);
-        });
-    });
+                reply.redirect(307, url);
+            });
+        }
+    );
 
     const handle2 = sentryHandle({
         transactionData: {
@@ -75,12 +96,12 @@ export const LoginRoute: FastifyPluginAsync = async (router, options) => {
         (request, reply) => {
             handle2(request, reply, async (transaction, registerCleanup) => {
                 await getCache();
-                log.debug(request.params.psk);
+                log.debug({ psk: request.params.psk });
                 const user_id = await CACHE.get(
                     'sedge-auth-link-' + request.params.psk
                 );
 
-                log.debug(user_id);
+                log.debug({ user_id });
 
                 if (!user_id) {
                     reply.status(401).send({ error: 'Unauthorized' });

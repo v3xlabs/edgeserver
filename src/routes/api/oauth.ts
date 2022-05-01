@@ -6,8 +6,8 @@ import {
     createUserFromGithub,
     getLoginSessionByState,
     getUserByGithub,
-    signToken,
 } from '../../services/user';
+import { log } from '../../util/logging';
 import { sentryHandle } from '../../util/sentry/sentryHandle';
 
 export const OAuthRoute: FastifyPluginAsync = async (router, options) => {
@@ -68,12 +68,16 @@ export const OAuthRoute: FastifyPluginAsync = async (router, options) => {
 
                 // const token = signToken(user.user_id);
                 // get the psk from code,
-                const psk = getLoginSessionByState(state);
+                const psk = await getLoginSessionByState(state);
+
+                log.debug({ psk });
 
                 // set the `cli-stage-code` to `user_id`
                 await getCache();
                 console.log(user.user_id);
-                CACHE.set('sedge-auth-link-' + psk, user.user_id.toString());
+                CACHE.set('sedge-auth-link-' + psk, user.user_id.toString(), {
+                    EX: 60 * 5,
+                });
 
                 reply.send('You can close this screen now');
             });

@@ -34,11 +34,9 @@ export const getLoginSessionByState = async (state: string) => {
 
     log.debug('finding ' + state, session);
 
-    if (session) return;
-
     return session;
 };
 
 export const setPSKfromState = async (code: string, psk: string) => {
-    await CACHE.set('sedge-auth-' + code, psk, { EX: 60 * 2 });
+    await CACHE.set('sedge-auth-' + code, psk, { EX: 60 * 5 });
 };

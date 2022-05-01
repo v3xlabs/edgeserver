@@ -2,7 +2,6 @@ import axios from 'axios';
 import BuildUrl from 'build-url';
 
 import { GithubUser } from '../types/GithubUser.type';
-import { log } from '../util/logging';
 
 export const getAccessToken = async (code: string) => {
     const response = await axios.post<{
