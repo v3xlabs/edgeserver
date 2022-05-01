@@ -35,7 +35,8 @@ export const GenericRoute: FastifyPluginAsync<{}> = async (router) => {
                 transaction.setTag('signal-ip', request.ip);
                 information.domain = request.hostname;
 
-                const pathname = new URL("http://ignore" + request.url).pathname;
+                const { pathname } = new URL('http://ignore' + request.url);
+
                 information.endpoint = pathname;
 
                 const path = normalize(pathname);
@@ -147,6 +148,32 @@ export const GenericRoute: FastifyPluginAsync<{}> = async (router) => {
                     reply.send(directPageData.stream);
 
                     return;
+                }
+
+                /* Load direct html page data */
+                if (!/\..*$/.test(path)) {
+                    const directHtmlPageData = await startAction(
+                        transaction,
+                        { op: 'Loading direct file' },
+                        async () => {
+                            return await StorageBackend.get(
+                                site_data.cid,
+                                path + '.html'
+                            );
+                        }
+                    );
+
+                    if (directHtmlPageData) {
+                        transaction.setTag('resolved-by', 'direct-html');
+                        information.resolved_path = path + '.html';
+                        information.success = true;
+
+                        reply.header('Cache-Control', 'max-age=60');
+                        reply.type(directHtmlPageData.type);
+                        reply.send(directHtmlPageData.stream);
+
+                        return;
+                    }
                 }
 
                 const indexPageData = await startAction(
