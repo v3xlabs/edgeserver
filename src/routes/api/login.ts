@@ -98,7 +98,7 @@ export const LoginRoute: FastifyPluginAsync = async (router, options) => {
                 log.debug({ address: request.params.address });
 
                 const user = await DB.selectOneFrom('owners', ['user_id'], {
-                    address: request.params.address,
+                    address: request.params.address.toLowerCase(),
                 });
 
                 reply.send({
