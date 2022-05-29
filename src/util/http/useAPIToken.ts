@@ -50,6 +50,8 @@ export const useAPIToken: (
         owner_id: decoded.account,
     });
 
+    console.log(decoded.account, decoded.value.toString());
+
     if (!key) return { status: 403, logMessages: ['Not owner of Site'] };
 
     request.context['user'] = {

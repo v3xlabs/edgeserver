@@ -8,7 +8,7 @@ import { Extract } from 'unzipper';
 
 import { StorageBackend } from '../..';
 import { DB } from '../../database';
-import { useAuth } from '../../util/http/useAuth';
+import { useAPIToken } from '../../util/http/useAPIToken';
 import { log } from '../../util/logging';
 import { startAction } from '../../util/sentry/createChild';
 import { sentryHandle } from '../../util/sentry/sentryHandle';
@@ -59,7 +59,7 @@ export const CreateRoute: FastifyPluginAsync = async (router, options) => {
         (request, reply) => {
             handle(request, reply, async (transaction, registerCleanup) => {
                 // Check auth
-                const auth = await useAuth(request, reply);
+                const auth = await useAPIToken(request, reply);
 
                 if (typeof auth !== 'string') {
                     return auth;
