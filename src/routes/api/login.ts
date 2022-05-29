@@ -60,59 +60,53 @@ export const LoginRoute: FastifyPluginAsync = async (router, options) => {
     //     }
     // );
 
-    // const handle2 = sentryHandle({
-    //     transactionData: {
-    //         name: 'Login Status',
-    //         op: 'login-status',
-    //     },
-    //     sample: true,
-    //     dataConsent: {
-    //         ip: true,
-    //         request: true,
-    //         serverName: true,
-    //         transaction: true,
-    //         user: true,
-    //         version: true,
-    //     },
-    // });
+    const handle2 = sentryHandle({
+        transactionData: {
+            name: 'Whitelist check',
+            op: 'whitelist-get',
+        },
+        sample: true,
+        dataConsent: {
+            ip: true,
+            request: true,
+            serverName: true,
+            transaction: true,
+            user: true,
+            version: true,
+        },
+    });
 
-    // router.get<{
-    //     Params: {
-    //         psk: string;
-    //     };
-    // }>(
-    //     '/status/:psk',
-    //     {
-    //         schema: {
-    //             params: {
-    //                 type: 'object',
-    //                 properties: {
-    //                     psk: { type: 'string' },
-    //                 },
-    //                 required: ['psk'],
-    //             },
-    //         },
-    //     },
-    //     (request, reply) => {
-    //         handle2(request, reply, async (transaction, registerCleanup) => {
-    //             await getCache();
-    //             log.debug({ psk: request.params.psk });
-    //             const user_id = await CACHE.get(
-    //                 'sedge-auth-link-' + request.params.psk
-    //             );
+    router.get<{
+        Params: {
+            address: string;
+        };
+    }>(
+        '/whitelist/:address',
+        {
+            schema: {
+                params: {
+                    type: 'object',
+                    properties: {
+                        address: { type: 'string' },
+                    },
+                    required: ['address'],
+                },
+            },
+        },
+        (request, reply) => {
+            handle2(request, reply, async () => {
+                log.debug({ address: request.params.address });
 
-    //             log.debug({ user_id });
+                const user = await DB.selectOneFrom('owners', ['user_id'], {
+                    address: request.params.address,
+                });
 
-    //             if (!user_id) {
-    //                 reply.status(401).send({ error: 'Unauthorized' });
-
-    //                 return;
-    //             }
-
-    //             reply.send({ token: signToken(user_id) });
-    //         });
-    //     }
-    // );
+                reply.send({
+                    exists: !!user,
+                });
+            });
+        }
+    );
 
     const handle3 = sentryHandle({
         transactionData: {
