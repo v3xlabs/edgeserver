@@ -1,3 +1,4 @@
+import Cors from '@fastify/cors';
 import chalk from 'chalk';
 import { config } from 'dotenv';
 import { fastify } from 'fastify';
@@ -61,6 +62,10 @@ export const StorageBackend: GenericStorage = new SignalStorage();
 
     log.lifecycle('Starting Express');
 
+    server.register(Cors, {
+        origin: true,
+        allowedHeaders: ['GET', 'PUT', 'POST'],
+    });
     server.register(CreateRoute, { prefix: '/deployments' });
     server.register(ApiRoute, { prefix: '/api' });
     server.register(GenericRoute);
