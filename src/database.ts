@@ -29,7 +29,7 @@ export const initDB = async () => {
             localDataCenter: Globals.DB_DATACENTER || 'datacenter1',
             keyspace: 'system',
         },
-        debug: false,
+        debug: process.env.DEBUG == 'true' || false,
     });
 
     log.database('Awaiting Connection');

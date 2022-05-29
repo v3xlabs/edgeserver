@@ -80,7 +80,7 @@ export const GenericRoute: FastifyPluginAsync<{}> = async (router) => {
                     }
                 );
 
-                log.debug('site_data', { site_data });
+                log.debug('site_data', { site_data, host: request.hostname });
 
                 /* If site does not exist, send 404 */
                 if (!site_data) {
