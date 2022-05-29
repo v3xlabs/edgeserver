@@ -1,5 +1,5 @@
 import { FastifyReply, FastifyRequest } from 'fastify';
-import { decode } from 'jsonwebtoken';
+import { decode, verify } from 'jsonwebtoken';
 
 import { DB } from '../../database';
 import { Owner } from '../../types/Owner.type';
@@ -26,37 +26,41 @@ export const useAuth: (
         auth = auth.slice('Bearer '.length);
     }
 
-    const decoded = decode(auth) as { account: string; value: number };
+    const decoded = decode(auth) as { address: string; user_id: string };
 
     if (!decoded)
         return { status: 403, logMessages: ['Incorrect decoded payload'] };
 
-    if (!decoded['account'])
+    if (!decoded.address)
         return {
             status: 403,
-            logMessages: ['Key "acount" was missing from payload'],
+            logMessages: ['Key "account" was missing from payload'],
         };
 
-    if (!decoded['value'])
+    if (!decoded.user_id)
         return {
             status: 403,
-            logMessages: ['Key "value" was missing from payload'],
+            logMessages: ['Key "user_id" was missing from payload'],
         };
 
-    // if (verify(auth, process.env.SIGNAL_MASTER)) return Malformat();
+    if (verify(auth, process.env.SIGNAL_MASTER))
+        return {
+            status: 403,
+            logMessages: ['Invalid signature on payload'],
+        };
 
-    const key = await DB.selectOneFrom('keys', ['owner_id'], {
-        key: decoded.value.toString(),
-        owner_id: decoded.account,
+    const owner = await DB.selectOneFrom('owners', ['user_id'], {
+        address: decoded.address,
+        user_id: decoded.user_id,
     });
 
-    if (!key) return { status: 403, logMessages: ['Not owner of Site'] };
+    if (!owner) return { status: 403, logMessages: ['Not valid user'] };
 
     request.context['user'] = {
-        user_id: key.owner_id,
+        user_id: owner.user_id,
     };
 
-    log.network('Verified Auth for user ' + key.owner_id);
+    log.network('Verified Auth for user ' + owner.user_id);
 
-    return key.owner_id.toString();
+    return owner.user_id;
 };
