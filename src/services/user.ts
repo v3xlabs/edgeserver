@@ -20,13 +20,14 @@ export const createUserFromAddress = async (address: string) => {
     return user;
 };
 
-export const signToken = (user_id: string) =>
-    sign(
-        {
-            user_id: user_id,
-        },
-        process.env.SIGNAL_MASTER
-    );
+export const signToken = (user_id: string, address: string) => {
+    const payload = {
+        address: address,
+        user_id: user_id,
+    };
+
+    return sign(payload, process.env.SIGNAL_MASTER);
+};
 
 export const getLoginSessionByState = async (state: string) => {
     const session = await CACHE.get('sedge-auth-' + state);

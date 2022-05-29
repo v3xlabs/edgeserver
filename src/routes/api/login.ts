@@ -1,9 +1,9 @@
 import { Static, Type } from '@sinclair/typebox';
 import { FastifyPluginAsync } from 'fastify';
-import { sign } from 'jsonwebtoken';
 import { SiweMessage } from 'siwe';
 
 import { DB } from '../../database';
+import { signToken } from '../../services/user';
 import { log } from '../../util/logging';
 import { sentryHandle } from '../../util/sentry/sentryHandle';
 
@@ -183,12 +183,10 @@ export const LoginRoute: FastifyPluginAsync = async (router, options) => {
                     return;
                 }
 
-                const payload = {
-                    address: verifiedMessage.data.address,
-                    user_id: user.user_id,
-                };
-
-                const token = sign(payload, process.env.SIGNAL_MASTER);
+                const token = signToken(
+                    user.user_id,
+                    verifiedMessage.data.address
+                );
 
                 reply.send({ token });
             });
