@@ -1,6 +1,8 @@
 import { createClient } from 'redis';
 
-export const CACHE = createClient({});
+export const CACHE = createClient({
+    url: process.env.REDIS_IP || '127.0.0.1:6379',
+});
 
 (async () => {
     await CACHE.connect();
