@@ -3,17 +3,16 @@ import { sign } from 'jsonwebtoken';
 import { CACHE } from '../cache';
 import { DB } from '../database';
 import { generateSnowflake } from '../routes/api';
-import { GithubUser } from '../types/GithubUser.type';
 import { Owner } from '../types/Owner.type';
 import { log } from '../util/logging';
 
-export const getUserByGithub = (github_id: string) =>
-    DB.selectOneFrom('owners', ['user_id'], { github_id });
+export const getUserBy = (address: string) =>
+    DB.selectOneFrom('owners', ['user_id'], { address });
 
-export const createUserFromGithub = async (github_user: GithubUser) => {
+export const createUserFromAddress = async (address: string) => {
     const user: Owner = {
         user_id: generateSnowflake(),
-        github_id: github_user.id.toString(),
+        address,
     };
 
     await DB.insertInto('owners', user);
