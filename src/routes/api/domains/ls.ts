@@ -3,6 +3,7 @@ import { generateSunflake } from 'sunflake';
 
 import { DB } from '../../../database';
 import { useAuth } from '../../../util/http/useAuth';
+import { log } from '../../../util/logging';
 import { Poof } from '../../../util/sentry/sentryHandle';
 
 export const generateSnowflake = generateSunflake();
@@ -18,7 +19,11 @@ export const DomainLsRoute: FastifyPluginAsync = async (router, options) => {
         const authData = (await useAuth(_request, reply)) as Poof | string;
 
         if (determineIfAuth(authData)) {
-            return reply.status(authData.status).send();
+            reply.status(authData.status || 500);
+            reply.send();
+            log.ok(...authData.logMessages);
+
+            return;
         }
 
         reply.send(

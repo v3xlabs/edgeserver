@@ -26,6 +26,8 @@ export const useAuth: (
         auth = auth.slice('Bearer '.length);
     }
 
+    console.log(auth);
+
     const decoded = decode(auth) as { address: string; user_id: string };
 
     if (!decoded)
@@ -43,11 +45,16 @@ export const useAuth: (
             logMessages: ['Key "user_id" was missing from payload'],
         };
 
-    if (verify(auth, process.env.SIGNAL_MASTER))
+    console.log(process.env.SIGNAL_MASTER);
+
+    try {
+        verify(auth, process.env.SIGNAL_MASTER);
+    } catch {
         return {
             status: 403,
             logMessages: ['Invalid signature on payload'],
         };
+    }
 
     const owner = await DB.selectOneFrom('owners', ['user_id'], {
         address: decoded.address,
