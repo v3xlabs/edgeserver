@@ -2,6 +2,7 @@ import { FastifyPluginAsync } from 'fastify';
 import { generateSunflake } from 'sunflake';
 
 import { Auth } from '../../../middleware/auth';
+import { DeploymentCreateRoute } from './create';
 import { DomainLsRoute } from './ls';
 
 export const generateSnowflake = generateSunflake();
@@ -14,4 +15,5 @@ export const DomainRoute: FastifyPluginAsync = async (router, options) => {
     });
 
     router.register(DomainLsRoute, { prefix: '/ls' });
+    router.register(DeploymentCreateRoute, { prefix: '/create' });
 };

@@ -8,7 +8,7 @@ import { Poof } from '../../../util/sentry/sentryHandle';
 
 export const generateSnowflake = generateSunflake();
 
-function determineIfAuth(
+export function determineIfAuth(
     toBeDetermined: Poof | string
 ): toBeDetermined is Poof {
     return !!toBeDetermined['status'];

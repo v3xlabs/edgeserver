@@ -48,7 +48,8 @@
         "lint": "eslint -c .eslintrc.json --ext .ts ./src",
         "lint:fix": "eslint src --ext .ts --fix",
         "start": "ts-node ./src/index.ts",
-        "dev": "ts-node-dev --quiet ./src/index.ts"
+        "dev": "ts-node-dev --quiet ./src/index.ts",
+        "db": "cd ./tools && docker-compose up -d"
     },
     "devDependencies": {
         "@types/express": "^4.17.13",
