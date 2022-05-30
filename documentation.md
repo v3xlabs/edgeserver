@@ -106,11 +106,14 @@ bar.com => DeploymentBAR
 ## **Deployment**
    - app_id COMPOSITE
    - deploy_id PRIMARY COMPOSITE
-   - created_on
+   - timestamp
+   - sid
+   - cid
 
 ## **Application**
    - app_id
    - owner_id
+   - domain_id
    - permissions
 
 (app_id, deploy_id)

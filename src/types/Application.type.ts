@@ -8,3 +8,5 @@ export type ApplicationV1 = {
         [user_id: Snowflake]: PermissionsBit;
     };
 };
+
+export type ApplicationV2 = ApplicationV1 & { domain_id: Snowflake };
