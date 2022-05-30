@@ -2,6 +2,7 @@ import Cors from '@fastify/cors';
 import chalk from 'chalk';
 import { config } from 'dotenv';
 import { fastify } from 'fastify';
+
 import { initDB } from './database';
 import { ApiRoute } from './routes/api';
 import { GenericRoute } from './routes/generic';

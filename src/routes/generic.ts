@@ -9,7 +9,6 @@ import { DB } from '../database';
 import { Site } from '../types/Site.type';
 import { getCache, updateCache } from '../util/cache/cache';
 import { informationWrap } from '../util/http/information_wrapper';
-import { log } from '../util/logging';
 import { startAction } from '../util/sentry/createChild';
 import { sentryHandle } from '../util/sentry/sentryHandle';
 

@@ -8,7 +8,7 @@ import { Poof } from '../../../util/sentry/sentryHandle';
 
 export const generateSnowflake = generateSunflake();
 
-function determineIfAuth(
+export function determineIfAuth(
     toBeDetermined: Poof | string
 ): toBeDetermined is Poof {
     return !!toBeDetermined['status'];
@@ -16,9 +16,6 @@ function determineIfAuth(
 
 export const DomainLsRoute: FastifyPluginAsync = async (router, options) => {
     router.get('/', async (_request, reply) => {
-<<<<<<< HEAD
-        reply.send(await DB.selectFrom('sites', '*', {}));
-=======
         const authData = (await useAuth(_request, reply)) as Poof | string;
 
         if (determineIfAuth(authData)) {
@@ -34,6 +31,5 @@ export const DomainLsRoute: FastifyPluginAsync = async (router, options) => {
                 owner: authData,
             })
         );
->>>>>>> 3109f3e01b5adcfcd2ef27acdcc5ad9c33742ed0
     });
 };
