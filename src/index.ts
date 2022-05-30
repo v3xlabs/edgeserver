@@ -64,7 +64,7 @@ export const StorageBackend: GenericStorage = new SignalStorage();
 
     server.register(Cors, {
         origin: true,
-        allowedHeaders: ['GET', 'PUT', 'POST'],
+        methods: ['GET', 'PUT', 'POST'],
     });
     server.register(CreateRoute, { prefix: '/deployments' });
     server.register(ApiRoute, { prefix: '/api' });
