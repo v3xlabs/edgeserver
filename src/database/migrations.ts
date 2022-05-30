@@ -6,6 +6,10 @@ import { initial_create } from './migrations/00_initial_create';
 import { applications_create } from './migrations/01_applications_create';
 import { sites_to_applications } from './migrations/02_sites_to_applications';
 import { deployments_create } from './migrations/03_deployments_create';
+import { domains_create } from './migrations/04_domains_create';
+import { deployments_date } from './migrations/05_deployments_date';
+import { sites_deprecate } from './migrations/06_sites_deprecate';
+import { owner_indexing } from './migrations/07_owner_indexing';
 
 export type MigrationState = {
     instance_id: string;
@@ -43,7 +47,11 @@ export const migrate = async (
 
     log.database('Current Migration: ' + current_version);
 
-    for (let index = +current_version; index < migrations.length; index++) {
+    let index = +current_version;
+    let migrations_run = 0;
+
+    while (index + 1 < migrations.length) {
+        index += 1;
         log.database('Running Migration ' + index);
         await migrations[index](database, (log_text) =>
             log.database('M-' + index + ': ' + log_text)
@@ -52,9 +60,14 @@ export const migrate = async (
             instance_id: '1',
             current_version: index.toString(),
         });
+        migrations_run += 1;
     }
 
-    log.database('Finished Migrations');
+    if (migrations_run == 0) {
+        log.database('No Migrations had to be run, everything up-to-date!');
+    } else {
+        log.database(`Finished ${migrations_run} Migrations`);
+    }
 };
 
 export const Migrations: Migration<undefined>[] = [
@@ -66,4 +79,12 @@ export const Migrations: Migration<undefined>[] = [
     sites_to_applications,
     // Create Deployment and DeploymentLookup Tables
     deployments_create,
+    // Create Domain Tables
+    domains_create,
+    // Update the date aspect of deployments (DeploymentV2)
+    deployments_date,
+    // Deprecate Sites
+    sites_deprecate,
+    // Index data types by owner
+    owner_indexing,
 ];

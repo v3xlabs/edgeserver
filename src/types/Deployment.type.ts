@@ -6,3 +6,9 @@ export type DeploymentV1 = {
     deploy_id: Snowflake;
     created_on: string;
 };
+
+export type DeploymentV2 = Omit<DeploymentV1, 'created_on'> & {
+    timestamp: string;
+    cid: string;
+    sid: string;
+};
