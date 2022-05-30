@@ -14,7 +14,10 @@ export function determineIfAuth(
     return !!toBeDetermined['status'];
 }
 
-export const DomainLsRoute: FastifyPluginAsync = async (router, options) => {
+export const DeploymentLsRoute: FastifyPluginAsync = async (
+    router,
+    options
+) => {
     router.get('/', async (_request, reply) => {
         const authData = (await useAuth(_request, reply)) as Poof | string;
 
