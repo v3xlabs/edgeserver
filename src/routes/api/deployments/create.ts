@@ -2,7 +2,7 @@ import { Static, Type } from '@sinclair/typebox';
 import { FastifyPluginAsync } from 'fastify';
 
 import { DB } from '../../../database';
-import { Site } from '../../../types/Site.type';
+import { SiteV1 } from '../../../types/Site.type';
 import { useAuth } from '../../../util/http/useAuth';
 import { log } from '../../../util/logging';
 import { Poof } from '../../../util/sentry/sentryHandle';
@@ -38,7 +38,7 @@ export const DeploymentCreateRoute: FastifyPluginAsync = async (
             }
 
             const { deployment } = _request.body;
-            const createdProject: Site = {
+            const createdProject: SiteV1 = {
                 site_id: generateSnowflake(),
                 owner: authData,
                 host: deployment,

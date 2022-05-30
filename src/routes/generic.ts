@@ -6,7 +6,7 @@ import { normalize } from 'node:path';
 
 import { StorageBackend } from '..';
 import { DB } from '../database';
-import { Site } from '../types/Site.type';
+import { SiteV1 } from '../types/Site.type';
 import { getCache, updateCache } from '../util/cache/cache';
 import { informationWrap } from '../util/http/information_wrapper';
 import { startAction } from '../util/sentry/createChild';
@@ -51,7 +51,7 @@ export const GenericRoute: FastifyPluginAsync<{}> = async (router) => {
                         child.setTag('host', request.hostname);
 
                         const cachedSite = getCache<
-                            Pick<Site, 'site_id' | 'cid'>
+                            Pick<SiteV1, 'site_id' | 'cid'>
                         >('site_' + request.hostname);
 
                         child.setTag('cached_cid', !!cachedSite);

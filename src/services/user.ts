@@ -3,14 +3,14 @@ import { sign } from 'jsonwebtoken';
 import { CACHE } from '../cache';
 import { DB } from '../database';
 import { generateSnowflake } from '../routes/api';
-import { Owner } from '../types/Owner.type';
+import { OwnerV1 } from '../types/Owner.type';
 import { log } from '../util/logging';
 
 export const getUserBy = (address: string) =>
     DB.selectOneFrom('owners', ['user_id'], { address });
 
 export const createUserFromAddress = async (address: string) => {
-    const user: Owner = {
+    const user: OwnerV1 = {
         user_id: generateSnowflake(),
         address,
     };

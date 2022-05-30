@@ -2,14 +2,14 @@ import { FastifyReply, FastifyRequest } from 'fastify';
 import { decode } from 'jsonwebtoken';
 
 import { DB } from '../../database';
-import { Owner } from '../../types/Owner.type';
+import { OwnerV1 } from '../../types/Owner.type';
 import { log } from '../logging';
 import { Poof } from '../sentry/sentryHandle';
 
 type useAuthReturn =
     | {
           allowed: true;
-          user: Owner;
+          user: OwnerV1;
       }
     | {
           allowed: false;
