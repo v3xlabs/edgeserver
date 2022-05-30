@@ -2,18 +2,18 @@ import { FastifyPluginAsync } from 'fastify';
 import { generateSunflake } from 'sunflake';
 
 import { Auth } from '../../../middleware/auth';
-import { DeploymentCreateRoute } from './create';
-import { DeploymentLsRoute } from './ls';
+import { AppCreateRoute } from './create';
+import { AppLsRoute } from './ls';
 
 export const generateSnowflake = generateSunflake();
 
-export const DeploymentRoute: FastifyPluginAsync = async (router, options) => {
+export const AppRoute: FastifyPluginAsync = async (router, _options) => {
     router.register(Auth);
 
     router.get('/', (_request, reply) => {
         reply.send('stick');
     });
 
-    router.register(DeploymentLsRoute, { prefix: '/ls' });
-    router.register(DeploymentCreateRoute, { prefix: '/create' });
+    router.register(AppLsRoute, { prefix: '/ls' });
+    router.register(AppCreateRoute, { prefix: '/create' });
 };

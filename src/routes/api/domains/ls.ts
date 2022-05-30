@@ -14,10 +14,7 @@ export function determineIfAuth(
     return !!toBeDetermined['status'];
 }
 
-export const DeploymentLsRoute: FastifyPluginAsync = async (
-    router,
-    options
-) => {
+export const DomainsLsRoute: FastifyPluginAsync = async (router, _options) => {
     router.get('/', async (_request, reply) => {
         const authData = (await useAuth(_request, reply)) as Poof | string;
 
@@ -30,8 +27,8 @@ export const DeploymentLsRoute: FastifyPluginAsync = async (
         }
 
         reply.send(
-            await DB.selectFrom('applications', '*', {
-                owner_id: authData,
+            await DB.selectFrom('domains', '*', {
+                user_id: authData,
             })
         );
     });

@@ -2,7 +2,6 @@ import { Static, Type } from '@sinclair/typebox';
 import { FastifyPluginAsync } from 'fastify';
 
 import { DB } from '../../../database';
-import { ApplicationV2 } from '../../../types/Application.type';
 import { DomainV1 } from '../../../types/Domain.type';
 import { useAuth } from '../../../util/http/useAuth';
 import { log } from '../../../util/logging';
@@ -10,12 +9,12 @@ import { Poof } from '../../../util/sentry/sentryHandle';
 import { generateSnowflake } from '.';
 import { determineIfAuth } from './ls';
 
-export const DeploymentCreateRoute: FastifyPluginAsync = async (
+export const DomainCreateRoute: FastifyPluginAsync = async (
     router,
-    options
+    _options
 ) => {
     const createPayload = Type.Object({
-        deployment: Type.String(),
+        host: Type.String(),
     });
 
     router.post<{
@@ -38,23 +37,18 @@ export const DeploymentCreateRoute: FastifyPluginAsync = async (
                 return;
             }
 
-            const { deployment } = _request.body;
+            const { host } = _request.body;
             const domain_id = generateSnowflake();
-            const createdProject: Partial<ApplicationV2> = {
-                app_id: generateSnowflake(),
-                owner_id: authData,
-                domain_id,
-            };
+
             const domain: Partial<DomainV1> = {
                 domain_id,
-                domain: deployment,
+                domain: host,
                 user_id: authData,
             };
 
-            await DB.insertInto('applications', createdProject);
             await DB.insertInto('domains', domain);
 
-            reply.send({ site_id: createdProject.app_id });
+            reply.send({ domain_id });
         }
     );
 };
