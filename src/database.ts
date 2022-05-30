@@ -29,13 +29,13 @@ export const initDB = async () => {
             localDataCenter: Globals.DB_DATACENTER || 'datacenter1',
             keyspace: 'system',
         },
-        debug: false,
+        debug: process.env.DEBUG == 'true' || false,
     });
 
     log.database('Awaiting Connection');
     await DB.awaitConnection();
 
-    await DB.useKeyspace('ipfssignal', true);
+    await DB.useKeyspace('signal', true);
 
     log.database('Ensuring Tables');
     await DB.createTable(
@@ -45,13 +45,13 @@ export const initDB = async () => {
             user_id: {
                 type: 'bigint',
             },
-            github_id: {
-                type: 'bigint',
+            address: {
+                type: 'text',
             },
         },
         'user_id'
     );
-    await DB.createIndex('owners', 'owners_by_github', 'github_id');
+    await DB.createIndex('owners', 'owners_by_address', 'address');
     await DB.createTable(
         'sites',
         true,

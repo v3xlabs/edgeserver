@@ -3,17 +3,16 @@ import { sign } from 'jsonwebtoken';
 import { CACHE } from '../cache';
 import { DB } from '../database';
 import { generateSnowflake } from '../routes/api';
-import { GithubUser } from '../types/GithubUser.type';
 import { Owner } from '../types/Owner.type';
 import { log } from '../util/logging';
 
-export const getUserByGithub = (github_id: string) =>
-    DB.selectOneFrom('owners', ['user_id'], { github_id });
+export const getUserBy = (address: string) =>
+    DB.selectOneFrom('owners', ['user_id'], { address });
 
-export const createUserFromGithub = async (github_user: GithubUser) => {
+export const createUserFromAddress = async (address: string) => {
     const user: Owner = {
         user_id: generateSnowflake(),
-        github_id: github_user.id.toString(),
+        address,
     };
 
     await DB.insertInto('owners', user);
@@ -21,13 +20,14 @@ export const createUserFromGithub = async (github_user: GithubUser) => {
     return user;
 };
 
-export const signToken = (user_id: string) =>
-    sign(
-        {
-            user_id: user_id,
-        },
-        process.env.SIGNAL_MASTER
-    );
+export const signToken = (user_id: string, address: string) => {
+    const payload = {
+        address: address,
+        user_id: user_id,
+    };
+
+    return sign(payload, process.env.SIGNAL_MASTER);
+};
 
 export const getLoginSessionByState = async (state: string) => {
     const session = await CACHE.get('sedge-auth-' + state);

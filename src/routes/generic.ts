@@ -9,6 +9,7 @@ import { DB } from '../database';
 import { Site } from '../types/Site.type';
 import { getCache, updateCache } from '../util/cache/cache';
 import { informationWrap } from '../util/http/information_wrapper';
+import { log } from '../util/logging';
 import { startAction } from '../util/sentry/createChild';
 import { sentryHandle } from '../util/sentry/sentryHandle';
 
@@ -78,6 +79,8 @@ export const GenericRoute: FastifyPluginAsync<{}> = async (router) => {
                         return liveSite;
                     }
                 );
+
+                // log.debug('site_data', { site_data, host: request.hostname });
 
                 /* If site does not exist, send 404 */
                 if (!site_data) {
