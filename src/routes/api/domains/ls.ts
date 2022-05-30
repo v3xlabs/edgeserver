@@ -7,10 +7,6 @@ export const generateSnowflake = generateSunflake();
 
 export const DomainLsRoute: FastifyPluginAsync = async (router, options) => {
     router.get('/', async (_request, reply) => {
-        reply.send(
-            await DB.selectFrom('sites', '*', {
-                owner: '123456789',
-            })
-        );
+        reply.send(await DB.selectFrom('sites', '*', {}));
     });
 };

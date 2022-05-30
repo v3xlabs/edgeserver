@@ -4,9 +4,7 @@ services:
         image: "scylladb/scylla"
         command: "--smp 1 --skip-wait-for-gossip-to-settle 0"
         ports:
-            - "9043:9042"
-        volumes:
-            - "./data:/var/lib/scylla"
+            - "9042:9042"
         restart: always
     redis:
         image: "redis"
