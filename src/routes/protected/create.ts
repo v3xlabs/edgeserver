@@ -72,12 +72,16 @@ export const CreateRoute: FastifyPluginAsync = async (router, options) => {
                 const site = await startAction(
                     transaction,
                     {
-                        op: 'getSiteById',
+                        op: 'getAppById',
                     },
                     async () => {
-                        return await DB.selectOneFrom('sites', ['site_id'], {
-                            site_id: request.query.site,
-                        });
+                        return await DB.selectOneFrom(
+                            'applications',
+                            ['app_id'],
+                            {
+                                app_id: request.query.site,
+                            }
+                        );
                     }
                 );
 
@@ -138,19 +142,39 @@ export const CreateRoute: FastifyPluginAsync = async (router, options) => {
                     }
                 );
 
+                const deploy_id = generateSnowflake();
+
                 await startAction(
                     transaction,
                     {
                         op: 'Update DB',
                     },
                     async () => {
-                        await DB.update(
-                            'sites',
-                            {
-                                cid: bucket_name,
-                            },
-                            { site_id: site.site_id }
+                        await DB.insertInto('deployments', {
+                            app_id: site.app_id,
+                            cid: '',
+                            deploy_id,
+                            sid: bucket_name,
+                            timestamp: new Date().toString(),
+                        });
+                        const { domain_id } = await DB.selectOneFrom(
+                            'applications',
+                            ['domain_id'],
+                            { app_id: site.app_id }
                         );
+                        const domain = await DB.selectOneFrom(
+                            'domains',
+                            ['domain'],
+                            { domain_id }
+                        );
+
+                        if (domain) {
+                            await DB.insertInto('dlt', {
+                                app_id: site.app_id,
+                                base_url: domain.domain,
+                                deploy_id,
+                            });
+                        }
                     }
                 );
 
@@ -158,7 +182,7 @@ export const CreateRoute: FastifyPluginAsync = async (router, options) => {
                     status: 200,
                     logMessages: [
                         'Successfully uploaded site',
-                        'SiteID: ' + site.site_id,
+                        'SiteID: ' + site.app_id,
                         'Bucket: ' + bucket_name,
                     ],
                 };

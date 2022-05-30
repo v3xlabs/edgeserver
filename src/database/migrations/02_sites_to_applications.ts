@@ -12,7 +12,6 @@ export const sites_to_applications: Migration<{
         await database.insertInto('applications', {
             app_id: site.site_id,
             owner_id: site.owner,
-            permissions: {},
         });
     }
 };

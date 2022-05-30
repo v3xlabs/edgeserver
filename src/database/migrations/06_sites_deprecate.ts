@@ -33,7 +33,5 @@ export const sites_deprecate: Migration<{
         };
 
         await database.insertInto('dlt', deploymentLink);
-
-        await database.dropTable('sites');
     }
 };

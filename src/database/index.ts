@@ -1,30 +1,30 @@
 import { ScylloClient } from 'scyllo';
 
 import { Globals } from '..';
-import { ApplicationV1 } from '../types/Application.type';
+import { ApplicationV2 } from '../types/Application.type';
 import { AuthKeyV1 } from '../types/AuthKey.type';
 import { DeploymentV2 } from '../types/Deployment.type';
 import { DeploymentLookupV1 } from '../types/DeploymentLookup.type';
+import { DomainV1 } from '../types/Domain.type';
 import { OwnerV1 } from '../types/Owner.type';
-import { SiteV1 } from '../types/Site.type';
 import { log } from '../util/logging';
 import { migrate, Migrations, MigrationState } from './migrations';
 
 type DBType = {
     // Get a list of all the owners by OwnerID
     owners: OwnerV1;
-    // Get a list of all the sites
-    sites: SiteV1;
     // Get authorization
     keys: AuthKeyV1;
     // Get authorization
     migrations: MigrationState;
     // Applications
-    applications: ApplicationV1;
+    applications: ApplicationV2;
     // Deployments
     deployments: DeploymentV2;
     // DeploymentLookups
     dlt: DeploymentLookupV1;
+    // Domains
+    domains: DomainV1;
 };
 export let DB: ScylloClient<DBType>;
 

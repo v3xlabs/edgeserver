@@ -2,7 +2,8 @@ import { Static, Type } from '@sinclair/typebox';
 import { FastifyPluginAsync } from 'fastify';
 
 import { DB } from '../../../database';
-import { SiteV1 } from '../../../types/Site.type';
+import { ApplicationV2 } from '../../../types/Application.type';
+import { DomainV1 } from '../../../types/Domain.type';
 import { useAuth } from '../../../util/http/useAuth';
 import { log } from '../../../util/logging';
 import { Poof } from '../../../util/sentry/sentryHandle';
@@ -38,16 +39,22 @@ export const DeploymentCreateRoute: FastifyPluginAsync = async (
             }
 
             const { deployment } = _request.body;
-            const createdProject: SiteV1 = {
-                site_id: generateSnowflake(),
-                owner: authData,
-                host: deployment,
-                cid: '',
+            const domain_id = generateSnowflake();
+            const createdProject: Partial<ApplicationV2> = {
+                app_id: generateSnowflake(),
+                owner_id: authData,
+                domain_id,
+            };
+            const domain: Partial<DomainV1> = {
+                domain_id,
+                domain: deployment,
+                user_id: authData,
             };
 
-            await DB.insertInto('sites', createdProject);
+            await DB.insertInto('applications', createdProject);
+            await DB.insertInto('domains', domain);
 
-            reply.send({ site_id: createdProject.site_id });
+            reply.send({ site_id: createdProject.app_id });
         }
     );
 };

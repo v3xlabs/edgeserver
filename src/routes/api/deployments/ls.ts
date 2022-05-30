@@ -30,8 +30,8 @@ export const DeploymentLsRoute: FastifyPluginAsync = async (
         }
 
         reply.send(
-            await DB.selectFrom('sites', '*', {
-                owner: authData,
+            await DB.selectFrom('applications', '*', {
+                owner_id: authData,
             })
         );
     });

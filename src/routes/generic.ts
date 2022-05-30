@@ -6,7 +6,7 @@ import { normalize } from 'node:path';
 
 import { StorageBackend } from '..';
 import { DB } from '../database';
-import { SiteV1 } from '../types/Site.type';
+import { DeploymentV2 } from '../types/Deployment.type';
 import { getCache, updateCache } from '../util/cache/cache';
 import { informationWrap } from '../util/http/information_wrapper';
 import { startAction } from '../util/sentry/createChild';
@@ -51,7 +51,7 @@ export const GenericRoute: FastifyPluginAsync<{}> = async (router) => {
                         child.setTag('host', request.hostname);
 
                         const cachedSite = getCache<
-                            Pick<SiteV1, 'site_id' | 'cid'>
+                            Pick<DeploymentV2, 'app_id' | 'sid'>
                         >('site_' + request.hostname);
 
                         child.setTag('cached_cid', !!cachedSite);
@@ -61,12 +61,17 @@ export const GenericRoute: FastifyPluginAsync<{}> = async (router) => {
 
                         if (cachedSite) return cachedSite;
 
-                        const liveSite = await DB.selectOneFrom(
-                            'sites',
-                            ['site_id', 'cid'],
+                        const { app_id, deploy_id } = await DB.selectOneFrom(
+                            'dlt',
+                            ['app_id', 'deploy_id'],
                             {
-                                host: request.hostname,
+                                base_url: request.hostname,
                             }
+                        );
+                        const liveSite = await DB.selectOneFrom(
+                            'deployments',
+                            ['sid'],
+                            { app_id, deploy_id }
                         );
 
                         updateCache(
@@ -92,12 +97,12 @@ export const GenericRoute: FastifyPluginAsync<{}> = async (router) => {
                 }
 
                 /* Update the bucket name in report */
-                transaction.setTag('bucket_name', site_data.cid);
-                information.cid = site_data.cid;
+                transaction.setTag('bucket_name', site_data.sid);
+                information.cid = site_data.sid;
 
                 /* Set the path but try cached first if we can */
                 const cachedPath = getCache<string>(
-                    'resolve_' + site_data.cid + '_' + path
+                    'resolve_' + site_data.sid + '_' + path
                 );
 
                 /* Update the cachedPath in report */
@@ -112,7 +117,7 @@ export const GenericRoute: FastifyPluginAsync<{}> = async (router) => {
                         { op: 'Loading cached file' },
                         async () => {
                             return await StorageBackend.get(
-                                site_data.cid,
+                                site_data.sid,
                                 cachedPath
                             );
                         }
@@ -136,7 +141,7 @@ export const GenericRoute: FastifyPluginAsync<{}> = async (router) => {
                     transaction,
                     { op: 'Loading direct file' },
                     async () => {
-                        return await StorageBackend.get(site_data.cid, path);
+                        return await StorageBackend.get(site_data.sid, path);
                     }
                 );
 
@@ -159,7 +164,7 @@ export const GenericRoute: FastifyPluginAsync<{}> = async (router) => {
                         { op: 'Loading direct file' },
                         async () => {
                             return await StorageBackend.get(
-                                site_data.cid,
+                                site_data.sid,
                                 path + '.html'
                             );
                         }
@@ -183,7 +188,7 @@ export const GenericRoute: FastifyPluginAsync<{}> = async (router) => {
                     { op: 'Loading page data' },
                     async () => {
                         return await StorageBackend.traverse(
-                            site_data.cid,
+                            site_data.sid,
                             join(path, '.')
                         );
                     }
@@ -196,7 +201,7 @@ export const GenericRoute: FastifyPluginAsync<{}> = async (router) => {
 
                     /* Store the resolved path in memory */
                     updateCache(
-                        'resolve_' + site_data.cid + '_' + path,
+                        'resolve_' + site_data.sid + '_' + path,
                         indexPageData.path,
                         60_000
                     );

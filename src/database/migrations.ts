@@ -11,6 +11,7 @@ import { deployments_date } from './migrations/05_deployments_date';
 import { sites_deprecate } from './migrations/06_sites_deprecate';
 import { owner_indexing } from './migrations/07_owner_indexing';
 import { domain_ownership } from './migrations/08_domain_ownership';
+import { sites_domain } from './migrations/09_sites_domain';
 
 export type MigrationState = {
     instance_id: string;
@@ -90,4 +91,6 @@ export const Migrations: Migration<undefined>[] = [
     owner_indexing,
     // Alter domain ownership
     domain_ownership,
+    // Transfer Domain Ownership Data
+    sites_domain,
 ];
