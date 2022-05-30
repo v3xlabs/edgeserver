@@ -170,14 +170,14 @@ export const LoginRoute: FastifyPluginAsync = async (router, options) => {
                 }
 
                 const user = await DB.selectOneFrom('owners', ['user_id'], {
-                    address: verifiedMessage.data.address,
+                    address: verifiedMessage.data.address.toLowerCase(),
                 });
 
                 if (!user) {
                     reply.status(403).send();
                     log.debug(
                         'No user found for address ' +
-                            verifiedMessage.data.address
+                            verifiedMessage.data.address.toLowerCase()
                     );
 
                     return;
@@ -185,7 +185,7 @@ export const LoginRoute: FastifyPluginAsync = async (router, options) => {
 
                 const token = signToken(
                     user.user_id,
-                    verifiedMessage.data.address
+                    verifiedMessage.data.address.toLowerCase()
                 );
 
                 reply.send({ token });
