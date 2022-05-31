@@ -34,9 +34,20 @@ export const DomainsEntryRoute: FastifyPluginAsync = async (
         }
 
         reply.send(
+<<<<<<< HEAD
             await DB.selectOneFrom('domains', '*', {
                 domain_id: _request.params.domain_id,
             })
+=======
+            await DB.selectFrom(
+                'domains',
+                '*',
+                {
+                    domain_id: _request.params.domain_id,
+                },
+                'LIMIT 50'
+            )
+>>>>>>> 6523dd75d020b33ecc26d0c7721476ad77952036
         );
     });
 };
