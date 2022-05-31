@@ -2,13 +2,11 @@ import { Static, Type } from '@sinclair/typebox';
 import { FastifyPluginAsync } from 'fastify';
 
 import { DB } from '../../../database';
-import { SiteV1 } from '../../../types/Site.type';
 import { useAuth } from '../../../util/http/useAuth';
 import { log } from '../../../util/logging';
 import { Poof } from '../../../util/sentry/sentryHandle';
-import { generateSnowflake } from '.';
 import { determineIfAuth } from './ls';
-import { updateRaw } from 'scyllo';
+
 export const DeploymentPermissionRoute: FastifyPluginAsync = async (
     router,
     options
@@ -19,9 +17,8 @@ export const DeploymentPermissionRoute: FastifyPluginAsync = async (
             instance_id: Type.String(),
             user_id: Type.String(),
             permissions: Type.String(),
-
         }),
-        signature: Type.String()
+        signature: Type.String(),
     });
 
     router.put<{
@@ -46,27 +43,39 @@ export const DeploymentPermissionRoute: FastifyPluginAsync = async (
 
             const { message, signature } = _request.body;
             const { app_id, instance_id, user_id, permissions } = message;
-            const owner = await DB.selectOneFrom('owners', '*', { address: signature });
+            const owner = await DB.selectOneFrom('owners', '*', {
+                address: signature,
+            });
             const owner_id = owner.user_id;
+
             log.network(`Deployment permissions for ${app_id} by ${owner_id}`);
-            const application = await DB.selectOneFrom('applications', '*', { app_id });
+            const application = await DB.selectOneFrom('applications', '*', {
+                app_id,
+            });
+
             if (Number(application.owner_id) !== Number(owner_id)) {
                 reply.status(401);
-                reply.send({ msg: "Unauthorized" });
+                reply.send({ msg: 'Unauthorized' });
                 log.error('Unauthorized');
-                return
+
+                return;
             }
+
             const app_perms = {
                 ...application.permissions,
-                [user_id]: permissions
-            }
-            log.network(app_perms)
+                [user_id]: permissions,
+            };
+
+            log.network(app_perms);
 
             // const insertedPermissions = await DB.raw(`UPDATE signal.applications SET permissions = ${JSON.stringify(app_perms)} WHERE app_id = ${app_id}`);
-            const insertedPermissions = await DB.insertInto('applications', { app_id, owner_id, permissions: app_perms });
-
+            const insertedPermissions = await DB.insertInto('applications', {
+                app_id,
+                owner_id,
+                permissions: app_perms,
+            });
 
             reply.send(insertedPermissions);
-        },
+        }
     );
-}
+};

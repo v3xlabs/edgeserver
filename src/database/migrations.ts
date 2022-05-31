@@ -44,25 +44,28 @@ export const migrate = async (
         }
     )) ?? {
         instance_id: '1',
-        current_version: 0,
+        current_version: '0',
     };
 
-    log.database('Current Migration: ' + current_version);
+    log.database(
+        'Current Migration: #' +
+            (-1 + Number.parseInt(current_version)).toString()
+    );
 
     let index = +current_version;
     let migrations_run = 0;
 
-    while (index + 1 < migrations.length) {
-        index += 1;
+    while (index < migrations.length) {
         log.database('Running Migration ' + index);
         await migrations[index](database, (log_text) =>
             log.database('M-' + index + ': ' + log_text)
         );
+        migrations_run += 1;
+        index += 1;
         await database.insertInto('migrations', {
             instance_id: '1',
             current_version: index.toString(),
         });
-        migrations_run += 1;
     }
 
     if (migrations_run == 0) {
