@@ -21,6 +21,22 @@ export const ApplicationPermissionRoute: FastifyPluginAsync = async (
         signature: Type.String(),
     });
 
+    /**
+     * @api {put} /api/apps/permissions/
+     *
+     * @apiName CreateAppPermission
+     *
+     * @apiGroup ApplicationPermission
+     *
+     * Input:
+     * @apiParam {String} app_id
+     * @apiParam {String} instance_id
+     * @apiParam {String} user_id
+     * @apiParam {String} permissions
+     *
+     * Return:
+     * @apiSuccess {String} message
+     */
     router.put<{
         Body: Static<typeof createPayload>;
     }>(
