@@ -10,3 +10,5 @@ export type ApplicationV1 = {
 };
 
 export type ApplicationV2 = ApplicationV1 & { domain_id: Snowflake };
+
+export type ApplicationV3 = ApplicationV2 & { name: string };

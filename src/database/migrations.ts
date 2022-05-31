@@ -12,6 +12,7 @@ import { sites_deprecate } from './migrations/06_sites_deprecate';
 import { owner_indexing } from './migrations/07_owner_indexing';
 import { domain_ownership } from './migrations/08_domain_ownership';
 import { sites_domain } from './migrations/09_sites_domain';
+import { application_name } from './migrations/10_application_name';
 
 export type MigrationState = {
     instance_id: string;
@@ -96,4 +97,6 @@ export const Migrations: Migration<undefined>[] = [
     domain_ownership,
     // Transfer Domain Ownership Data
     sites_domain,
+    // Add name for each application based on their domain
+    application_name,
 ];
