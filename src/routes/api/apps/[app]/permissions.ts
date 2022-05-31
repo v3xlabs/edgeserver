@@ -26,8 +26,6 @@ export const ApplicationPermissionRoute: FastifyPluginAsync = async (
      * @apiGroup ApplicationPermission
      *
      * Input:
-     * @apiParam {String} app_id
-     * @apiParam {String} instance_id
      * @apiParam {String} user_id
      * @apiParam {String} permissions
      *
@@ -93,7 +91,7 @@ export const ApplicationPermissionRoute: FastifyPluginAsync = async (
                 permissions: app_perms,
             });
 
-            reply.status(200);
+            reply.send(insertedPermissions);
         }
     );
 };
