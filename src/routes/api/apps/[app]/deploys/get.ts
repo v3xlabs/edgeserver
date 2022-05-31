@@ -39,6 +39,7 @@ export const DeploysEntryRoute: FastifyPluginAsync = async (
                 'deployments',
                 '*',
                 {
+                    app_id: _request.params.app_id,
                     deploy_id: _request.params.deploy_id,
                 },
                 'LIMIT 50'
