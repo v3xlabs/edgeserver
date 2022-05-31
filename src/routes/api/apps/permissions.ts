@@ -22,7 +22,7 @@ export const ApplicationPermissionRoute: FastifyPluginAsync = async (
     });
 
     /**
-     * @api {put} /api/apps/permissions/
+     * @api {PUT} /api/apps/permissions/
      *
      * @apiName CreateAppPermission
      *
@@ -35,7 +35,8 @@ export const ApplicationPermissionRoute: FastifyPluginAsync = async (
      * @apiParam {String} permissions
      *
      * Return:
-     * @apiSuccess {String} message
+     * @apiSuccess {Status} 200
+     * @apiForbidden {Status} 403
      */
     router.put<{
         Body: Static<typeof createPayload>;
