@@ -71,7 +71,7 @@ export const ApplicationPermissionRoute: FastifyPluginAsync = async (
 
             if (String(application.owner_id) !== String(owner_id)) {
                 reply.status(403);
-                reply.send({ msg: 'Unauthorized' });
+                reply.send();
                 log.error('Unauthorized');
 
                 return;
@@ -83,15 +83,13 @@ export const ApplicationPermissionRoute: FastifyPluginAsync = async (
             };
 
             log.network(app_perms);
-
-            // const insertedPermissions = await DB.raw(`UPDATE signal.applications SET permissions = ${JSON.stringify(app_perms)} WHERE app_id = ${app_id}`);
             const insertedPermissions = await DB.insertInto('applications', {
                 app_id,
                 owner_id,
                 permissions: app_perms,
             });
 
-            reply.send(insertedPermissions);
+            reply.status(200).send();
         }
     );
 };
