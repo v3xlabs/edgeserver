@@ -5,7 +5,6 @@ import { Auth } from '../../../middleware/auth';
 import { AppEntryRoute } from './[app]';
 import { AppCreateRoute } from './create';
 import { AppLsRoute } from './ls';
-import { ApplicationPermissionRoute } from './permissions';
 
 export const generateSnowflake = generateSunflake();
 
@@ -20,8 +19,5 @@ export const AppRoute: FastifyPluginAsync = async (router, _options) => {
     router.register(AppCreateRoute, { prefix: '/create' });
     router.register(AppEntryRoute, {
         prefix: '/:app_id',
-    });
-    router.register(ApplicationPermissionRoute, {
-        prefix: '/permission',
     });
 };

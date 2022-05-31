@@ -1,11 +1,11 @@
 import { Static, Type } from '@sinclair/typebox';
 import { FastifyPluginAsync } from 'fastify';
 
-import { DB } from '../../../database';
-import { useAuth } from '../../../util/http/useAuth';
-import { log } from '../../../util/logging';
-import { Poof } from '../../../util/sentry/sentryHandle';
-import { determineIfAuth } from './ls';
+import { DB } from '../../../../database';
+import { useAuth } from '../../../../util/http/useAuth';
+import { log } from '../../../../util/logging';
+import { Poof } from '../../../../util/sentry/sentryHandle';
+import { determineIfAuth } from '../ls';
 
 export const ApplicationPermissionRoute: FastifyPluginAsync = async (
     router,
@@ -13,8 +13,6 @@ export const ApplicationPermissionRoute: FastifyPluginAsync = async (
 ) => {
     const createPayload = Type.Object({
         message: Type.Object({
-            app_id: Type.String(),
-            instance_id: Type.String(),
             user_id: Type.String(),
             permissions: Type.String(),
         }),
@@ -38,6 +36,9 @@ export const ApplicationPermissionRoute: FastifyPluginAsync = async (
      * @apiForbidden {Status} 403
      */
     router.put<{
+        Params: {
+            app_id: string;
+        };
         Body: Static<typeof createPayload>;
     }>(
         '/',
@@ -47,6 +48,7 @@ export const ApplicationPermissionRoute: FastifyPluginAsync = async (
             },
         },
         async (_request, reply) => {
+            const { app_id } = _request.params;
             const authData = (await useAuth(_request, reply)) as Poof | string;
 
             if (determineIfAuth(authData)) {
@@ -58,7 +60,7 @@ export const ApplicationPermissionRoute: FastifyPluginAsync = async (
             }
 
             const { message } = _request.body;
-            const { app_id, instance_id, user_id, permissions } = message;
+            const { user_id, permissions } = message;
             const owner = await DB.selectOneFrom('owners', '*', {
                 user_id: authData,
             });
