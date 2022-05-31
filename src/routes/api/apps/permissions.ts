@@ -7,7 +7,7 @@ import { log } from '../../../util/logging';
 import { Poof } from '../../../util/sentry/sentryHandle';
 import { determineIfAuth } from './ls';
 
-export const DeploymentPermissionRoute: FastifyPluginAsync = async (
+export const ApplicationPermissionRoute: FastifyPluginAsync = async (
     router,
     options
 ) => {
