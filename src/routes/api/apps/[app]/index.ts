@@ -17,6 +17,8 @@ export const AppEntryRoute: FastifyPluginAsync = async (router, _options) => {
 
     router.get<AppIDParameters>('/', async (_request, reply) => {
         const parameters = _request.params;
+
+        ///TODO: Permission Verification
         const app = await DB.selectOneFrom('applications', '*', {
             app_id: parameters.app_id,
         });

@@ -18,7 +18,6 @@ export const ApplicationPermissionRoute: FastifyPluginAsync = async (
             user_id: Type.String(),
             permissions: Type.String(),
         }),
-        signature: Type.String(),
     });
 
     /**
@@ -58,10 +57,10 @@ export const ApplicationPermissionRoute: FastifyPluginAsync = async (
                 return;
             }
 
-            const { message, signature } = _request.body;
+            const { message } = _request.body;
             const { app_id, instance_id, user_id, permissions } = message;
             const owner = await DB.selectOneFrom('owners', '*', {
-                address: signature,
+                user_id: authData,
             });
             const owner_id = owner.user_id;
 
@@ -70,8 +69,8 @@ export const ApplicationPermissionRoute: FastifyPluginAsync = async (
                 app_id,
             });
 
-            if (Number(application.owner_id) !== Number(owner_id)) {
-                reply.status(401);
+            if (String(application.owner_id) !== String(owner_id)) {
+                reply.status(403);
                 reply.send({ msg: 'Unauthorized' });
                 log.error('Unauthorized');
 
@@ -92,7 +91,7 @@ export const ApplicationPermissionRoute: FastifyPluginAsync = async (
                 permissions: app_perms,
             });
 
-            reply.send(insertedPermissions);
+            reply.status(200);
         }
     );
 };
