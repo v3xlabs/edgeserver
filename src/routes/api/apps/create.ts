@@ -2,8 +2,7 @@ import { Static, Type } from '@sinclair/typebox';
 import { FastifyPluginAsync } from 'fastify';
 
 import { DB } from '../../../database';
-import { ApplicationV2 } from '../../../types/Application.type';
-import { DomainV1 } from '../../../types/Domain.type';
+import { ApplicationV3 } from '../../../types/Application.type';
 import { useAuth } from '../../../util/http/useAuth';
 import { log } from '../../../util/logging';
 import { Poof } from '../../../util/sentry/sentryHandle';
@@ -11,7 +10,9 @@ import { generateSnowflake } from '.';
 import { determineIfAuth } from './ls';
 
 export const AppCreateRoute: FastifyPluginAsync = async (router, _options) => {
-    const createPayload = Type.Object({});
+    const createPayload = Type.Object({
+        name: Type.String(),
+    });
 
     router.post<{
         Body: Static<typeof createPayload>;
@@ -33,11 +34,14 @@ export const AppCreateRoute: FastifyPluginAsync = async (router, _options) => {
                 return;
             }
 
+            const { name } = _request.body;
+
             // const {} = _request.body;
             // const domain_id = generateSnowflake();
-            const createdProject: Partial<ApplicationV2> = {
+            const createdProject: Partial<ApplicationV3> = {
                 app_id: generateSnowflake(),
                 owner_id: authData,
+                name,
                 // domain_id,
             };
             // const domain: Partial<DomainV1> = {
