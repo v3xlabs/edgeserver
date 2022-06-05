@@ -1,7 +1,7 @@
 import { ScylloClient } from 'scyllo';
 
 import { Globals } from '..';
-import { ApplicationV3 } from '../types/Application.type';
+import { ApplicationV4 } from '../types/Application.type';
 import { AuthKeyV1 } from '../types/AuthKey.type';
 import { DeploymentV2 } from '../types/Deployment.type';
 import { DeploymentLookupV1 } from '../types/DeploymentLookup.type';
@@ -18,7 +18,7 @@ type DBType = {
     // Get authorization
     migrations: MigrationState;
     // Applications
-    applications: ApplicationV3;
+    applications: ApplicationV4;
     // Deployments
     deployments: DeploymentV2;
     // DeploymentLookups

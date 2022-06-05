@@ -13,6 +13,7 @@ import { owner_indexing } from './migrations/07_owner_indexing';
 import { domain_ownership } from './migrations/08_domain_ownership';
 import { sites_domain } from './migrations/09_sites_domain';
 import { application_name } from './migrations/10_application_name';
+import { application_last_deployed } from './migrations/11_application_last_deployed';
 
 export type MigrationState = {
     instance_id: string;
@@ -99,4 +100,6 @@ export const Migrations: Migration<undefined>[] = [
     sites_domain,
     // Add name for each application based on their domain
     application_name,
+    // Add a timestamp for last deploy
+    application_last_deployed,
 ];
