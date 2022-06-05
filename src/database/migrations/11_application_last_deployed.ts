@@ -22,6 +22,8 @@ export const application_last_deployed: Migration<{
             domain_id: app.domain_id,
         });
 
+        if (!domain) continue;
+
         const { deploy_id } = await database.selectOneFrom(
             'dlt',
             ['deploy_id'],
@@ -30,11 +32,15 @@ export const application_last_deployed: Migration<{
             }
         );
 
+        if (!deploy_id) continue;
+
         const { timestamp } = await database.selectOneFrom(
             'deployments',
             ['timestamp'],
             { deploy_id }
         );
+
+        if (!timestamp) continue;
 
         await database.update(
             'applications',
