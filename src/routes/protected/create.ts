@@ -168,6 +168,14 @@ export const CreateRoute: FastifyPluginAsync = async (router, options) => {
                             { domain_id }
                         );
 
+                        await DB.update(
+                            'applications',
+                            { last_deployed: new Date().toString() },
+                            {
+                                app_id: site.app_id,
+                            }
+                        );
+
                         if (domain) {
                             await DB.insertInto('dlt', {
                                 app_id: site.app_id,
