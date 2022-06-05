@@ -1,12 +1,31 @@
 name: Build Docker Container
 on:
-  release:
-    types: [created]
+  push:
+    tags:
+      - 'v*.*.*'
+    branches:
+      - master
+
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v4
+        with:
+          # list of Docker images to use as base name for tags
+          images: |
+            lvkdotsh/ipfs-signal
+          # generate Docker tags based on the following events/attributes
+          # semver runs on tag push
+          tags: |
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=semver,pattern={{major}}
+            type=edge
+            type=sha
       - name: Login to DockerHub
         uses: docker/login-action@v1 
         with:
@@ -17,4 +36,4 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           push: true
-          tags: lvkdotsh/ipfs-signal:latest
+          tags: ${{ steps.meta.outputs.tags }}
