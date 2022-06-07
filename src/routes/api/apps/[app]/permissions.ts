@@ -62,12 +62,29 @@ export const ApplicationPermissionRoute: FastifyPluginAsync = async (
             const owner = await DB.selectOneFrom('owners', '*', {
                 user_id: authData,
             });
+
+            if (!owner) {
+                reply.status(403);
+                reply.send();
+                log.warning('Not valid user');
+
+                return;
+            }
+
             const owner_id = owner.user_id;
 
             log.network(`Deployment permissions for ${app_id} by ${owner_id}`);
             const application = await DB.selectOneFrom('applications', '*', {
                 app_id,
             });
+
+            if (!application) {
+                reply.status(403);
+                reply.send();
+                log.warning('Not valid app');
+
+                return;
+            }
 
             if (String(application.owner_id) !== String(owner_id)) {
                 reply.status(403);

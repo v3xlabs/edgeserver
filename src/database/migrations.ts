@@ -27,7 +27,7 @@ export type Migration<K extends TableScheme> = (
 
 export const migrate = async (
     database: typeof DB,
-    migrations: Migration<undefined>[]
+    migrations: Migration<TableScheme>[]
 ) => {
     await database.createTable(
         'migrations',
@@ -77,7 +77,7 @@ export const migrate = async (
     }
 };
 
-export const Migrations: Migration<undefined>[] = [
+export const Migrations: Migration<TableScheme>[] = [
     // Create Initial Database
     initial_create,
     // Create Applications Table

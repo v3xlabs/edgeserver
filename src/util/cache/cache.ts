@@ -10,7 +10,8 @@ export const getCache = <T>(key: string) => {
 
     if (!data) return;
 
-    if (data.at(0) < Date.now()) return;
+    // eslint-disable-next-line unicorn/prefer-at
+    if (data[0] < Date.now()) return;
 
     return data.at(1) as T;
 };

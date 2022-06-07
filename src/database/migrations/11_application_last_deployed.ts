@@ -18,29 +18,29 @@ export const application_last_deployed: Migration<{
     ]);
 
     for (const app of applications) {
-        const { domain } = await database.selectOneFrom('domains', ['domain'], {
+        const domain = await database.selectOneFrom('domains', ['domain'], {
             domain_id: app.domain_id,
         });
 
         if (!domain) continue;
 
-        const { deploy_id } = await database.selectOneFrom(
-            'dlt',
-            ['deploy_id'],
-            {
-                base_url: domain,
-            }
-        );
+        const deploy = await database.selectOneFrom('dlt', ['deploy_id'], {
+            base_url: domain.domain,
+        });
 
-        if (!deploy_id) continue;
+        if (!deploy) continue;
 
-        const { timestamp } = await database.selectOneFrom(
+        const { deploy_id } = deploy;
+
+        const deployment = await database.selectOneFrom(
             'deployments',
             ['timestamp'],
             { deploy_id }
         );
 
-        if (!timestamp) continue;
+        if (!deployment) continue;
+
+        const { timestamp } = deployment;
 
         await database.update(
             'applications',

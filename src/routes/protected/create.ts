@@ -157,11 +157,12 @@ export const CreateRoute: FastifyPluginAsync = async (router, options) => {
                             sid: bucket_name,
                             timestamp: new Date().toString(),
                         });
-                        const { domain_id } = await DB.selectOneFrom(
+                        const { domain_id } = (await DB.selectOneFrom(
                             'applications',
                             ['domain_id'],
                             { app_id: site.app_id }
-                        );
+                        ))!;
+
                         const domain = await DB.selectOneFrom(
                             'domains',
                             ['domain'],

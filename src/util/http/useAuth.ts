@@ -22,6 +22,13 @@ export const useAuth: (
 ) => Promise<Poof | string> = async (request, _reply) => {
     let auth = request.headers.authorization;
 
+    if (!auth) {
+        return {
+            status: 401,
+            logMessages: ['No Authorization header found'],
+        };
+    }
+
     if (auth.toLowerCase().startsWith('bearer ')) {
         auth = auth.slice('Bearer '.length);
     }
@@ -45,10 +52,8 @@ export const useAuth: (
             logMessages: ['Key "user_id" was missing from payload'],
         };
 
-    console.log(process.env.SIGNAL_MASTER);
-
     try {
-        verify(auth, process.env.SIGNAL_MASTER);
+        verify(auth, process.env.SIGNAL_MASTER ?? '');
     } catch {
         return {
             status: 403,
