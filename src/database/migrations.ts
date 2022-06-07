@@ -14,6 +14,7 @@ import { domain_ownership } from './migrations/08_domain_ownership';
 import { sites_domain } from './migrations/09_sites_domain';
 import { application_name } from './migrations/10_application_name';
 import { application_last_deployed } from './migrations/11_application_last_deployed';
+import { application_name_index } from './migrations/12_application_name_index';
 
 export type MigrationState = {
     instance_id: string;
@@ -102,4 +103,6 @@ export const Migrations: Migration<TableScheme>[] = [
     application_name,
     // Add a timestamp for last deploy
     application_last_deployed,
+    // Create index for name of application
+    application_name_index,
 ];
