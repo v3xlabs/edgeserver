@@ -3,7 +3,7 @@ import { ScylloClient } from 'scyllo';
 import { Globals } from '..';
 import { ApplicationV4 } from '../types/Application.type';
 import { AuthKeyV1 } from '../types/AuthKey.type';
-import { DeploymentV2 } from '../types/Deployment.type';
+import { DeploymentV2, DeploymentV3 } from '../types/Deployment.type';
 import { DeploymentLookupV1 } from '../types/DeploymentLookup.type';
 import { DomainV1 } from '../types/Domain.type';
 import { OwnerV1 } from '../types/Owner.type';
@@ -20,7 +20,7 @@ type DBType = {
     // Applications
     applications: ApplicationV4;
     // Deployments
-    deployments: DeploymentV2;
+    deployments: DeploymentV3;
     // DeploymentLookups
     dlt: DeploymentLookupV1;
     // Domains

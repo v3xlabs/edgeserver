@@ -5,6 +5,7 @@ import { rm } from 'node:fs/promises';
 import { join } from 'node:path';
 import { generateSunflake } from 'sunflake';
 import { Extract } from 'unzipper';
+import { string } from 'yup';
 
 import { StorageBackend } from '../..';
 import { DB } from '../../database';
@@ -38,6 +39,11 @@ export const CreateRoute: FastifyPluginAsync = async (router, options) => {
         typeof options & {
             Querystring: {
                 site: string;
+                comment?: string;
+                git_sha?: string;
+                git_src?: string;
+                git_type?: string;
+                git_actor?: string;
             };
         }
     >(

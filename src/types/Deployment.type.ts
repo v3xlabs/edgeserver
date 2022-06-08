@@ -12,3 +12,11 @@ export type DeploymentV2 = Omit<DeploymentV1, 'created_on'> & {
     cid: string;
     sid: string;
 };
+
+export type DeploymentV3 = DeploymentV2 & {
+    comment: string;
+    git_sha: string; // aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+    git_src: number; // 0 pull_request / 1 commit / 2 tag / 3 release
+    git_type: number; // 0 github / 1 gitlab / 2 gitea / 3 bitbucket
+    git_actor: string; // lucemans
+};

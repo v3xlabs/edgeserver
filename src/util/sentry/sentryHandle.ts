@@ -24,7 +24,7 @@ export type Poof = {
 };
 
 export const sentryHandle = (options: SentryHandleOptions) => {
-    const { dataConsent, transactionData, sample = false } = options;
+    const { dataConsent, transactionData, sample: _sample = false } = options;
     const currentHub = getCurrentHub();
     const client = currentHub.getClient<NodeClient>();
 
