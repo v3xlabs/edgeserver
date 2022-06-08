@@ -36,6 +36,21 @@ export const AppCreateRoute: FastifyPluginAsync = async (router, _options) => {
 
             const { name } = _request.body;
 
+            const oldAppId = await DB.selectOneFrom(
+                'applications',
+                ['app_id'],
+                { name }
+            );
+
+            if (oldAppId) {
+                reply.status(409);
+                reply.send({
+                    error: 'Application already exists',
+                });
+
+                return;
+            }
+
             // const {} = _request.body;
             // const domain_id = generateSnowflake();
             const createdProject: Partial<ApplicationV3> = {
