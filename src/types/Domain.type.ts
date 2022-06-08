@@ -1,5 +1,4 @@
 type Snowflake = string;
-type PermissionsBit = string;
 
 export type DomainV1 = {
     domain_id: Snowflake;
@@ -9,3 +8,5 @@ export type DomainV1 = {
         [key: string]: string;
     };
 };
+
+export type Domain = DomainV1;
