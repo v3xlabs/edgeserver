@@ -16,6 +16,7 @@ import { application_name } from './migrations/10_application_name';
 import { application_last_deployed } from './migrations/11_application_last_deployed';
 import { application_name_index } from './migrations/12_application_name_index';
 import { deployment_comment } from './migrations/13_deployment_comment';
+import { deployments_timestamp } from './migrations/14_deployment_timestamp';
 
 export type MigrationState = {
     instance_id: string;
@@ -108,4 +109,6 @@ export const Migrations: Migration<TableScheme>[] = [
     application_name_index,
     // Create Deployment comments
     deployment_comment,
+    // Remove Timestamp from Deployments
+    deployments_timestamp,
 ];

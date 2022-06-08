@@ -1,5 +1,4 @@
 type Snowflake = string;
-type PermissionsBit = string;
 
 export type DeploymentV1 = {
     app_id: Snowflake;
@@ -20,3 +19,7 @@ export type DeploymentV3 = DeploymentV2 & {
     git_type: number; // 0 github / 1 gitlab / 2 gitea / 3 bitbucket
     git_actor: string; // lucemans
 };
+
+export type DeploymentV4 = Omit<DeploymentV3, 'timestamp'>;
+
+export type Deployment = DeploymentV4;
