@@ -61,13 +61,20 @@ export const GenericRoute: FastifyPluginAsync<{}> = async (router) => {
 
                         if (cachedSite) return cachedSite;
 
-                        const { app_id, deploy_id } = await DB.selectOneFrom(
+                        const dltLookup = await DB.selectOneFrom(
                             'dlt',
                             ['app_id', 'deploy_id'],
                             {
                                 base_url: request.hostname,
                             }
                         );
+
+                        if (!dltLookup) {
+                            return;
+                        }
+
+                        const { app_id, deploy_id } = dltLookup;
+
                         const liveSite = await DB.selectOneFrom(
                             'deployments',
                             ['sid'],

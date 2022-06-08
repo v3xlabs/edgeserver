@@ -22,6 +22,13 @@ export const useAPIToken: (
 ) => Promise<Poof | string> = async (request, _reply) => {
     let auth = request.headers.authorization;
 
+    if (!auth) {
+        return {
+            status: 401,
+            logMessages: ['No Authorization header found'],
+        };
+    }
+
     if (auth.toLowerCase().startsWith('bearer ')) {
         auth = auth.slice('Bearer '.length);
     }

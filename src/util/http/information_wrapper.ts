@@ -21,7 +21,7 @@ export const informationWrap: <T extends H[], G, H>(
         try {
             return await handler(data, ...trans);
         } finally {
-            const addressData = data.domain + data.endpoint;
+            const addressData = (data.domain ?? '') + (data.endpoint ?? '');
 
             if (data.success) {
                 log.network(

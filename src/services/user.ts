@@ -26,7 +26,7 @@ export const signToken = (user_id: string, address: string) => {
         user_id: user_id,
     };
 
-    return sign(payload, process.env.SIGNAL_MASTER);
+    return sign(payload, process.env.SIGNAL_MASTER ?? '');
 };
 
 export const getLoginSessionByState = async (state: string) => {
