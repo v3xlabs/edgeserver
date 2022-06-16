@@ -44,7 +44,7 @@ export const AppEntryLinkRoute: FastifyPluginAsync = async (
             const oldAppId = await DB.selectOneFrom(
                 'applications',
                 ['app_id'],
-                { app_id }
+                { app_id, owner_id: authData }
             );
 
             if (!oldAppId) {
