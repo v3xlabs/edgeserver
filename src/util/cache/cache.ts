@@ -15,3 +15,7 @@ export const getCache = <T>(key: string) => {
 
     return data.at(1) as T;
 };
+
+export const deleteCache = (key: string) => {
+    delete cache[key];
+};
