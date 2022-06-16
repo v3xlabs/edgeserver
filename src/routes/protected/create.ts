@@ -5,10 +5,10 @@ import { rm } from 'node:fs/promises';
 import { join } from 'node:path';
 import { generateSunflake } from 'sunflake';
 import { Extract } from 'unzipper';
-import { string } from 'yup';
 
 import { StorageBackend } from '../..';
 import { DB } from '../../database';
+import { deleteCache } from '../../util/cache/cache';
 import { useAPIToken } from '../../util/http/useAPIToken';
 import { log } from '../../util/logging';
 import { startAction } from '../../util/sentry/createChild';
@@ -200,6 +200,7 @@ export const CreateRoute: FastifyPluginAsync = async (router, options) => {
                                 base_url: domain.domain,
                                 deploy_id,
                             });
+                            deleteCache('site_' + domain?.domain);
                         }
                     }
                 );
