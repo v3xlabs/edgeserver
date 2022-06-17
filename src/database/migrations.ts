@@ -17,6 +17,7 @@ import { application_last_deployed } from './migrations/11_application_last_depl
 import { application_name_index } from './migrations/12_application_name_index';
 import { deployment_comment } from './migrations/13_deployment_comment';
 import { deployments_timestamp } from './migrations/14_deployment_timestamp';
+import { deployment_configs_create } from './migrations/15_deployment_configs_create';
 
 export type MigrationState = {
     instance_id: string;
@@ -111,4 +112,6 @@ export const Migrations: Migration<TableScheme>[] = [
     deployment_comment,
     // Remove Timestamp from Deployments
     deployments_timestamp,
+    // Create deployment configs
+    deployment_configs_create,
 ];
