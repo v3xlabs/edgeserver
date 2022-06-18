@@ -47,6 +47,17 @@ export type EdgeRcConfig = {
     ssl: boolean;
 };
 
+export const defaultEdgeRcConfig: EdgeRcConfig = {
+    routing: {
+        file_extensions: true,
+        trailing_slash: 'true',
+    },
+    headers: [],
+    redirects: [],
+    rewrites: [],
+    ssl: true,
+};
+
 export type Edgerc = {
     app_id: Snowflake;
     config: EdgeRcConfig;
