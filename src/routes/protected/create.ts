@@ -209,12 +209,16 @@ export const CreateRoute: FastifyPluginAsync = async (router, options) => {
                                 join('tmp', temporary_name, 'edgerc.json'),
                                 'utf8'
                             );
-                            const edgerc = JSON.parse(configData) as Edgerc;
+                            const { config } = JSON.parse(configData) as Edgerc;
                             // TODO Validate config before inserting
 
                             await DB.insertInto('deployment_configs', {
                                 deploy_id,
-                                config: JSON.stringify(edgerc.config),
+                                headers: JSON.stringify(config.headers),
+                                redirects: JSON.stringify(config.redirects),
+                                rewrites: JSON.stringify(config.rewrites),
+                                routing: JSON.stringify(config.routing),
+                                ssl: JSON.stringify(config.ssl),
                             });
                         } catch {
                             // Do nothing

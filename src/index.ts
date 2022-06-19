@@ -5,7 +5,7 @@ import { fastify } from 'fastify';
 
 import { initDB } from './database';
 import { ApiRoute } from './routes/api';
-import { GenericRoute } from './routes/generic';
+import { GenericRouteV2 } from './routes/default';
 import { CreateRoute } from './routes/protected/create';
 import { GenericStorage } from './storage/GenericStorage';
 import { SignalStorage } from './storage/SignalFS';
@@ -68,7 +68,7 @@ export const StorageBackend: GenericStorage = new SignalStorage();
     });
     server.register(CreateRoute, { prefix: '/deployments' });
     server.register(ApiRoute, { prefix: '/api' });
-    server.register(GenericRoute);
+    server.register(GenericRouteV2);
 
     server.listen(1234, '0.0.0.0', () => {
         log.lifecycle('Done ✨');

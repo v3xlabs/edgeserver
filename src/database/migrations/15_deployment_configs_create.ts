@@ -11,7 +11,19 @@ export const deployment_configs_create: Migration<{
             deploy_id: {
                 type: 'bigint',
             },
-            config: {
+            headers: {
+                type: 'text',
+            },
+            redirects: {
+                type: 'text',
+            },
+            rewrites: {
+                type: 'text',
+            },
+            routing: {
+                type: 'text',
+            },
+            ssl: {
                 type: 'text',
             },
         },
