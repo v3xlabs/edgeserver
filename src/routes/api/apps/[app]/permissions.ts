@@ -4,8 +4,6 @@ import { FastifyPluginAsync } from 'fastify';
 import { DB } from '../../../../database';
 import { useAuth } from '../../../../util/http/useAuth';
 import { log } from '../../../../util/logging';
-import { Poof } from '../../../../util/sentry/sentryHandle';
-import { determineIfAuth } from '../ls';
 
 export const ApplicationPermissionRoute: FastifyPluginAsync = async (
     router,
@@ -47,20 +45,12 @@ export const ApplicationPermissionRoute: FastifyPluginAsync = async (
         },
         async (_request, reply) => {
             const { app_id } = _request.params;
-            const authData = (await useAuth(_request, reply)) as Poof | string;
-
-            if (determineIfAuth(authData)) {
-                reply.status(authData.status || 500);
-                reply.send();
-                log.ok(...authData.logMessages);
-
-                return;
-            }
+            const { user_id: user_idz } = await useAuth(_request, reply);
 
             const { message } = _request.body;
             const { user_id, permissions } = message;
             const owner = await DB.selectOneFrom('owners', '*', {
-                user_id: authData,
+                user_id: user_idz,
             });
 
             if (!owner) {

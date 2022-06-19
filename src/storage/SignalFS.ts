@@ -7,7 +7,6 @@ import { join } from 'node:path';
 import { Readable } from 'node:stream';
 
 import { Globals } from '..';
-import { startAction } from '../util/sentry/createChild';
 import { FileData, GenericStorage, ResolveData } from './GenericStorage';
 
 export class SignalStorage implements GenericStorage {
@@ -125,8 +124,7 @@ export class SignalStorage implements GenericStorage {
     async uploadDirectory(
         bucket_name: string,
         prefix: string,
-        path: string,
-        transaction: Span
+        path: string
     ): Promise<void> {
         // Index
         const file_names = await readdir(path, {
@@ -144,34 +142,20 @@ export class SignalStorage implements GenericStorage {
         for (const entry of sorted_file_names) {
             if (entry.isFile()) {
                 actions.push(
-                    startAction(
-                        transaction,
-                        { op: 'Upload File', description: entry.name },
-                        () =>
-                            this.put(
-                                bucket_name,
-                                join(prefix, entry.name),
-                                createReadStream(join(path, entry.name))
-                            )
+                    this.put(
+                        bucket_name,
+                        join(prefix, entry.name),
+                        createReadStream(join(path, entry.name))
                     )
                 );
             }
 
             if (entry.isDirectory()) {
                 actions.push(
-                    startAction(
-                        transaction,
-                        {
-                            op: 'Upload Directory',
-                            description: entry.name,
-                        },
-                        async (span) =>
-                            this.uploadDirectory(
-                                bucket_name,
-                                join(prefix, entry.name),
-                                join(path, entry.name),
-                                span
-                            )
+                    this.uploadDirectory(
+                        bucket_name,
+                        join(prefix, entry.name),
+                        join(path, entry.name)
                     )
                 );
             }

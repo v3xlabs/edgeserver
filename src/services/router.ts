@@ -1,8 +1,8 @@
 import { FastifyReply, FastifyRequest } from 'fastify';
-import { log } from '../util/logging';
 
-// import RE2 from 're2';
-import { resolveRoute } from './resolver/RouteResolver';
+import { StorageBackend } from '..';
+import { SafeError } from '../util/error/SafeError';
+import { getDeploymentData } from './deployment';
 // import { getConfig } from './deploymentConfig';
 import { getSiteData } from './dlt';
 import {
@@ -12,20 +12,9 @@ import {
     matchRedirects,
     matchRewrites,
 } from './hrr';
+// import RE2 from 're2';
+import { resolveRoute } from './resolver/RouteResolver';
 import { shouldSlashRedirect } from './routing/tailing_slash';
-import { SignalStorage } from '../storage/SignalFS';
-import { StorageBackend } from '..';
-import { getDeploymentData } from './deployment';
-
-export class SafeError extends Error {
-    constructor(
-        public status: number,
-        public reply: string,
-        public marker?: string
-    ) {
-        super(`---${status}-${reply}`);
-    }
-}
 
 /**
  * List of shit to do
@@ -137,9 +126,7 @@ export const routeGeneric = async (
         reply.send(fileData.stream);
 
         return;
-    } catch {
-
-    }
+    } catch {}
 
     reply.send(`Hello World: ${base_url}${resolve_path}`);
 

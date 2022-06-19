@@ -1,20 +1,18 @@
 import { FastifyReply, FastifyRequest } from 'fastify';
 import { decode } from 'jsonwebtoken';
+import { object, string } from 'yup';
 
 import { DB } from '../../database';
-import { OwnerV1 } from '../../types/Owner.type';
+import { JWTAuthKey } from '../../types/AuthKey.type';
 import { log } from '../logging';
-import { Poof } from '../sentry/sentryHandle';
 
-type useAuthReturn =
-    | {
-          allowed: true;
-          user: OwnerV1;
-      }
-    | {
-          allowed: false;
-          reason: Poof;
-      };
+const JWTAuthKeySchema = object().shape({
+    key: string(),
+    owner_id: string(),
+    owner_address: string(),
+    instance_id: string(),
+    app_id: string().optional(),
+});
 
 export const useAPIToken: (
     request: FastifyRequest,
@@ -33,18 +31,15 @@ export const useAPIToken: (
         auth = auth.slice('Bearer '.length);
     }
 
-    const decoded = decode(auth) as { account: string; value: number };
+    const decoded = decode(auth) as JWTAuthKey;
 
     if (!decoded)
         return { status: 403, logMessages: ['Incorrect decoded payload'] };
 
-    if (!decoded['account'])
-        return {
-            status: 403,
-            logMessages: ['Key "acount" was missing from payload'],
-        };
+    /* Yup validation here */
+    const valid = JWTAuthKeySchema.isValidSync(decoded);
 
-    if (!decoded['value'])
+    if (!valid)
         return {
             status: 403,
             logMessages: ['Key "value" was missing from payload'],
@@ -53,11 +48,11 @@ export const useAPIToken: (
     // if (verify(auth, process.env.SIGNAL_MASTER)) return Malformat();
 
     const key = await DB.selectOneFrom('keys', ['owner_id'], {
-        key: decoded.value.toString(),
-        owner_id: decoded.account,
+        key: decoded.key.toString(),
+        owner_id: decoded.owner_id,
     });
 
-    console.log(decoded.account, decoded.value.toString());
+    console.log(decoded.owner_id, decoded.key.toString());
 
     if (!key) return { status: 403, logMessages: ['Not owner of Site'] };
 

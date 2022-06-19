@@ -4,10 +4,7 @@ import { FastifyPluginAsync } from 'fastify';
 import { DB } from '../../../database';
 import { ApplicationV3 } from '../../../types/Application.type';
 import { useAuth } from '../../../util/http/useAuth';
-import { log } from '../../../util/logging';
-import { Poof } from '../../../util/sentry/sentryHandle';
 import { generateSnowflake } from '.';
-import { determineIfAuth } from './ls';
 
 export const AppCreateRoute: FastifyPluginAsync = async (router, _options) => {
     const createPayload = Type.Object({
@@ -24,15 +21,7 @@ export const AppCreateRoute: FastifyPluginAsync = async (router, _options) => {
             },
         },
         async (_request, reply) => {
-            const authData = (await useAuth(_request, reply)) as Poof | string;
-
-            if (determineIfAuth(authData)) {
-                reply.status(authData.status || 500);
-                reply.send();
-                log.ok(...authData.logMessages);
-
-                return;
-            }
+            const { user_id } = await useAuth(_request, reply);
 
             const { name } = _request.body;
 
@@ -55,7 +44,7 @@ export const AppCreateRoute: FastifyPluginAsync = async (router, _options) => {
             // const domain_id = generateSnowflake();
             const createdProject: Partial<ApplicationV3> = {
                 app_id: generateSnowflake(),
-                owner_id: authData,
+                owner_id: user_id,
                 name,
                 // domain_id,
             };

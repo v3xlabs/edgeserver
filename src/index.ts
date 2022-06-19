@@ -10,7 +10,6 @@ import { CreateRoute } from './routes/protected/create';
 import { GenericStorage } from './storage/GenericStorage';
 import { SignalStorage } from './storage/SignalFS';
 import { log } from './util/logging';
-import { setupSentry } from './util/sentry/setupSentry';
 import { setupLogger } from './util/setupLogger';
 
 config();
@@ -51,12 +50,15 @@ export const StorageBackend: GenericStorage = new SignalStorage();
     );
     log.empty();
 
-    const server = fastify();
+    const server = fastify({
+        logger: false,
+        ajv: { customOptions: { keywords: ['kind', 'modifier'] } },
+    });
 
     setupLogger(server, log);
 
     /* Initiate Error Handling */
-    setupSentry();
+    // setupSentry();
 
     await initDB();
 
@@ -66,11 +68,18 @@ export const StorageBackend: GenericStorage = new SignalStorage();
         origin: true,
         methods: ['GET', 'PUT', 'POST'],
     });
+
     server.register(CreateRoute, { prefix: '/deployments' });
     server.register(ApiRoute, { prefix: '/api' });
     server.register(GenericRouteV2);
 
-    server.listen(1234, '0.0.0.0', () => {
+    server.listen({ port: 1234, host: '0.0.0.0' }, (error) => {
+        if (error) {
+            log.error(error);
+
+            return;
+        }
+
         log.lifecycle('Done ✨');
     });
 })();
