@@ -35,6 +35,8 @@
         "ipfs-only-hash": "^4.0.0",
         "jsonwebtoken": "^8.5.1",
         "keccak": "^3.0.2",
+        "node-cache": "^5.1.2",
+        "re2": "^1.17.7",
         "redis": "^4.0.4",
         "scyllo": "^1.2.0",
         "siwe": "2.0.3",

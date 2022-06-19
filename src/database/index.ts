@@ -4,6 +4,7 @@ import { Globals } from '..';
 import { Application } from '../types/Application.type';
 import { AuthKey } from '../types/AuthKey.type';
 import { Deployment } from '../types/Deployment.type';
+import { DeploymentConfig } from '../types/DeploymentConfig.type';
 import { DeploymentLookup } from '../types/DeploymentLookup.type';
 import { Domain } from '../types/Domain.type';
 import { Owner } from '../types/Owner.type';
@@ -25,6 +26,8 @@ type DBType = {
     dlt: DeploymentLookup;
     // Domains
     domains: Domain;
+    // DeploymentConfig
+    deployment_configs: DeploymentConfig;
 };
 export let DB: ScylloClient<DBType>;
 

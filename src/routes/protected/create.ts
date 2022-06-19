@@ -1,13 +1,14 @@
 import { addBreadcrumb } from '@sentry/node';
 import { FastifyPluginAsync } from 'fastify';
 import Multipart from 'fastify-multipart';
-import { rm } from 'node:fs/promises';
+import { readFile, rm } from 'node:fs/promises';
 import { join } from 'node:path';
 import { generateSunflake } from 'sunflake';
 import { Extract } from 'unzipper';
 
 import { StorageBackend } from '../..';
 import { DB } from '../../database';
+import { Edgerc } from '../../types/ConfigFile.type';
 import { deleteCache } from '../../util/cache/cache';
 import { useAPIToken } from '../../util/http/useAPIToken';
 import { log } from '../../util/logging';
@@ -201,6 +202,26 @@ export const CreateRoute: FastifyPluginAsync = async (router, options) => {
                                 deploy_id,
                             });
                             deleteCache('site_' + domain?.domain);
+                        }
+
+                        try {
+                            const configData = await readFile(
+                                join('tmp', temporary_name, 'edgerc.json'),
+                                'utf8'
+                            );
+                            const { config } = JSON.parse(configData) as Edgerc;
+                            // TODO Validate config before inserting
+
+                            await DB.insertInto('deployment_configs', {
+                                deploy_id,
+                                headers: JSON.stringify(config.headers),
+                                redirects: JSON.stringify(config.redirects),
+                                rewrites: JSON.stringify(config.rewrites),
+                                routing: JSON.stringify(config.routing),
+                                ssl: JSON.stringify(config.ssl),
+                            });
+                        } catch {
+                            // Do nothing
                         }
                     }
                 );
