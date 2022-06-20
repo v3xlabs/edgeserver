@@ -14,7 +14,7 @@ export const sendError = (
     url: string
 ) => {
     if (!(error instanceof SafeError)) {
-        log.error(`REQ ${url}`, error);
+        log.error(`REQ ${url}`, error, error.name, error.message);
 
         reply.status(502).send();
         log.debug(`502 ${url}`);
@@ -39,7 +39,11 @@ export const sendError = (
         return;
     }
 
-    log.debug(`REQ ${url}`, `http aborted with ${error.status}`);
+    log.debug(
+        `REQ ${url}`,
+        `http aborted with ${error.status}` +
+            (error._marker ? ` (${error._marker})` : '')
+    );
     reply.status(error.status).send(error.reply);
 };
 

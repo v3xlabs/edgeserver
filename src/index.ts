@@ -27,6 +27,7 @@ export const Globals = {
     SENTRY_DSN: process.env.SENTRY_DSN || '',
     ENVIRONMENT: process.env.ENVIRONMENT || 'dev',
     SENTRY_SAMPLE_RATE: process.env.ENVIRONMENT == 'production' ? 0.1 : 1,
+    INSTANCE_ID: process.env.INSTANCE_ID || 'localhost',
 };
 
 export const StorageBackend: GenericStorage = new SignalStorage();
@@ -47,7 +48,8 @@ export const StorageBackend: GenericStorage = new SignalStorage();
             (Globals.SENTRY_DSN
                 ? chalk.gray(Globals.SENTRY_DSN)
                 : chalk.red('MISSING')),
-        'SAMPLE RATE ' + chalk.gray(Globals.SENTRY_SAMPLE_RATE)
+        'SAMPLE RATE ' + chalk.gray(Globals.SENTRY_SAMPLE_RATE),
+        'INSTANCE_ID ' + chalk.gray(Globals.INSTANCE_ID)
     );
     log.empty();
 
@@ -67,7 +69,7 @@ export const StorageBackend: GenericStorage = new SignalStorage();
 
     server.register(Cors, {
         origin: true,
-        methods: ['GET', 'PUT', 'POST'],
+        methods: ['GET', 'PUT', 'POST', 'DELETE'],
     });
 
     server.register(CreateRoute, { prefix: '/deployments' });

@@ -2,19 +2,19 @@ import { FastifyReply, FastifyRequest } from 'fastify';
 import { decode } from 'jsonwebtoken';
 import { object, string } from 'yup';
 
-import { DB } from '../../database';
+import { getAuthKey, updateExpiringLastUsed, updateLongLivedLastUsed } from '../../services/auth/keys';
 import { JWTAuthKey } from '../../types/AuthKey.type';
 import { SafeError } from '../error/SafeError';
 import { log } from '../logging';
 
 const JWTAuthKeySchema = object().shape({
-    key: string(),
-    owner_id: string(),
-    instance_id: string(),
+    key: string().required(),
+    owner_id: string().required(),
+    instance_id: string().required(),
     app_id: string().optional(),
 });
 
-export type AuthData = { user_id: string };
+export type AuthData = { user_id: string; key_id: string };
 
 export const useAuth: (
     request: FastifyRequest,
@@ -39,12 +39,7 @@ export const useAuth: (
 
     // if (verify(auth, process.env.SIGNAL_MASTER)) return Malformat();
 
-    const key = await DB.selectOneFrom('keys', ['owner_id'], {
-        key: decoded.key.toString(),
-        owner_id: decoded.owner_id,
-    });
-
-    console.log(decoded.owner_id, decoded.key.toString());
+    const key = await getAuthKey(decoded.key.toString(), decoded.owner_id);
 
     if (!key) throw new SafeError(403, '', 'auth-no-key-found');
 
@@ -54,5 +49,13 @@ export const useAuth: (
 
     log.network('Verified Auth for user ' + key.owner_id);
 
-    return { user_id: key.owner_id.toString() };
+    {
+        if (key['exp']) {
+            updateExpiringLastUsed(key.key, key.owner_id);
+        } else {
+            updateLongLivedLastUsed(key.key);
+        }
+    }
+
+    return { user_id: key.owner_id.toString(), key_id: key.key };
 };
