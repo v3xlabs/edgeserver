@@ -1,6 +1,6 @@
 import chalk from 'chalk';
 import { FastifyReply } from 'fastify';
-import { createReadStream, readFileSync } from 'node:fs';
+import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 import { SafeError } from '../../util/error/SafeError';
@@ -16,8 +16,7 @@ export const sendError = (
     if (!(error instanceof SafeError)) {
         log.error(`REQ ${url}`, error);
 
-        reply.type('html');
-        reply.send(createReadStream(join(__dirname, '../static/502.html')));
+        reply.status(502).send();
         log.debug(`502 ${url}`);
 
         return;
@@ -46,6 +45,7 @@ export const sendError = (
 
 export const sendErrorPage = (reply: FastifyReply, status: number) => {
     reply.type('text/html');
+    reply.status(status);
 
     const buffer = readFileSync(join(__dirname, `../../static/${status}.html`));
 

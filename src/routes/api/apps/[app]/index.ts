@@ -2,7 +2,6 @@ import { FastifyPluginAsync } from 'fastify';
 import { generateSunflake } from 'sunflake';
 
 import { DB } from '../../../../database';
-import { Auth } from '../../../../middleware/auth';
 import { AppDeploysRoute } from './deploys';
 import { AppEntryLinkRoute } from './link';
 import { ApplicationPermissionRoute } from './permissions';
@@ -15,8 +14,6 @@ export type AppIDParameters = {
     };
 };
 export const AppEntryRoute: FastifyPluginAsync = async (router, _options) => {
-    router.register(Auth);
-
     router.get<AppIDParameters>('/', async (_request, reply) => {
         const parameters = _request.params;
 

@@ -10,7 +10,6 @@ import { log } from '../logging';
 const JWTAuthKeySchema = object().shape({
     key: string(),
     owner_id: string(),
-    owner_address: string(),
     instance_id: string(),
     app_id: string().optional(),
 });

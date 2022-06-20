@@ -12,7 +12,6 @@ export type AuthKeyV2 = AuthKeyV1 & {
 export type JWTAuthKey = {
     key: string;
     owner_id: string;
-    owner_address: string;
     instance_id: string;
     app_id?: string;
 };

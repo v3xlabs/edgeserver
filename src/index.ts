@@ -7,6 +7,7 @@ import { initDB } from './database';
 import { ApiRoute } from './routes/api';
 import { GenericRouteV2 } from './routes/default';
 import { CreateRoute } from './routes/protected/create';
+import { sendError } from './services/routing/send_error';
 import { GenericStorage } from './storage/GenericStorage';
 import { SignalStorage } from './storage/SignalFS';
 import { log } from './util/logging';
@@ -72,6 +73,10 @@ export const StorageBackend: GenericStorage = new SignalStorage();
     server.register(CreateRoute, { prefix: '/deployments' });
     server.register(ApiRoute, { prefix: '/api' });
     server.register(GenericRouteV2);
+
+    server.setErrorHandler((error, request, reply) => {
+        sendError(error, reply, request.hostname + request.url);
+    });
 
     server.listen({ port: 1234, host: '0.0.0.0' }, (error) => {
         if (error) {
