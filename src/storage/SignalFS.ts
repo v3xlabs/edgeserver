@@ -19,7 +19,8 @@ export class SignalStorage implements GenericStorage {
                 '/buckets/' +
                 bucket_name +
                 '/exists?path=' +
-                path
+                path,
+            { validateStatus: (v) => true }
         );
 
         return data.status == 200 ? data.data : undefined;
