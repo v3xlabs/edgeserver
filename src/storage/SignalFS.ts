@@ -1,12 +1,14 @@
 import { Span } from '@sentry/types';
 import axios from 'axios';
 import FormData from 'form-data';
+import fetch from 'node-fetch';
 import { createReadStream } from 'node:fs';
 import { readdir } from 'node:fs/promises';
 import { join } from 'node:path';
 import { Readable } from 'node:stream';
 
 import { Globals } from '..';
+import { log } from '../util/logging';
 import { FileData, GenericStorage, ResolveData } from './GenericStorage';
 
 export class SignalStorage implements GenericStorage {
@@ -30,7 +32,7 @@ export class SignalStorage implements GenericStorage {
         bucket_name: string,
         path: string
     ): Promise<FileData | undefined> {
-        const data = await axios.get(
+        const data = await fetch(
             Globals.SIGNALFS_HOST +
                 '/buckets/' +
                 bucket_name +
@@ -38,17 +40,32 @@ export class SignalStorage implements GenericStorage {
                 path,
             {
                 method: 'get',
-                responseType: 'stream',
-                validateStatus: (status) => true,
             }
         );
 
         if (data.status != 200) return;
 
+        log.debug(
+            Globals.SIGNALFS_HOST +
+                '/buckets/' +
+                bucket_name +
+                '/get?path=' +
+                path
+        );
+
+        let header = data.headers.get('content-type');
+        let header2 = header && Array.isArray(header) ? header.at(0) : header;
+        let lengthHeader = data.headers.get('content-length');
+        let header3 =
+            lengthHeader && Array.isArray(lengthHeader)
+                ? lengthHeader.at(0)
+                : lengthHeader;
+
         return {
             name: '',
-            stream: data.data,
-            type: data.headers['content-type'],
+            stream: data.body,
+            type: header2 || 'text/plain',
+            length: header3 || '0',
         };
     }
 
@@ -78,6 +95,7 @@ export class SignalStorage implements GenericStorage {
                         name: '',
                         stream: data.data,
                         type: data.headers['content-type'],
+                        length: data.headers['content-length'],
                     },
                 };
 
