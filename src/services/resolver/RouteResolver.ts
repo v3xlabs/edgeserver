@@ -19,22 +19,28 @@ export const resolveRoute = async (
             '/' +
             (fileToCheck.length === 0
                 ? 'index.html'
-                : (fileToCheck.split('.').length > 1
+                : fileToCheck.split('.').length > 1
                 ? fileToCheck
-                : fileToCheck + '.html'));
+                : fileToCheck + '.html');
 
         log.debug({ pathToCheck });
         const steve = await storage.exists(sid, pathToCheck);
 
         if (steve) {
+            log.debug({ pathExists: true });
             return await storage.get(sid, pathToCheck);
         }
     }
 
     if (fallback_sid) {
+        log.debug({ fallback_sid });
         const fallback_exists = await storage.exists(sid, fallback_sid);
 
-        if (fallback_exists) return await storage.get(sid, fallback_sid);
+        if (fallback_exists) {
+            log.debug({ fallback_exists });
+
+            return await storage.get(sid, fallback_sid);
+        }
     }
     // const data = await storage.traverse(sid, path);
 

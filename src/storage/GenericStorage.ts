@@ -2,9 +2,10 @@ import { Span } from '@sentry/types';
 import { Readable } from 'node:stream';
 
 export type FileData = {
-    stream: Readable;
+    stream: NodeJS.ReadableStream;
     name: string;
     type: string;
+    length: string;
 };
 
 export type ResolveData = {

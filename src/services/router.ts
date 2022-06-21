@@ -1,7 +1,10 @@
 import { FastifyReply, FastifyRequest } from 'fastify';
+import { Readable, Stream } from 'node:stream';
+import { inspect } from 'node:util';
 
 import { StorageBackend } from '..';
 import { SafeError } from '../util/error/SafeError';
+import { log } from '../util/logging';
 import { getDeploymentData } from './deployment';
 import { getRoutingConfig } from './deploymentConfig';
 import { getSiteData } from './dlt';
@@ -40,6 +43,16 @@ import { shouldSlashRedirect } from './routing/tailing_slash';
  * MANUALLY LOAD DA SHIT, FOR LOOP DA SHIT, FIND DHAT SHIT
  * in the meanwhile code a super efficient other docker microservice thingie boi in rust or go that goes brrrrr real faster then regex, yes, much wow
  */
+
+import { Writable } from 'stream';
+import pump from 'pump';
+
+const getSteve = () =>
+    new Writable({
+        write: (chunk, encoding, done) => {
+            log.debug('v', { chunk, encoding, done });
+        },
+    });
 
 export const routeGeneric = async (
     request: FastifyRequest,
@@ -127,9 +140,36 @@ export const routeGeneric = async (
 
     // Send file to user
     // reply.send(stream);
+    // fileData.stream.on('data', (v) => console.log(v.toString()));
+    // log.debug({ value });
 
-    reply.type(fileData.type);
-    reply.send(fileData.stream);
+    // log.debug(inspect(fileData.stream, true, 0));
+    // const strm = getSteve();
+    // pump(fileData.stream, strm);
+
+    // await new Promise((acc) => setTimeout(acc, 1000));
+
+    // reply.type(fileData.type);
+    // reply.send(fileData.stream);
+
+    reply.raw.writeHead(200, '', {
+        'content-type': fileData.type,
+        'x-server': 'edgeserver.io',
+    });
+
+    fileData.stream.pipe(reply.raw);
+    // while (fileData.stream.readable) {
+    //     read = fileData.stream.read();
+    //     if (!read) break;
+    //     reply.raw.write(read);
+    // }
+    // reply.raw.end();
+    // fileData.stream.pipe(reply.raw);
+    // reply.raw.pipe();
+
+    // log.debug({ length: fileData.stream.read(100) });
+    // reply.send(fileData.stream);
+    // reply.send(fileData.stream);
 
     // const config = await getConfig(deploy_id);
 
