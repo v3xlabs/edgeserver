@@ -55,21 +55,24 @@ export const CreateRoute: FastifyPluginAsync = async (router, options) => {
         },
         async (request, reply) => {
             // Check auth
-            const auth = await useAuth(request, reply);
-
-            if (typeof auth !== 'string') {
-                return auth;
-            }
+            const { user_id } = await useAuth(request, reply);
 
             // Do the rest
             const data = await request.file();
             const temporary_name = generateSnowflake();
 
-            const site = await DB.selectOneFrom('applications', ['app_id'], {
-                app_id: request.query.site,
-            });
+            const site = await DB.selectOneFrom(
+                'applications',
+                ['app_id', 'owner_id'],
+                {
+                    app_id: request.query.site,
+                }
+            );
 
             if (!site) throw new SafeError(404, '', 'no-site-create');
+
+            if (site.owner_id != user_id)
+                throw new SafeError(403, '', 'site-create-no-perms');
 
             log.ok('Downloading file...');
             addBreadcrumb({
