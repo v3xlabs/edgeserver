@@ -40,6 +40,8 @@ export type EdgeRcConfig = {
         trailing_slash: trailSlash;
     };
 
+    default_route: string;
+
     headers: Header[];
     redirects: Redirect[];
     rewrites: Rewrite[];
@@ -48,6 +50,7 @@ export type EdgeRcConfig = {
 };
 
 export const defaultEdgeRcConfig: EdgeRcConfig = {
+    default_route: '/index.html',
     routing: {
         file_extensions: true,
         trailing_slash: 'true',

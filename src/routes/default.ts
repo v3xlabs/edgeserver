@@ -1,9 +1,7 @@
 import chalk from 'chalk';
 import { FastifyPluginAsync } from 'fastify';
-import { createReadStream } from 'node:fs';
-import { join } from 'node:path';
 
-import { routeGeneric, SafeError } from '../services/router';
+import { routeGeneric } from '../services/router';
 import { sendError } from '../services/routing/send_error';
 import { log } from '../util/logging';
 

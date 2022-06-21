@@ -7,10 +7,10 @@ import { initDB } from './database';
 import { ApiRoute } from './routes/api';
 import { GenericRouteV2 } from './routes/default';
 import { CreateRoute } from './routes/protected/create';
+import { sendError } from './services/routing/send_error';
 import { GenericStorage } from './storage/GenericStorage';
 import { SignalStorage } from './storage/SignalFS';
 import { log } from './util/logging';
-import { setupSentry } from './util/sentry/setupSentry';
 import { setupLogger } from './util/setupLogger';
 
 config();
@@ -27,6 +27,7 @@ export const Globals = {
     SENTRY_DSN: process.env.SENTRY_DSN || '',
     ENVIRONMENT: process.env.ENVIRONMENT || 'dev',
     SENTRY_SAMPLE_RATE: process.env.ENVIRONMENT == 'production' ? 0.1 : 1,
+    INSTANCE_ID: process.env.INSTANCE_ID || 'localhost',
 };
 
 export const StorageBackend: GenericStorage = new SignalStorage();
@@ -47,16 +48,20 @@ export const StorageBackend: GenericStorage = new SignalStorage();
             (Globals.SENTRY_DSN
                 ? chalk.gray(Globals.SENTRY_DSN)
                 : chalk.red('MISSING')),
-        'SAMPLE RATE ' + chalk.gray(Globals.SENTRY_SAMPLE_RATE)
+        'SAMPLE RATE ' + chalk.gray(Globals.SENTRY_SAMPLE_RATE),
+        'INSTANCE_ID ' + chalk.gray(Globals.INSTANCE_ID)
     );
     log.empty();
 
-    const server = fastify();
+    const server = fastify({
+        logger: false,
+        ajv: { customOptions: { keywords: ['kind', 'modifier'] } },
+    });
 
     setupLogger(server, log);
 
     /* Initiate Error Handling */
-    setupSentry();
+    // setupSentry();
 
     await initDB();
 
@@ -64,13 +69,24 @@ export const StorageBackend: GenericStorage = new SignalStorage();
 
     server.register(Cors, {
         origin: true,
-        methods: ['GET', 'PUT', 'POST'],
+        methods: ['GET', 'PUT', 'POST', 'DELETE'],
     });
+
     server.register(CreateRoute, { prefix: '/deployments' });
     server.register(ApiRoute, { prefix: '/api' });
     server.register(GenericRouteV2);
 
-    server.listen(1234, '0.0.0.0', () => {
+    server.setErrorHandler((error, request, reply) => {
+        sendError(error, reply, request.hostname + request.url);
+    });
+
+    server.listen({ port: 1234, host: '0.0.0.0' }, (error) => {
+        if (error) {
+            log.error(error);
+
+            return;
+        }
+
         log.lifecycle('Done ✨');
     });
 })();

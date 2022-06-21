@@ -1,5 +1,3 @@
-import { sign } from 'jsonwebtoken';
-
 import { CACHE } from '../cache';
 import { DB } from '../database';
 import { generateSnowflake } from '../routes/api';
@@ -18,15 +16,6 @@ export const createUserFromAddress = async (address: string) => {
     await DB.insertInto('owners', user);
 
     return user;
-};
-
-export const signToken = (user_id: string, address: string) => {
-    const payload = {
-        address: address,
-        user_id: user_id,
-    };
-
-    return sign(payload, process.env.SIGNAL_MASTER ?? '');
 };
 
 export const getLoginSessionByState = async (state: string) => {

@@ -20,5 +20,5 @@ export const setupLogger = (
         warn: logger.network,
         trace: logger.network,
         child: (): FastifyLoggerInstance => old,
-    } as FastifyLoggerInstance;
+    } as unknown as FastifyLoggerInstance;
 };

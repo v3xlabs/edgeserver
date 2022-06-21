@@ -1,9 +1,9 @@
 import { FastifyReply, FastifyRequest } from 'fastify';
-import { log } from '../util/logging';
 
-// import RE2 from 're2';
-import { resolveRoute } from './resolver/RouteResolver';
-// import { getConfig } from './deploymentConfig';
+import { StorageBackend } from '..';
+import { SafeError } from '../util/error/SafeError';
+import { getDeploymentData } from './deployment';
+import { getRoutingConfig } from './deploymentConfig';
 import { getSiteData } from './dlt';
 import {
     getHeaderRules,
@@ -12,20 +12,9 @@ import {
     matchRedirects,
     matchRewrites,
 } from './hrr';
+// import RE2 from 're2';
+import { resolveRoute } from './resolver/RouteResolver';
 import { shouldSlashRedirect } from './routing/tailing_slash';
-import { SignalStorage } from '../storage/SignalFS';
-import { StorageBackend } from '..';
-import { getDeploymentData } from './deployment';
-
-export class SafeError extends Error {
-    constructor(
-        public status: number,
-        public reply: string,
-        public marker?: string
-    ) {
-        super(`---${status}-${reply}`);
-    }
-}
 
 /**
  * List of shit to do
@@ -63,18 +52,19 @@ export const routeGeneric = async (
 
     const siteData = await getSiteData(base_url);
 
-    if (!siteData) {
-        throw new SafeError(404, 'Not Found');
-    }
+    if (!siteData) throw new SafeError(404, '', 'generic-sitedata');
 
     const { deploy_id, app_id } = siteData;
 
     // Parallel Requests to Figure out Rewrites/Redirects/Headers
-    const [headers, redirects, rewrites] = await Promise.allSettled([
-        getHeaderRules(deploy_id, path_url),
-        getRedirectRules(deploy_id, path_url),
-        getRewriteRules(deploy_id, path_url),
-    ]);
+    const [headers, redirects, rewrites, configData] = await Promise.allSettled(
+        [
+            getHeaderRules(deploy_id, path_url),
+            getRedirectRules(deploy_id, path_url),
+            getRewriteRules(deploy_id, path_url),
+            getRoutingConfig(deploy_id),
+        ]
+    );
 
     // log.debug({ headers, redirects, rewrites });
 
@@ -116,11 +106,17 @@ export const routeGeneric = async (
 
     if (!sidData) throw new SafeError(404, 'Not Found', 'no-sid');
 
+    const fallback_path =
+        configData.status == 'fulfilled'
+            ? configData.value.default_route
+            : undefined;
+
     // File traversal magic
     const fileData = await resolveRoute(
         StorageBackend,
         sidData.sid,
-        resolve_path
+        resolve_path,
+        fallback_path
     );
 
     if (!fileData) {
@@ -132,16 +128,8 @@ export const routeGeneric = async (
     // Send file to user
     // reply.send(stream);
 
-    try {
-        reply.type(fileData.type);
-        reply.send(fileData.stream);
-
-        return;
-    } catch {
-
-    }
-
-    reply.send(`Hello World: ${base_url}${resolve_path}`);
+    reply.type(fileData.type);
+    reply.send(fileData.stream);
 
     // const config = await getConfig(deploy_id);
 

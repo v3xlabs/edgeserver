@@ -1,78 +1,61 @@
 import { FastifyReply, FastifyRequest } from 'fastify';
-import { decode, verify } from 'jsonwebtoken';
+import { decode } from 'jsonwebtoken';
+import { object, string } from 'yup';
 
-import { DB } from '../../database';
-import { OwnerV1 } from '../../types/Owner.type';
+import { getAuthKey, updateExpiringLastUsed, updateLongLivedLastUsed } from '../../services/auth/keys';
+import { JWTAuthKey } from '../../types/AuthKey.type';
+import { SafeError } from '../error/SafeError';
 import { log } from '../logging';
-import { Poof } from '../sentry/sentryHandle';
 
-type useAuthReturn =
-    | {
-          allowed: true;
-          user: OwnerV1;
-      }
-    | {
-          allowed: false;
-          reason: Poof;
-      };
+const JWTAuthKeySchema = object().shape({
+    key: string().required(),
+    owner_id: string().required(),
+    instance_id: string().required(),
+    app_id: string().optional(),
+});
+
+export type AuthData = { user_id: string; key_id: string };
 
 export const useAuth: (
     request: FastifyRequest,
     reply: FastifyReply
-) => Promise<Poof | string> = async (request, _reply) => {
+) => Promise<AuthData> = async (request, _reply) => {
     let auth = request.headers.authorization;
 
-    if (!auth) {
-        return {
-            status: 401,
-            logMessages: ['No Authorization header found'],
-        };
-    }
+    if (!auth) throw new SafeError(401, '', 'auth-no-header');
 
     if (auth.toLowerCase().startsWith('bearer ')) {
         auth = auth.slice('Bearer '.length);
     }
 
-    console.log(auth);
+    const decoded = decode(auth) as JWTAuthKey;
 
-    const decoded = decode(auth) as { address: string; user_id: string };
+    if (!decoded) throw new SafeError(403, '', 'auth-invalid-jwt-payload');
 
-    if (!decoded)
-        return { status: 403, logMessages: ['Incorrect decoded payload'] };
+    /* Yup validation here */
+    const valid = JWTAuthKeySchema.isValidSync(decoded);
 
-    if (!decoded.address)
-        return {
-            status: 403,
-            logMessages: ['Key "account" was missing from payload'],
-        };
+    if (!valid) throw new SafeError(403, '', 'auth-invalid-yup-payload');
 
-    if (!decoded.user_id)
-        return {
-            status: 403,
-            logMessages: ['Key "user_id" was missing from payload'],
-        };
+    // if (verify(auth, process.env.SIGNAL_MASTER)) return Malformat();
 
-    try {
-        verify(auth, process.env.SIGNAL_MASTER ?? '');
-    } catch {
-        return {
-            status: 403,
-            logMessages: ['Invalid signature on payload'],
-        };
-    }
+    const key = await getAuthKey(decoded.key.toString(), decoded.owner_id);
 
-    const owner = await DB.selectOneFrom('owners', ['user_id'], {
-        address: decoded.address,
-        user_id: decoded.user_id,
-    });
-
-    if (!owner) return { status: 403, logMessages: ['Not valid user'] };
+    if (!key) throw new SafeError(403, '', 'auth-no-key-found');
 
     request.context['user'] = {
-        user_id: owner.user_id,
+        user_id: key.owner_id,
     };
 
-    log.network('Verified Auth for user ' + owner.user_id);
+    log.network('Verified Auth for user ' + key.owner_id);
 
-    return owner.user_id;
+    {
+        if (key['exp']) {
+            updateExpiringLastUsed(key.key, key.owner_id);
+        } else {
+            updateLongLivedLastUsed(key.key);
+        }
+    }
+
+    return { user_id: key.owner_id.toString(), key_id: key.key };
 };

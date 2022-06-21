@@ -4,6 +4,6 @@
         "resolveJsonModule": true,
         "target": "es2020",
         "moduleResolution": "node",
-        "strictNullChecks": true,
-    }
+        "strictNullChecks": true
+    },
 }
