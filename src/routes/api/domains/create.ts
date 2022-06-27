@@ -28,6 +28,16 @@ export const DomainCreateRoute: FastifyPluginAsync = async (
             const { user_id } = await useAuth(_request, reply);
 
             const { host } = _request.body;
+
+            const old_domain = await DB.selectOneFrom('domains', ['domain'], {
+                domain: host,
+            });
+
+            if (old_domain) {
+                reply.status(409);
+                reply.send();
+            }
+
             const domain_id = generateSnowflake();
 
             const domain: Partial<DomainV1> = {
