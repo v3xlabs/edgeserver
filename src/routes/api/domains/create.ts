@@ -3,8 +3,8 @@ import { FastifyPluginAsync } from 'fastify';
 
 import { DB } from '../../../database';
 import { DomainV1 } from '../../../types/Domain.type';
+import { SafeError } from '../../../util/error/SafeError';
 import { useAuth } from '../../../util/http/useAuth';
-import { log } from '../../../util/logging';
 import { generateSnowflake } from '.';
 
 export const DomainCreateRoute: FastifyPluginAsync = async (
@@ -28,6 +28,14 @@ export const DomainCreateRoute: FastifyPluginAsync = async (
             const { user_id } = await useAuth(_request, reply);
 
             const { host } = _request.body;
+
+            const old_domain = await DB.selectOneFrom('domains', ['domain'], {
+                domain: host,
+            });
+
+            if (old_domain)
+                throw new SafeError(409, '', 'domain-create-exists');
+
             const domain_id = generateSnowflake();
 
             const domain: Partial<DomainV1> = {
