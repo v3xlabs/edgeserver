@@ -6,6 +6,7 @@ import { DomainV1 } from '../../../types/Domain.type';
 import { useAuth } from '../../../util/http/useAuth';
 import { log } from '../../../util/logging';
 import { generateSnowflake } from '.';
+import { SafeError } from '../../../util/error/SafeError';
 
 export const DomainCreateRoute: FastifyPluginAsync = async (
     router,
@@ -34,8 +35,7 @@ export const DomainCreateRoute: FastifyPluginAsync = async (
             });
 
             if (old_domain) {
-                reply.status(409);
-                reply.send();
+                throw new SafeError(409, '', 'domain-create-exists');
             }
 
             const domain_id = generateSnowflake();
