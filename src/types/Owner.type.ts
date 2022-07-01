@@ -3,4 +3,8 @@ export type OwnerV1 = {
     address: string;
 };
 
-export type Owner = OwnerV1;
+export type OwnerV2 = OwnerV1 & {
+    admin: boolean;
+};
+
+export type Owner = OwnerV2;

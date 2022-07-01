@@ -1,8 +1,13 @@
 import { FastifyReply, FastifyRequest } from 'fastify';
 import { decode } from 'jsonwebtoken';
 import { object, string } from 'yup';
+import { DB } from '../../database';
 
-import { getAuthKey, updateExpiringLastUsed, updateLongLivedLastUsed } from '../../services/auth/keys';
+import {
+    getAuthKey,
+    updateExpiringLastUsed,
+    updateLongLivedLastUsed,
+} from '../../services/auth/keys';
 import { JWTAuthKey } from '../../types/AuthKey.type';
 import { SafeError } from '../error/SafeError';
 import { log } from '../logging';
@@ -16,10 +21,21 @@ const JWTAuthKeySchema = object().shape({
 
 export type AuthData = { user_id: string; key_id: string };
 
+export type OptionsData = {
+    adminOnly: boolean;
+};
+
+const defaultOptions: OptionsData = {
+    adminOnly: false,
+};
+
 export const useAuth: (
     request: FastifyRequest,
-    reply: FastifyReply
-) => Promise<AuthData> = async (request, _reply) => {
+    reply: FastifyReply,
+    options?: OptionsData
+) => Promise<AuthData> = async (request, _reply, optionsRaw?: OptionsData) => {
+    const options = { ...defaultOptions, ...optionsRaw };
+
     let auth = request.headers.authorization;
 
     if (!auth) throw new SafeError(401, '', 'auth-no-header');
@@ -54,6 +70,16 @@ export const useAuth: (
             updateExpiringLastUsed(key.key, key.owner_id);
         } else {
             updateLongLivedLastUsed(key.key);
+        }
+    }
+
+    if (options.adminOnly) {
+        const data = await DB.selectOneFrom('owners', ['admin'], {
+            user_id: key.owner_id,
+        });
+
+        if (!data?.admin) {
+            throw new SafeError(403, '', 'auth-not-admin');
         }
     }
 

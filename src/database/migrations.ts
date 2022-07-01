@@ -20,6 +20,7 @@ import { deployments_timestamp } from './migrations/14_deployment_timestamp';
 import { deployment_configs_create } from './migrations/15_deployment_configs_create';
 import { auth_key_upgrade } from './migrations/16_auth_key';
 import { domains_by_domain } from './migrations/17_domains_by_domain';
+import { owner_admin } from './migrations/18_owner_admin';
 
 export type MigrationState = {
     instance_id: string;
@@ -120,4 +121,6 @@ export const Migrations: Migration<TableScheme>[] = [
     auth_key_upgrade,
     // Domains by Domain Index
     domains_by_domain,
+    // Add admin field to owners
+    owner_admin,
 ];
