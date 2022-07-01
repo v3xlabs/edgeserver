@@ -53,13 +53,3 @@ export const getFullPermissions = (): Permissions[] => [
 export const serializePermissions = (permissions: Permissions[]): string => {
     return permissions.join(',');
 };
-// Oof
-
-// This random chinese guy is a lunatic and tryna claim 'web3://' as his EIPs schema rofl.
-// And his thing is not decentralized, doesnt match w half the pre-existing specs, and we are all here just like "lol wtf, this guy forreal?!?"
-
-// const steve = new AccessControl();
-
-// steve.grant('app').create('resource').delete('resource');
-
-// log.debug(steve.getGrants());
