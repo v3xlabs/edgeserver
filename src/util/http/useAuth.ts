@@ -78,9 +78,8 @@ export const useAuth: (
             user_id: key.owner_id,
         });
 
-        if (!data?.admin) {
+        if (!data?.admin)
             throw new SafeError(403, '', 'auth-not-admin');
-        }
     }
 
     return { user_id: key.owner_id.toString(), key_id: key.key };
