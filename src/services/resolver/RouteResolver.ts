@@ -28,6 +28,7 @@ export const resolveRoute = async (
 
         if (steve) {
             log.debug({ pathExists: true });
+
             return await storage.get(sid, pathToCheck);
         }
     }

@@ -1,6 +1,27 @@
 import { FastifyReply, FastifyRequest } from 'fastify';
-import { Readable, Stream } from 'node:stream';
-import { inspect } from 'node:util';
+/**
+ * List of shit to do
+ * - DLT
+ * - Get Domain Settings
+ * - Find file to resolve
+ * -
+ */
+/**
+ * IN PARAELLELLlOGRAM, do ze following plz:
+ * - check full-text-search 4 headers
+ *   - if found, remember em 4 later
+ * - check full-text-search 4 redirects
+ *   - if found, abort all other, send 30X
+ * - check full-text-search 4 rewrites
+ *   - if found, or not found, load the path from deployment
+ *      - traverse `storage-provider` (signalfs), to find file that matches and exists
+ *        - send file to user
+ */
+/**
+ * MANUALLY LOAD DA SHIT, FOR LOOP DA SHIT, FIND DHAT SHIT
+ * in the meanwhile code a super efficient other docker microservice thingie boi in rust or go that goes brrrrr real faster then regex, yes, much wow
+ */
+import { Writable } from 'node:stream';
 
 import { StorageBackend } from '..';
 import { SafeError } from '../util/error/SafeError';
@@ -18,34 +39,6 @@ import {
 // import RE2 from 're2';
 import { resolveRoute } from './resolver/RouteResolver';
 import { shouldSlashRedirect } from './routing/tailing_slash';
-
-/**
- * List of shit to do
- * - DLT
- * - Get Domain Settings
- * - Find file to resolve
- * -
- */
-
-/**
- * IN PARAELLELLlOGRAM, do ze following plz:
- * - check full-text-search 4 headers
- *   - if found, remember em 4 later
- * - check full-text-search 4 redirects
- *   - if found, abort all other, send 30X
- * - check full-text-search 4 rewrites
- *   - if found, or not found, load the path from deployment
- *      - traverse `storage-provider` (signalfs), to find file that matches and exists
- *        - send file to user
- */
-
-/**
- * MANUALLY LOAD DA SHIT, FOR LOOP DA SHIT, FIND DHAT SHIT
- * in the meanwhile code a super efficient other docker microservice thingie boi in rust or go that goes brrrrr real faster then regex, yes, much wow
- */
-
-import { Writable } from 'stream';
-import pump from 'pump';
 
 const getSteve = () =>
     new Writable({
