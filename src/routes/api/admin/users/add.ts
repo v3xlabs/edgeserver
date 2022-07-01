@@ -69,10 +69,6 @@ export const UsersAddRoute: FastifyPluginAsync = async (router, _options) => {
                 throw new SafeError(403, '', 'admin-users-add-not-admin');
             }
 
-            log.debug({
-                db: data.address,
-                sig: signatureAddress,
-            });
 
             // Check if addresses match
             if (data.address !== signatureAddress.toLowerCase()) {
