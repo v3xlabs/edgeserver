@@ -1,4 +1,5 @@
 import NodeCache from 'node-cache';
+
 import { ResolverSetter } from '../../util/useData';
 
 export const cache = new NodeCache({

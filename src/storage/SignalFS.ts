@@ -1,11 +1,10 @@
-import { Span } from '@sentry/types';
 import axios from 'axios';
 import FormData from 'form-data';
-import fetch from 'node-fetch';
 import { createReadStream } from 'node:fs';
 import { readdir } from 'node:fs/promises';
 import { join } from 'node:path';
 import { Readable } from 'node:stream';
+import fetch from 'node-fetch';
 
 import { Globals } from '..';
 import { log } from '../util/logging';
@@ -53,10 +52,10 @@ export class SignalStorage implements GenericStorage {
                 path
         );
 
-        let header = data.headers.get('content-type');
-        let header2 = header && Array.isArray(header) ? header.at(0) : header;
-        let lengthHeader = data.headers.get('content-length');
-        let header3 =
+        const header = data.headers.get('content-type');
+        const header2 = header && Array.isArray(header) ? header.at(0) : header;
+        const lengthHeader = data.headers.get('content-length');
+        const header3 =
             lengthHeader && Array.isArray(lengthHeader)
                 ? lengthHeader.at(0)
                 : lengthHeader;

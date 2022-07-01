@@ -1,8 +1,8 @@
 import { FastifyReply, FastifyRequest } from 'fastify';
 import { decode } from 'jsonwebtoken';
 import { object, string } from 'yup';
-import { DB } from '../../database';
 
+import { DB } from '../../database';
 import {
     getAuthKey,
     updateExpiringLastUsed,
@@ -78,8 +78,7 @@ export const useAuth: (
             user_id: key.owner_id,
         });
 
-        if (!data?.admin)
-            throw new SafeError(403, '', 'auth-not-admin');
+        if (!data?.admin) throw new SafeError(403, '', 'auth-not-admin');
     }
 
     return { user_id: key.owner_id.toString(), key_id: key.key };
