@@ -84,9 +84,8 @@ export const UsersAddRoute: FastifyPluginAsync = async (router, _options) => {
                 address: payload.address.toLowerCase(),
             });
 
-            if (old_data) {
+            if (old_data)
                 throw new SafeError(409, '', 'admin-users-add-already-exists');
-            }
 
             // Create new whitelist entry
             const new_user_id = generateSnowflake();
