@@ -19,6 +19,7 @@ import { deployment_comment } from './migrations/13_deployment_comment';
 import { deployments_timestamp } from './migrations/14_deployment_timestamp';
 import { deployment_configs_create } from './migrations/15_deployment_configs_create';
 import { auth_key_upgrade } from './migrations/16_auth_key';
+import { domains_by_domain } from './migrations/17_domains_by_domain';
 
 export type MigrationState = {
     instance_id: string;
@@ -117,4 +118,6 @@ export const Migrations: Migration<TableScheme>[] = [
     deployment_configs_create,
     // Update Auth Keys with last_use and state
     auth_key_upgrade,
+    // Domains by Domain Index
+    domains_by_domain,
 ];
