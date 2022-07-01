@@ -4,11 +4,7 @@ import { FastifyPluginAsync } from 'fastify';
 
 import { Globals } from '../..';
 import { DB } from '../../database';
-import {
-    brutalDeleteKey,
-    createExpiringAuthKey,
-    getAuthKeys,
-} from '../../services/auth/keys';
+import { brutalDeleteKey, getAuthKeys } from '../../services/auth/keys';
 import {
     createExpiringAuthToken,
     createLongLivedAuthToken,

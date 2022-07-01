@@ -5,7 +5,6 @@ import { FastifyPluginAsync } from 'fastify';
 import { DB } from '../../../../database';
 import { SafeError } from '../../../../util/error/SafeError';
 import { useAuth } from '../../../../util/http/useAuth';
-import { log } from '../../../../util/logging';
 import { generateSnowflake } from '..';
 
 export const UsersAddRoute: FastifyPluginAsync = async (router, _options) => {
@@ -28,7 +27,9 @@ export const UsersAddRoute: FastifyPluginAsync = async (router, _options) => {
             },
         },
         async (_request, reply) => {
-            const { user_id } = await useAuth(_request, reply);
+            const { user_id } = await useAuth(_request, reply, {
+                adminOnly: true,
+            });
 
             const { message, signature, payload } = _request.body;
 
@@ -68,7 +69,6 @@ export const UsersAddRoute: FastifyPluginAsync = async (router, _options) => {
             if (!data || !data.admin) {
                 throw new SafeError(403, '', 'admin-users-add-not-admin');
             }
-
 
             // Check if addresses match
             if (data.address !== signatureAddress.toLowerCase()) {
