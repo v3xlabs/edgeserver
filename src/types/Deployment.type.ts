@@ -22,4 +22,11 @@ export type DeploymentV3 = DeploymentV2 & {
 
 export type DeploymentV4 = Omit<DeploymentV3, 'timestamp'>;
 
-export type Deployment = DeploymentV4;
+export type DeploymentV5 = Omit<
+    DeploymentV4,
+    'git_sha' | 'git_src' | 'git_type' | 'git_actor' | 'comment'
+> & {
+    context: string; // CI/CD Context
+};
+
+export type Deployment = DeploymentV5;

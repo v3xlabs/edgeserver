@@ -109,11 +109,6 @@ export const CreateRoute: FastifyPluginAsync = async (router, options) => {
                 cid: '',
                 deploy_id,
                 sid: bucket_name,
-                comment: request.query.comment,
-                git_actor: request.query.git_actor,
-                git_sha: request.query.git_sha,
-                git_src: request.query.git_src,
-                git_type: request.query.git_type,
             });
             const { domain_id } = (await DB.selectOneFrom(
                 'applications',
