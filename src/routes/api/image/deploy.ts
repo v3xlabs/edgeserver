@@ -18,7 +18,7 @@ export const ImageDeployRoute: FastifyPluginAsync = async (router, options) => {
                 request.params.variant
             );
 
-            reply.type('webp');
+            reply.type('image/webp');
             reply.status(200);
             reply.send(data);
         }
