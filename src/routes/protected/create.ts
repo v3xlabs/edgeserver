@@ -147,7 +147,7 @@ export const CreateRoute: FastifyPluginAsync = async (router, options) => {
                     id: deploy_id,
                     url: 'http://' + domain.domain,
                     viewport: '1920x1080',
-                    scales: ['100', '400'],
+                    scales: ['128', '256'],
                 };
 
                 CACHE.LPUSH('edge_render_q', JSON.stringify(renderConfig));
