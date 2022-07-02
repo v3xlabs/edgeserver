@@ -2,7 +2,7 @@ import { Static, Type } from '@sinclair/typebox';
 import { FastifyPluginAsync } from 'fastify';
 
 import { DB } from '../../../database';
-import { ApplicationV3 } from '../../../types/Application.type';
+import { Application } from '../../../types/Application.type';
 import { useAuth } from '../../../util/http/useAuth';
 import { generateSnowflake } from '.';
 
@@ -42,10 +42,11 @@ export const AppCreateRoute: FastifyPluginAsync = async (router, _options) => {
 
             // const {} = _request.body;
             // const domain_id = generateSnowflake();
-            const createdProject: Partial<ApplicationV3> = {
+            const createdProject: Partial<Application> = {
                 app_id: generateSnowflake(),
                 owner_id: user_id,
                 name,
+                last_deployed: new Date().toString(),
                 // domain_id,
             };
             // const domain: Partial<DomainV1> = {

@@ -125,6 +125,7 @@ export const CreateRoute: FastifyPluginAsync = async (router, options) => {
                 { last_deployed: new Date().toString() },
                 {
                     app_id: site.app_id,
+                    owner_id: site.owner_id,
                 }
             );
 

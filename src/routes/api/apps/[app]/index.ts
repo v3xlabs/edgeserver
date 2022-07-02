@@ -4,7 +4,6 @@ import { generateSunflake } from 'sunflake';
 import { DB } from '../../../../database';
 import { AppDeploysRoute } from './deploys';
 import { AppEntryLinkRoute } from './link';
-import { ApplicationPermissionRoute } from './permissions';
 
 export const generateSnowflake = generateSunflake();
 
@@ -24,8 +23,6 @@ export const AppEntryRoute: FastifyPluginAsync = async (router, _options) => {
 
         reply.send(app);
     });
-
-    router.register(ApplicationPermissionRoute, { prefix: '/permissions' });
 
     router.register(AppEntryLinkRoute, { prefix: '/link' });
 

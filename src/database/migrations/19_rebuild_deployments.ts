@@ -101,4 +101,6 @@ export const rebuild_deployments: Migration<{
             database as ScylloClient<{ deployments: DeploymentV5 }>
         ).insertInto('deployments', deploymentData as DeploymentV5);
     }
+
+    await database.dropTable('deployments_tmp');
 };

@@ -11,9 +11,14 @@ export const AppLsRoute: FastifyPluginAsync = async (router, _options) => {
     router.get('/', async (_request, reply) => {
         const { user_id } = await useAuth(_request, reply);
 
-        const applications = await DB.selectFrom('applications', '*', {
-            owner_id: user_id,
-        });
+        const applications = await DB.selectFrom(
+            'applications_by_user' as 'applications',
+            '*',
+            {
+                owner_id: user_id,
+            },
+            ' ORDER BY last_deployed DESC'
+        );
 
         log.debug(applications);
 

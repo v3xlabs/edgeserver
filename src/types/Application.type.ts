@@ -15,4 +15,6 @@ export type ApplicationV3 = ApplicationV2 & { name: string };
 
 export type ApplicationV4 = ApplicationV3 & { last_deployed: string };
 
-export type Application = ApplicationV4;
+export type ApplicationV5 = Omit<ApplicationV4, 'permissions'>;
+
+export type Application = ApplicationV5;

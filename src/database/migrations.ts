@@ -22,6 +22,7 @@ import { auth_key_upgrade } from './migrations/16_auth_key';
 import { domains_by_domain } from './migrations/17_domains_by_domain';
 import { owner_admin } from './migrations/18_owner_admin';
 import { rebuild_deployments } from './migrations/19_rebuild_deployments';
+import { rebuild_applications } from './migrations/20_rebuild_applications';
 
 export type MigrationState = {
     instance_id: string;
@@ -126,4 +127,6 @@ export const Migrations: Migration<TableScheme>[] = [
     owner_admin,
     // Rebuild the entirey of deployments
     rebuild_deployments,
+    // Rebuild applications
+    rebuild_applications,
 ];
