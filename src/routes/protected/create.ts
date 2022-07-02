@@ -7,6 +7,7 @@ import { generateSunflake } from 'sunflake';
 import { Extract } from 'unzipper';
 
 import { StorageBackend } from '../..';
+import { CACHE } from '../../cache';
 import { DB } from '../../database';
 import { Edgerc } from '../../types/ConfigFile.type';
 import { deleteCache } from '../../util/cache/cache';
@@ -139,6 +140,17 @@ export const CreateRoute: FastifyPluginAsync = async (router, options) => {
                     deploy_id,
                 });
                 deleteCache('site_' + domain?.domain);
+
+                // Trigger Render
+                log.ok('Triggering render for ' + deploy_id);
+                const renderConfig = {
+                    id: deploy_id,
+                    url: domain.domain,
+                    viewport: '1920x1080',
+                    scales: ['100', '400'],
+                };
+
+                CACHE.LPUSH('edge_render_q', JSON.stringify(renderConfig));
             }
 
             try {
