@@ -145,7 +145,7 @@ export const CreateRoute: FastifyPluginAsync = async (router, options) => {
                 log.ok('Triggering render for ' + deploy_id);
                 const renderConfig = {
                     id: deploy_id,
-                    url: domain.domain,
+                    url: 'http://' + domain.domain,
                     viewport: '1920x1080',
                     scales: ['100', '400'],
                 };
