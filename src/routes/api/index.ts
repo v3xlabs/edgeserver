@@ -4,6 +4,7 @@ import { generateSunflake } from 'sunflake';
 import { AdminRoute } from './admin';
 import { AppRoute } from './apps';
 import { DomainRoute } from './domains';
+import { ImageDeployRoute } from './image/deploy';
 import { KeysRoute } from './keys';
 import { LoginRoute } from './login';
 import { MeRoute } from './me';
@@ -17,4 +18,5 @@ export const ApiRoute: FastifyPluginAsync = async (router, options) => {
     router.register(KeysRoute, { prefix: '/keys' });
     router.register(DomainRoute, { prefix: '/domains' });
     router.register(AdminRoute, { prefix: '/admin' });
+    router.register(ImageDeployRoute, { prefix: '/image/deploy' });
 };

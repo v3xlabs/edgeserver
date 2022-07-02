@@ -24,6 +24,7 @@ export const Globals = {
     DB_DATACENTER: process.env.DB_DATACENTER || 'localdatacenter1',
     DB_IP: process.env.DB_IP || '0.0.0.0:9042',
     SIGNAL_MASTER: process.env.SIGNAL_MASTER || '',
+    SIGNAL_HOST: process.env.SIGNAL_HOST || '',
     SENTRY_DSN: process.env.SENTRY_DSN || '',
     ENVIRONMENT: process.env.ENVIRONMENT || 'dev',
     SENTRY_SAMPLE_RATE: process.env.ENVIRONMENT == 'production' ? 0.1 : 1,
