@@ -45,7 +45,11 @@ export const AppEntryLinkRoute: FastifyPluginAsync = async (
                 return;
             }
 
-            await DB.update('applications', { domain_id }, { app_id });
+            await DB.update(
+                'applications',
+                { domain_id },
+                { app_id, owner_id: user_id }
+            );
 
             reply.status(200).send('OK');
         }
