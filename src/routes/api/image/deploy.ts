@@ -9,7 +9,7 @@ export const generateSnowflake = generateSunflake();
 
 export const ImageDeployRoute: FastifyPluginAsync = async (router, options) => {
     router.get<{ Params: { domain_id: string; variant: string } }>(
-        ':domain_id/:variant',
+        '/:domain_id/:variant',
         { constraints: { host: Globals.SIGNAL_HOST } },
         async (request, reply) => {
             const data = await CACHE.HGET(
