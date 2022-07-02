@@ -18,7 +18,7 @@ export const DeploysLsRoute: FastifyPluginAsync = async (router, _options) => {
                 {
                     app_id: _request.params.app_id,
                 },
-                'LIMIT 50'
+                'ORDER BY deploy_id DESC LIMIT 50'
             )
         );
     });
