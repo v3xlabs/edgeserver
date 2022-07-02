@@ -23,7 +23,9 @@ export const AppCreateRoute: FastifyPluginAsync = async (router, _options) => {
         async (_request, reply) => {
             const { user_id } = await useAuth(_request, reply);
 
-            const { name } = _request.body;
+            let { name } = _request.body;
+
+            name = name.replace(/(\.|\s)/g, '-');
 
             const oldAppId = await DB.selectOneFrom(
                 'applications',
