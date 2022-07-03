@@ -49,12 +49,13 @@ export const UsersAddRoute: FastifyPluginAsync = async (router, _options) => {
             // Check if payload and signed message match
             const format = JSON.parse(message);
 
-            if (JSON.stringify(format) !== JSON.stringify(payload))
+            if (JSON.stringify(format) !== JSON.stringify(payload)) {
                 throw new SafeError(
                     500,
                     '',
                     'admin-users-add-payload-not-matching'
                 );
+            }
 
             // Check admin status
             const data = await DB.selectOneFrom(
@@ -66,9 +67,8 @@ export const UsersAddRoute: FastifyPluginAsync = async (router, _options) => {
             );
 
             // Check if user is admin
-            if (!data || !data.admin) {
+            if (!data || !data.admin)
                 throw new SafeError(403, '', 'admin-users-add-not-admin');
-            }
 
             // Check if addresses match
             if (data.address !== signatureAddress.toLowerCase()) {

@@ -2,12 +2,14 @@ import { FastifyPluginAsync } from 'fastify';
 import { commandOptions } from 'redis';
 import { generateSunflake } from 'sunflake';
 
-import { Globals } from '../../..';
 import { CACHE } from '../../../cache';
 
 export const generateSnowflake = generateSunflake();
 
-export const ImageDeployRoute: FastifyPluginAsync = async (router, options) => {
+export const ImageDeployRoute: FastifyPluginAsync = async (
+    router,
+    _options
+) => {
     router.get<{ Params: { domain_id: string; variant: string } }>(
         '/:domain_id/:variant',
         // { constraints: { host: Globals.SIGNAL_HOST } },

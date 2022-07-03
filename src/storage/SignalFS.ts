@@ -21,7 +21,7 @@ export class SignalStorage implements GenericStorage {
                 bucket_name +
                 '/exists?path=' +
                 path,
-            { validateStatus: (v) => true }
+            { validateStatus: (_v) => true }
         );
 
         return data.status == 200 ? data.data : undefined;
@@ -87,7 +87,7 @@ export class SignalStorage implements GenericStorage {
                 }
             );
 
-            if (data.status === 200)
+            if (data.status === 200) {
                 return {
                     path: indexPath,
                     file: {
@@ -97,6 +97,7 @@ export class SignalStorage implements GenericStorage {
                         length: data.headers['content-length'],
                     },
                 };
+            }
 
             if (path.length === 1) return;
 

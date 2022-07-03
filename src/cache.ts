@@ -9,9 +9,7 @@ export const CACHE = createClient({
 })();
 
 export const getCache = async () => {
-    if (!CACHE.isOpen) {
-        await CACHE.connect();
-    }
+    if (!CACHE.isOpen) await CACHE.connect();
 
     return CACHE;
 };

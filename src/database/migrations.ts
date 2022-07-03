@@ -79,11 +79,9 @@ export const migrate = async (
         });
     }
 
-    if (migrations_run == 0) {
+    if (migrations_run == 0)
         log.database('No Migrations had to be run, everything up-to-date!');
-    } else {
-        log.database(`Finished ${migrations_run} Migrations`);
-    }
+    else log.database(`Finished ${migrations_run} Migrations`);
 };
 
 export const Migrations: Migration<TableScheme>[] = [

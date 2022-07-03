@@ -88,7 +88,7 @@ export const matchRedirects = (
     path: string
 ): RedirectRule | undefined => {
     for (const redirect of redirects) {
-        if (new RegExp(redirect.pattern).test(path))
+        if (new RegExp(redirect.pattern).test(path)) {
             return Object.assign(
                 {},
                 {
@@ -96,6 +96,7 @@ export const matchRedirects = (
                 },
                 redirect
             );
+        }
     }
 
     return undefined;
@@ -104,9 +105,8 @@ export const matchRewrites = (
     rewrites: RewriteRule[],
     path: string
 ): RewriteRule | undefined => {
-    for (const rewrite of rewrites) {
+    for (const rewrite of rewrites)
         if (new RegExp(rewrite.pattern).test(path)) return rewrite;
-    }
 
     return undefined;
 };

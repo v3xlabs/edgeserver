@@ -40,9 +40,7 @@ export const informationWrap: <T extends H[], G, H>(
                               }`
                             : '')
                 );
-            } else {
-                log.network(`❌ ${addressData}`);
-            }
+            } else log.network(`❌ ${addressData}`);
         }
     };
 };

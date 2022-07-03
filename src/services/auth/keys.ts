@@ -54,13 +54,10 @@ export const getAuthKey = async (
         CACHE.GET(`keys_${user_id}_${key_id}`),
     ]);
 
-    if (DBKey.status == 'fulfilled' && DBKey.value) {
-        return DBKey.value;
-    }
+    if (DBKey.status == 'fulfilled' && DBKey.value) return DBKey.value;
 
-    if (RedisKey.status == 'fulfilled' && RedisKey.value) {
+    if (RedisKey.status == 'fulfilled' && RedisKey.value)
         return JSON.parse(RedisKey.value);
-    }
 };
 
 export const createExpiringAuthKey = async (

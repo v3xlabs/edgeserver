@@ -15,9 +15,8 @@ export const useRedisCache: <K>() => ResolverSetter<K> = (expiry = 600) => ({
     },
     setter(key, value) {
         getCache().then((cache) => {
-            if (cache && cache.isOpen) {
+            if (cache && cache.isOpen)
                 cache.set(key, JSON.stringify(value), { EX: expiry });
-            }
         });
     },
 });

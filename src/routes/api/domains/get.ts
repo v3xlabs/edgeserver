@@ -15,7 +15,7 @@ export const DomainsEntryRoute: FastifyPluginAsync = async (
             domain_id: string;
         };
     }>('/', async (_request, reply) => {
-        const { user_id } = await useAuth(_request, reply);
+        const { user_id: _user_id } = await useAuth(_request, reply);
 
         reply.send(
             await DB.selectOneFrom('domains', '*', {

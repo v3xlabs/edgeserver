@@ -102,12 +102,13 @@ export const KeysRoute: FastifyPluginAsync = async (router, _options) => {
 
             const format = JSON.parse(message);
 
-            if (JSON.stringify(format) !== JSON.stringify(payload))
+            if (JSON.stringify(format) !== JSON.stringify(payload)) {
                 throw new SafeError(
                     500,
                     '',
                     'keys-create-payload-not-matching'
                 );
+            }
 
             const token = payload.data.expiresIn
                 ? await createExpiringAuthToken(

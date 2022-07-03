@@ -40,9 +40,8 @@ export const useAuth: (
 
     if (!auth) throw new SafeError(401, '', 'auth-no-header');
 
-    if (auth.toLowerCase().startsWith('bearer ')) {
+    if (auth.toLowerCase().startsWith('bearer '))
         auth = auth.slice('Bearer '.length);
-    }
 
     const decoded = decode(auth) as JWTAuthKey;
 
@@ -66,11 +65,8 @@ export const useAuth: (
     log.network('Verified Auth for user ' + key.owner_id);
 
     {
-        if (key['exp']) {
-            updateExpiringLastUsed(key.key, key.owner_id);
-        } else {
-            updateLongLivedLastUsed(key.key);
-        }
+        if (key['exp']) updateExpiringLastUsed(key.key, key.owner_id);
+        else updateLongLivedLastUsed(key.key);
     }
 
     if (options.adminOnly) {
