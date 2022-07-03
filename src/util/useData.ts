@@ -12,21 +12,17 @@ export const useData = async <K>(
         for (const resolverFunction of resolverFunctions) {
             data = await resolverFunction(key);
 
-            if (data !== undefined) {
-                break;
-            }
+            if (data !== undefined) break;
         }
     }
 
-    if (data !== undefined) {
-        cache.set(key, data);
-    }
+    if (data !== undefined) cache.set(key, data);
 
     return data;
 };
 
-export type Setter<K> = <K>(key: string, value: K) => void;
-export type Resolver<K> = <K>(
+export type Setter<K> = (key: string, value: K) => void;
+export type Resolver<K> = (
     key: string
 ) => Promise<K | undefined> | K | undefined;
 export type ResolverSetter<K> = {
@@ -50,15 +46,12 @@ export const useCache = async <K>(
         data = await resolver(key);
 
         if (data !== undefined) {
-            for (const set of setters) {
-                set(key, data);
-            }
+            for (const set of setters) set(key, data);
+
             break;
         }
 
-        if (setter) {
-            setters.push(setter);
-        }
+        if (setter) setters.push(setter);
     }
 
     return data;

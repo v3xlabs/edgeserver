@@ -16,7 +16,7 @@ export const DeploysEntryRoute: FastifyPluginAsync = async (
             deploy_id: string;
         };
     }>('/', async (_request, reply) => {
-        const authData = await useAuth(_request, reply);
+        const { user_id: _user_id } = await useAuth(_request, reply);
 
         reply.send(
             await DB.selectFrom(

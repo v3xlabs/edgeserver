@@ -11,7 +11,7 @@ import { MeRoute } from './me';
 
 export const generateSnowflake = generateSunflake();
 
-export const ApiRoute: FastifyPluginAsync = async (router, options) => {
+export const ApiRoute: FastifyPluginAsync = async (router, _options) => {
     router.register(LoginRoute, { prefix: '/login' });
     router.register(MeRoute, { prefix: '/me' });
     router.register(AppRoute, { prefix: '/apps' });

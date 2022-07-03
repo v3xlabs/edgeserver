@@ -9,7 +9,7 @@ export const generateSnowflake = generateSunflake();
 
 export const DeploysLsRoute: FastifyPluginAsync = async (router, _options) => {
     router.get<AppIDParameters>('/', async (_request, reply) => {
-        const authData = await useAuth(_request, reply);
+        const { user_id: _user_id } = await useAuth(_request, reply);
 
         reply.send(
             await DB.selectFrom(
