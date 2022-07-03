@@ -23,7 +23,7 @@ export const shouldSlashRedirect = (
         return path_url_no_query + '/';
     }
 
-    if (config.trailing_slash === 'false') {
+    if (config.trailing_slash === 'never') {
         if (!path_url_no_query.endsWith('/')) {
             return undefined;
         }
