@@ -69,6 +69,8 @@ export const CreateRoute: FastifyPluginAsync = async (router, options) => {
                 ? JSON.parse(contextMultipart['value'])
                 : undefined;
 
+            log.debug('Context', context);
+
             // console.log(request.files);
 
             const temporary_name = generateSnowflake();
