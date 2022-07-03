@@ -38,7 +38,7 @@ import {
 } from './hrr';
 // import RE2 from 're2';
 import { resolveRoute } from './resolver/RouteResolver';
-import { shouldSlashRedirect } from './routing/tailing_slash';
+import { shouldSlashRedirect } from './routing/trailing_slash';
 
 const getSteve = () =>
     new Writable({
@@ -92,20 +92,19 @@ export const routeGeneric = async (
 
     // Apply redirecting routing data (eg trailingSlash)
     // check if basepath ends with slashiething, do logic, redirect if needed
-    const shouldSlashRedirects = shouldSlashRedirect();
+    const slashRedirectPath =
+        configData.status == 'fulfilled' &&
+        configData.value &&
+        shouldSlashRedirect(configData.value, path_url);
 
-    if (shouldSlashRedirects) {
-        throw new SafeError(307, shouldSlashRedirects);
-    }
+    if (slashRedirectPath) throw new SafeError(307, slashRedirectPath);
 
     // If we should rewrite, alter path
     const shouldRewriteURL =
         rewrites.status == 'fulfilled' &&
         matchRewrites(rewrites.value, path_url);
 
-    if (shouldRewriteURL) {
-        resolve_path == shouldRewriteURL.destination;
-    }
+    if (shouldRewriteURL) resolve_path == shouldRewriteURL.destination;
 
     // Get SID
     const sidData = await getDeploymentData(deploy_id);
@@ -125,9 +124,7 @@ export const routeGeneric = async (
         fallback_path
     );
 
-    if (!fileData) {
-        throw new SafeError(404, 'Not Found', 'no-file-data');
-    }
+    if (!fileData) throw new SafeError(404, 'Not Found', 'no-file-data');
 
     // log.debug({ fileData });
 

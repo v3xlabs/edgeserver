@@ -1,4 +1,4 @@
-type trailSlash = 'true' | 'false' | 'auto';
+type trailSlash = 'always' | 'never' | 'auto';
 type Snowflake = string;
 
 export type Header = {
@@ -34,13 +34,15 @@ export type Redirect = {
     }[];
 };
 
-export type EdgeRcConfig = {
-    routing: {
-        file_extensions: boolean;
-        trailing_slash: trailSlash;
-    };
+export type RoutingConfig = {
+    file_extensions: boolean;
+    trailing_slash: trailSlash;
 
     default_route: string;
+};
+
+export type EdgeRcConfig = {
+    routing: RoutingConfig;
 
     headers: Header[];
     redirects: Redirect[];
@@ -50,10 +52,11 @@ export type EdgeRcConfig = {
 };
 
 export const defaultEdgeRcConfig: EdgeRcConfig = {
-    default_route: '/index.html',
     routing: {
         file_extensions: true,
         trailing_slash: 'true',
+
+        default_route: '/index.html',
     },
     headers: [],
     redirects: [],

@@ -16,6 +16,7 @@
         "node": true
     },
     "rules": {
-        "prefer-at": "off"
+        "prefer-at": "off",
+        "curly": ["error", "multi-or-nest"]
     }
 }
