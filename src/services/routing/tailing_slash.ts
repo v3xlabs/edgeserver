@@ -15,7 +15,7 @@ export const shouldSlashRedirect = (
 
     if (extension) return undefined;
 
-    if (config.trailing_slash === 'true') {
+    if (config.trailing_slash === 'always') {
         if (path_url_no_query.endsWith('/')) {
             return undefined;
         }
