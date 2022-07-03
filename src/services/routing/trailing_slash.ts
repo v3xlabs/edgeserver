@@ -16,17 +16,13 @@ export const shouldSlashRedirect = (
     if (extension) return undefined;
 
     if (config.trailing_slash === 'always') {
-        if (path_url_no_query.endsWith('/')) {
-            return undefined;
-        }
+        if (path_url_no_query.endsWith('/')) return undefined;
 
         return path_url_no_query + '/';
     }
 
     if (config.trailing_slash === 'never') {
-        if (!path_url_no_query.endsWith('/')) {
-            return undefined;
-        }
+        if (!path_url_no_query.endsWith('/')) return undefined;
 
         return path_url_no_query.slice(0, -1);
     }

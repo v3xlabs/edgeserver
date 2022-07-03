@@ -1,4 +1,4 @@
-type trailSlash = 'true' | 'false' | 'auto';
+type trailSlash = 'always' | 'never' | 'auto';
 type Snowflake = string;
 
 export type Header = {
