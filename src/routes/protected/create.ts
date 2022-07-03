@@ -17,18 +17,22 @@ import { log } from '../../util/logging';
 
 const generateSnowflake = generateSunflake();
 
+type BaseContext = {
+    contextType: string;
+    data: unknown;
+};
+
 export const CreateRoute: FastifyPluginAsync = async (router, options) => {
-    router.register(Multipart);
+    router.register(Multipart, {
+        // addToBody: true,
+        // attachFieldsToBody: true,
+        // sharedSchemaId: '#mySharedSchema',
+    });
 
     router.put<
         typeof options & {
             Querystring: {
                 site: string;
-                comment?: string;
-                git_sha?: string;
-                git_src?: number;
-                git_type?: number;
-                git_actor?: string;
             };
         }
     >(
@@ -39,11 +43,6 @@ export const CreateRoute: FastifyPluginAsync = async (router, options) => {
                     type: 'object',
                     properties: {
                         site: { type: 'string' },
-                        comment: { type: 'string' },
-                        git_sha: { type: 'string' },
-                        git_src: { type: 'number' },
-                        git_type: { type: 'number' },
-                        git_actor: { type: 'string' },
                     },
                     required: ['site'],
                 },
@@ -60,6 +59,18 @@ export const CreateRoute: FastifyPluginAsync = async (router, options) => {
 
             // Do the rest
             const data = await request.file();
+
+            // Load Context Data
+            const contextMultipart = Array.isArray(data.fields.context)
+                ? data.fields.context.at(0)
+                : data.fields.context;
+
+            const context: BaseContext | undefined = contextMultipart
+                ? JSON.parse(contextMultipart['value'])
+                : undefined;
+
+            // console.log(request.files);
+
             const temporary_name = generateSnowflake();
 
             const site = await DB.selectOneFrom(
@@ -109,6 +120,7 @@ export const CreateRoute: FastifyPluginAsync = async (router, options) => {
                 cid: '',
                 deploy_id,
                 sid: bucket_name,
+                context: context ? JSON.stringify(context) : '',
             });
             const { domain_id } = (await DB.selectOneFrom(
                 'applications',
