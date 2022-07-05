@@ -74,9 +74,12 @@ export const LoginRoute: FastifyPluginAsync = async (router, _options) => {
 
             if (!user) throw new SafeError(403, '', 'keys-create-no-user');
 
+            const now = new Date();
+
             const token = await createExpiringAuthToken(
                 user.user_id,
                 serializePermissions(getFullPermissions()),
+                `Browser Token (${now.toDateString()})`,
                 '10h'
             );
 

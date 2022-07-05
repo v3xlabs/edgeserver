@@ -54,6 +54,7 @@ export const KeysRoute: FastifyPluginAsync = async (router, _options) => {
             instance_id: Type.Literal(Globals.INSTANCE_ID),
             data: Type.Object({
                 permissions: Type.String(),
+                name: Type.String(),
                 expiresIn: Type.Optional(Type.String()),
                 app_id: Type.Optional(Type.String()),
             }),
@@ -114,11 +115,15 @@ export const KeysRoute: FastifyPluginAsync = async (router, _options) => {
                 ? await createExpiringAuthToken(
                       user_id,
                       payload.data.permissions,
+                      payload.data.name,
+                      '',
                       payload.data.expiresIn
                   )
                 : await createLongLivedAuthToken(
                       user_id,
-                      payload.data.permissions
+                      payload.data.permissions,
+                      payload.data.name,
+                      ''
                   );
             // const token = await createAndSignFullAccessToken(
             //     user.user_id,
