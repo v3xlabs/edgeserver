@@ -10,15 +10,9 @@ import { PermissionsString } from './permissions';
 export const createLongLivedAuthToken = async (
     user_id: string,
     permissions: PermissionsString,
-    name: string,
-    last_use_data: string
+    name: string
 ) => {
-    const key = await createLongLivedAuthKey(
-        user_id,
-        permissions,
-        name,
-        last_use_data
-    );
+    const key = await createLongLivedAuthKey(user_id, permissions, name);
 
     const payload: JWTAuthKey = {
         instance_id: Globals.INSTANCE_ID,

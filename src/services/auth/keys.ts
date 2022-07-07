@@ -99,8 +99,7 @@ export const createExpiringAuthKey = async (
 export const createLongLivedAuthKey = async (
     user_id: string,
     permissions: PermissionsString,
-    name: string,
-    last_use_data: string
+    name: string
 ) => {
     const key: AuthKey = {
         key: generateSnowflake(),
@@ -109,7 +108,7 @@ export const createLongLivedAuthKey = async (
         permissions,
         state: 1,
         name,
-        last_use_data,
+        last_use_data: '',
     };
 
     await DB.insertInto('keys', key);

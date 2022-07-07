@@ -122,8 +122,7 @@ export const KeysRoute: FastifyPluginAsync = async (router, _options) => {
                 : await createLongLivedAuthToken(
                       user_id,
                       payload.data.permissions,
-                      payload.data.name,
-                      ''
+                      payload.data.name
                   );
             // const token = await createAndSignFullAccessToken(
             //     user.user_id,
