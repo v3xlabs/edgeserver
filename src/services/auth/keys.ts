@@ -63,6 +63,8 @@ export const getAuthKey = async (
 export const createExpiringAuthKey = async (
     user_id: string,
     permissions: PermissionsString,
+    name: string,
+    last_use_data: string,
     expiresAt: number
 ) => {
     const key: RedisAuthKey = {
@@ -72,6 +74,8 @@ export const createExpiringAuthKey = async (
         permissions,
         state: 1,
         exp: expiresAt.toString(),
+        name,
+        last_use_data,
     };
 
     await CACHE.set(
@@ -94,7 +98,8 @@ export const createExpiringAuthKey = async (
 
 export const createLongLivedAuthKey = async (
     user_id: string,
-    permissions: PermissionsString
+    permissions: PermissionsString,
+    name: string
 ) => {
     const key: AuthKey = {
         key: generateSnowflake(),
@@ -102,6 +107,8 @@ export const createLongLivedAuthKey = async (
         owner_id: user_id,
         permissions,
         state: 1,
+        name,
+        last_use_data: '',
     };
 
     await DB.insertInto('keys', key);

@@ -9,9 +9,10 @@ import { PermissionsString } from './permissions';
 
 export const createLongLivedAuthToken = async (
     user_id: string,
-    permissions: PermissionsString
+    permissions: PermissionsString,
+    name: string
 ) => {
-    const key = await createLongLivedAuthKey(user_id, permissions);
+    const key = await createLongLivedAuthKey(user_id, permissions, name);
 
     const payload: JWTAuthKey = {
         instance_id: Globals.INSTANCE_ID,
@@ -25,11 +26,19 @@ export const createLongLivedAuthToken = async (
 export const createExpiringAuthToken = async (
     user_id: string,
     permissions: PermissionsString,
+    name: string,
+    last_use_data: string,
     expiresIn: string = '10h'
 ) => {
     const expiresAt = Date.now() + ms(expiresIn);
 
-    const key = await createExpiringAuthKey(user_id, permissions, expiresAt);
+    const key = await createExpiringAuthKey(
+        user_id,
+        permissions,
+        name,
+        last_use_data,
+        expiresAt
+    );
 
     const payload: JWTAuthKey = {
         instance_id: Globals.INSTANCE_ID,

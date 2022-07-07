@@ -9,9 +9,11 @@ export type AuthKeyV2 = AuthKeyV1 & {
     last_use: number; // timestamp
 };
 
-export type RedisAuthKey = AuthKeyV2 & { exp: string };
+export type AuthKeyV3 = AuthKeyV2 & { name: string; last_use_data: string };
 
-export type AuthKey = AuthKeyV2 | RedisAuthKey;
+export type RedisAuthKey = AuthKeyV3 & { exp: string };
+
+export type AuthKey = AuthKeyV3 | RedisAuthKey;
 
 export type JWTAuthKey = {
     key: string;
