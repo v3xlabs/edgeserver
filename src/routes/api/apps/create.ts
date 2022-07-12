@@ -4,6 +4,7 @@ import { FastifyPluginAsync } from 'fastify';
 import { DB } from '../../../database';
 import { Application } from '../../../types/Application.type';
 import { useAuth } from '../../../util/http/useAuth';
+import { KeyPerms, usePerms } from '../../../util/permissions';
 import { generateSnowflake } from '.';
 
 export const AppCreateRoute: FastifyPluginAsync = async (router, _options) => {
@@ -21,7 +22,9 @@ export const AppCreateRoute: FastifyPluginAsync = async (router, _options) => {
             },
         },
         async (_request, reply) => {
-            const { user_id } = await useAuth(_request, reply);
+            const { user_id, permissions } = await useAuth(_request, reply);
+
+            usePerms(permissions, [KeyPerms.APPS_WRITE]);
 
             let { name } = _request.body;
 
