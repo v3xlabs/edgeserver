@@ -62,7 +62,7 @@ export const getAuthKey = async (
 
 export const createExpiringAuthKey = async (
     user_id: string,
-    permissions: PermissionsString,
+    permissions: bigint,
     name: string,
     last_use_data: string,
     expiresAt: number
@@ -98,7 +98,7 @@ export const createExpiringAuthKey = async (
 
 export const createLongLivedAuthKey = async (
     user_id: string,
-    permissions: PermissionsString,
+    permissions: bigint,
     name: string
 ) => {
     const key: AuthKey = {

@@ -10,10 +10,13 @@ export type AuthKeyV2 = AuthKeyV1 & {
 };
 
 export type AuthKeyV3 = AuthKeyV2 & { name: string; last_use_data: string };
+export type AuthKeyV4 = Omit<AuthKeyV3, 'permissions'> & {
+    permissions: bigint;
+};
 
-export type RedisAuthKey = AuthKeyV3 & { exp: string };
+export type RedisAuthKey = AuthKeyV4 & { exp: string };
 
-export type AuthKey = AuthKeyV3 | RedisAuthKey;
+export type AuthKey = AuthKeyV4 | RedisAuthKey;
 
 export type JWTAuthKey = {
     key: string;

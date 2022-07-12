@@ -24,6 +24,7 @@ import { owner_admin } from './migrations/18_owner_admin';
 import { rebuild_deployments } from './migrations/19_rebuild_deployments';
 import { rebuild_applications } from './migrations/20_rebuild_applications';
 import { keys_name_lud } from './migrations/21_keys_name_lud';
+import { keys_perms_bigint } from './migrations/22_keys_perms_bigint';
 
 export type MigrationState = {
     instance_id: string;
@@ -130,4 +131,6 @@ export const Migrations: Migration<TableScheme>[] = [
     rebuild_applications,
     // Alter keys table with name and last_use_data
     keys_name_lud,
+    // Edit permissions column to bigint from string
+    keys_perms_bigint,
 ];

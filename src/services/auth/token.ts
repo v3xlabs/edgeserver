@@ -5,11 +5,10 @@ import { Globals } from '../..';
 import { JWTAuthKey } from '../../types/AuthKey.type';
 import { log } from '../../util/logging';
 import { createExpiringAuthKey, createLongLivedAuthKey } from './keys';
-import { PermissionsString } from './permissions';
 
 export const createLongLivedAuthToken = async (
     user_id: string,
-    permissions: PermissionsString,
+    permissions: bigint,
     name: string
 ) => {
     const key = await createLongLivedAuthKey(user_id, permissions, name);
@@ -25,7 +24,7 @@ export const createLongLivedAuthToken = async (
 
 export const createExpiringAuthToken = async (
     user_id: string,
-    permissions: PermissionsString,
+    permissions: bigint,
     name: string,
     last_use_data: string,
     expiresIn: string = '10h'

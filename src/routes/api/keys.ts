@@ -1,6 +1,7 @@
 import { Static, Type } from '@sinclair/typebox';
 import { utils } from 'ethers';
 import { FastifyPluginAsync } from 'fastify';
+import { toPermissionsBuffer } from 'permissio';
 
 import { Globals } from '../..';
 import { DB } from '../../database';
@@ -114,14 +115,14 @@ export const KeysRoute: FastifyPluginAsync = async (router, _options) => {
             const token = payload.data.expiresIn
                 ? await createExpiringAuthToken(
                       user_id,
-                      payload.data.permissions,
+                      BigInt(payload.data.permissions),
                       payload.data.name,
                       '',
                       payload.data.expiresIn
                   )
                 : await createLongLivedAuthToken(
                       user_id,
-                      payload.data.permissions,
+                      BigInt(payload.data.permissions),
                       payload.data.name
                   );
             // const token = await createAndSignFullAccessToken(
