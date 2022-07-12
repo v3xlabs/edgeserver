@@ -37,6 +37,9 @@ export const initDB = async () => {
             contactPoints: [Globals.DB_IP || 'localhost:9042'],
             localDataCenter: Globals.DB_DATACENTER || 'datacenter1',
             keyspace: 'system',
+            encoding: {
+                useBigIntAsLong: true,
+            },
         },
         debug: (process.env.DEBUG || '').toLowerCase() == 'true' || false,
     });
