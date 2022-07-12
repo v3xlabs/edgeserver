@@ -19,7 +19,7 @@ const JWTAuthKeySchema = object().shape({
     app_id: string().optional(),
 });
 
-export type AuthData = { user_id: string; key_id: string };
+export type AuthData = { user_id: string; key_id: string; permissions: bigint };
 
 export type OptionsData = {
     adminOnly: boolean;
@@ -77,5 +77,9 @@ export const useAuth: (
         if (!data?.admin) throw new SafeError(403, '', 'auth-not-admin');
     }
 
-    return { user_id: key.owner_id.toString(), key_id: key.key };
+    return {
+        user_id: key.owner_id.toString(),
+        key_id: key.key,
+        permissions: key.permissions,
+    };
 };
