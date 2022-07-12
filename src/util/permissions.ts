@@ -1,4 +1,6 @@
-import { EMPTY_PERMISSIONS, grantPermission } from 'permissio';
+import { EMPTY_PERMISSIONS, grantPermission, hasPermission } from 'permissio';
+
+import { SafeError } from './error/SafeError';
 
 export enum KeyPerms {
     FULL,
@@ -17,3 +19,16 @@ export enum KeyPerms {
 }
 
 export const FullPerm = grantPermission(EMPTY_PERMISSIONS, KeyPerms.FULL);
+
+export const usePerms = (
+    permission_data: bigint,
+    required_perms: KeyPerms[]
+) => {
+    if (hasPermission(permission_data, KeyPerms.FULL)) return;
+
+    const missing_perm = required_perms.find(
+        (perm) => !hasPermission(permission_data, perm)
+    );
+
+    if (missing_perm) throw new SafeError(403, '', 'use-perms-' + missing_perm);
+};
