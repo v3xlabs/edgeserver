@@ -14,6 +14,7 @@ import { log } from './util/logging';
 import { setupLogger } from './util/setupLogger';
 
 config();
+
 declare global {
     interface BigInt {
         toJSON(): string;
