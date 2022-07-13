@@ -1,5 +1,3 @@
-type Snowflake = string;
-
 export type DeploymentV1 = {
     app_id: bigint;
     deploy_id: bigint;

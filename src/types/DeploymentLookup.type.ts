@@ -1,5 +1,3 @@
-type Snowflake = string;
-
 export type DeploymentLookupV1 = {
     base_url: string; // foo.bar.com
     app_id: bigint;

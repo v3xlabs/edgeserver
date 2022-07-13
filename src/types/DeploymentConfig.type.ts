@@ -1,5 +1,3 @@
-type Snowflake = string;
-
 export type DeploymentConfigV1 = {
     deploy_id: bigint;
     routing: string;
