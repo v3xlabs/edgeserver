@@ -1,7 +1,6 @@
 import { Static, Type } from '@sinclair/typebox';
 import { utils } from 'ethers';
 import { FastifyPluginAsync } from 'fastify';
-import { toPermissionsBuffer } from 'permissio';
 
 import { Globals } from '../..';
 import { DB } from '../../database';
@@ -36,7 +35,7 @@ export const KeysRoute: FastifyPluginAsync = async (router, _options) => {
             const { key_id } = request.body;
 
             log.debug('Deleting User Key');
-            brutalDeleteKey(key_id, user_id);
+            brutalDeleteKey(BigInt(key_id), user_id);
         }
     );
 

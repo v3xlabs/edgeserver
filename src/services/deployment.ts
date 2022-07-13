@@ -4,7 +4,7 @@ import { useRedisCache } from '../util/cache/redisCache';
 import { useCache } from '../util/useData';
 import { Resolver } from '../util/useData';
 
-export const getDeploymentData = async (deployment_id: string) => {
+export const getDeploymentData = async (deployment_id: bigint) => {
     return useCache<{ sid: string }>(
         'deployment_' + deployment_id,
         useLocalCache(),

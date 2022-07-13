@@ -1,6 +1,6 @@
 export type AuthKeyV1 = {
-    key: string;
-    owner_id: string;
+    key: bigint;
+    owner_id: bigint;
 };
 
 export type AuthKeyV2 = AuthKeyV1 & {

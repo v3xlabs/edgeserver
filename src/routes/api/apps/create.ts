@@ -48,7 +48,7 @@ export const AppCreateRoute: FastifyPluginAsync = async (router, _options) => {
             // const {} = _request.body;
             // const domain_id = generateSnowflake();
             const createdProject: Partial<Application> = {
-                app_id: generateSnowflake(),
+                app_id: BigInt(generateSnowflake()),
                 owner_id: user_id,
                 name,
                 last_deployed: new Date().toString(),

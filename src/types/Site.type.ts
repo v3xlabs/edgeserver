@@ -2,8 +2,8 @@
  * @deprecated See #application
  */
 export type SiteV1 = {
-    site_id: string;
+    site_id: bigint;
     host: string; // HTTP Location
-    owner: string;
+    owner: bigint;
     cid: string;
 };

@@ -2,14 +2,14 @@ type Snowflake = string;
 type PermissionsBit = string;
 
 export type ApplicationV1 = {
-    app_id: Snowflake;
-    owner_id: Snowflake;
+    app_id: bigint;
+    owner_id: bigint;
     permissions: {
         [user_id: Snowflake]: PermissionsBit;
     };
 };
 
-export type ApplicationV2 = ApplicationV1 & { domain_id: Snowflake };
+export type ApplicationV2 = ApplicationV1 & { domain_id: bigint };
 
 export type ApplicationV3 = ApplicationV2 & { name: string };
 

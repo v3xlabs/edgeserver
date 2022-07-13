@@ -1,9 +1,9 @@
 type Snowflake = string;
 
 export type DomainV1 = {
-    domain_id: Snowflake;
+    domain_id: bigint;
     domain: string; //wip
-    user_id: Snowflake;
+    user_id: bigint;
     permissions: {
         [key: string]: string;
     };

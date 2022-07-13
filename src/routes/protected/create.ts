@@ -118,7 +118,7 @@ export const CreateRoute: FastifyPluginAsync = async (router, options) => {
                 join('tmp', temporary_name)
             );
 
-            const deploy_id = generateSnowflake();
+            const deploy_id = BigInt(generateSnowflake());
 
             await DB.insertInto('deployments', {
                 app_id: site.app_id,

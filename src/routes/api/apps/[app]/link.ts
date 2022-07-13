@@ -50,7 +50,7 @@ export const AppEntryLinkRoute: FastifyPluginAsync = async (
 
             await DB.update(
                 'applications',
-                { domain_id },
+                { domain_id: BigInt(domain_id) },
                 { app_id, owner_id: user_id }
             );
 

@@ -39,7 +39,7 @@ export const DomainCreateRoute: FastifyPluginAsync = async (
             if (old_domain)
                 throw new SafeError(409, '', 'domain-create-exists');
 
-            const domain_id = generateSnowflake();
+            const domain_id = BigInt(generateSnowflake());
 
             const domain: Partial<DomainV1> = {
                 domain_id,

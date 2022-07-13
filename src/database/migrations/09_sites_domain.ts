@@ -17,7 +17,7 @@ export const sites_domain: Migration<{
 
     for (const site of sites) {
         const domain: Partial<DomainV1> = {
-            domain_id: generateSnowflake(),
+            domain_id: BigInt(generateSnowflake()),
             domain: site.host,
             user_id: site.owner,
         };

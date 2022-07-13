@@ -1,8 +1,8 @@
 type Snowflake = string;
 
 export type DeploymentV1 = {
-    app_id: Snowflake;
-    deploy_id: Snowflake;
+    app_id: bigint;
+    deploy_id: bigint;
     created_on: string;
 };
 

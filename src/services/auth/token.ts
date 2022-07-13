@@ -7,7 +7,7 @@ import { log } from '../../util/logging';
 import { createExpiringAuthKey, createLongLivedAuthKey } from './keys';
 
 export const createLongLivedAuthToken = async (
-    user_id: string,
+    user_id: bigint,
     permissions: bigint,
     name: string
 ) => {
@@ -15,15 +15,15 @@ export const createLongLivedAuthToken = async (
 
     const payload: JWTAuthKey = {
         instance_id: Globals.INSTANCE_ID,
-        key: key.key,
-        owner_id: user_id,
+        key: key.key.toString(),
+        owner_id: user_id.toString(),
     };
 
     return sign(payload, process.env.SIGNAL_MASTER ?? '');
 };
 
 export const createExpiringAuthToken = async (
-    user_id: string,
+    user_id: bigint,
     permissions: bigint,
     name: string,
     last_use_data: string,
@@ -41,8 +41,8 @@ export const createExpiringAuthToken = async (
 
     const payload: JWTAuthKey = {
         instance_id: Globals.INSTANCE_ID,
-        key: key.key,
-        owner_id: user_id,
+        key: key.key.toString(),
+        owner_id: user_id.toString(),
     };
 
     log.debug('vals', expiresIn, payload, key);

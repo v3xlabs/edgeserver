@@ -1,7 +1,7 @@
 type Snowflake = string;
 
 export type DeploymentConfigV1 = {
-    deploy_id: Snowflake;
+    deploy_id: bigint;
     routing: string;
     headers: string;
     redirects: string;

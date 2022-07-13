@@ -1,4 +1,4 @@
-import { createTableRaw, ScylloClient } from 'scyllo';
+import { ScylloClient } from 'scyllo';
 
 import { DeploymentV4, DeploymentV5 } from '../../types/Deployment.type';
 import { log } from '../../util/logging';
@@ -10,8 +10,7 @@ const createTable = async (
     }>,
     table_name: string
 ) => {
-    const query = createTableRaw<{ deployments: DeploymentV5 }, 'deployments'>(
-        'signal',
+    await database.createTable(
         table_name as 'deployments',
         true,
         {
@@ -34,19 +33,6 @@ const createTable = async (
         'app_id',
         ['deploy_id']
     );
-
-    log.debug(query.query);
-
-    await database.query({
-        args: query.args,
-        query: query.query,
-    });
-
-    // await database.createIndex(
-    //     table_name as 'deployments',
-    //     table_name + '_by_app_id',
-    //     'app_id'
-    // );
 };
 
 export const rebuild_deployments: Migration<{
@@ -55,6 +41,8 @@ export const rebuild_deployments: Migration<{
 }> = async (database) => {
     log.debug('creating table');
     await createTable(database, 'deployments_tmp');
+
+    // await new Promise((r) => setTimeout(r, 20_000));
 
     log.debug('getting ol');
     const deployments_from_old = await database.selectFrom('deployments', [
