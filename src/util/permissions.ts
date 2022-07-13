@@ -16,6 +16,9 @@ export enum KeyPerms {
     DEPLOYMENTS_READ,
     DEPLOYMENTS_WRITE,
     DEPLOYMENTS_DELETE,
+
+    USER_READ,
+    USER_WRITE,
 }
 
 export const FullPerm = grantPermission(EMPTY_PERMISSIONS, KeyPerms.FULL);
