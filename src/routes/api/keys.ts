@@ -35,7 +35,7 @@ export const KeysRoute: FastifyPluginAsync = async (router, _options) => {
             const { key_id } = request.body;
 
             log.debug('Deleting User Key');
-            brutalDeleteKey(BigInt(key_id), user_id);
+            brutalDeleteKey(key_id, user_id);
         }
     );
 

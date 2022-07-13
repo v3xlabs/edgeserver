@@ -1,5 +1,5 @@
 export type AuthKeyV1 = {
-    key: bigint;
+    key: string;
     owner_id: bigint;
 };
 

@@ -45,7 +45,7 @@ export const getAuthKeys = async (user_id: bigint) => {
 };
 
 export const getAuthKey = async (
-    key_id: bigint,
+    key_id: string,
     user_id: bigint
 ): Promise<AuthKey | undefined> => {
     const [DBKey, RedisKey] = await Promise.allSettled([
@@ -72,7 +72,7 @@ export const createExpiringAuthKey = async (
     expiresAt: number
 ) => {
     const key: RedisAuthKey = {
-        key: BigInt(generateSnowflake()),
+        key: generateSnowflake(),
         last_use: 0,
         owner_id: user_id,
         permissions,
@@ -106,7 +106,7 @@ export const createLongLivedAuthKey = async (
     name: string
 ) => {
     const key: AuthKey = {
-        key: BigInt(generateSnowflake()),
+        key: generateSnowflake(),
         last_use: 0,
         owner_id: user_id,
         permissions,
@@ -120,7 +120,7 @@ export const createLongLivedAuthKey = async (
     return key;
 };
 
-export const brutalDeleteKey = async (key: bigint, user_id: bigint) => {
+export const brutalDeleteKey = async (key: string, user_id: bigint) => {
     await Promise.all([
         CACHE.DEL(`keys_${user_id}_${key}`),
         CACHE.LREM(`keys_${user_id}`, -1, key.toString()),
@@ -128,7 +128,7 @@ export const brutalDeleteKey = async (key: bigint, user_id: bigint) => {
     ]);
 };
 
-export const updateExpiringLastUsed = async (key: bigint, owner_id: bigint) => {
+export const updateExpiringLastUsed = async (key: string, owner_id: bigint) => {
     const data = await CACHE.get(`keys_${owner_id}_${key}`);
 
     if (!data) return;
@@ -140,6 +140,6 @@ export const updateExpiringLastUsed = async (key: bigint, owner_id: bigint) => {
     await CACHE.set(`keys_${owner_id}_${key}`, JSON.stringify(parsedData));
 };
 
-export const updateLongLivedLastUsed = async (key: bigint) => {
+export const updateLongLivedLastUsed = async (key: string) => {
     await DB.update('keys', { last_use: Date.now() }, { key });
 };
