@@ -9,9 +9,6 @@ export const keys_perms_bigint: Migration<{ keys: AuthKeyV4 }> = async (
 ) => {
     await database.raw('alter table keys drop permissions');
     await database.raw('alter table keys add permissions bigint');
-    // await database.raw('alter table keys with permissions = 1');
-
-    // const full_perm = grantPermission(EMPTY_PERMISSIONS, KeyPerms.FULL);
 
     const keys = await database.selectFrom('keys', ['key']);
 
