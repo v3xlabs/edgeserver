@@ -1,5 +1,6 @@
 import { Static, Type } from '@sinclair/typebox';
 import { FastifyPluginAsync } from 'fastify';
+import { toPermissionsBuffer } from 'permissio';
 import { SiweMessage } from 'siwe';
 
 import { DB } from '../../database';
@@ -10,6 +11,7 @@ import {
 import { createExpiringAuthToken } from '../../services/auth/token';
 import { SafeError } from '../../util/error/SafeError';
 import { log } from '../../util/logging';
+import { FullPerm } from '../../util/permissions';
 
 export const LoginRoute: FastifyPluginAsync = async (router, _options) => {
     router.get<{
@@ -78,7 +80,7 @@ export const LoginRoute: FastifyPluginAsync = async (router, _options) => {
 
             const token = await createExpiringAuthToken(
                 user.user_id,
-                serializePermissions(getFullPermissions()),
+                FullPerm,
                 `Browser Token (${now.toDateString()})`,
                 '10h'
             );

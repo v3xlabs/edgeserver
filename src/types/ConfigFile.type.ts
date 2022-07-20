@@ -1,5 +1,4 @@
 type trailSlash = 'always' | 'never' | 'auto';
-type Snowflake = string;
 
 export type Header = {
     source: string;
@@ -65,6 +64,6 @@ export const defaultEdgeRcConfig: EdgeRcConfig = {
 };
 
 export type Edgerc = {
-    app_id: Snowflake;
+    app_id: bigint;
     config: EdgeRcConfig;
 };

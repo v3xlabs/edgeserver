@@ -19,7 +19,7 @@ const JWTAuthKeySchema = object().shape({
     app_id: string().optional(),
 });
 
-export type AuthData = { user_id: string; key_id: string };
+export type AuthData = { user_id: bigint; key_id: string; permissions: bigint };
 
 export type OptionsData = {
     adminOnly: boolean;
@@ -54,7 +54,7 @@ export const useAuth: (
 
     // if (verify(auth, process.env.SIGNAL_MASTER)) return Malformat();
 
-    const key = await getAuthKey(decoded.key.toString(), decoded.owner_id);
+    const key = await getAuthKey(decoded.key, BigInt(decoded.owner_id));
 
     if (!key) throw new SafeError(403, '', 'auth-no-key-found');
 
@@ -77,5 +77,9 @@ export const useAuth: (
         if (!data?.admin) throw new SafeError(403, '', 'auth-not-admin');
     }
 
-    return { user_id: key.owner_id.toString(), key_id: key.key };
+    return {
+        user_id: key.owner_id,
+        key_id: key.key,
+        permissions: key.permissions,
+    };
 };

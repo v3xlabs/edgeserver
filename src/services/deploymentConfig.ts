@@ -3,13 +3,13 @@ import { defaultEdgeRcConfig, RoutingConfig } from '../types/ConfigFile.type';
 import { useData } from '../util/useData';
 
 const getRoutingConfigFromRedis =
-    (base_url: string) => async (): Promise<RoutingConfig | undefined> => {
+    (base_url: bigint) => async (): Promise<RoutingConfig | undefined> => {
         // TODO get config from redis
         return undefined;
     };
 
 const getRoutingConfigFromBaseDB =
-    (deploy_id: string) => async (): Promise<RoutingConfig | undefined> => {
+    (deploy_id: bigint) => async (): Promise<RoutingConfig | undefined> => {
         const data = await DB.selectOneFrom('deployment_configs', ['routing'], {
             deploy_id,
         });
@@ -18,7 +18,7 @@ const getRoutingConfigFromBaseDB =
         return data ? (JSON.parse(data.routing) as RoutingConfig) : undefined;
     };
 
-export const getRoutingConfig = async (deploy_id: string) => {
+export const getRoutingConfig = async (deploy_id: bigint) => {
     return {
         ...defaultEdgeRcConfig.routing,
         ...(await useData<RoutingConfig>(

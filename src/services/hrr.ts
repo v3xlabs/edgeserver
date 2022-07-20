@@ -46,7 +46,7 @@ type RedirectRule = GenericRule & {
 type Rules = HeaderRule | RewriteRule | RedirectRule;
 
 export const getHeaderRules = async (
-    deploy_id: string,
+    deploy_id: bigint,
     path: string
 ): Promise<HeaderRule[]> => {
     const rules = useData(`header_${deploy_id}`);
@@ -54,7 +54,7 @@ export const getHeaderRules = async (
     return [];
 };
 export const getRedirectRules = async (
-    deploy_id: string,
+    deploy_id: bigint,
     path: string
 ): Promise<RedirectRule[] | undefined> =>
     await useCache<RedirectRule[]>(
@@ -77,7 +77,7 @@ export const getRedirectRules = async (
     );
 
 export const getRewriteRules = async (
-    deploy_id: string,
+    deploy_id: bigint,
     path: string
 ): Promise<RewriteRule[]> => {
     return [];

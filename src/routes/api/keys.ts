@@ -12,10 +12,13 @@ import {
 import { SafeError } from '../../util/error/SafeError';
 import { useAuth } from '../../util/http/useAuth';
 import { log } from '../../util/logging';
+import { KeyPerms, usePerms } from '../../util/permissions';
 
 export const KeysRoute: FastifyPluginAsync = async (router, _options) => {
     router.get('/', {}, async (request, reply) => {
-        const { user_id } = await useAuth(request, reply);
+        const { user_id, permissions } = await useAuth(request, reply);
+
+        usePerms(permissions, [KeyPerms.USER_READ]);
 
         const keys = await getAuthKeys(user_id);
 
@@ -30,7 +33,9 @@ export const KeysRoute: FastifyPluginAsync = async (router, _options) => {
         '/',
         { schema: { body: DeleteType } },
         async (request, reply) => {
-            const { user_id } = await useAuth(request, reply);
+            const { user_id, permissions } = await useAuth(request, reply);
+
+            usePerms(permissions, [KeyPerms.USER_WRITE]);
 
             const { key_id } = request.body;
 
@@ -114,14 +119,14 @@ export const KeysRoute: FastifyPluginAsync = async (router, _options) => {
             const token = payload.data.expiresIn
                 ? await createExpiringAuthToken(
                       user_id,
-                      payload.data.permissions,
+                      BigInt(payload.data.permissions),
                       payload.data.name,
                       '',
                       payload.data.expiresIn
                   )
                 : await createLongLivedAuthToken(
                       user_id,
-                      payload.data.permissions,
+                      BigInt(payload.data.permissions),
                       payload.data.name
                   );
             // const token = await createAndSignFullAccessToken(

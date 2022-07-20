@@ -56,7 +56,7 @@ export const AdminSetupRoute: FastifyPluginAsync = async (router, _options) => {
             }
 
             // Create admin user
-            const user_id = generateSnowflake();
+            const user_id = BigInt(generateSnowflake());
 
             await DB.insertInto('owners', {
                 admin: true,

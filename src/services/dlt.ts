@@ -1,7 +1,7 @@
 import { DB } from '../database';
 import { useData } from '../util/useData';
 
-type SiteDataType = { deploy_id: string; app_id: string };
+type SiteDataType = { deploy_id: bigint; app_id: bigint };
 
 const getSiteDataFromRedis =
     (base_url: string) => async (): Promise<SiteDataType | undefined> => {

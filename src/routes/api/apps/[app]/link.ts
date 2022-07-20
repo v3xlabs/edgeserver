@@ -3,6 +3,7 @@ import { FastifyPluginAsync } from 'fastify';
 
 import { DB } from '../../../../database';
 import { useAuth } from '../../../../util/http/useAuth';
+import { KeyPerms, usePerms } from '../../../../util/permissions';
 import { AppIDParameters } from '.';
 
 export const AppEntryLinkRoute: FastifyPluginAsync = async (
@@ -26,7 +27,9 @@ export const AppEntryLinkRoute: FastifyPluginAsync = async (
         },
         async (_request, reply) => {
             const { app_id } = _request.params;
-            const { user_id } = await useAuth(_request, reply);
+            const { user_id, permissions } = await useAuth(_request, reply);
+
+            usePerms(permissions, [KeyPerms.APPS_WRITE]);
 
             const { domain_id } = _request.body;
 
@@ -47,7 +50,7 @@ export const AppEntryLinkRoute: FastifyPluginAsync = async (
 
             await DB.update(
                 'applications',
-                { domain_id },
+                { domain_id: BigInt(domain_id) },
                 { app_id, owner_id: user_id }
             );
 

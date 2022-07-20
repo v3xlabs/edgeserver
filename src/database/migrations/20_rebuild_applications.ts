@@ -1,4 +1,4 @@
-import { createTableRaw, ScylloClient } from 'scyllo';
+import { ScylloClient } from 'scyllo';
 
 import { ApplicationV4, ApplicationV5 } from '../../types/Application.type';
 import { log } from '../../util/logging';
@@ -10,11 +10,7 @@ const createTable = async (
     }>,
     table_name: string
 ) => {
-    const query = createTableRaw<
-        { applications: ApplicationV5 },
-        'applications'
-    >(
-        'signal',
+    await database.createTable(
         table_name as 'applications',
         true,
         {
@@ -37,13 +33,6 @@ const createTable = async (
         'owner_id',
         ['app_id']
     );
-
-    log.debug(query.query);
-
-    await database.query({
-        args: query.args,
-        query: query.query,
-    });
 };
 
 export const rebuild_applications: Migration<{

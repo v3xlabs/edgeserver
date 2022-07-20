@@ -14,6 +14,7 @@ import { deleteCache } from '../../util/cache/cache';
 import { SafeError } from '../../util/error/SafeError';
 import { useAuth } from '../../util/http/useAuth';
 import { log } from '../../util/logging';
+import { KeyPerms, usePerms } from '../../util/permissions';
 
 const generateSnowflake = generateSunflake();
 
@@ -55,7 +56,9 @@ export const CreateRoute: FastifyPluginAsync = async (router, options) => {
         },
         async (request, reply) => {
             // Check auth
-            const { user_id } = await useAuth(request, reply);
+            const { user_id, permissions } = await useAuth(request, reply);
+
+            usePerms(permissions, [KeyPerms.DEPLOYMENTS_WRITE]);
 
             // Do the rest
             const data = await request.file();
@@ -115,7 +118,7 @@ export const CreateRoute: FastifyPluginAsync = async (router, options) => {
                 join('tmp', temporary_name)
             );
 
-            const deploy_id = generateSnowflake();
+            const deploy_id = BigInt(generateSnowflake());
 
             await DB.insertInto('deployments', {
                 app_id: site.app_id,

@@ -17,7 +17,7 @@ export const sites_deprecate: Migration<{
 
     for (const site of sites) {
         const deployment: DeploymentV2 = {
-            deploy_id: generateSnowflake(),
+            deploy_id: BigInt(generateSnowflake()),
             app_id: site.site_id,
             timestamp: new Date().toString(),
             cid: '',

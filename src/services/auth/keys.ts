@@ -7,9 +7,8 @@ import { CACHE } from '../../cache';
 import { DB } from '../../database';
 import { generateSnowflake } from '../../routes/api';
 import { AuthKey, RedisAuthKey } from '../../types/AuthKey.type';
-import { PermissionsString } from './permissions';
 
-export const getAuthKeys = async (user_id: string) => {
+export const getAuthKeys = async (user_id: bigint) => {
     const [DBKey, RedisKey] = await Promise.allSettled([
         DB.selectFrom('keys', '*', { owner_id: user_id }),
         CACHE.LRANGE(`keys_${user_id}`, 0, -1),
@@ -47,7 +46,7 @@ export const getAuthKeys = async (user_id: string) => {
 
 export const getAuthKey = async (
     key_id: string,
-    user_id: string
+    user_id: bigint
 ): Promise<AuthKey | undefined> => {
     const [DBKey, RedisKey] = await Promise.allSettled([
         DB.selectOneFrom('keys', '*', { key: key_id, owner_id: user_id }),
@@ -56,13 +55,18 @@ export const getAuthKey = async (
 
     if (DBKey.status == 'fulfilled' && DBKey.value) return DBKey.value;
 
-    if (RedisKey.status == 'fulfilled' && RedisKey.value)
-        return JSON.parse(RedisKey.value);
+    if (RedisKey.status == 'fulfilled' && RedisKey.value) {
+        const result = JSON.parse(RedisKey.value);
+
+        return Object.assign(result, {
+            permissions: BigInt(result.permissions),
+        });
+    }
 };
 
 export const createExpiringAuthKey = async (
-    user_id: string,
-    permissions: PermissionsString,
+    user_id: bigint,
+    permissions: bigint,
     name: string,
     last_use_data: string,
     expiresAt: number
@@ -90,15 +94,15 @@ export const createExpiringAuthKey = async (
         }
     );
 
-    await CACHE.lPush(`keys_${key.owner_id.toString()}`, key.key);
+    await CACHE.lPush(`keys_${key.owner_id.toString()}`, key.key.toString());
     // CACHE.LREM(`keys_${key.owner_id}`, -1, key.key);
 
     return key;
 };
 
 export const createLongLivedAuthKey = async (
-    user_id: string,
-    permissions: PermissionsString,
+    user_id: bigint,
+    permissions: bigint,
     name: string
 ) => {
     const key: AuthKey = {
@@ -116,15 +120,15 @@ export const createLongLivedAuthKey = async (
     return key;
 };
 
-export const brutalDeleteKey = async (key: string, user_id: string) => {
+export const brutalDeleteKey = async (key: string, user_id: bigint) => {
     await Promise.all([
         CACHE.DEL(`keys_${user_id}_${key}`),
-        CACHE.LREM(`keys_${user_id}`, -1, key),
+        CACHE.LREM(`keys_${user_id}`, -1, key.toString()),
         DB.deleteFrom('keys', '*', { key: key }),
     ]);
 };
 
-export const updateExpiringLastUsed = async (key: string, owner_id: string) => {
+export const updateExpiringLastUsed = async (key: string, owner_id: bigint) => {
     const data = await CACHE.get(`keys_${owner_id}_${key}`);
 
     if (!data) return;

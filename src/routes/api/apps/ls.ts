@@ -4,12 +4,15 @@ import { generateSunflake } from 'sunflake';
 import { DB } from '../../../database';
 import { useAuth } from '../../../util/http/useAuth';
 import { log } from '../../../util/logging';
+import { KeyPerms, usePerms } from '../../../util/permissions';
 
 export const generateSnowflake = generateSunflake();
 
 export const AppLsRoute: FastifyPluginAsync = async (router, _options) => {
     router.get('/', async (_request, reply) => {
-        const { user_id } = await useAuth(_request, reply);
+        const { user_id, permissions } = await useAuth(_request, reply);
+
+        usePerms(permissions, [KeyPerms.APPS_READ]);
 
         const applications = await DB.selectFrom(
             'applications_by_user' as 'applications',

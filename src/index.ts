@@ -15,6 +15,16 @@ import { setupLogger } from './util/setupLogger';
 
 config();
 
+declare global {
+    interface BigInt {
+        toJSON(): string;
+    }
+}
+
+BigInt.prototype.toJSON = function () {
+    return this.toString();
+};
+
 const obfusicate = (value: string) => {
     return '*'.repeat(value.length);
 };

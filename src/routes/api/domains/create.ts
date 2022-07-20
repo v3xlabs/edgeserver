@@ -5,6 +5,7 @@ import { DB } from '../../../database';
 import { DomainV1 } from '../../../types/Domain.type';
 import { SafeError } from '../../../util/error/SafeError';
 import { useAuth } from '../../../util/http/useAuth';
+import { KeyPerms, usePerms } from '../../../util/permissions';
 import { generateSnowflake } from '.';
 
 export const DomainCreateRoute: FastifyPluginAsync = async (
@@ -25,7 +26,9 @@ export const DomainCreateRoute: FastifyPluginAsync = async (
             },
         },
         async (_request, reply) => {
-            const { user_id } = await useAuth(_request, reply);
+            const { user_id, permissions } = await useAuth(_request, reply);
+
+            usePerms(permissions, [KeyPerms.DOMAINS_WRITE]);
 
             const { host } = _request.body;
 
@@ -36,7 +39,7 @@ export const DomainCreateRoute: FastifyPluginAsync = async (
             if (old_domain)
                 throw new SafeError(409, '', 'domain-create-exists');
 
-            const domain_id = generateSnowflake();
+            const domain_id = BigInt(generateSnowflake());
 
             const domain: Partial<DomainV1> = {
                 domain_id,
