@@ -1,7 +1,7 @@
 <p align="center">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="./assets/edgeserver_light.png" />
-    <img alt="edgeserver.io bridging web2 to web3" src="./assets/edgerserver_dark.png" width="400px" />
+    <img alt="edgeserver.io bridging web2 to web3" src="./assets/edgeserver_dark.png" width="400px" />
   </picture>
 </p>
 
