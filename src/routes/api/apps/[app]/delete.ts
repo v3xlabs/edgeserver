@@ -35,7 +35,20 @@ export const AppEntryDeleteRoute: FastifyPluginAsync = async (
                 app_id,
                 owner_id: user_id,
             });
-            await DB.deleteFrom('deployments', '*', { app_id });
+
+            const result = await DB.deleteFrom('deployments', '*', { app_id });
+
+            const batch = DB.batch();
+            result.rows.forEach((row) => {
+                const deploy_id = row.get('deploy_id')?.toString() as
+                    | string
+                    | undefined;
+                if (!deploy_id) return;
+
+                batch.deleteFrom('deployment_configs', '*', { deploy_id });
+            });
+
+            if (batch.queries.length > 0) await batch.execute();
 
             reply.status(200).send('OK');
         }
