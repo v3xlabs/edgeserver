@@ -2,6 +2,7 @@ import { FastifyPluginAsync } from 'fastify';
 import { generateSunflake } from 'sunflake';
 
 import { DB } from '../../../../database';
+import { AppEntryDeleteRoute } from './delete';
 import { AppDeploysRoute } from './deploys';
 import { AppEntryLinkRoute } from './link';
 
@@ -27,4 +28,6 @@ export const AppEntryRoute: FastifyPluginAsync = async (router, _options) => {
     router.register(AppEntryLinkRoute, { prefix: '/link' });
 
     router.register(AppDeploysRoute, { prefix: '/deploys' });
+
+    router.register(AppEntryDeleteRoute, { prefix: '/delete' });
 };
