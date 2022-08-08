@@ -1,6 +1,7 @@
 import { FastifyPluginAsync } from 'fastify';
 import { generateSunflake } from 'sunflake';
 
+import { CACHE } from '../../../cache';
 import { DB } from '../../../database';
 import { useAuth } from '../../../util/http/useAuth';
 import { log } from '../../../util/logging';
@@ -36,9 +37,24 @@ export const AppLsRoute: FastifyPluginAsync = async (router, _options) => {
 
                 if (!last_deploy) return app;
 
+                const favicon_url = await CACHE.GET(
+                    `favicon:${last_deploy.deploy_id}`
+                );
+
+                if (!favicon_url) {
+                    return {
+                        ...app,
+                        last_deploy: last_deploy.deploy_id,
+                        preview_url:
+                            '/api/image/deploy/' + last_deploy.deploy_id,
+                    };
+                }
+
                 return {
                     ...app,
+                    last_deploy: last_deploy.deploy_id,
                     preview_url: '/api/image/deploy/' + last_deploy.deploy_id,
+                    favicon_url,
                 };
             })
         );
