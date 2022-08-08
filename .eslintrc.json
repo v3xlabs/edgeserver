@@ -17,6 +17,7 @@
     },
     "rules": {
         "prefer-at": "off",
-        "curly": ["error", "multi-or-nest"]
+        "curly": ["error", "multi-or-nest"],
+        "unused-imports/no-unused-vars": "off"
     }
 }
