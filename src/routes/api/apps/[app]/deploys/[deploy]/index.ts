@@ -1,9 +1,10 @@
 import { FastifyPluginAsync } from 'fastify';
 import { generateSunflake } from 'sunflake';
 
-import { DB } from '../../../../../database';
-import { useAuth } from '../../../../../util/http/useAuth';
-import { KeyPerms, usePerms } from '../../../../../util/permissions';
+import { DB } from '../../../../../../database';
+import { useAuth } from '../../../../../../util/http/useAuth';
+import { KeyPerms, usePerms } from '../../../../../../util/permissions';
+import { DeploysRenderRoute } from '../../render';
 
 export const generateSnowflake = generateSunflake();
 
@@ -36,4 +37,6 @@ export const DeploysEntryRoute: FastifyPluginAsync = async (
             )
         );
     });
+
+    router.register(DeploysRenderRoute, { prefix: '/render' });
 };
