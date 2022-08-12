@@ -1,7 +1,7 @@
 import { FastifyPluginAsync } from 'fastify';
 import { generateSunflake } from 'sunflake';
-import { CACHE } from '../../../../cache';
 
+import { CACHE } from '../../../../cache';
 import { DB } from '../../../../database';
 import { SafeError } from '../../../../util/error/SafeError';
 import { useAuth } from '../../../../util/http/useAuth';
@@ -19,6 +19,7 @@ export const DeploysRenderRoute: FastifyPluginAsync = async (
             app_id: string;
         };
     }>('/', async (_request, reply) => {
+        log.debug('');
         const { user_id, permissions } = await useAuth(_request, reply);
 
         usePerms(permissions, [KeyPerms.DEPLOYMENTS_WRITE]);
@@ -30,7 +31,7 @@ export const DeploysRenderRoute: FastifyPluginAsync = async (
 
         if (!app) throw new SafeError(404, '', 'app-render-no-app');
 
-        const deployment = await DB.selectOneFrom(
+        const deployment = await DB.selectFrom(
             'deployments',
             '*',
             {
@@ -39,7 +40,12 @@ export const DeploysRenderRoute: FastifyPluginAsync = async (
             'ORDER BY deploy_id DESC'
         );
 
-        if (!deployment) throw new SafeError(404, '', 'app-render-no-deploys');
+        if (
+            !deployment ||
+            deployment.at(0) == undefined ||
+            deployment.length === 0
+        )
+            throw new SafeError(404, '', 'app-render-no-deploys');
 
         const domain = await DB.selectOneFrom('domains', ['domain'], {
             domain_id: app.domain_id,
@@ -47,9 +53,9 @@ export const DeploysRenderRoute: FastifyPluginAsync = async (
 
         if (!domain) throw new SafeError(404, '', 'app-render-no-domain');
 
-        log.ok('Triggering render for ' + deployment.deploy_id);
+        log.ok('Triggering render for ' + deployment.at(0)!.deploy_id);
         const renderConfig = {
-            id: deployment.deploy_id,
+            id: deployment.at(0)!.deploy_id,
             url: 'http://' + domain.domain,
             viewport: '1920x1080',
             scales: ['128', '256'],
