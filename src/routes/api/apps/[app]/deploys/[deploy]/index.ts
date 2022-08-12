@@ -1,9 +1,9 @@
 import { FastifyPluginAsync } from 'fastify';
 import { generateSunflake } from 'sunflake';
 
-import { DB } from '../../../../../database';
-import { useAuth } from '../../../../../util/http/useAuth';
-import { KeyPerms, usePerms } from '../../../../../util/permissions';
+import { DB } from '../../../../../../database';
+import { useAuth } from '../../../../../../util/http/useAuth';
+import { KeyPerms, usePerms } from '../../../../../../util/permissions';
 
 export const generateSnowflake = generateSunflake();
 

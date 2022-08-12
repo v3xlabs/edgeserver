@@ -1,12 +1,13 @@
 import { FastifyPluginAsync } from 'fastify';
 import { generateSunflake } from 'sunflake';
-import { CACHE } from '../../../../cache';
 
+import { CACHE } from '../../../../cache';
 import { DB } from '../../../../database';
 import { SafeError } from '../../../../util/error/SafeError';
 import { AppEntryDeleteRoute } from './delete';
 import { AppDeploysRoute } from './deploys';
 import { AppEntryLinkRoute } from './link';
+import { DeploysRenderRoute } from './render';
 
 export const generateSnowflake = generateSunflake();
 
@@ -46,9 +47,7 @@ export const AppEntryRoute: FastifyPluginAsync = async (router, _options) => {
                 `favicon:${last_deploy.deploy_id}`
             );
 
-            if (favicon_url) {
-                returner.push({ favicon_url });
-            }
+            if (favicon_url) returner.push({ favicon_url });
         }
 
         reply.send(Object.assign(app, ...returner));
@@ -59,4 +58,6 @@ export const AppEntryRoute: FastifyPluginAsync = async (router, _options) => {
     router.register(AppDeploysRoute, { prefix: '/deploys' });
 
     router.register(AppEntryDeleteRoute, { prefix: '/delete' });
+
+    router.register(DeploysRenderRoute, { prefix: '/render' });
 };

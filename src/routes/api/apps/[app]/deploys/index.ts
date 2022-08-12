@@ -1,7 +1,7 @@
 import { FastifyPluginAsync } from 'fastify';
 import { generateSunflake } from 'sunflake';
 
-import { DeploysEntryRoute } from './get';
+import { DeploysEntryRoute } from './[deploy]';
 import { DeploysLsRoute } from './ls';
 import { DeploysTotalRoute } from './total';
 
