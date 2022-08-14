@@ -1,49 +1,12 @@
 import { DB } from '../database';
+import {
+    HeaderRule,
+    RedirectRule,
+    RewriteRule,
+} from '../types/ConfigFile.type';
 import { useLocalCache } from '../util/cache/localCache';
 import { useRedisCache } from '../util/cache/redisCache';
 import { useCache, useData } from '../util/useData';
-
-type GenericRule = {
-    pattern: string;
-};
-
-export type Header = {
-    source: string;
-    headers: {
-        [key: string]: string;
-    }[];
-    has: {
-        type: 'header' | 'cookie' | 'host' | 'query';
-        key: string;
-        value?: string;
-    }[];
-};
-
-type Condition = {
-    type: 'header' | 'cookie' | 'host' | 'query';
-    key: string;
-    value?: string;
-};
-
-type HeaderRule = GenericRule & {
-    // Conditions that need to be true in order for the rule to apply
-    conditions: Condition[];
-    // Headers to add when the rule is applied
-    headers: Record<string, string>;
-};
-
-type RewriteRule = GenericRule & {
-    // Conditions that need to be true in order for the rule to apply
-    conditions: Condition[];
-    destination: string;
-};
-type RedirectRule = GenericRule & {
-    // Conditions that need to be true in order for the rule to apply
-    conditions: Condition[];
-    status: 301 | 302 | 307;
-    destination: string;
-};
-type Rules = HeaderRule | RewriteRule | RedirectRule;
 
 export const getHeaderRules = async (
     deploy_id: bigint,
