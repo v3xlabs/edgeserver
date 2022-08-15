@@ -11,38 +11,38 @@ export type Condition = {
 
 export type HeaderRule = GenericRule & {
     // Conditions that need to be true in order for the rule to apply
-    conditions: Condition[];
+    conditions?: Condition[];
     // Headers to add when the rule is applied
     headers: Record<string, string>;
 };
 
 export type RewriteRule = GenericRule & {
     // Conditions that need to be true in order for the rule to apply
-    conditions: Condition[];
+    conditions?: Condition[];
     destination: string;
 };
 export type RedirectRule = GenericRule & {
     // Conditions that need to be true in order for the rule to apply
-    conditions: Condition[];
+    conditions?: Condition[];
     status: 301 | 302 | 307;
     destination: string;
 };
 
 export type RoutingConfig = {
-    file_extensions: boolean;
-    trailing_slash: trailSlash;
+    file_extensions?: boolean;
+    trailing_slash?: trailSlash;
 
-    default_route: string;
+    default_route?: string;
 };
 
 export type EdgeRcConfig = {
-    routing: RoutingConfig;
+    routing?: RoutingConfig;
 
-    headers: HeaderRule[];
-    redirects: RedirectRule[];
-    rewrites: RewriteRule[];
+    headers?: HeaderRule[];
+    redirects?: RedirectRule[];
+    rewrites?: RewriteRule[];
 
-    ssl: boolean;
+    ssl?: boolean;
 };
 
 export const defaultEdgeRcConfig: EdgeRcConfig = {
@@ -59,6 +59,6 @@ export const defaultEdgeRcConfig: EdgeRcConfig = {
 };
 
 export type Edgerc = {
-    app_id: bigint;
+    app_id: string;
     config: EdgeRcConfig;
 };
