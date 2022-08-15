@@ -1,36 +1,31 @@
-type trailSlash = 'always' | 'never' | 'auto';
+export type trailSlash = 'always' | 'never' | 'auto';
 
-export type Header = {
-    source: string;
-    headers: {
-        [key: string]: string;
-    }[];
-    has: {
-        type: 'header' | 'cookie' | 'host' | 'query';
-        key: string;
-        value?: string;
-    }[];
+export type GenericRule = {
+    pattern: string;
+};
+export type Condition = {
+    type: 'header' | 'cookie' | 'host' | 'query';
+    key: string;
+    value?: string;
 };
 
-export type Rewrite = {
-    source: string;
-    destination: string;
-    has: {
-        type: 'header' | 'cookie' | 'host' | 'query';
-        key: string;
-        value?: string;
-    };
+export type HeaderRule = GenericRule & {
+    // Conditions that need to be true in order for the rule to apply
+    conditions: Condition[];
+    // Headers to add when the rule is applied
+    headers: Record<string, string>;
 };
 
-export type Redirect = {
-    source: string;
+export type RewriteRule = GenericRule & {
+    // Conditions that need to be true in order for the rule to apply
+    conditions: Condition[];
     destination: string;
-    permanent: boolean;
-    has: {
-        type: 'header' | 'cookie' | 'host' | 'query';
-        key: string;
-        value?: string;
-    }[];
+};
+export type RedirectRule = GenericRule & {
+    // Conditions that need to be true in order for the rule to apply
+    conditions: Condition[];
+    status: 301 | 302 | 307;
+    destination: string;
 };
 
 export type RoutingConfig = {
@@ -43,9 +38,9 @@ export type RoutingConfig = {
 export type EdgeRcConfig = {
     routing: RoutingConfig;
 
-    headers: Header[];
-    redirects: Redirect[];
-    rewrites: Rewrite[];
+    headers: HeaderRule[];
+    redirects: RedirectRule[];
+    rewrites: RewriteRule[];
 
     ssl: boolean;
 };
