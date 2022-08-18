@@ -1,15 +1,25 @@
 {
-  "$schema": "https://turborepo.org/schema.json",
-  "pipeline": {
-    "build": {
-      "dependsOn": ["^build"],
-      "outputs": ["dist/**", ".next/**"]
-    },
-    "lint": {
-      "outputs": []
-    },
-    "dev": {
-      "cache": false
+    "$schema": "https://turborepo.org/schema.json",
+    "globalDependencies": [
+        "$SIGNALFS_IP",
+        "$DB_DATACENTER",
+        "$DB_IP",
+        "$SIGNAL_MASTER",
+        "$SIGNAL_HOST",
+        "$SENTRY_DSN",
+        "$ENVIRONMENT",
+        "$INSTANCE_ID"
+    ],
+    "pipeline": {
+        "build": {
+            "dependsOn": ["^build"],
+            "outputs": ["dist/**", ".next/**"]
+        },
+        "lint": {
+            "outputs": []
+        },
+        "dev": {
+            "cache": false
+        }
     }
-  }
 }
