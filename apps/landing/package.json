@@ -40,6 +40,6 @@
         "start": "vite",
         "dev": "vite",
         "build": "vite build",
-        "lint": "eslint -c .eslintrc.json --ext .ts ./src"
+        "lint": "eslint -c .eslintrc.js --ext .ts ./src"
     }
 }
