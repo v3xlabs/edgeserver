@@ -1,6 +1,7 @@
 {
   "files.exclude": {
-    "node_modules": true
+    "packages/groot/node_modules": true,
+    "packages/groot/tmp": true,
   },
   "files.eol": "\n"
 }
