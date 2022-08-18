@@ -1,4 +1,4 @@
-node_modules
-.env
-tools/data
-tmp
+packages/groot/node_modules
+packages/groot/.env
+packages/groot/tools/data
+packages/groot/tmp

@@ -1,6 +1,6 @@
 import NodeCache from 'node-cache';
 
-import { ResolverSetter } from '../../util/useData';
+import { ResolverSetter } from '../useData';
 
 export const cache = new NodeCache({
     stdTTL: 5,
