@@ -1,0 +1,13 @@
+{
+    "$schema": "https://unpkg.com/@changesets/config@1.7.0/schema.json",
+    "changelog": [
+        "@changesets/changelog-github",
+        { "repo": "v3xlabs/edgeserver" }
+    ],
+    "commit": false,
+    "linked": [],
+    "access": "public",
+    "baseBranch": "mono",
+    "updateInternalDependencies": "patch",
+    "ignore": ["@example/*", "@test/*"]
+}

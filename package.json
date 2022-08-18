@@ -8,7 +8,9 @@
   ],
   "scripts": {
     "build": "turbo run build",
-    "dev": "turbo run dev --parallel"
+    "dev": "turbo run dev --parallel",
+    "version": "changeset version && pnpm install --no-frozen-lockfile && pnpm run format",
+    "release": "pnpm run build && changeset publish"
   },
   "devDependencies": {
     "turbo": "latest"
@@ -17,6 +19,8 @@
     "npm": ">=7.0.0",
     "node": ">=14.0.0"
   },
-  "dependencies": {},
+  "dependencies": {
+    "@changesets/cli": "^2.24.3"
+  },
   "packageManager": "pnpm@7.1.9"
 }
