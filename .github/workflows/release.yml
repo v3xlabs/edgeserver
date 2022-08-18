@@ -41,7 +41,7 @@ jobs:
         with:
           # Note: pnpm install after versioning is necessary to refresh lockfile
           version: pnpm run version
-          publish: pnpm exec changeset publish
+          publish: pnpm run pub #exec changeset publish
           commit: '[ci] release'
           title: '[ci] release'
         env:

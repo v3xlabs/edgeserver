@@ -1,5 +1,5 @@
 {
-    "name": "landing",
+    "name": "@web/landing",
     "version": "1.0.0",
     "private": true,
     "license": "GPL-3.0",
@@ -40,6 +40,7 @@
         "start": "vite",
         "dev": "vite",
         "build": "vite build",
-        "lint": "eslint -c .eslintrc.json --ext .ts ./src"
+        "lint": "eslint -c .eslintrc.json --ext .ts ./src",
+        "pub": "echo 'PUB LANDING'"
     }
 }
