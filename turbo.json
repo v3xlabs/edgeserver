@@ -8,7 +8,9 @@
         "$SIGNAL_HOST",
         "$SENTRY_DSN",
         "$ENVIRONMENT",
-        "$INSTANCE_ID"
+        "$INSTANCE_ID",
+        "$REDIS_IP",
+        "$DEBUG"
     ],
     "pipeline": {
         "build": {
