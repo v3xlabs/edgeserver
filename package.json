@@ -11,7 +11,6 @@
     "dev": "turbo run dev --parallel"
   },
   "devDependencies": {
-    "eslint-config-custom": "workspace:*",
     "turbo": "latest"
   },
   "engines": {

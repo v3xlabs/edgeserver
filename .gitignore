@@ -4,3 +4,4 @@ node_modules
 dist
 apps/groot/tools/data
 apps/groot/tmp
+.env
