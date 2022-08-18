@@ -28,14 +28,20 @@ jobs:
             node-version: 16
             cache: 'pnpm'
 
+        - name: TurboRepo local server
+          uses: felixmosh/turborepo-gh-artifacts@v1
+          with:
+            repo-token: ${{ secrets.GITHUB_TOKEN }}
+            server-token: ${{ secrets.TURBO_SERVER_TOKEN }}
+
         - name: Install dependencies
-          run: pnpm install
+          run: pnpm install --api="http://127.0.0.1:9080" --token="${{ secrets.TURBO_SERVER_TOKEN }}" --team="foo"
 
         - name: Build
-          run: pnpm build
+          run: pnpm build --api="http://127.0.0.1:9080" --token="${{ secrets.TURBO_SERVER_TOKEN }}" --team="foo"
 
         - name: Test
-          run: pnpm lint
+          run: pnpm lint --api="http://127.0.0.1:9080" --token="${{ secrets.TURBO_SERVER_TOKEN }}" --team="foo"
 
         # - name: "[Landing] Deploy"
         #   uses: lvkdotsh/edgeserver-action@master
