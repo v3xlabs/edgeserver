@@ -42,7 +42,7 @@ jobs:
         run: pnpm install
 
       - name: Get Changeset status
-        run: pnpm changeset status --output versions.json
+        run: pnpm changeset status --since mono --output versions.json
 
       - name: Build Packages
         run: pnpm run build --api="http://127.0.0.1:9080" --token="${{ secrets.TURBO_SERVER_TOKEN }}" --team="foo"
