@@ -1,9 +1,7 @@
-import { Hello } from '@edgelabs/types';
+import { Application } from '@edgelabs/types';
 import { createLogger } from '@lvksh/logger';
 
-const f: Hello = {
-    world: 'hi',
-};
+const f: Partial<Application> = {};
 
 const log = createLogger({
     debug: 'DEBUG',

@@ -1,5 +1,6 @@
+import { defaultEdgeRcConfig, RoutingConfig } from '@edgelabs/types';
+
 import { DB } from '../database';
-import { defaultEdgeRcConfig, RoutingConfig } from '../types/ConfigFile.type';
 import { useData } from '../util/useData';
 
 const getRoutingConfigFromRedis =

@@ -55,7 +55,8 @@
         "undici": "*",
         "unzipper": "^0.10.11",
         "use-yup": "^1.1.0",
-        "yup": "^0.32.11"
+        "yup": "^0.32.11",
+        "@edgelabs/types": "workspace:*"
     },
     "scripts": {
         "lint": "eslint -c .eslintrc.json --ext .ts ./src",

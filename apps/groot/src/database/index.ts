@@ -1,13 +1,7 @@
+import { Owner } from '@edgelabs/types';
 import { ScylloClient } from 'scyllo';
 
 import { Globals } from '..';
-import { Application } from '../types/Application.type';
-import { AuthKey } from '../types/AuthKey.type';
-import { Deployment } from '../types/Deployment.type';
-import { DeploymentConfig } from '../types/DeploymentConfig.type';
-import { DeploymentLookup } from '../types/DeploymentLookup.type';
-import { Domain } from '../types/Domain.type';
-import { Owner } from '../types/Owner.type';
 import { log } from '../util/logging';
 import { migrate, Migrations, MigrationState } from './migrations';
 
