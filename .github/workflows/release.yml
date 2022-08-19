@@ -43,6 +43,9 @@ jobs:
       - name: Build Packages
         run: pnpm run build --api="http://127.0.0.1:9080" --token="${{ secrets.TURBO_SERVER_TOKEN }}" --team="foo"
 
+      - name: Get Changeset status
+        run: pnpm changeset status --output versions.json
+
       - name: Create Release Pull Request or Publish
         id: changesets
         uses: changesets/action@v1
@@ -57,5 +60,14 @@ jobs:
           # Needs access to publish to npm
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-      - name: Collect Data
-        run: echo '${{ steps.changesets.outputs.publishedPackages }}'
+      - name: Get ChangeData
+        run: pnpm ts-node ./scripts/extract.ts
+        id: changedata
+
+      - name: Edgeserver Update
+        run: echo BANG edgeserver
+        if: ${{ steps.changedata.outputs.web_landing == true }}
+
+      - name: CLI Update
+        run: echo BANG cli
+        if: ${{ steps.changedata.outputs.edgelabs_cli == true }}
