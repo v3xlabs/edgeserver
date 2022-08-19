@@ -1,5 +1,11 @@
 # @edgelabs/cli
 
+## 0.0.6
+
+### Patch Changes
+
+- [#87](https://github.com/v3xlabs/edgeserver/pull/87) [`be5f04c`](https://github.com/v3xlabs/edgeserver/commit/be5f04c466bb9febb4e8a495b70985d9b6660cda) Thanks [@lucemans](https://github.com/lucemans)! - Introduce shebang
+
 ## 0.0.5
 
 ### Patch Changes
