@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - master
+      - mono
 
 defaults:
   run:
@@ -39,7 +40,7 @@ jobs:
         id: changesets
         uses: changesets/action@v1
         with:
-          publish: pnpm run pub #exec changeset publish
+          publish: echo 'ghello'
           commit: '[ci] release'
           title: '[ci] release'
         env:
