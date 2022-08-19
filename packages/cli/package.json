@@ -14,7 +14,7 @@
         "build:ncc": "ncc build ./lib/index.js -m -o dist --license LICENSE --target es6",
         "build:bang": "echo -e \"#!/usr/bin/env node\" > ./dist/edge.js && cat dist/index.js >> dist/edge.js && chmod +x ./dist/edge.js && rm ./dist/index.js",
         "lint": "eslint -c .eslintrc.json --ext .ts ./src",
-        "pub": "pnpm changeset publish"
+        "pub": "pnpm build && pnpm publish --access public"
     },
     "keywords": [],
     "author": "Lucemans <luc@lucemans.nl>",
