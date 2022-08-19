@@ -56,3 +56,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           # Needs access to publish to npm
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Collect Data
+        run: echo '${steps.changesets.outputs.publishedPackages}'
