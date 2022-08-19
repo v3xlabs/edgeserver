@@ -22,6 +22,9 @@
         },
         "dev": {
             "cache": false
+        },
+        "pub": {
+            "dependsOn": ["build"]
         }
     }
 }
