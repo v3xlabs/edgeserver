@@ -9,7 +9,7 @@
   "scripts": {
     "build": "turbo run build",
     "dev": "turbo run dev --parallel",
-    "version": "echo 'version ding' && changeset version && pnpm install --no-frozen-lockfile && pnpm run format",
+    "version": "echo 'version ding' && changeset version && pnpm install --no-frozen-lockfile # && pnpm exec turbo run lint",
     "release": "echo 'release ding' && pnpm run build && changeset publish"
   },
   "devDependencies": {
