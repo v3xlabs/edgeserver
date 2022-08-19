@@ -221,17 +221,16 @@ importers:
       pkg: ^5.8.0
       sunflake: ^0.5.0
       typescript: ^4.7.4
-    dependencies:
+    devDependencies:
       '@edgelabs/types': link:../types
       '@lvksh/logger': 1.6.3
-      permissio: 2.0.2
-      sunflake: 0.5.0
-    devDependencies:
       '@typescript-eslint/parser': 5.33.1_4rv7y5c6xz3vfxwhbrcxxi73bq
       '@vercel/ncc': 0.34.0
       eslint: 8.22.0
       eslint-plugin-lvksh: 1.4.1_4rv7y5c6xz3vfxwhbrcxxi73bq
+      permissio: 2.0.2
       pkg: 5.8.0
+      sunflake: 0.5.0
       typescript: 4.7.4
 
   packages/types:
@@ -2856,7 +2855,6 @@ packages:
 
   /@lvksh/logger/1.6.3:
     resolution: {integrity: sha512-xt7s3k9Dk7oaUH1GxU//vGdKftJ1UZkurwXJ189aB6CxY0cy6ATOSti5iTDh5BMsvEcT6Hk5GL/dF+HaZl+pQA==}
-    dev: false
 
   /@manypkg/find-root/1.1.0:
     resolution: {integrity: sha512-mki5uBvhHzO8kYYix/WRy2WX8S3B5wdVSc9D6KcU5lQNglP2yt58/VfLuAK49glRXChosY8ap2oJ1qgma3GUVA==}
@@ -10573,7 +10571,6 @@ packages:
 
   /permissio/2.0.2:
     resolution: {integrity: sha512-QEx2X6ppM+6bJ2dTeGUOZOvwQnm4YEnb9FPWB+kIn+mP9h+/M5WujgtQDWs6dnIl0iGAzMPPrwdk2V0WxSrYdQ==}
-    dev: false
 
   /picocolors/1.0.0:
     resolution: {integrity: sha512-1fygroTLlHu66zi26VoTDv8yRgm0Fccecssto+MhsZ0D/DGW2sm8E8AjW7NU5VVTRt5GxbeZ5qBuJr+HyLYkjQ==}
@@ -12315,7 +12312,6 @@ packages:
 
   /sunflake/0.5.0:
     resolution: {integrity: sha512-CRCJIDmADMd/lRB16DD5mRlSDbHiB9Q8XlmXm2qZqfvxJkbAbp3OMa6z7MbUXwSI0U9ldpeSNzqmih58Xc+/0g==}
-    dev: false
 
   /superstruct/0.14.2:
     resolution: {integrity: sha512-nPewA6m9mR3d6k7WkZ8N8zpTWfenFH3q9pA2PkuiZxINr9DKB2+40wEQf0ixn8VaGuJ78AB6iWOtStI+/4FKZQ==}
