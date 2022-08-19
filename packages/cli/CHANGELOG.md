@@ -1,5 +1,11 @@
 # @edgelabs/cli
 
+## 0.0.5
+
+### Patch Changes
+
+- [#87](https://github.com/v3xlabs/edgeserver/pull/87) [`3ecd241`](https://github.com/v3xlabs/edgeserver/commit/3ecd241055fb7321a1fcd41637554737096afe51) Thanks [@lucemans](https://github.com/lucemans)! - CI/CD
+
 ## 0.0.4
 
 ### Patch Changes
