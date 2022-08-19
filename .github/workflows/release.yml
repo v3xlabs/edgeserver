@@ -32,8 +32,8 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-      - name: Build Packages
-        run: pnpm run build
+      # - name: Build Packages
+      #   run: pnpm run build
 
       - name: Create Release Pull Request or Publish
         id: changesets
