@@ -9,6 +9,5 @@
   "linked": [],
   "access": "public",
   "baseBranch": "mono",
-  "updateInternalDependencies": "patch",
-  "ignore": ["apps/**"]
+  "updateInternalDependencies": "patch"
 }

@@ -7,4 +7,4 @@ const log = createLogger({
 
 console.log('hi');
 log.debug('hi');
-log.debug('never gonna give u up');
+log.debug('never gonna give u up!');
