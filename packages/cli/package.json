@@ -7,6 +7,9 @@
     "files": [
         "lib"
     ],
+    "bin": {
+        "edge": "lib/index.js"
+    },
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
         "build": "pnpm build:tsc && pnpm build:ncc && pnpm build:bang",
