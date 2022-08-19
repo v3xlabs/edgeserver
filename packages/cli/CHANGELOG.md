@@ -1,5 +1,11 @@
 # @edgelabs/cli
 
+## 0.0.4
+
+### Patch Changes
+
+- [#87](https://github.com/v3xlabs/edgeserver/pull/87) [`915d4c1`](https://github.com/v3xlabs/edgeserver/commit/915d4c123b4d277a13077acb1a9c0a80484adbb1) Thanks [@lucemans](https://github.com/lucemans)! - Fix Binaries in package.json
+
 ## 0.0.3
 
 ### Patch Changes
