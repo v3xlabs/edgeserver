@@ -12,9 +12,10 @@
     },
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
-        "build": "pnpm build:tsc && pnpm build:ncc",
+        "build": "pnpm build:tsc && pnpm build:ncc && pnpm build:bang",
         "build:tsc": "tsc -p ./tsconfig.json",
         "build:ncc": "ncc build ./dist/index.js -m -o lib --license LICENSE --target es6",
+        "build:bang": "mv ./lib/index.js ./lib/edge.js && echo -e \"#!/usr/bin/env node\" > ./lib/index.js && cat lib/edge.js >> lib/index.js && chmod +x ./lib/index.js && rm ./lib/edge.js",
         "lint": "eslint -c .eslintrc.json --ext .ts ./src",
         "pub": "pnpm publish --access public"
     },
