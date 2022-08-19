@@ -58,4 +58,4 @@ jobs:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Collect Data
-        run: echo '${steps.changesets.outputs.publishedPackages}'
+        run: echo '${{ steps.changesets.outputs.publishedPackages }}'
