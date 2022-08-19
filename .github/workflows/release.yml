@@ -41,9 +41,6 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-      - name: Get Changeset status
-        run: pnpm changeset status --since mono --output versions.json
-
       - name: Build Packages
         run: pnpm run build --api="http://127.0.0.1:9080" --token="${{ secrets.TURBO_SERVER_TOKEN }}" --team="foo"
 
@@ -60,6 +57,9 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           # Needs access to publish to npm
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+     
+      - name: Get Changeset status
+        run: pnpm changeset status --since mono --output versions.json
 
       - name: Get ChangeData
         run: pnpm ts-node ./scripts/extract.ts

@@ -8,14 +8,18 @@ importers:
       '@changesets/changelog-github': ^0.4.6
       '@changesets/cli': ^2.24.3
       root: github:actions/toolkit
+      ts-node: ^10.8.1
       turbo: latest
+      typescript: ^4.7.4
     dependencies:
       '@actions/core': 1.9.1
       '@changesets/changelog-github': 0.4.6
       '@changesets/cli': 2.24.3
     devDependencies:
       root: github.com/actions/toolkit/bc4be505973a6a7344bfd71e1b32f77e1755310c
+      ts-node: 10.9.1_z5yog5l5yqinvqran22gqy2vdi
       turbo: 1.4.3
+      typescript: 4.7.4
 
   apps/groot:
     specifiers:
