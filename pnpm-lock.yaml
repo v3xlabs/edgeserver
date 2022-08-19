@@ -15,6 +15,7 @@ importers:
 
   apps/groot:
     specifiers:
+      '@edgelabs/types': workspace:*
       '@fastify/cors': ^8.0.0
       '@fastify/multipart': ^7.1.0
       '@lvksh/logger': ^1.6.3
@@ -79,6 +80,7 @@ importers:
       use-yup: ^1.1.0
       yup: ^0.32.11
     dependencies:
+      '@edgelabs/types': link:../../packages/types
       '@fastify/cors': 8.1.0
       '@fastify/multipart': 7.1.0
       '@lvksh/logger': 1.6.3
