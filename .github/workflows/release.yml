@@ -62,7 +62,7 @@ jobs:
         run: pnpm changeset status --since mono --output versions.json
 
       - name: Get ChangeData
-        run: pnpm ts-node ./scripts/extract.ts
+        run: pnpm ts-node ./scripts/extract.ts --resolveJsonModule
         id: changedata
 
       - name: Edgeserver Update
