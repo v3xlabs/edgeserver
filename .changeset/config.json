@@ -8,6 +8,6 @@
   "commit": false,
   "linked": [],
   "access": "public",
-  "baseBranch": "mono",
+  "baseBranch": "master",
   "updateInternalDependencies": "patch"
 }
