@@ -209,6 +209,7 @@ importers:
 
   packages/cli:
     specifiers:
+      '@edgelabs/types': workspace:*
       '@lvksh/logger': ^1.6.3
       '@typescript-eslint/parser': ^5.30.7
       '@vercel/ncc': ^0.34.0
@@ -219,6 +220,7 @@ importers:
       sunflake: ^0.5.0
       typescript: ^4.7.4
     dependencies:
+      '@edgelabs/types': link:../types
       '@lvksh/logger': 1.6.3
       permissio: 2.0.2
       sunflake: 0.5.0
@@ -228,6 +230,12 @@ importers:
       eslint: 8.22.0
       eslint-plugin-lvksh: 1.4.1_4rv7y5c6xz3vfxwhbrcxxi73bq
       pkg: 5.8.0
+      typescript: 4.7.4
+
+  packages/types:
+    specifiers:
+      typescript: ^4.7.4
+    devDependencies:
       typescript: 4.7.4
 
 packages:

@@ -30,6 +30,7 @@
     "dependencies": {
         "@lvksh/logger": "^1.6.3",
         "permissio": "^2.0.2",
-        "sunflake": "^0.5.0"
+        "sunflake": "^0.5.0",
+        "@edgelabs/types": "workspace:*"
     }
 }

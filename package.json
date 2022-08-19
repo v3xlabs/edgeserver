@@ -9,9 +9,8 @@
   "scripts": {
     "build": "turbo run build",
     "dev": "turbo run dev --parallel",
-    "version": "changeset version && pnpm install --no-frozen-lockfile",
-    "release": "pnpm run build && changeset publish",
-    "pub": "turbo run pub"
+    "version": "echo 'version ding' && changeset version && pnpm install --no-frozen-lockfile && pnpm run format",
+    "release": "echo 'release ding' && pnpm run build && changeset publish"
   },
   "devDependencies": {
     "turbo": "latest"

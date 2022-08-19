@@ -1,6 +1,7 @@
 {
     "name": "@web/ipedge",
     "version": "3.9.0",
+    "private": "true",
     "repository": "git@github.com:lvkdotsh/ipedge.git",
     "author": "lucemans <luc@lucemans.nl>",
     "license": "GPL-3.0",

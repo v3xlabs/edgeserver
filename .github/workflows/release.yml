@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - master
+      - mono
 
 defaults:
   run:
@@ -32,14 +33,15 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-      # - name: Build Packages
-      #   run: pnpm run build
+      - name: Build Packages
+        run: pnpm run build
 
       - name: Create Release Pull Request or Publish
         id: changesets
         uses: changesets/action@v1
         with:
-          publish: echo 'ghello'
+          version: pnpm run version
+          publish: pnpm run release
           commit: '[ci] release'
           title: '[ci] release'
         env:
