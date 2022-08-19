@@ -10,7 +10,8 @@
     "build": "turbo run build",
     "dev": "turbo run dev --parallel",
     "version": "changeset version && pnpm install --no-frozen-lockfile",
-    "release": "pnpm run build && changeset publish"
+    "release": "pnpm run build && changeset publish",
+    "pub": "pnpm run pub"
   },
   "devDependencies": {
     "turbo": "latest"
