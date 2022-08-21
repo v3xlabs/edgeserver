@@ -57,18 +57,3 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           # Needs access to publish to npm
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-     
-      - name: Get Changeset status
-        run: pnpm changeset status --since mono --output versions.json
-
-      - name: Get ChangeData
-        run: pnpm run changedata
-        id: changedata
-
-      - name: Edgeserver Update
-        run: echo BANG edgeserver
-        if: ${{ steps.changedata.outputs.web_landing == true }}
-
-      - name: CLI Update
-        run: echo BANG cli
-        if: ${{ steps.changedata.outputs.edgelabs_cli == true }}
