@@ -1,12 +1,16 @@
 
 
-name: Build Docker Container
+name: Build EdgeServer Docker Container
 on:
   push:
     tags:
       - '@edgelabs/groot@*.*.*'
+
     branches:
       - mono
+    paths:
+      - "apps/groot/**"
+      - ".github/workflows/groot.yml"
 
 jobs:
   build:
@@ -49,6 +53,7 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          context: apps/groot
 
   build-arm:
     runs-on: ubuntu-latest
@@ -99,3 +104,4 @@ jobs:
           platforms: linux/arm64
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          context: apps/groot
