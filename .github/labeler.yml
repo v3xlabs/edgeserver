@@ -1,15 +1,19 @@
-@edgelabs/app:
+wontfix:
+- .gitignore
+- LICENSE
+
+"@edgelabs/app":
 - apps/app/*
 - apps/app/**/*
 
-@edgelabs/groot:
+"@edgelabs/groot":
 - apps/groot/*
 - apps/groot/**/*
 
-@edgelabs/cli:
+"@edgelabs/cli":
 - packages/cli/*
 - packages/cli/**/*
 
-@edgelabs/types:
+"@edgelabs/types":
 - packages/types/*
 - packages/types/**/*
