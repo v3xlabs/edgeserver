@@ -1,5 +1,5 @@
 {
-    "name": "@web/ipedge",
+    "name": "@edgelabs/groot",
     "version": "3.9.2",
     "private": true,
     "repository": "git@github.com:lvkdotsh/ipedge.git",
