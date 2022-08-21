@@ -1,4 +1,9 @@
 node_modules
+.next
+.turbo
+dist
+apps/groot/tools/data
+apps/groot/tmp
 .env
-tools/data
-tmp
+versions.json
+tools

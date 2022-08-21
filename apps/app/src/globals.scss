@@ -1,0 +1,170 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
+
+* {
+    box-sizing: border-box;
+}
+
+:root {
+    font-size: 16px;
+}
+
+.root {
+    width: 100%;
+    max-width: 100%;
+}
+
+html,
+body {
+    width: 100%;
+    height: 100vh;
+    padding: 0;
+    margin: 0;
+    overflow: hidden;
+    font-family: 'Inter', monospace, sans-serif;
+}
+
+body.dark {
+    color-scheme: dark;
+}
+
+body {
+    overflow-y: scroll;
+    scrollbar-gutter: stable;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+.card {
+    @apply rounded-sm;
+}
+
+.inset {
+    top: 0px;
+    right: 0px;
+    bottom: 0px;
+    left: 0px;
+}
+
+.hvr-hover {
+    .hvr-regular {
+        display: block;
+    }
+    .hvr-alt {
+        display: none;
+    }
+
+    &:hover {
+        .hvr-regular {
+            display: none;
+        }
+        .hvr-alt {
+            display: block;
+        }
+    }
+}
+
+.bluebutton {
+    @apply bg-accent-blue-normal hover:bg-accent-blue-normal hover:brightness-90 transition-all text-white;
+    &:hover {
+        --tw-scale-x: 1.02;
+        --tw-scale-y: 1.02;
+        transform: translate(var(--tw-translate-x), var(--tw-translate-y))
+            rotate(var(--tw-rotate)) skewX(var(--tw-skew-x))
+            skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x))
+            scaleY(var(--tw-scale-y));
+    }
+}
+
+.containerd {
+    @apply w-full px-8;
+}
+
+.link {
+    @apply text-neutral-400 hover:brightness-75 hover:underline;
+}
+
+.human-slider {
+    width: 100%;
+    height: 2rem;
+    padding: 0;
+    overflow: hidden;
+    background: inherit;
+    -webkit-appearance: none;
+    &::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 2rem;
+        height: 2rem;
+        background: #fff;
+    }
+}
+
+.hide-ul {
+    ul {
+        display: none;
+    }
+    &:focus-within {
+        ul {
+            display: block;
+        }
+    }
+}
+
+.bg-texture {
+    background-color: #111111;
+    // background: linear-gradient(to bottom, rgba(url("../assets/hideout.svg"), 0.0), url("../assets/hideout.svg"), 1.0);
+    // background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23696969' fill-opacity='0.32'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+
+code {
+    @apply bg-neutral-200 dark:bg-neutral-800 p-2;
+    border-radius: 6px;
+}
+
+pre {
+    @apply bg-neutral-200 dark:bg-neutral-800 p-4 pl-6;
+    border-radius: 6px;
+}
+
+.logincard {
+    @apply border dark:border-neutral-700;
+}
+
+.navtext {
+    @apply py-1;
+}
+
+.navlink-active div .navtext {
+    @apply border-b-2 border-b-blue-500;
+}
+
+button:hover .leavebtn::before {
+    content: "🚶";
+}
+
+.leavebtn::before {
+    content: "🚪";
+}
+
+body .themebtn::before {
+    content: "🌞";
+}
+
+body.dark .themebtn::before {
+    content: "🌙";
+}
+
+.skeleton {
+    @apply bg-neutral-300 dark:bg-neutral-700 animate-pulse;
+}
+
+.tab .tabtext {
+    @apply border-b-2 border-b-blue-500;
+}

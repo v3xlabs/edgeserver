@@ -1,0 +1,38 @@
+name: Deploy Landing to Staging
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - "apps/landing/**"
+      - ".github/workflows/staging-landing.yml"
+
+jobs:
+  build-staging:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup PNPM
+        uses: pnpm/action-setup@v2.2.1
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install
+      - name: Build
+        run: pnpm turbo run build --filter @edgelabs/landing
+        env:
+          API_URL: 'https://api.edgeserver.dev'
+
+      - name: Edgeserver Upload
+        uses: lvkdotsh/edgeserver-action@master
+        with:
+          app_id: '84206408874070016'
+          server: https://api.edgeserver.io
+          token: ${{ secrets.SIGNAL_TOKEN }}
+          directory: apps/landing/dist

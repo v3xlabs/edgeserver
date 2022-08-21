@@ -1,0 +1,21 @@
+{
+  "name": "@edgelabs/types",
+  "version": "1.0.2",
+  "description": "",
+  "type": "module",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc"
+  },
+  "exports": {
+    ".": "./dist/index.js",
+    "./package.json": "./package.json"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "LGPL-3",
+  "devDependencies": {
+    "typescript": "^4.7.4"
+  }
+}
