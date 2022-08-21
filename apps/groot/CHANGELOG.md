@@ -1,5 +1,12 @@
 # @web/ipedge
 
+## 3.9.2
+
+### Patch Changes
+
+- Updated dependencies [[`04a24dd`](https://github.com/v3xlabs/edgeserver/commit/04a24dd40a320c2b2f8d8eedac206b5335a32ead)]:
+  - @edgelabs/types@1.0.2
+
 ## 3.9.1
 
 ### Patch Changes
