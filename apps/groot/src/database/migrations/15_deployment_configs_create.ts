@@ -1,4 +1,5 @@
-import { DeploymentConfigV1 } from '../../types/DeploymentConfig.type';
+import { DeploymentConfigV1 } from '@edgelabs/types';
+
 import { Migration } from '../migrations';
 
 export const deployment_configs_create: Migration<{

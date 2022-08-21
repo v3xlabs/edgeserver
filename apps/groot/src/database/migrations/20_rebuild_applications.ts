@@ -1,6 +1,6 @@
+import { ApplicationV4, ApplicationV5 } from '@edgelabs/types';
 import { ScylloClient } from 'scyllo';
 
-import { ApplicationV4, ApplicationV5 } from '../../types/Application.type';
 import { log } from '../../util/logging';
 import { Migration } from '../migrations';
 

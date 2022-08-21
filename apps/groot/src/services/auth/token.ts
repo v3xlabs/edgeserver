@@ -1,8 +1,8 @@
+import { JWTAuthKey } from '@edgelabs/types';
 import { sign } from 'jsonwebtoken';
 import ms from 'ms';
 
 import { Globals } from '../..';
-import { JWTAuthKey } from '../../types/AuthKey.type';
 import { log } from '../../util/logging';
 import { createExpiringAuthKey, createLongLivedAuthKey } from './keys';
 

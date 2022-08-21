@@ -1,9 +1,6 @@
+import { ApplicationV1, DeploymentLookupV1, DeploymentV2, DomainV1, SiteV1 } from '@edgelabs/types';
+
 import { generateSnowflake } from '../../routes/api';
-import { ApplicationV1 } from '../../types/Application.type';
-import { DeploymentV2 } from '../../types/Deployment.type';
-import { DeploymentLookupV1 } from '../../types/DeploymentLookup.type';
-import { DomainV1 } from '../../types/Domain.type';
-import { SiteV1 } from '../../types/Site.type';
 import { Migration } from '../migrations';
 
 export const sites_deprecate: Migration<{

@@ -76,7 +76,7 @@ importers:
       pump: ^3.0.0
       re2: ^1.17.7
       redis: ^4.1.0
-      scyllo: ^1.4.0
+      scyllo: v1.5.0
       sentry: ^0.1.2
       siwe: 1.1.6
       sunflake: ^0.5.0
@@ -130,7 +130,7 @@ importers:
       pump: 3.0.0
       re2: 1.17.7
       redis: 4.2.0
-      scyllo: 1.4.0
+      scyllo: 1.5.0
       sentry: 0.1.2
       siwe: 1.1.6_ethers@5.5.1
       sunflake: 0.5.0
@@ -11744,8 +11744,8 @@ packages:
     resolution: {integrity: sha512-cdwTTnqPu0Hyvf5in5asVdZocVDTNRmR7XEcJuIzMjJeSHybHl7vpB66AzwTaIg6CLSbtjcxc8fqcySfnTkccA==}
     dev: false
 
-  /scyllo/1.4.0:
-    resolution: {integrity: sha512-r/H8kXaX6AefeItH7qjdKfX3YGoWfi88o24LcS+WCbkw3nZfiN2/gVaGLDWWCiGG+cnzORMbUHh2fBAB+PWzuQ==}
+  /scyllo/1.5.0:
+    resolution: {integrity: sha512-PaJfCz63reSRqbcC69SwjqamE5VWV5VRjvngY2JRqACSylYoXH+pplSMD+WLa91EctUK+HOJf04vWh4TbhLPaQ==}
     dependencies:
       '@lvksh/logger': 1.6.3
       cassandra-driver: 4.6.4

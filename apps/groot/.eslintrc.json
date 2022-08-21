@@ -3,21 +3,16 @@
     "parserOptions": {
         "ecmaVersion": 2020
     },
-    "extends": [
-        "plugin:lvksh/recommended"
-    ],
-    "ignorePatterns": [
-        "!**/*"
-    ],
-    "plugins": [
-        "lvksh"
-    ],
+    "extends": ["plugin:lvksh/recommended"],
+    "ignorePatterns": ["!**/*"],
+    "plugins": ["lvksh"],
     "env": {
         "node": true
     },
     "rules": {
         "prefer-at": "off",
         "curly": ["error", "multi-or-nest"],
-        "unused-imports/no-unused-vars": "off"
+        "unused-imports/no-unused-vars": "off",
+        "prettier/prettier": "off"
     }
 }

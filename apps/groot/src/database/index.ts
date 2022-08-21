@@ -1,4 +1,4 @@
-import { Owner } from '@edgelabs/types';
+import { Application, AuthKey, Deployment, DeploymentConfig, DeploymentLookup, Domain, Owner } from '@edgelabs/types';
 import { ScylloClient } from 'scyllo';
 
 import { Globals } from '..';

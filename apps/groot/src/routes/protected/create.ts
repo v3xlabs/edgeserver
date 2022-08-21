@@ -1,3 +1,4 @@
+import { Edgerc } from '@edgelabs/types';
 import Multipart from '@fastify/multipart';
 import { addBreadcrumb } from '@sentry/node';
 import { FastifyPluginAsync } from 'fastify';
@@ -9,7 +10,6 @@ import { Extract } from 'unzipper';
 import { StorageBackend } from '../..';
 import { CACHE } from '../../cache';
 import { DB } from '../../database';
-import { Edgerc } from '../../types/ConfigFile.type';
 import { deleteCache } from '../../util/cache/cache';
 import { SafeError } from '../../util/error/SafeError';
 import { useAuth } from '../../util/http/useAuth';

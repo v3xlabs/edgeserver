@@ -3,10 +3,11 @@
  * Expiring Keys should be stored in redis
  */
 
+import { AuthKey, RedisAuthKey } from '@edgelabs/types';
+
 import { CACHE } from '../../cache';
 import { DB } from '../../database';
 import { generateSnowflake } from '../../routes/api';
-import { AuthKey, RedisAuthKey } from '../../types/AuthKey.type';
 
 export const getAuthKeys = async (user_id: bigint) => {
     const [DBKey, RedisKey] = await Promise.allSettled([
@@ -28,16 +29,16 @@ export const getAuthKeys = async (user_id: bigint) => {
                 const key_data = await CACHE.GET(`keys_${user_id}_${key_id}`);
 
                 if (key_data) return JSON.parse(key_data) as AuthKey;
-            })
+            }),
         );
 
         const _redisKeys = rediskeys.filter(
             (redisKeyRequest) =>
-                redisKeyRequest.status === 'fulfilled' && redisKeyRequest.value
+                redisKeyRequest.status === 'fulfilled' && redisKeyRequest.value,
         ) as unknown as PromiseFulfilledResult<AuthKey>[];
 
         resultList.push(
-            ..._redisKeys.map((redisKeyRequest) => redisKeyRequest.value)
+            ..._redisKeys.map((redisKeyRequest) => redisKeyRequest.value),
         );
     }
 
@@ -46,7 +47,7 @@ export const getAuthKeys = async (user_id: bigint) => {
 
 export const getAuthKey = async (
     key_id: string,
-    user_id: bigint
+    user_id: bigint,
 ): Promise<AuthKey | undefined> => {
     const [DBKey, RedisKey] = await Promise.allSettled([
         DB.selectOneFrom('keys', '*', { key: key_id, owner_id: user_id }),
@@ -69,7 +70,7 @@ export const createExpiringAuthKey = async (
     permissions: bigint,
     name: string,
     last_use_data: string,
-    expiresAt: number
+    expiresAt: number,
 ) => {
     const key: RedisAuthKey = {
         key: generateSnowflake(),
@@ -89,9 +90,9 @@ export const createExpiringAuthKey = async (
             EXAT: Number.parseInt(
                 expiresAt
                     .toString()
-                    .slice(0, Math.max(0, expiresAt.toString().length - 3))
+                    .slice(0, Math.max(0, expiresAt.toString().length - 3)),
             ),
-        }
+        },
     );
 
     await CACHE.lPush(`keys_${key.owner_id.toString()}`, key.key.toString());
@@ -103,7 +104,7 @@ export const createExpiringAuthKey = async (
 export const createLongLivedAuthKey = async (
     user_id: bigint,
     permissions: bigint,
-    name: string
+    name: string,
 ) => {
     const key: AuthKey = {
         key: generateSnowflake(),

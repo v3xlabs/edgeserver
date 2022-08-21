@@ -1,5 +1,5 @@
-import { DeploymentV1 } from '../../types/Deployment.type';
-import { DeploymentLookupV1 } from '../../types/DeploymentLookup.type';
+import { DeploymentLookupV1, DeploymentV1 } from '@edgelabs/types';
+
 import { Migration } from '../migrations';
 
 export const deployments_create: Migration<{
@@ -21,7 +21,7 @@ export const deployments_create: Migration<{
             },
         },
         'deploy_id',
-        ['app_id']
+        ['app_id'],
     );
     await database.createTable(
         'dlt',
@@ -37,6 +37,6 @@ export const deployments_create: Migration<{
                 type: 'bigint',
             },
         },
-        'base_url'
+        'base_url',
     );
 };

@@ -1,6 +1,5 @@
-import { AuthKeyV1 } from '../../types/AuthKey.type';
-import { OwnerV1 } from '../../types/Owner.type';
-import { SiteV1 } from '../../types/Site.type';
+import { AuthKeyV1, OwnerV1, SiteV1 } from '@edgelabs/types';
+
 import { Migration } from '../migrations';
 
 export const initial_create: Migration<{
@@ -20,7 +19,7 @@ export const initial_create: Migration<{
                 type: 'text',
             },
         },
-        'user_id'
+        'user_id',
     );
     await database.createIndex('owners', 'owners_by_address', 'address');
     await database.createTable(
@@ -32,7 +31,7 @@ export const initial_create: Migration<{
             site_id: { type: 'bigint' },
             cid: { type: 'text' },
         },
-        'site_id'
+        'site_id',
     );
     await database.createIndex('sites', 'sites_by_owner', 'owner');
     await database.createIndex('sites', 'sites_by_host', 'host');
@@ -43,7 +42,7 @@ export const initial_create: Migration<{
             key: { type: 'text' },
             owner_id: { type: 'bigint' },
         },
-        'key'
+        'key',
     );
 
     await database.createIndex('keys', 'keys_by_owner', 'owner_id');

@@ -1,6 +1,6 @@
+import { AuthKeyV4 } from '@edgelabs/types';
 import { EMPTY_PERMISSIONS, grantPermission } from 'permissio';
 
-import { AuthKeyV4 } from '../../types/AuthKey.type';
 import { KeyPerms } from '../../util/permissions';
 import { Migration } from '../migrations';
 

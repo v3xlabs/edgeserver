@@ -2,8 +2,10 @@
     "compilerOptions": {
         "esModuleInterop": true,
         "resolveJsonModule": true,
-        "target": "es2020",
+        "target": "ES2022",
         "moduleResolution": "node",
-        "strictNullChecks": true
+        "strictNullChecks": true,
+        "outDir": "dist"
     },
+    "include": ["./src/index.ts"]
 }

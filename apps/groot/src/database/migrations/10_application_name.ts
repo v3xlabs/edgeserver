@@ -1,5 +1,5 @@
-import { ApplicationV3 } from '../../types/Application.type';
-import { DomainV1 } from '../../types/Domain.type';
+import { ApplicationV3, DomainV1 } from '@edgelabs/types';
+
 import { Migration } from '../migrations';
 
 export const application_name: Migration<{

@@ -1,3 +1,4 @@
+import { JWTAuthKey } from '@edgelabs/types';
 import { FastifyReply, FastifyRequest } from 'fastify';
 import { decode } from 'jsonwebtoken';
 import { object, string } from 'yup';
@@ -8,7 +9,6 @@ import {
     updateExpiringLastUsed,
     updateLongLivedLastUsed,
 } from '../../services/auth/keys';
-import { JWTAuthKey } from '../../types/AuthKey.type';
 import { SafeError } from '../error/SafeError';
 import { log } from '../logging';
 
@@ -32,7 +32,7 @@ const defaultOptions: OptionsData = {
 export const useAuth: (
     request: FastifyRequest,
     reply: FastifyReply,
-    options?: OptionsData
+    options?: OptionsData,
 ) => Promise<AuthData> = async (request, _reply, optionsRaw?: OptionsData) => {
     const options = { ...defaultOptions, ...optionsRaw };
 

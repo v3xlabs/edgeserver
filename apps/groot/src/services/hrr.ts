@@ -1,9 +1,6 @@
+import { HeaderRule, RedirectRule, RewriteRule } from '@edgelabs/types';
+
 import { DB } from '../database';
-import {
-    HeaderRule,
-    RedirectRule,
-    RewriteRule,
-} from '../types/ConfigFile.type';
 import { useLocalCache } from '../util/cache/localCache';
 import { useRedisCache } from '../util/cache/redisCache';
 import { useCache, useData } from '../util/useData';

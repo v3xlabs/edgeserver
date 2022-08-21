@@ -1,5 +1,5 @@
-import { ApplicationV1 } from '../../types/Application.type';
-import { SiteV1 } from '../../types/Site.type';
+import { ApplicationV1, SiteV1 } from '@edgelabs/types';
+
 import { Migration } from '../migrations';
 
 export const sites_to_applications: Migration<{

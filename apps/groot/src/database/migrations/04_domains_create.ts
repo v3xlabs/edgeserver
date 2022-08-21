@@ -1,4 +1,5 @@
-import { DomainV1 } from '../../types/Domain.type';
+import { DomainV1 } from '@edgelabs/types';
+
 import { Migration } from '../migrations';
 
 export const domains_create: Migration<{

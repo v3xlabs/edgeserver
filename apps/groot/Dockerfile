@@ -6,7 +6,6 @@ COPY package.json ./
 
 RUN yarn install
 
-COPY tsconfig.json ./
-COPY src src
+COPY dist src
 
-CMD ["yarn", "start"]
+CMD ["yarn", "node ./src/index.js"]

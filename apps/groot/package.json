@@ -6,6 +6,7 @@
     "author": "lucemans <luc@lucemans.nl>",
     "license": "GPL-3.0",
     "dependencies": {
+        "@edgelabs/types": "workspace:*",
         "@fastify/cors": "^8.0.0",
         "@fastify/multipart": "^7.1.0",
         "@lvksh/logger": "^1.6.3",
@@ -47,7 +48,7 @@
         "pump": "^3.0.0",
         "re2": "^1.17.7",
         "redis": "^4.1.0",
-        "scyllo": "^1.4.0",
+        "scyllo": "v1.5.0",
         "sentry": "^0.1.2",
         "siwe": "1.1.6",
         "sunflake": "^0.5.0",
@@ -55,8 +56,7 @@
         "undici": "*",
         "unzipper": "^0.10.11",
         "use-yup": "^1.1.0",
-        "yup": "^0.32.11",
-        "@edgelabs/types": "workspace:*"
+        "yup": "^0.32.11"
     },
     "scripts": {
         "lint": "eslint -c .eslintrc.json --ext .ts ./src",
@@ -64,7 +64,8 @@
         "start": "ts-node ./src/index.ts",
         "dev": "ts-node-dev --quiet ./src/index.ts",
         "db": "cd ./tools && docker-compose up -d",
-        "pub": "echo 'PUB GROOT'"
+        "pub": "echo 'PUB GROOT'",
+        "build": "tsc --p ./tsconfig.json"
     },
     "devDependencies": {
         "@sentry/types": "^7.2.0",

@@ -1,7 +1,6 @@
+import { ApplicationV2, DomainV1, SiteV1 } from '@edgelabs/types';
+
 import { generateSnowflake } from '../../routes/api';
-import { ApplicationV2 } from '../../types/Application.type';
-import { DomainV1 } from '../../types/Domain.type';
-import { SiteV1 } from '../../types/Site.type';
 import { Migration } from '../migrations';
 
 export const sites_domain: Migration<{

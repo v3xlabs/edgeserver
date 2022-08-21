@@ -1,6 +1,6 @@
+import { DeploymentV4, DeploymentV5 } from '@edgelabs/types';
 import { ScylloClient } from 'scyllo';
 
-import { DeploymentV4, DeploymentV5 } from '../../types/Deployment.type';
 import { log } from '../../util/logging';
 import { Migration } from '../migrations';
 

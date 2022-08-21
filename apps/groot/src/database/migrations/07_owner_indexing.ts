@@ -1,6 +1,5 @@
-import { ApplicationV1 } from '../../types/Application.type';
-import { DeploymentV2 } from '../../types/Deployment.type';
-import { DomainV1 } from '../../types/Domain.type';
+import { ApplicationV1, DeploymentV2, DomainV1 } from '@edgelabs/types';
+
 import { Migration } from '../migrations';
 
 export const owner_indexing: Migration<{

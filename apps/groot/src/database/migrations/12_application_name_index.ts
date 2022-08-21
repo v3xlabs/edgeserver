@@ -1,4 +1,5 @@
-import { ApplicationV4 } from '../../types/Application.type';
+import { ApplicationV4 } from '@edgelabs/types';
+
 import { Migration } from '../migrations';
 
 export const application_name_index: Migration<{

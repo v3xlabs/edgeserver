@@ -1,4 +1,5 @@
-import { ApplicationV1 } from '../../types/Application.type';
+import { ApplicationV1 } from '@edgelabs/types';
+
 import { Migration } from '../migrations';
 
 export const applications_create: Migration<{

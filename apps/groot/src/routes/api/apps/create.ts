@@ -1,8 +1,8 @@
+import { Application } from '@edgelabs/types';
 import { Static, Type } from '@sinclair/typebox';
 import { FastifyPluginAsync } from 'fastify';
 
 import { DB } from '../../../database';
-import { Application } from '../../../types/Application.type';
 import { useAuth } from '../../../util/http/useAuth';
 import { KeyPerms, usePerms } from '../../../util/permissions';
 import { generateSnowflake } from '.';

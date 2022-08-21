@@ -1,4 +1,5 @@
-import { DeploymentV4 } from '../../types/Deployment.type';
+import { DeploymentV4 } from '@edgelabs/types';
+
 import { Migration } from '../migrations';
 
 export const deployments_timestamp: Migration<{

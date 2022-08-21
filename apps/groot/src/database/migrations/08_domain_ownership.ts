@@ -1,4 +1,5 @@
-import { ApplicationV2 } from '../../types/Application.type';
+import { ApplicationV2 } from '@edgelabs/types';
+
 import { Migration } from '../migrations';
 
 export const domain_ownership: Migration<{

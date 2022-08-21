@@ -1,10 +1,9 @@
+import { RoutingConfig } from '@edgelabs/types';
 import { extname } from 'node:path';
-
-import { RoutingConfig } from '../../types/ConfigFile.type';
 
 export const shouldSlashRedirect = (
     config: RoutingConfig,
-    path_url: string
+    path_url: string,
 ): string | undefined => {
     // ignore query parameters
     const path_url_no_query = path_url.split('?').at(0);
