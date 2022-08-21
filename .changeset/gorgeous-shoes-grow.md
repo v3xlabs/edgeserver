@@ -1,5 +1,0 @@
----
-"@edgelabs/landing": patch
----
-
-Bump
