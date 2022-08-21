@@ -1,0 +1,15 @@
+@edgelabs/app:
+- apps/app/*
+- apps/app/**/*
+
+@edgelabs/groot:
+- apps/groot/*
+- apps/groot/**/*
+
+@edgelabs/cli:
+- packages/cli/*
+- packages/cli/**/*
+
+@edgelabs/types:
+- packages/types/*
+- packages/types/**/*
