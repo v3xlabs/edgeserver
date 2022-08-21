@@ -22,7 +22,7 @@ jobs:
       - name: Install dependencies
         run: pnpm install
       - name: Build
-        run: pnpm turbo run build --filter @web/landing
+        run: pnpm turbo run build --filter @edgelabs/landing
         env:
           API_URL: 'https://api.edgeserver.io'
 
