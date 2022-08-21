@@ -1,0 +1,29 @@
+{
+	"folders": [
+		{
+			"name": "✨ @edgelabs/repository",
+			"path": "."
+		},
+		{
+			"name": "🚀 @edgelabs/app",
+			"path": "apps/app"
+		},
+		{
+			"name": "🚀 @edgelabs/groot",
+			"path": "apps/groot"
+		},
+		{
+			"name": "🚀 @edgelabs/landing",
+			"path": "apps/landing"
+		},
+		{
+			"name": "📦 @edgelabs/cli",
+			"path": "packages/cli"
+		},
+		{
+			"name": "📦 @edgelabs/types",
+			"path": "packages/types"
+		}
+	],
+	"settings": {}
+}
