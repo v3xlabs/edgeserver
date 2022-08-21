@@ -1,5 +1,11 @@
 # @web/landing
 
+## 1.0.5
+
+### Patch Changes
+
+- [#87](https://github.com/v3xlabs/edgeserver/pull/87) [`d737e25`](https://github.com/v3xlabs/edgeserver/commit/d737e253155e96be671eac8b02bd6e3f7ac95ef6) Thanks [@lucemans](https://github.com/lucemans)! - Bump
+
 ## 1.0.4
 
 ### Patch Changes
