@@ -3,8 +3,7 @@ name: Deploy Landing to Staging
 on:
   push:
     branches:
-      - "master"
-      - "mono"
+      - master
     paths:
       - "apps/landing/**"
       - ".github/workflows/staging-landing.yml"

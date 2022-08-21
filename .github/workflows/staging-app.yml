@@ -3,8 +3,7 @@ name: Deploy App to Staging
 on:
   push:
     branches:
-      - "master"
-      - "mono"
+      - master
     paths:
       - "apps/app/**"
       - ".github/workflows/staging-app.yml"
