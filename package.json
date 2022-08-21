@@ -10,7 +10,7 @@
     "build": "turbo run build",
     "dev": "turbo run dev --parallel",
     "version": "echo 'version ding' && changeset version && pnpm install --no-frozen-lockfile # && pnpm exec turbo run lint",
-    "release": "echo 'release ding' && pnpm run build && changeset publish",
+    "release": "echo 'release ding' && pnpm run build && changeset tag",
     "changedata": "ts-node ./scripts/extract.ts --resolveJsonModule"
   },
   "devDependencies": {
