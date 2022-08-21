@@ -1,5 +1,11 @@
 # @web/ipedge
 
+## 3.10.0
+
+### Minor Changes
+
+- [#87](https://github.com/v3xlabs/edgeserver/pull/87) [`ee89913`](https://github.com/v3xlabs/edgeserver/commit/ee8991374f3e5334c3c8435e6e72e6f4a77797b2) Thanks [@lucemans](https://github.com/lucemans)! - Migrate to building javascript before docker
+
 ## 3.9.2
 
 ### Patch Changes
