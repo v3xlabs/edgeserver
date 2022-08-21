@@ -6,8 +6,13 @@ const f: Partial<Application> = {};
 const log = createLogger({
     debug: 'DEBUG',
     info: 'INFO',
+    raw: { label: '', newLine: '', newLineEnd: '' },
 });
 
-console.log('hi');
-log.debug('hi');
-log.debug('never gonna give u up!');
+console.log(`
+##############################################
+#                                            #
+#    @edgelabs/cli                           #
+#                                            #
+##############################################
+`);
