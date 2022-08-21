@@ -1,0 +1,50 @@
+name: Deploy Landing to Staging
+
+on:
+  push:
+    branches:
+      - "master"
+      - "mono"
+    paths:
+      - "apps/landing/**"
+      - ".github/workflows/staging-landing.yml"
+
+jobs:
+  build-staging:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+
+      - uses: pnpm/action-setup@v2.0.1
+        name: Install pnpm
+        id: pnpm-install
+        with:
+          version: 7
+          run_install: false
+
+      - uses: actions/cache@v3
+        name: Setup pnpm cache
+        with:
+          path: ${{ steps.pnpm-cache.outputs.pnpm_cache_dir }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install dependencies
+        run: pnpm install
+      - name: Build
+        run: pnpm turbo run build --filter @web/landing
+        env:
+          API_URL: 'https://api.edgeserver.dev'
+
+      - name: Edgeserver Upload
+        uses: lvkdotsh/edgeserver-action@master
+        with:
+          app_id: '84206408874070016'
+          server: https://api.edgeserver.io
+          token: ${{ secrets.SIGNAL_TOKEN }}
+          directory: apps/landing/dist
