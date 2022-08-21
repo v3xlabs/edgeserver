@@ -6,3 +6,4 @@ apps/groot/tools/data
 apps/groot/tmp
 .env
 versions.json
+tools
