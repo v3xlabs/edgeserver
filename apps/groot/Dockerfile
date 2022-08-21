@@ -2,10 +2,14 @@ FROM node:18.6.0
 
 WORKDIR /app
 
-COPY package.json ./
+COPY ./edgelabs*.tgz ./
 
-RUN yarn install
+RUN tar zxvf ./edgelabs-groot-*.tgz 
 
-COPY dist src
+WORKDIR /app/package
 
-CMD ["yarn", "node ./src/index.js"]
+RUN yarn global add pnpm
+
+RUN pnpm install
+
+CMD ["pnpm", "start"]

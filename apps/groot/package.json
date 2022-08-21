@@ -65,7 +65,7 @@
         "dev": "ts-node-dev --quiet ./src/index.ts",
         "db": "cd ./tools && docker-compose up -d",
         "pub": "echo 'PUB GROOT'",
-        "build": "tsc --p ./tsconfig.json"
+        "build": "pnpm pack"
     },
     "devDependencies": {
         "@sentry/types": "^7.2.0",

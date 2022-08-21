@@ -1,7 +1,8 @@
+import { OwnerV1 } from '@edgelabs/types';
+
 import { CACHE } from '../cache';
 import { DB } from '../database';
 import { generateSnowflake } from '../routes/api';
-import { OwnerV1 } from '../types/Owner.type';
 import { log } from '../util/logging';
 
 export const getUserBy = (address: string) =>
