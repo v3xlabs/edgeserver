@@ -1,13 +1,9 @@
-name: Deploy App to Staging
+name: Deploy App to Production
 
 on:
   push:
-    branches:
-      - "master"
-      - "mono"
-    paths:
-      - "apps/app/**"
-      - ".github/workflows/staging-app.yml"
+    tags:
+      - '@edgelabs/app@*.*.*'
 
 jobs:
   zip-files:
@@ -42,11 +38,11 @@ jobs:
       - name: Build
         run: pnpm turbo run build --filter @edgelabs/app
         env:
-          API_URL: 'https://api.edgeserver.dev'
+          API_URL: 'https://api.edgeserver.io'
       - name: Edgeserver Upload
         uses: lvkdotsh/edgeserver-action@master
         with:
-          app_id: '61535119206256640'
+          app_id: '987654338'
           server: https://api.edgeserver.io
           token: ${{ secrets.SIGNAL_TOKEN }}
           directory: apps/app/dist
