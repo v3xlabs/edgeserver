@@ -1,5 +1,6 @@
 import Multipart from '@fastify/multipart';
 import { addBreadcrumb } from '@sentry/node';
+import Ajv from 'ajv';
 import { FastifyPluginAsync } from 'fastify';
 import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
@@ -9,12 +10,12 @@ import { Extract } from 'unzipper';
 import { StorageBackend } from '../..';
 import { CACHE } from '../../cache';
 import { DB } from '../../database';
-import { Edgerc } from '../../types/ConfigFile.type';
 import { deleteCache } from '../../util/cache/cache';
 import { SafeError } from '../../util/error/SafeError';
 import { useAuth } from '../../util/http/useAuth';
 import { log } from '../../util/logging';
 import { KeyPerms, usePerms } from '../../util/permissions';
+import { edgeRcSchema } from '../../util/validation/validateEdgeRc';
 
 const generateSnowflake = generateSunflake();
 
@@ -166,13 +167,38 @@ export const CreateRoute: FastifyPluginAsync = async (router, options) => {
                 CACHE.LPUSH('edge_render_q', JSON.stringify(renderConfig));
             }
 
+            let edgerc: unknown | undefined;
+
             try {
                 const configData = await readFile(
                     join('tmp', temporary_name, 'edgerc.json'),
                     'utf8'
                 );
-                const { config } = JSON.parse(configData) as Edgerc;
+
+                edgerc = JSON.parse(configData);
                 // TODO Validate config before inserting
+            } catch {
+                // Do nothing
+            }
+
+            if (edgerc) {
+                const ajv = new Ajv();
+                const validate = ajv.compile(edgeRcSchema);
+
+                if (!validate(edgerc)) {
+                    throw new SafeError(
+                        400,
+                        `Bad EdgeRc: ${validate.errors
+                            ?.map(
+                                // eslint-disable-next-line sonarjs/no-nested-template-literals
+                                (error) => `${error.message} (${error.params})`
+                            )
+                            .join(', ')}`,
+                        'invalid-edgerc'
+                    );
+                }
+
+                const { config } = edgerc;
 
                 await DB.insertInto('deployment_configs', {
                     deploy_id,
@@ -182,8 +208,6 @@ export const CreateRoute: FastifyPluginAsync = async (router, options) => {
                     routing: JSON.stringify(config.routing),
                     ssl: JSON.stringify(config.ssl),
                 });
-            } catch {
-                // Do nothing
             }
 
             return {

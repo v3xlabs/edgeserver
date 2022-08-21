@@ -1,4 +1,4 @@
-import Ajv, { JSONSchemaType } from 'ajv';
+import { JSONSchemaType } from 'ajv';
 
 import {
     Condition,
@@ -169,7 +169,7 @@ const edgeRcConfigSchema: JSONSchemaType<EdgeRcConfig> = {
     additionalProperties: false,
 };
 
-const edgeRcSchema: JSONSchemaType<Edgerc> = {
+export const edgeRcSchema: JSONSchemaType<Edgerc> = {
     type: 'object',
     properties: {
         app_id: {
@@ -180,4 +180,3 @@ const edgeRcSchema: JSONSchemaType<Edgerc> = {
     required: ['app_id', 'config'],
     additionalProperties: false,
 };
-
