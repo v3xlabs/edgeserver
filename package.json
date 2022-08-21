@@ -1,5 +1,5 @@
 {
-  "name": "dm",
+  "name": "@edgelabs/repository",
   "version": "0.0.0",
   "private": true,
   "workspaces": [
