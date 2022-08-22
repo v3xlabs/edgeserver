@@ -285,7 +285,6 @@ importers:
       typescript: ^4.7.2
       util: ^0.12.4
       vite: ^3.0.8
-      wagmi: ^0.4.12
       zustand: ^4.0.0-rc.1
     dependencies:
       '@esbuild-plugins/node-globals-polyfill': 0.1.1_esbuild@0.15.5
@@ -305,7 +304,6 @@ importers:
       styled-components: 5.3.5_pumtretovylab5lwhztzjp2kuy
       tailwindcss: 3.1.8_postcss@8.4.14
       vite: 3.0.8_sass@1.54.4
-      wagmi: 0.4.12_v53yskzlb7auon6fdtjnpmvxqu
       zustand: 4.0.0_react@18.2.0
     devDependencies:
       '@types/react': 17.0.48
