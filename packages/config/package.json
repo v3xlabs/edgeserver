@@ -2,38 +2,27 @@
     "name": "@edgelabs/config",
     "description": "Configuration Parsing Utilities for Edgeserver",
     "version": "0.0.3",
-    "main": "lib/index.js",
-    "types": "lib/index.d.ts",
-    "files": [
-        "lib"
-    ],
-    "bin": {
-        "edge": "lib/index.js"
+    "exports": {
+      ".": {
+        "require": "./dist/index.js",
+        "import": "./dist/index.mjs",
+        "types": "./dist/index.d.ts"
+      }
     },
+    "main": "./dist/index.js",
+    "module": "./dist/index.mjs",
+    "types": "./dist/index.d.ts",
     "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1",
-        "build": "pnpm build:tsup && pnpm build:ncc && pnpm build:bang",
-        "build:tsup": "tsup src/index.ts --clean",
-        "build:tsc": "tsc -p ./tsconfig.json",
-        "build:ncc": "ncc build ./dist/index.js -m -o lib --license LICENSE --target es6",
-        "build:bang": "mv ./lib/index.js ./lib/edge.js && echo \"#!/usr/bin/env node\" > ./lib/index.js && cat lib/edge.js >> lib/index.js && chmod +x ./lib/index.js && rm ./lib/edge.js",
-        "lint": "eslint -c .eslintrc.json --ext .ts ./src",
-        "pub": "pnpm publish --access public || true"
+      "test": "echo \"Error: no test specified\" && exit 1",
+      "build": "tsup src/index.ts --format cjs,esm --dts --clean",
+      "pub": "pnpm publish --access public || true"
     },
     "keywords": [],
-    "author": "Lucemans <luc@lucemans.nl>",
-    "license": "LGPL-3.0-or-later",
+    "author": "",
+    "license": "LGPL-3",
     "devDependencies": {
-        "@edgelabs/types": "workspace:*",
-        "@lvksh/logger": "^1.6.3",
-        "@typescript-eslint/parser": "^5.30.7",
-        "@vercel/ncc": "^0.34.0",
-        "eslint": "^8.20.0",
-        "eslint-plugin-lvksh": "^1.4.1",
-        "permissio": "^2.0.2",
-        "pkg": "^5.8.0",
-        "sunflake": "^0.5.0",
-        "tsup": "^6.2.2",
-        "typescript": "^4.7.4"
+      "tsup": "^6.2.2",
+      "typescript": "^4.7.4"
     }
-}
+  }
+  
