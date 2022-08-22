@@ -1,0 +1,9 @@
+{
+    "compilerOptions": {
+        "target": "ES6",
+        "strict": true,
+        "outDir": "dist",
+        "moduleResolution": "node",
+        "resolveJsonModule": true
+    }
+}
