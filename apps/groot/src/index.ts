@@ -1,3 +1,4 @@
+import { Application } from '@edgelabs/types';
 import Cors from '@fastify/cors';
 import chalk from 'chalk';
 import { config } from 'dotenv';
@@ -12,6 +13,8 @@ import { GenericStorage } from './storage/GenericStorage';
 import { SignalStorage } from './storage/SignalFS';
 import { log } from './util/logging';
 import { setupLogger } from './util/setupLogger';
+
+const _s: Partial<Application> = {};
 
 config();
 

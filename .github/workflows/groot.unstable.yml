@@ -1,8 +1,11 @@
-name: Build Groot Docker Container
+name: Build Edge Groot Docker Container
 on:
   push:
-    tags:
-      - '@edgelabs/groot@*.*.*'
+    branches:
+      - master
+    paths:
+      - "apps/groot/**"
+      - ".github/workflows/groot.unstable.yml"
 
 jobs:
   build:
@@ -46,6 +49,7 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install
+
       - name: Build
         run: pnpm turbo run build --filter @edgelabs/groot
 
@@ -56,4 +60,5 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          context: apps/groot
+          file: .deploy/groot.unstable.dockerfile
+          context: .

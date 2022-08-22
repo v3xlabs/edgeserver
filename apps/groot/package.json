@@ -63,9 +63,7 @@
         "lint:fix": "eslint src --ext .ts --fix",
         "start": "ts-node ./src/index.ts",
         "dev": "ts-node-dev --quiet ./src/index.ts",
-        "db": "cd ./tools && docker-compose up -d",
-        "pub": "echo 'PUB GROOT'",
-        "build": "pnpm pack"
+        "db": "cd ./tools && docker-compose up -d"
     },
     "devDependencies": {
         "@sentry/types": "^7.2.0",
