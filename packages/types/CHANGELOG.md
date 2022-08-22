@@ -1,5 +1,11 @@
 # @edgelabs/types
 
+## 1.0.3
+
+### Patch Changes
+
+- [`3f6048c`](https://github.com/v3xlabs/edgeserver/commit/3f6048ce212cccad16d69be4b10f461915bf36b0) Thanks [@lucemans](https://github.com/lucemans)! - TSConfig Configuration
+
 ## 1.0.2
 
 ### Patch Changes

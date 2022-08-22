@@ -1,5 +1,11 @@
 # @edgelabs/cli
 
+## 0.0.10
+
+### Patch Changes
+
+- [#117](https://github.com/v3xlabs/edgeserver/pull/117) [`9180547`](https://github.com/v3xlabs/edgeserver/commit/918054711dcc0566022be4a2402f92512452a396) Thanks [@lucemans](https://github.com/lucemans)! - Introduce Header
+
 ## 0.0.9
 
 ### Patch Changes
