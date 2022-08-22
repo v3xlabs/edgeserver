@@ -46,8 +46,14 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install
+
       - name: Build
         run: pnpm turbo run build --filter @edgelabs/groot
+
+      - name: Build
+        run: |
+          cd apps/groot
+          pnpm pack
 
       - name: Build and push
         id: docker_build
@@ -56,4 +62,5 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          context: apps/groot
+          file: .deploy/groot.dockerfile
+          context: .
