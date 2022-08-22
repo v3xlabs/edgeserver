@@ -1,5 +1,0 @@
----
-"@edgelabs/types": patch
----
-
-Cleanup
