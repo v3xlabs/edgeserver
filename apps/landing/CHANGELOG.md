@@ -1,5 +1,11 @@
 # @web/landing
 
+## 1.0.6
+
+### Patch Changes
+
+- [`06975df`](https://github.com/v3xlabs/edgeserver/commit/06975df6a124d9fd09d632f3e58bfc5d5c80c133) Thanks [@lucemans](https://github.com/lucemans)! - Update Publish Script
+
 ## 1.0.5
 
 ### Patch Changes
