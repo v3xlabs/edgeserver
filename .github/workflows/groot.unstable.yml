@@ -5,6 +5,7 @@ on:
       - master
     paths:
       - "apps/groot/**"
+      - "apps/types/**"
       - ".github/workflows/groot.unstable.yml"
 
 jobs:
