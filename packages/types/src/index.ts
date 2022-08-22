@@ -7,5 +7,3 @@ export * from "./types/DeploymentLookup.type";
 export * from "./types/Domain.type";
 export * from "./types/Owner.type";
 export * from "./types/Site.type";
-
-// Hello there

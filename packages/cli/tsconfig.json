@@ -3,6 +3,7 @@
         "target": "ES6",
         "strict": true,
         "outDir": "dist",
-        "moduleResolution": "node"
+        "moduleResolution": "node",
+        "resolveJsonModule": true
     }
 }
