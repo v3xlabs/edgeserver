@@ -2,7 +2,7 @@ name: Build Groot Docker Container
 on:
   push:
     tags:
-      - '@edgelabs/groot@*.*.*'
+      - '@edgelabs/groot@**'
 
 jobs:
   build:
