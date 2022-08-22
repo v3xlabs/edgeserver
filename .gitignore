@@ -2,6 +2,7 @@ node_modules
 .next
 .turbo
 dist
+lib
 apps/groot/tools/data
 apps/groot/tmp
 .env
