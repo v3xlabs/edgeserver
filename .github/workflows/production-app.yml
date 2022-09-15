@@ -3,7 +3,7 @@ name: Deploy App to Production
 on:
   push:
     tags:
-      - '@edgelabs/app@*.*.*'
+      - '*edgelabs/app@**'
 
 jobs:
   zip-files:
