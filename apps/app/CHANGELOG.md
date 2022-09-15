@@ -1,5 +1,11 @@
 # @edgelabs/app
 
+## 1.1.5
+
+### Patch Changes
+
+- [#139](https://github.com/v3xlabs/edgeserver/pull/139) [`b931045`](https://github.com/v3xlabs/edgeserver/commit/b931045a6f5eda0e3181bf4e2a16178a8ca05ce9) Thanks [@svemat01](https://github.com/svemat01)! - Bump
+
 ## 1.1.4
 
 ### Patch Changes
