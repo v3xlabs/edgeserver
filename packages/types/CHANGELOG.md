@@ -1,5 +1,11 @@
 # @edgelabs/types
 
+## 1.0.6
+
+### Patch Changes
+
+- [`a84037f`](https://github.com/v3xlabs/edgeserver/commit/a84037fa28289d3e1c83c310b024d8ba11c7c7f4) Thanks [@lucemans](https://github.com/lucemans)! - Cleanup and Bump Scripts
+
 ## 1.0.5
 
 ### Patch Changes

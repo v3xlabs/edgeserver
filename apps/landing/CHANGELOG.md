@@ -1,5 +1,15 @@
 # @web/landing
 
+## 1.1.0
+
+### Minor Changes
+
+- [#131](https://github.com/v3xlabs/edgeserver/pull/131) [`2db4c80`](https://github.com/v3xlabs/edgeserver/commit/2db4c802435e5e93b4e34544996356f7661d2a33) Thanks [@lucemans](https://github.com/lucemans)! - Migrate to vite
+
+### Patch Changes
+
+- [`a84037f`](https://github.com/v3xlabs/edgeserver/commit/a84037fa28289d3e1c83c310b024d8ba11c7c7f4) Thanks [@lucemans](https://github.com/lucemans)! - Cleanup and Bump Scripts
+
 ## 1.0.6
 
 ### Patch Changes
