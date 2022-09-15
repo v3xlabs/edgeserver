@@ -5,8 +5,8 @@ import { useNetwork } from 'wagmi';
 
 const CHAIN_IMG: Record<number, string> = {
     1: '/assets/chains/1.png',
-    137: '/assets/chains/137.svg',
     10: '/assets/chains/10.svg',
+    137: '/assets/chains/137.svg',
     42_161: '/assets/chains/42161.svg',
 };
 
