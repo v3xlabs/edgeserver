@@ -1,5 +1,11 @@
 # @edgelabs/app
 
+## 1.1.3
+
+### Patch Changes
+
+- [`08d9ee1`](https://github.com/v3xlabs/edgeserver/commit/08d9ee119c080b2b1de2bf2b5d5a2e13d327de48) Thanks [@lucemans](https://github.com/lucemans)! - Bump
+
 ## 1.1.1
 
 ### Patch Changes
