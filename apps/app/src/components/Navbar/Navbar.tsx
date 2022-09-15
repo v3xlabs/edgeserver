@@ -6,6 +6,7 @@ import { FC, useMemo, useState } from 'react';
 import { Link, NavLink, useLocation } from 'react-router-dom';
 
 import logo from '../../../assets/logo.svg';
+import { ChainSwap } from './ChainSwap';
 import { UserProfile } from './UserProfile';
 
 const links: {
@@ -58,7 +59,7 @@ export const Navbar: FC = () => {
 
     return (
         <>
-            <div className="flex justify-between w-full border-b border-neutral-300 dark:border-neutral-700 h-16 dark:bg-black-800 bg-neutral-50 relative z-50">
+            <div className="flex justify-between w-full border-b border-neutral-300 dark:border-neutral-700 h-12 dark:bg-black-800 bg-neutral-50 relative z-50">
                 <div className="flex">
                     <Link
                         className="flex gap-2 h-full items-center px-4 border-r border-neutral-300 dark:border-neutral-700 hover:bg-neutral-100 dark:hover:bg-neutral-800 cursor-pointer"
@@ -156,9 +157,10 @@ export const Navbar: FC = () => {
                         </div>
                     </div> */}
                 </div>
-                {/* <div> */}
-                <UserProfile />
-                {/* </div> */}
+                <div className="flex">
+                    <ChainSwap />
+                    <UserProfile />
+                </div>
             </div>
             {/* <div className="sticky top-0 left-0 right-0 w-full flex h-16 items-end bg-black-900 border-b-2 border-neutral-700">
                 <div className="flex justify-between containerd">

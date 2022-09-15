@@ -13,5 +13,6 @@
  * ```
  */
 export const environment = {
-    API_URL: process.env.API_URL!,
+    // @ts-ignore
+    API_URL: import.meta.env.API_URL || 'https://api.edgeserver.app',
 };

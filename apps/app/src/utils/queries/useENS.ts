@@ -12,6 +12,7 @@ export const useENS = () => {
         isSuccess: NameIsSuccess,
     } = useEnsName({
         address,
+        chainId: 1,
     });
 
     const {
@@ -21,6 +22,7 @@ export const useENS = () => {
         isSuccess: AvatarIsSuccess,
     } = useEnsAvatar({
         addressOrName: Name || address,
+        chainId: 1,
     });
 
     useEffect(() => {

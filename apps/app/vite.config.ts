@@ -2,17 +2,18 @@ import { NodeGlobalsPolyfillPlugin } from '@esbuild-plugins/node-globals-polyfil
 import inject from '@rollup/plugin-inject';
 import react from '@vitejs/plugin-react';
 import nodePolyfills from 'rollup-plugin-polyfill-node';
-import typescriptPaths from 'rollup-plugin-typescript-paths';
 import { defineConfig } from 'vite';
+import tsconfigPaths from 'vite-tsconfig-paths';
 
 // https://vitejs.dev/config/
 export default defineConfig({
     plugins: [
+        tsconfigPaths(),
+        // typescriptPaths({ tsConfigPath: './tsconfig.json' }),
         react(),
         inject({
             util: 'util/',
         }),
-        typescriptPaths(),
     ],
     define: { global: 'globalThis' },
     build: {

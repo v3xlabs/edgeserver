@@ -6,7 +6,7 @@ import { cx } from '@utils/cx';
 import { environment } from '@utils/enviroment';
 import { KeyPerms } from '@utils/permissions';
 import { useJWT } from '@utils/useAuth';
-import { decode } from 'jsonwebtoken';
+import decode from 'jwt-decode';
 import ms from 'ms';
 import { EMPTY_PERMISSIONS, grantPermission } from 'permissio';
 import { FC, useCallback, useMemo, useState } from 'react';

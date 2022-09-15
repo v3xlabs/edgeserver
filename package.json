@@ -9,6 +9,7 @@
   "scripts": {
     "build": "turbo run build",
     "dev": "turbo run dev --parallel",
+    "dev-app": "turbo run dev --parallel --filter=@edgelabs/app",
     "version": "echo 'version ding' && changeset version && pnpm install --no-frozen-lockfile # && pnpm exec turbo run lint",
     "release": "echo 'release ding' && pnpm run build && turbo run pub && changeset tag",
     "changedata": "ts-node ./scripts/extract.ts --resolveJsonModule"

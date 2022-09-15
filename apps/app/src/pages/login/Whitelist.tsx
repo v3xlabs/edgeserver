@@ -4,8 +4,9 @@ import { formatAddress } from '@utils/formatAddress';
 import { gradientAvatar } from '@utils/gradientAvatar';
 import { useENS } from '@utils/queries/useENS';
 import { FC } from 'react';
-import whitelist from 'url:../../../assets/whitelist.svg';
 import { useAccount, useConnect } from 'wagmi';
+
+import whitelist from '../../../assets/whitelist.svg';
 
 export const Whitelist: FC = () => {
     const { data: Wallet, isSuccess } = useAccount();

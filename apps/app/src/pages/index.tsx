@@ -34,7 +34,7 @@ const ApplicationCard: FC<{
 
     return (
         <Link
-            className="card overflow-hidden bg-neutral-50 dark:bg-black-800 border border-neutral-300 dark:border-neutral-700 shadow-lg hover:shadow-xl relative"
+            className="card flex-col overflow-hidden relative"
             to={'/app/' + application.app_id}
         >
             {(application['preview_url'] && previewImage && (
@@ -105,27 +105,70 @@ const AppsList: FC = () => {
     const [isCreatingApp, setCreatingApp] = useState(false);
 
     return (
-        <div className="gap-4 flex flex-col w-full">
+        <div className="gap-4 flex flex-col w-full max-w-5xl mx-auto">
             <div className="flex">
-                <h2 className="text-2xl block flex-grow">
-                    Apps {data && data.length > 0 ? `(${data.length})` : ''}
-                </h2>
-                <Button
-                    label={'Create an App!'}
-                    onClick={() => {
-                        console.log('click');
-                        setCreatingApp(true);
-                    }}
-                />
-                {isCreatingApp && (
-                    <CreateAppModal
-                        onClose={() => {
-                            setCreatingApp(false);
-                        }}
-                    />
-                )}
+                <div className="card flex w-full overflow-hidden">
+                    <div className="border-r border-neutral-300 dark:border-neutral-700">
+                        <h1 className="text-2xl block flex-grow m-4 h-24">
+                            Overview
+                        </h1>
+                        <div className="w-full flex border-t border-neutral-300 dark:border-neutral-700">
+                            <div
+                                className="grid grid-cols-2 bg-neutral-300 dark:bg-neutral-700 max-w-sm"
+                                style={{ gap: '1px' }}
+                            >
+                                {[
+                                    [
+                                        'Total Applications',
+                                        data && data.length > 0
+                                            ? data.length
+                                            : '-',
+                                    ],
+                                    ['Deploys in last 30 days', '-'],
+                                    ['Total Requests', '-'],
+                                    [
+                                        'Last Login',
+                                        ((b = new Date()) =>
+                                            `${b.getHours()}:${b.getMinutes()}, ${b.getDay()}-${b.getMonth()}`)(),
+                                    ],
+                                ].map((a, index) => (
+                                    <div
+                                        key={index}
+                                        className="card-bg p-2 px-4 flex flex-col"
+                                    >
+                                        <p className="text-neutral-500 flex-grow truncate">
+                                            {a.at(0)}
+                                        </p>
+                                        <span>{a.at(1)}</span>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                    <div className="flex justify-center items-center flex-grow p-4 bg-white dark:bg-black-900">
+                        <div className="card border-0 p-4 gap-2 flex flex-col items-center">
+                            <p>This is the application menu</p>
+                            <Button
+                                label={'New App'}
+                                className="px-2 py-1 text-xs"
+                                onClick={() => {
+                                    console.log('click');
+                                    setCreatingApp(true);
+                                }}
+                            />
+                            {isCreatingApp && (
+                                <CreateAppModal
+                                    onClose={() => {
+                                        setCreatingApp(false);
+                                    }}
+                                />
+                            )}
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div className="gap-4 grid grid-cols-1 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
+            <h2 className="text-xl">Applications</h2>
+            <div className="gap-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
                 {data &&
                     isSuccess &&
                     data.map((project) => (
