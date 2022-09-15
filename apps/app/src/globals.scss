@@ -90,6 +90,10 @@ a {
     @apply w-full px-8;
 }
 
+.containerc {
+    @apply w-full max-w-5xl mx-auto;
+}
+
 .link {
     @apply text-neutral-400 hover:brightness-75 hover:underline;
 }
