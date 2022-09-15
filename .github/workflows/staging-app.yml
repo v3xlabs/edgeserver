@@ -41,7 +41,7 @@ jobs:
       - name: Build
         run: pnpm turbo run build --filter @edgelabs/app
         env:
-          API_URL: 'https://api.edgeserver.dev'
+          VITE_API_URL: 'https://api.edgeserver.dev'
       - name: Edgeserver Upload
         uses: lvkdotsh/edgeserver-action@master
         with:

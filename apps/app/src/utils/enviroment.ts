@@ -14,5 +14,5 @@
  */
 export const environment = {
     // @ts-ignore
-    API_URL: import.meta.env.API_URL || 'https://api.edgeserver.app',
+    API_URL: import.meta.env.VITE_API_URL,
 };
