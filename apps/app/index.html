@@ -6,12 +6,29 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link rel="stylesheet" href="./src/globals.scss" />
         <title>Signal Edge</title>
-        <link rel="icon" id="favicon" href="./assets/favicon.svg" type="image/svg+xml" sizes="any" />
+        <link
+            rel="icon"
+            id="favicon"
+            href="./assets/favicon.svg"
+            type="image/svg+xml"
+            sizes="any"
+        />
     </head>
 
     <body>
         <div id="root"></div>
         <noscript>You need to enable JavaScript to run this app.</noscript>
+        <script>
+            window.global = window;
+        </script>
+        <script type="module">
+            import process from 'process';
+            import EventEmitter from 'events';
+            import { Buffer } from 'buffer';
+            window.Buffer = Buffer;
+            window.process = process;
+            window.EventEmitter = EventEmitter;
+        </script>
         <script src="./src/index.tsx" type="module"></script>
         <script>
             /** Load Theme */
@@ -25,7 +42,9 @@
                 document.body.classList.remove('dark');
             }
 
-            window.OG_FAVICON = document.getElementById('favicon').getAttribute('href');
+            window.OG_FAVICON = document
+                .getElementById('favicon')
+                .getAttribute('href');
         </script>
     </body>
 </html>

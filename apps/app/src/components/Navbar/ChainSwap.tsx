@@ -3,11 +3,16 @@ import { cx } from '@utils/cx';
 import { FC } from 'react';
 import { useNetwork } from 'wagmi';
 
+import EthereumIcon from '../../../assets/chains/1.png';
+import OptimismIcon from '../../../assets/chains/10.svg';
+import PolygonIcon from '../../../assets/chains/137.svg';
+import ArbitrumIcon from '../../../assets/chains/42161.svg';
+
 const CHAIN_IMG: Record<number, string> = {
-    1: '/assets/chains/1.png',
-    10: '/assets/chains/10.svg',
-    137: '/assets/chains/137.svg',
-    42_161: '/assets/chains/42161.svg',
+    1: EthereumIcon,
+    10: OptimismIcon,
+    137: PolygonIcon,
+    42_161: ArbitrumIcon,
 };
 
 export const ChainSwap: FC = () => {

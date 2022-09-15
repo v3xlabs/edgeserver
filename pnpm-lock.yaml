@@ -36,6 +36,7 @@ importers:
       '@types/string-hash': ^1.1.1
       '@typescript-eslint/parser': ^5.26.0
       '@vitejs/plugin-react': ^2.0.1
+      buffer: ^6.0.3
       crypto-browserify: ^3.12.0
       date-fns: ^2.28.0
       eslint: ^8.16.0
@@ -43,6 +44,7 @@ importers:
       eslint-plugin-node: ^11.1.0
       eslint-plugin-react: ^7.30.0
       ethers: 5.5.1
+      events: ^3.3.0
       jsonwebtoken: ^8.5.1
       jwt-decode: ^3.1.2
       keccak: ^3.0.2
@@ -82,9 +84,11 @@ importers:
       '@rollup/plugin-inject': 4.0.4_rollup@2.77.3
       '@types/jsonwebtoken': 8.5.8
       '@vitejs/plugin-react': 2.0.1_vite@3.0.8
+      buffer: 6.0.3
       crypto-browserify: 3.12.0
       date-fns: 2.29.2
       ethers: 5.5.1
+      events: 3.3.0
       jsonwebtoken: 8.5.1
       jwt-decode: 3.1.2
       keccak: 3.0.2

@@ -1,3 +1,4 @@
+import GlobalPolyFill from '@esbuild-plugins/node-globals-polyfill';
 import { NodeGlobalsPolyfillPlugin } from '@esbuild-plugins/node-globals-polyfill';
 import inject from '@rollup/plugin-inject';
 import react from '@vitejs/plugin-react';
@@ -34,8 +35,18 @@ export default defineConfig({
             plugins: [
                 NodeGlobalsPolyfillPlugin({
                     buffer: true,
+                    process: true,
                 }),
+                GlobalPolyFill({ process: true, buffer: true }),
             ],
+        },
+    },
+    resolve: {
+        alias: {
+            process: 'process/browser',
+            stream: 'stream-browserify',
+            zlib: 'browserify-zlib',
+            util: 'util',
         },
     },
 });
