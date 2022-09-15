@@ -41,8 +41,12 @@ a {
     color: inherit;
 }
 
+.card-bg {
+    @apply bg-neutral-50 dark:bg-black-800;
+}
+
 .card {
-    @apply rounded-sm;
+    @apply rounded-lg card-bg border border-neutral-300 dark:border-neutral-700;
 }
 
 .inset {
@@ -84,6 +88,10 @@ a {
 
 .containerd {
     @apply w-full px-8;
+}
+
+.containerc {
+    @apply w-full max-w-5xl mx-auto;
 }
 
 .link {
@@ -167,4 +175,9 @@ body.dark .themebtn::before {
 
 .tab .tabtext {
     @apply border-b-2 border-b-blue-500;
+}
+
+.bg-clip-text {
+    background-clip: text;
+    -webkit-background-clip: text;
 }

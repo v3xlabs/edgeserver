@@ -1,3 +1,5 @@
+import '@rainbow-me/rainbowkit/styles.css';
+
 import { AdminPage } from '@pages/admin';
 import { AppPage } from '@pages/app';
 import { AppContainer } from '@pages/app/_container';

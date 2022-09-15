@@ -51,16 +51,16 @@ export const UserProfile: FC = () => {
                                     </b> */}
                                     </div>
                                 </div>
-                                <div className="w-10 h-10 flex-shrink-0 rounded-full bg-neutral-700">
+                                <div className="w-8 h-8 flex-shrink-0 rounded-full bg-neutral-700">
                                     {Avatar ? (
                                         <img
                                             src={Avatar}
-                                            className="w-10 h-10 rounded-full"
+                                            className="w-8 h-8 rounded-full"
                                             alt="ENSavatar"
                                         />
                                     ) : (
                                         <div
-                                            className="w-10 h-10 rounded-full overflow-hidden"
+                                            className="w-8 h-8 rounded-full overflow-hidden"
                                             dangerouslySetInnerHTML={{
                                                 __html: gradientAvatar(
                                                     userData.address!

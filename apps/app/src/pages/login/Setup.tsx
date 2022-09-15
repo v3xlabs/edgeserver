@@ -7,8 +7,9 @@ import { gradientAvatar } from '@utils/gradientAvatar';
 import { useENS } from '@utils/queries/useENS';
 import { FC } from 'react';
 import { SiweMessage } from 'siwe';
-import gear from 'url:../../../assets/gear.svg';
 import { useAccount, useConnect, useSignMessage } from 'wagmi';
+
+import gear from '../../../assets/gear.svg';
 
 export const Setup: FC = () => {
     const { data: Wallet, isSuccess } = useAccount();

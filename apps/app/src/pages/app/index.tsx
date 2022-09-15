@@ -51,57 +51,59 @@ export const AppPage: FC = () => {
     }, [0]);
 
     return (
-        <div className="containerd pt-8 flex flex-col gap-4">
-            <link rel="shortcut icon" href={app.favicon_url} />
-            <div className="flex">
-                <h2 className="text-2xl flex-grow block">{app.name}</h2>
-            </div>
-            <Tabs
-                labels={[
-                    '🔧 Setup',
-                    '🔎 Information',
-                    '🐛 Debug',
-                    '⚙️ Settings',
-                ]}
-                defaultTab={app.last_deploy ? 1 : 0}
-            >
-                <Tab>
-                    <NoDeployments app_id={app.app_id} />
-                </Tab>
-                <Tab>Welcome to your Application</Tab>
-                <Tab>
-                    Please ignore the following debug information <br />
-                    App ID: {app.app_id}
-                    <br />
-                    Owner: {app.owner_id}
-                    <br />
-                    Domain: {app.domain_id}
-                    <br />
-                    <div>
-                        <ReRender app_id={app.app_id} />
-                    </div>
-                </Tab>
-                <Tab>
-                    Welcome to the settings! <br />
-                    <h2 className="text-2xl mt-4">Danger Zone</h2>
-                    <div className="bg-red-500 outline outline-1 outline-red-400 rounded-md max-w-2xl mt-4 bg-opacity-10 text-black dark:text-white p-4">
-                        <div className="flex justify-between items-center">
-                            <div className="flex-grow">
-                                <h3 className="font-bold">
-                                    Delete Application
-                                </h3>
-                                <div>
-                                    Once you delete an application, there is no
-                                    going back.
-                                </div>
-                            </div>
-                            <DeleteButton app={app} />
+        <div className="containerd">
+            <div className="containerc pt-8 flex flex-col gap-4">
+                <link rel="shortcut icon" href={app.favicon_url} />
+                <div className="flex">
+                    <h2 className="text-2xl flex-grow block">{app.name}</h2>
+                </div>
+                <Tabs
+                    labels={[
+                        '🔧 Setup',
+                        '🔎 Information',
+                        '🐛 Debug',
+                        '⚙️ Settings',
+                    ]}
+                    defaultTab={app.last_deploy ? 1 : 0}
+                >
+                    <Tab>
+                        <NoDeployments app_id={app.app_id} />
+                    </Tab>
+                    <Tab>Welcome to your Application</Tab>
+                    <Tab>
+                        Please ignore the following debug information <br />
+                        App ID: {app.app_id}
+                        <br />
+                        Owner: {app.owner_id}
+                        <br />
+                        Domain: {app.domain_id}
+                        <br />
+                        <div>
+                            <ReRender app_id={app.app_id} />
                         </div>
-                    </div>
-                </Tab>
-            </Tabs>
+                    </Tab>
+                    <Tab>
+                        Welcome to the settings! <br />
+                        <h2 className="text-2xl mt-4">Danger Zone</h2>
+                        <div className="bg-red-500 outline outline-1 outline-red-400 rounded-md max-w-2xl mt-4 bg-opacity-10 text-black dark:text-white p-4">
+                            <div className="flex justify-between items-center">
+                                <div className="flex-grow">
+                                    <h3 className="font-bold">
+                                        Delete Application
+                                    </h3>
+                                    <div>
+                                        Once you delete an application, there is
+                                        no going back.
+                                    </div>
+                                </div>
+                                <DeleteButton app={app} />
+                            </div>
+                        </div>
+                    </Tab>
+                </Tabs>
 
-            {app.last_deploy && <AppDeploymentList app={app} />}
+                {app.last_deploy && <AppDeploymentList app={app} />}
+            </div>
         </div>
     );
 };
