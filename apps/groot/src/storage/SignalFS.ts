@@ -72,7 +72,7 @@ export class SignalStorage implements GenericStorage {
         bucket_name: string,
         path: string
     ): Promise<ResolveData | undefined> {
-        while (path.length > 0) {
+        while (path.length > 1) {
             const indexPath = join(path, '.', 'index.html');
             const data = await axios.get(
                 Globals.SIGNALFS_HOST +
