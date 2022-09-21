@@ -17,6 +17,14 @@
 			"path": "apps/groot"
 		},
 		{
+			"name": "⚙️ @edgelabs/dns-validate",
+			"path": "apps/dns-validate"
+		},
+		{
+			"name": "⚙️ @edgelabs/dns-cron",
+			"path": "apps/dns-cron"
+		},
+		{
 			"name": "🚀 @edgelabs/landing",
 			"path": "apps/landing"
 		},

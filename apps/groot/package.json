@@ -2,8 +2,11 @@
     "name": "@edgelabs/groot",
     "version": "3.10.8",
     "private": true,
-    "repository": "git@github.com:lvkdotsh/ipedge.git",
-    "author": "lucemans <luc@lucemans.nl>",
+    "repository": "https://github.com:v3xlabs/edgeserver",
+    "author": {
+        "name": "V3X Labs",
+        "url": "https://v3x.company"
+    },
     "license": "GPL-3.0",
     "dependencies": {
         "@edgelabs/types": "workspace:*",

@@ -3,8 +3,8 @@
     "version": "1.2.0",
     "license": "GPL-3.0",
     "author": {
-        "name": "lvkdotsh",
-        "url": "https://lvk.sh"
+        "name": "V3X Labs",
+        "url": "https://v3x.company"
     },
     "scripts": {
         "dev": "vite",
