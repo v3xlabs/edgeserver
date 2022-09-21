@@ -4,13 +4,12 @@ The purpose of this service is to run work through the queue of domains to valid
 
 ## Flow
 
-`dns:users:luc` is the list of domains luc is trying to claim
-
-`dns:domains:luc.computer` is the list of users trying to claim luc.computer
-
-`dns:queue` is the ZSET for delayed queueing
-
-`dns:iqueue` is the LIST for immediate queueing
+|            Key             |                      Purpose                      |
+| :------------------------: | :-----------------------------------------------: |
+|      `dns:users:luc`       |   is the list of domains luc is trying to claim   |
+| `dns:domains:luc.computer` | is the list of users trying to claim luc.computer |
+|        `dns:queue`         |         is the ZSET for delayed queueing          |
+|        `dns:iqueue`        |        is the LIST for immediate queueing         |
 
 ### When a user files a claim
 
@@ -45,13 +44,13 @@ SREM dns:domains:luc.computer luc
 
 // technically we could add the domain to a "check if we should deprecate"-queue, but thats beyond overkill
 
-
 if the output of
+
 ```
 SMEMBERS dns:domains:luc.computer
 ```
-== 0, we should
 
+== 0, we should
 
 ```
 DEL dns:domains:luc.computer
@@ -85,6 +84,7 @@ provided `X` is the current timestamp plus delay when to check again (an hour fo
 provided `luc.computer` is the name of the domain.
 
 if
+
 ```
 EXISTS dns:domains:luc.computer
 ```
