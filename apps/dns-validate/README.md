@@ -79,7 +79,7 @@ DEL dns:domains:luc.computer
 
 ### When a (delayed/instant) claim fails
 
-provided `X` is the current timestamp plus delay when to check again (an hour for example).
+provided `Y` is the current timestamp plus delay when to check again (an hour for example).
 
 provided `luc.computer` is the name of the domain.
 
@@ -90,5 +90,19 @@ EXISTS dns:domains:luc.computer
 ```
 
 ```
-ZADD dns:queue X luc.computer
+ZADD dns:queue Y luc.computer
+```
+
+### Every X period of time
+
+provided `Y` is the current timestamp plus delay when to check again (an hour for example).
+
+```
+ZRANGE dns:queue -1 Y BYSCORE
+```
+
+and then foreach, where the value is `Z`
+
+```
+LPUSH dns:iqueue Z
 ```
