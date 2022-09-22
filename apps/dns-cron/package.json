@@ -1,5 +1,5 @@
 {
-    "name": "dns-cron",
+    "name": "@edgelabs/dns-cron",
     "version": "1.0.0",
     "description": "",
     "license": "GPL-3.0",

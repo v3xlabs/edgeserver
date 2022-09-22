@@ -28,7 +28,7 @@ LPUSH dns:iqueue luc.computer
 provided the username is `luc`
 
 ```
-LRANGE dns:users:luc -1 999999
+SMEMBERS dns:users:luc
 ```
 
 ### When a user removes a domain from its list (and its still unverified)
@@ -97,12 +97,17 @@ ZADD dns:queue Y luc.computer
 
 provided `Y` is the current timestamp plus delay when to check again (an hour for example).
 
+first check if entries in temp queue, if entries move them to instant queue.
+
+then move the next gap worth of entries to the temp queue
 ```
-ZRANGE dns:queue -1 Y BYSCORE
+ZRANGESTORE dns:tempqueue dns:queue -1 Y BYSCORE
+ZREMRANGEBYSCORE dns:queue -1 Y
 ```
 
-and then foreach, where the value is `Z`
+and then foreach chunk of K entries, where the values are `Z`
+aka move the entires from temp to instant
 
 ```
-LPUSH dns:iqueue Z
+RPUSH dns:iqueue Z
 ```
