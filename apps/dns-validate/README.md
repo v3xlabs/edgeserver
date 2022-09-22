@@ -4,6 +4,8 @@ The purpose of this service is to run work through the queue of domains to valid
 
 ## Flow
 
+![](./flow.jpg)
+
 |            Key             |                      Purpose                      |
 | :------------------------: | :-----------------------------------------------: |
 |      `dns:users:luc`       |   is the list of domains luc is trying to claim   |
