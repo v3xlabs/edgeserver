@@ -1,7 +1,8 @@
 import { createClient } from 'redis';
 
-import { CHANNELS } from './lib/constants';
+import { CHANNELS, TIME } from './lib/constants';
 import { log } from './lib/logger';
+import { processDelayedQueue } from './tasks/processDelayedQueue';
 
 const client = createClient();
 
@@ -23,4 +24,15 @@ while (true) {
     }
 
     log.info('processing', data);
+
+    log.info(
+        'Failed to find a user that matches this information, re-queue-ing entry'
+    );
+
+    const now = Date.now();
+
+    await client.ZADD(CHANNELS.DNSQUEUE, {
+        score: now + TIME.REQUEUE,
+        value: data.element,
+    });
 }
