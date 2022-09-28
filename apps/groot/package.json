@@ -1,6 +1,6 @@
 {
     "name": "@edgelabs/groot",
-    "version": "3.10.4",
+    "version": "3.10.5",
     "private": true,
     "repository": "git@github.com:lvkdotsh/ipedge.git",
     "author": "lucemans <luc@lucemans.nl>",
