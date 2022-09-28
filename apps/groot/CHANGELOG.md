@@ -1,5 +1,11 @@
 # @web/ipedge
 
+## 3.10.5
+
+### Patch Changes
+
+- [#143](https://github.com/v3xlabs/edgeserver/pull/143) [`5f72a2b`](https://github.com/v3xlabs/edgeserver/commit/5f72a2b26076e7c5ce9f3989412379d9828bade2) Thanks [@Jontes-Tech](https://github.com/Jontes-Tech)! - Changed 404 page to reflect rebranding
+
 ## 3.10.4
 
 ### Patch Changes
