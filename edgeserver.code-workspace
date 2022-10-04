@@ -35,6 +35,14 @@
 		{
 			"name": "📦 @edgelabs/types",
 			"path": "packages/types"
+		},
+		{
+			"name": "📦 @edgelabs/config",
+			"path": "packages/config"
+		},
+		{
+			"name": "📦 @edgelabs/env",
+			"path": "packages/env"
 		}
 	],
 	"settings": {}
