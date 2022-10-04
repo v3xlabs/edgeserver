@@ -3,6 +3,7 @@ import '@rainbow-me/rainbowkit/styles.css';
 import { AdminPage } from '@pages/admin';
 import { AppPage } from '@pages/app';
 import { AppContainer } from '@pages/app/_container';
+import { CreateAppPage } from '@pages/app/create/create';
 import { DeploymentPage } from '@pages/app/deploy/deployment';
 import { AppDeploymentsPage } from '@pages/app/deployments';
 import { AppSettingsPage } from '@pages/app/settings';
@@ -23,6 +24,7 @@ export const App: FC = () => {
                 <Route path="keys" element={<KeysPage />} />
                 <Route path="settings" element={<SettingsPage />} />
                 <Route path="admin" element={<AdminPage />} />
+                <Route path="app/new" element={<CreateAppPage />} />
                 <Route path="app/:app_id" element={<AppContainer />}>
                     <Route path="" element={<AppPage />} />
                     <Route

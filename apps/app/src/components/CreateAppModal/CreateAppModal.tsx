@@ -13,7 +13,7 @@ export const CreateAppModal: FC<{ onClose: () => void }> = ({ onClose }) => {
         handleSubmit,
         watch,
         formState: { errors, isSubmitting, isValid },
-    } = useForm<{ domain: string }>({
+    } = useForm<{ appname: string; domain?: string }>({
         reValidateMode: 'onChange',
         delayError: 100,
         mode: 'all',
@@ -21,6 +21,7 @@ export const CreateAppModal: FC<{ onClose: () => void }> = ({ onClose }) => {
             console.log('validating');
 
             if (
+                values.domain &&
                 !/^((?!-))(xn--)?[\da-z][\w-]{0,61}[\da-z]*\.?((xn--)?([\d.a-z-]{1,61}|[\da-z-]{1,30})\.?[a-z]{2,})$/gim.test(
                     values.domain
                 )
@@ -128,9 +129,32 @@ export const CreateAppModal: FC<{ onClose: () => void }> = ({ onClose }) => {
     }, []);
 
     return (
-        <Modal label="App Creator" onClose={onClose}>
+        <Modal label="New App" onClose={onClose}>
             <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
                 <div>
+                    <label
+                        htmlFor="appname"
+                        className="block text-sm font-medium text-neutral-900 dark:text-neutral-300 pt-4 mb-2"
+                    >
+                        App Name
+                    </label>
+
+                    <div className="flex items-center gap-2 text-neutral-500">
+                        <input
+                            type="text"
+                            id="appname"
+                            className={cx(
+                                'text-sm rounded-lg block w-full p-2.5 border',
+                                errors.appname
+                                    ? 'bg-red-500 dark:bg-red-900 bg-opacity-20 border-red-500 focus-visible:outine-red-500'
+                                    : 'focus:ring-blue-500 focus:border-blue-500 bg-neutral-50 border-neutral-300 dark:bg-neutral-600 dark:border-neutral-500 dark:placeholder-neutral-400 dark:text-white'
+                            )}
+                            placeholder="edgeserver.app"
+                            required
+                            {...register('domain')}
+                        />
+                    </div>
+
                     <label
                         htmlFor="domain"
                         className="block text-sm font-medium text-neutral-900 dark:text-neutral-300 pt-4 mb-2"

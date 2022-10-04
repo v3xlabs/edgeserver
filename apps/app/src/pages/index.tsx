@@ -149,21 +149,12 @@ const AppsList: FC = () => {
                         <div className="flex justify-center items-center flex-grow p-4 bg-white dark:bg-black-900">
                             <div className="card border-0 p-4 gap-2 flex flex-col items-center">
                                 <p>This is the application menu</p>
-                                <Button
-                                    label={'New App'}
-                                    className="px-2 py-1 text-xs"
-                                    onClick={() => {
-                                        console.log('click');
-                                        setCreatingApp(true);
-                                    }}
-                                />
-                                {isCreatingApp && (
-                                    <CreateAppModal
-                                        onClose={() => {
-                                            setCreatingApp(false);
-                                        }}
+                                <Link to="/app/new">
+                                    <Button
+                                        label={'New App'}
+                                        className="px-2 py-1 text-xs"
                                     />
-                                )}
+                                </Link>
                             </div>
                         </div>
                     </div>

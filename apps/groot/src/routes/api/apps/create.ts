@@ -10,6 +10,12 @@ import { generateSnowflake } from '.';
 export const AppCreateRoute: FastifyPluginAsync = async (router, _options) => {
     const createPayload = Type.Object({
         name: Type.String(),
+        domains: Type.Array(
+            Type.Object({
+                type: Type.Union([Type.Literal('ens'), Type.Literal('dns')]),
+                name: Type.String(),
+            }),
+        ),
     });
 
     router.post<{
@@ -26,14 +32,12 @@ export const AppCreateRoute: FastifyPluginAsync = async (router, _options) => {
 
             usePerms(permissions, [KeyPerms.APPS_WRITE]);
 
-            let { name } = _request.body;
-
-            name = name.replace(/(\.|\s)/g, '-');
+            const { name } = _request.body;
 
             const oldAppId = await DB.selectOneFrom(
                 'applications',
                 ['app_id'],
-                { name }
+                { name, owner_id: user_id },
             );
 
             if (oldAppId) {
@@ -45,14 +49,11 @@ export const AppCreateRoute: FastifyPluginAsync = async (router, _options) => {
                 return;
             }
 
-            // const {} = _request.body;
-            // const domain_id = generateSnowflake();
             const createdProject: Partial<Application> = {
                 app_id: BigInt(generateSnowflake()),
                 owner_id: user_id,
                 name,
                 last_deployed: new Date().toString(),
-                // domain_id,
             };
             // const domain: Partial<DomainV1> = {
             //     domain_id,
@@ -61,9 +62,10 @@ export const AppCreateRoute: FastifyPluginAsync = async (router, _options) => {
             // };
 
             await DB.insertInto('applications', createdProject);
+
             // await DB.insertInto('domains', domain);
 
             reply.send({ site_id: createdProject.app_id });
-        }
+        },
     );
 };

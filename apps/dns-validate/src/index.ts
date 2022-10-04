@@ -1,12 +1,14 @@
 import { createClient } from 'redis';
 
 import { CHANNELS, TIME } from './lib/constants';
+import { DB } from './lib/database';
 import { log } from './lib/logger';
-import { processDelayedQueue } from './tasks/processDelayedQueue';
+import { verifyDNS } from './tasks/verifyDNS';
 
 const client = createClient();
 
 await client.connect();
+await DB.awaitConnection();
 
 process.on('SIGTERM', async () => {
     log.info('SIGTERM signal received.');
@@ -23,7 +25,11 @@ while (true) {
         continue;
     }
 
-    log.info('processing', data);
+    log.info('Processing ', data.element);
+
+    const dnsSuccess = await verifyDNS(data.element);
+
+    if (dnsSuccess) continue;
 
     log.info(
         'Failed to find a user that matches this information, re-queue-ing entry'

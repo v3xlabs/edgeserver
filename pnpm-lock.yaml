@@ -136,6 +136,7 @@ importers:
 
   apps/dns-validate:
     specifiers:
+      '@edgelabs/types': workspace:^1.0.6
       '@lvksh/logger': ^1.6.3
       '@types/redis': ^4.0.11
       '@typescript-eslint/parser': ^5.38.0
@@ -144,14 +145,17 @@ importers:
       eslint-plugin-v3xlabs: ^1.5.2
       kleur: ^4.1.5
       redis: ^4.1.0
+      scyllo: v1.5.0
       ts-node: ^10.8.1
       typescript: ^4.8.3
     dependencies:
+      '@edgelabs/types': link:../../packages/types
       '@lvksh/logger': 1.6.3
       '@types/redis': 4.0.11
       chalk: 4.0.0
       kleur: 4.1.5
       redis: 4.2.0
+      scyllo: 1.5.0
       ts-node: 10.9.1_yklad3uwlubcc4tnbijo3gryzy
     devDependencies:
       '@typescript-eslint/parser': 5.38.0_irgkl5vooow2ydyo6aokmferha
@@ -418,6 +422,17 @@ importers:
     devDependencies:
       tsup: 6.2.2_typescript@4.7.4
       typescript: 4.7.4
+
+  packages/env:
+    specifiers:
+      '@edgelabs/types': workspace:*
+      tsup: ^6.2.2
+      typescript: ^4.7.4
+    dependencies:
+      '@edgelabs/types': link:../types
+    devDependencies:
+      tsup: 6.2.2_typescript@4.8.3
+      typescript: 4.8.3
 
   packages/types:
     specifiers:
@@ -5191,7 +5206,7 @@ packages:
     engines: {node: '>=8'}
     dependencies:
       '@types/long': 4.0.2
-      '@types/node': 18.7.6
+      '@types/node': 18.7.8
       adm-zip: 0.5.9
       long: 2.4.0
     dev: false
@@ -13573,6 +13588,42 @@ packages:
       sucrase: 3.25.0
       tree-kill: 1.2.2
       typescript: 4.7.4
+    transitivePeerDependencies:
+      - supports-color
+      - ts-node
+    dev: true
+
+  /tsup/6.2.2_typescript@4.8.3:
+    resolution: {integrity: sha512-vJ9IAdif4GKAz2XMZzjX1hNqhBezJWXjm0qeQEoI7y//a64cxgCF8178eTMV4jBu7YNKnfAPpPSuyXW4mN+9rA==}
+    engines: {node: '>=14'}
+    hasBin: true
+    peerDependencies:
+      '@swc/core': ^1
+      postcss: ^8.4.12
+      typescript: ^4.1.0
+    peerDependenciesMeta:
+      '@swc/core':
+        optional: true
+      postcss:
+        optional: true
+      typescript:
+        optional: true
+    dependencies:
+      bundle-require: 3.0.4_esbuild@0.15.5
+      cac: 6.7.12
+      chokidar: 3.5.3
+      debug: 4.3.4
+      esbuild: 0.15.5
+      execa: 5.1.1
+      globby: 11.1.0
+      joycon: 3.1.1
+      postcss-load-config: 3.1.4
+      resolve-from: 5.0.0
+      rollup: 2.77.3
+      source-map: 0.8.0-beta.0
+      sucrase: 3.25.0
+      tree-kill: 1.2.2
+      typescript: 4.8.3
     transitivePeerDependencies:
       - supports-color
       - ts-node
