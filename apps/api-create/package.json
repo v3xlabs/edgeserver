@@ -1,0 +1,33 @@
+{
+    "name": "@edgelabs/api-create",
+    "version": "1.0.0",
+    "description": "",
+    "license": "GPL-3.0",
+    "type": "module",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "dev": "ts-node ./src/index.ts",
+        "lint": "eslint -c .eslintrc.json --ext .ts ./src"
+    },
+    "keywords": [],
+    "author": {
+        "name": "V3X Labs",
+        "url": "https://v3x.company"
+    },
+    "devDependencies": {
+        "@typescript-eslint/parser": "^5.38.0",
+        "eslint": "^8.23.1",
+        "eslint-plugin-v3xlabs": "^1.5.2",
+        "typescript": "^4.8.3"
+    },
+    "dependencies": {
+        "@edgelabs/types": "workspace:^1.0.6",
+        "@lvksh/logger": "^1.6.3",
+        "@types/redis": "^4.0.11",
+        "chalk": "4.0.0",
+        "kleur": "^4.1.5",
+        "redis": "^4.1.0",
+        "scyllo": "v1.5.0",
+        "ts-node": "^10.8.1"
+    }
+}

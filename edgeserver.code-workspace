@@ -21,8 +21,8 @@
 			"path": "apps/dns-validate"
 		},
 		{
-			"name": "⚙️ @edgelabs/dns-cron",
-			"path": "apps/dns-cron"
+			"name": "✂️ @edgelabs/api-create",
+			"path": "apps/api-create"
 		},
 		{
 			"name": "🚀 @edgelabs/landing",
