@@ -1,4 +1,4 @@
-import { createClient } from 'redis';
+import { createClient, RedisClientType } from 'redis';
 
 import { CHANNELS, TIME } from './lib/constants';
 import { DB } from './lib/database';
@@ -27,7 +27,7 @@ while (true) {
 
     log.info('Processing ', data.element);
 
-    const dnsSuccess = await verifyDNS(data.element);
+    const dnsSuccess = await verifyDNS(data.element, client as RedisClientType);
 
     if (dnsSuccess) continue;
 

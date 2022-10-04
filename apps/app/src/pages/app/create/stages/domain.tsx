@@ -2,16 +2,11 @@ import { Button } from '@components/Button';
 import { FC, useState } from 'react';
 import { generateSunflake } from 'sunflake';
 import { useAccount, useEnsAddress } from 'wagmi';
+import { DomainVerificationRequest } from '@edgelabs/types';
 
 const gen = generateSunflake();
 
-export type CreateAppDomainState = {
-    type: 'dns' | 'ens' | '';
-    name: string;
-    id: string;
-};
-
-const ValidatedENS: FC<{ domain: CreateAppDomainState }> = ({ domain }) => {
+const ValidatedENS: FC<{ domain: DomainVerificationRequest }> = ({ domain }) => {
     const { data } = useEnsAddress({ name: domain.name });
     const { data: addressData } = useAccount();
 
@@ -23,8 +18,8 @@ const ValidatedENS: FC<{ domain: CreateAppDomainState }> = ({ domain }) => {
 };
 
 const StagedDomain: FC<{
-    update: (domain: CreateAppDomainState) => void;
-    domain: CreateAppDomainState;
+    update: (domain: DomainVerificationRequest) => void;
+    domain: DomainVerificationRequest;
 }> = ({ domain, update }) => {
     return (
         <div key={domain.id} className="flex gap-2">
@@ -50,10 +45,10 @@ const StagedDomain: FC<{
 };
 
 export const CreateStageDomain: FC<{
-    next: (a: CreateAppDomainState[]) => void;
+    next: (a: DomainVerificationRequest[]) => void;
     back: () => void;
 }> = ({ next, back }) => {
-    const [domains, setDomains] = useState([] as CreateAppDomainState[]);
+    const [domains, setDomains] = useState([] as DomainVerificationRequest[]);
 
     return (
         <>

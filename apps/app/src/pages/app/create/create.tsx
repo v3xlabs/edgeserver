@@ -4,8 +4,10 @@ import { FC, useCallback, useState } from 'react';
 import { useNavigate } from 'react-router';
 
 import { CreateStageConfirm } from './stages/confirm';
-import { CreateAppDomainState, CreateStageDomain } from './stages/domain';
+import { CreateStageDomain } from './stages/domain';
 import { CreateStageName } from './stages/name';
+
+import { DomainVerificationRequest } from '@edgelabs/types';
 
 export const CreateAppPage: FC = () => {
     const { token } = useJWT();
@@ -13,7 +15,7 @@ export const CreateAppPage: FC = () => {
 
     const [stage, setStage] = useState('name');
     const [name, setName] = useState('');
-    const [domains, setDomains] = useState([] as CreateAppDomainState[]);
+    const [domains, setDomains] = useState([] as DomainVerificationRequest[]);
 
     const confirm = useCallback(async () => {
         let application_id: string;
@@ -46,7 +48,7 @@ export const CreateAppPage: FC = () => {
         }
 
         nav('/app/' + application_id);
-    }, []);
+    }, [token, name, domains, nav]);
 
     return (
         <div className="w-full">

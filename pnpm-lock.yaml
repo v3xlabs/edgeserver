@@ -23,6 +23,7 @@ importers:
 
   apps/api-create:
     specifiers:
+      '@edgelabs/log': workspace:^0.0.1
       '@edgelabs/types': workspace:^1.0.6
       '@lvksh/logger': ^1.6.3
       '@types/redis': ^4.0.11
@@ -36,6 +37,7 @@ importers:
       ts-node: ^10.8.1
       typescript: ^4.8.3
     dependencies:
+      '@edgelabs/log': link:../../packages/log
       '@edgelabs/types': link:../../packages/types
       '@lvksh/logger': 1.6.3
       '@types/redis': 4.0.11
@@ -54,6 +56,7 @@ importers:
     specifiers:
       '@babel/core': ^7.18.2
       '@edgelabs/log': workspace:^0.0.1
+      '@edgelabs/types': workspace:^1.0.6
       '@esbuild-plugins/node-globals-polyfill': ^0.1.1
       '@headlessui/react': ^1.6.5
       '@rainbow-me/rainbowkit': ^0.2.1
@@ -110,6 +113,7 @@ importers:
     dependencies:
       '@babel/core': 7.18.10
       '@edgelabs/log': link:../../packages/log
+      '@edgelabs/types': link:../../packages/types
       '@esbuild-plugins/node-globals-polyfill': 0.1.1_esbuild@0.15.5
       '@headlessui/react': 1.6.6_biqbaboplfbrettd7655fr4n2y
       '@rainbow-me/rainbowkit': 0.2.5_3bo567u5v2wnafr7ww6xz5flv4
@@ -425,7 +429,6 @@ importers:
 
   packages/cli:
     specifiers:
-      '@edgelabs/log': workspace:^0.0.1
       '@edgelabs/types': workspace:*
       '@lvksh/logger': ^1.6.3
       '@typescript-eslint/parser': ^5.30.7
@@ -437,8 +440,6 @@ importers:
       sunflake: ^0.5.0
       tsup: ^6.2.2
       typescript: ^4.7.4
-    dependencies:
-      '@edgelabs/log': link:../log
     devDependencies:
       '@edgelabs/types': link:../types
       '@lvksh/logger': 1.6.3
@@ -454,12 +455,10 @@ importers:
 
   packages/config:
     specifiers:
-      '@edgelabs/log': workspace:^0.0.1
       '@edgelabs/types': workspace:*
       tsup: ^6.2.2
       typescript: ^4.7.4
     dependencies:
-      '@edgelabs/log': link:../log
       '@edgelabs/types': link:../types
     devDependencies:
       tsup: 6.2.2_typescript@4.7.4

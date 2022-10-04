@@ -14,6 +14,8 @@ import { Route, Routes } from 'react-router';
 
 import { Navbar } from './components/Navbar/Navbar';
 import { Home } from './pages';
+import { DomainsPage } from '@pages/domains';
+import { DomainContainer } from '@pages/domain/_container';
 
 export const App: FC = () => {
     return (
@@ -35,6 +37,11 @@ export const App: FC = () => {
                         path="deployment/:deploy_id"
                         element={<DeploymentPage />}
                     />
+                    <Route path="settings" element={<AppSettingsPage />} />
+                </Route>
+                <Route path="domains" element={<DomainsPage />} />
+                <Route path="domain/:app_id" element={<DomainContainer />}>
+                    <Route path="" element={<AppPage />} />
                     <Route path="settings" element={<AppSettingsPage />} />
                 </Route>
             </Routes>

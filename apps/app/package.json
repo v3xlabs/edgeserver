@@ -21,6 +21,7 @@
     "dependencies": {
         "@babel/core": "^7.18.2",
         "@edgelabs/log": "workspace:^0.0.1",
+        "@edgelabs/types": "workspace:^1.0.6",
         "@esbuild-plugins/node-globals-polyfill": "^0.1.1",
         "@headlessui/react": "^1.6.5",
         "@rainbow-me/rainbowkit": "^0.2.1",
