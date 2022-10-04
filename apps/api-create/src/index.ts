@@ -1,1 +1,3 @@
-console.log('Hi');
+import { log } from '@edgelabs/log';
+
+log.

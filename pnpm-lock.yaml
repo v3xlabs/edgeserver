@@ -21,9 +21,39 @@ importers:
       turbo: 1.6.2
       typescript: 4.7.4
 
+  apps/api-create:
+    specifiers:
+      '@edgelabs/types': workspace:^1.0.6
+      '@lvksh/logger': ^1.6.3
+      '@types/redis': ^4.0.11
+      '@typescript-eslint/parser': ^5.38.0
+      chalk: 4.0.0
+      eslint: ^8.23.1
+      eslint-plugin-v3xlabs: ^1.5.2
+      kleur: ^4.1.5
+      redis: ^4.1.0
+      scyllo: v1.5.0
+      ts-node: ^10.8.1
+      typescript: ^4.8.3
+    dependencies:
+      '@edgelabs/types': link:../../packages/types
+      '@lvksh/logger': 1.6.3
+      '@types/redis': 4.0.11
+      chalk: 4.0.0
+      kleur: 4.1.5
+      redis: 4.2.0
+      scyllo: 1.5.0
+      ts-node: 10.9.1_yklad3uwlubcc4tnbijo3gryzy
+    devDependencies:
+      '@typescript-eslint/parser': 5.38.0_irgkl5vooow2ydyo6aokmferha
+      eslint: 8.23.1
+      eslint-plugin-v3xlabs: 1.5.2_irgkl5vooow2ydyo6aokmferha
+      typescript: 4.8.3
+
   apps/app:
     specifiers:
       '@babel/core': ^7.18.2
+      '@edgelabs/log': workspace:^0.0.1
       '@esbuild-plugins/node-globals-polyfill': ^0.1.1
       '@headlessui/react': ^1.6.5
       '@rainbow-me/rainbowkit': ^0.2.1
@@ -79,6 +109,7 @@ importers:
       zustand: ^4.0.0-rc.1
     dependencies:
       '@babel/core': 7.18.10
+      '@edgelabs/log': link:../../packages/log
       '@esbuild-plugins/node-globals-polyfill': 0.1.1_esbuild@0.15.5
       '@headlessui/react': 1.6.6_biqbaboplfbrettd7655fr4n2y
       '@rainbow-me/rainbowkit': 0.2.5_3bo567u5v2wnafr7ww6xz5flv4
@@ -136,6 +167,7 @@ importers:
 
   apps/dns-validate:
     specifiers:
+      '@edgelabs/log': workspace:^0.0.1
       '@edgelabs/types': workspace:^1.0.6
       '@lvksh/logger': ^1.6.3
       '@types/redis': ^4.0.11
@@ -149,6 +181,7 @@ importers:
       ts-node: ^10.8.1
       typescript: ^4.8.3
     dependencies:
+      '@edgelabs/log': link:../../packages/log
       '@edgelabs/types': link:../../packages/types
       '@lvksh/logger': 1.6.3
       '@types/redis': 4.0.11
@@ -165,6 +198,7 @@ importers:
 
   apps/groot:
     specifiers:
+      '@edgelabs/log': workspace:^0.0.1
       '@edgelabs/types': workspace:*
       '@fastify/cors': ^8.0.0
       '@fastify/multipart': ^7.1.0
@@ -230,6 +264,7 @@ importers:
       use-yup: ^1.1.0
       yup: ^0.32.11
     dependencies:
+      '@edgelabs/log': link:../../packages/log
       '@edgelabs/types': link:../../packages/types
       '@fastify/cors': 8.1.0
       '@fastify/multipart': 7.1.0
@@ -298,6 +333,7 @@ importers:
 
   apps/landing:
     specifiers:
+      '@edgelabs/log': workspace:^0.0.1
       '@esbuild-plugins/node-globals-polyfill': ^0.1.1
       '@rollup/plugin-inject': ^4.0.4
       '@types/react': ^17.0.36
@@ -324,6 +360,7 @@ importers:
       vite: ^3.0.8
       zustand: ^4.0.0-rc.1
     dependencies:
+      '@edgelabs/log': link:../../packages/log
       '@esbuild-plugins/node-globals-polyfill': 0.1.1_esbuild@0.15.5
       '@rollup/plugin-inject': 4.0.4_rollup@2.77.3
       '@vitejs/plugin-react': 2.0.1_vite@3.0.8
@@ -388,6 +425,7 @@ importers:
 
   packages/cli:
     specifiers:
+      '@edgelabs/log': workspace:^0.0.1
       '@edgelabs/types': workspace:*
       '@lvksh/logger': ^1.6.3
       '@typescript-eslint/parser': ^5.30.7
@@ -399,6 +437,8 @@ importers:
       sunflake: ^0.5.0
       tsup: ^6.2.2
       typescript: ^4.7.4
+    dependencies:
+      '@edgelabs/log': link:../log
     devDependencies:
       '@edgelabs/types': link:../types
       '@lvksh/logger': 1.6.3
@@ -414,10 +454,12 @@ importers:
 
   packages/config:
     specifiers:
+      '@edgelabs/log': workspace:^0.0.1
       '@edgelabs/types': workspace:*
       tsup: ^6.2.2
       typescript: ^4.7.4
     dependencies:
+      '@edgelabs/log': link:../log
       '@edgelabs/types': link:../types
     devDependencies:
       tsup: 6.2.2_typescript@4.7.4
@@ -425,11 +467,26 @@ importers:
 
   packages/env:
     specifiers:
+      '@edgelabs/log': workspace:^0.0.1
       '@edgelabs/types': workspace:*
       tsup: ^6.2.2
       typescript: ^4.7.4
     dependencies:
+      '@edgelabs/log': link:../log
       '@edgelabs/types': link:../types
+    devDependencies:
+      tsup: 6.2.2_typescript@4.8.3
+      typescript: 4.8.3
+
+  packages/log:
+    specifiers:
+      '@edgelabs/types': workspace:*
+      '@lvksh/logger': ^1.6.3
+      tsup: ^6.2.2
+      typescript: ^4.7.4
+    dependencies:
+      '@edgelabs/types': link:../types
+      '@lvksh/logger': 1.6.3
     devDependencies:
       tsup: 6.2.2_typescript@4.8.3
       typescript: 4.8.3

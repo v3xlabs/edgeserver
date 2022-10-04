@@ -4,6 +4,7 @@
     "private": true,
     "license": "GPL-3.0",
     "dependencies": {
+        "@edgelabs/log": "workspace:^0.0.1",
         "@esbuild-plugins/node-globals-polyfill": "^0.1.1",
         "@rollup/plugin-inject": "^4.0.4",
         "@vitejs/plugin-react": "^2.0.1",

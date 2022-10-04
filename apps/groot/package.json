@@ -9,6 +9,7 @@
     },
     "license": "GPL-3.0",
     "dependencies": {
+        "@edgelabs/log": "workspace:^0.0.1",
         "@edgelabs/types": "workspace:*",
         "@fastify/cors": "^8.0.0",
         "@fastify/multipart": "^7.1.0",
