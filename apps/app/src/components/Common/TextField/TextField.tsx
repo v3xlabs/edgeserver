@@ -1,12 +1,17 @@
 import { cx } from '@utils/cx';
-import { FC, useRef } from 'react';
-import { AriaTextFieldProps, FocusableOptions, useTextField } from 'react-aria';
-
+import React, { ChangeEventHandler, FC, useRef } from 'react';
+import {
+    AriaTextFieldProps,
+    chain,
+    FocusableOptions,
+    useTextField,
+} from 'react-aria';
 export interface TextFieldProperties
-    extends AriaTextFieldProps,
+    extends Omit<AriaTextFieldProps, 'onChange'>,
         FocusableOptions {
     className?: string;
 
+    onChange: ChangeEventHandler<HTMLInputElement>;
     // 'aria-label': string;
 
     // Custom props
@@ -22,18 +27,27 @@ export interface TextFieldProperties
 
 export const TextField: FC<TextFieldProperties> = (properties) => {
     const reference = useRef<HTMLInputElement>(null);
-    const { inputProps } = useTextField(properties, reference);
+
+    const { inputProps } = useTextField(properties as any, reference);
 
     return (
         <div className="flex flex-col gap-1">
-            {/*eslint-disable-next-line jsx-a11y/label-has-associated-control */}
             {properties.label != undefined && (
-                <label htmlFor={reference.current?.id} className="text-lg mb-1">
+                <label
+                    htmlFor={
+                        reference != undefined
+                            ? reference.current?.id
+                            : undefined
+                    }
+                    className="text-lg mb-1"
+                >
                     {properties.label}
                 </label>
             )}
             <input
                 {...inputProps}
+                // onChange={properties.onChange}
+                onChange={chain(inputProps.onChange, properties.onChange)}
                 className={cx(
                     'text-sm rounded-md block w-full py-2.5 px-4 border outline-none focus:ring-1',
                     'bg-neutral-100 dark:bg-neutral-800',
