@@ -23,6 +23,7 @@ export const App: FC = () => {
             <Navbar />
             <Routes>
                 <Route path="/" element={<Home />} />
+                <Route path="components" element={<Components />} />
                 <Route path="keys" element={<KeysPage />} />
                 <Route path="settings" element={<SettingsPage />} />
                 <Route path="admin" element={<AdminPage />} />

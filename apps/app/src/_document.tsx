@@ -11,7 +11,6 @@ import { jsonRpcProvider } from 'wagmi/providers/jsonRpc';
 import { publicProvider } from 'wagmi/providers/public';
 
 import { App } from './App';
-import { LoginFacade } from './components/LoginFacade';
 
 const { chains, provider } = configureChains(
     [chain.mainnet, chain.polygon, chain.optimism, chain.arbitrum],
@@ -78,9 +77,9 @@ export const Document = () => {
                 <QueryClientProvider client={queryClient}>
                     <BrowserRouter>
                         <div className="dark:text-white text-black-800 w-full min-h-screen">
-                            <LoginFacade>
-                                <App />
-                            </LoginFacade>
+                            {/* <LoginFacade> */}
+                            <App />
+                            {/* </LoginFacade> */}
                         </div>
                     </BrowserRouter>
                 </QueryClientProvider>
