@@ -1,3 +1,4 @@
+import { LoginFacade } from '@components/LoginFacade';
 import {
     darkTheme,
     DisclaimerComponent,
@@ -77,9 +78,9 @@ export const Document = () => {
                 <QueryClientProvider client={queryClient}>
                     <BrowserRouter>
                         <div className="dark:text-white text-black-800 w-full min-h-screen">
-                            {/* <LoginFacade> */}
-                            <App />
-                            {/* </LoginFacade> */}
+                            <LoginFacade>
+                                <App />
+                            </LoginFacade>
                         </div>
                     </BrowserRouter>
                 </QueryClientProvider>
