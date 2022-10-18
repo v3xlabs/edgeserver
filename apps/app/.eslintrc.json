@@ -3,9 +3,13 @@
     "parserOptions": {
         "ecmaVersion": 2022
     },
-    "extends": ["plugin:lvksh/recommended", "plugin:react/recommended"],
+    "extends": [
+        "plugin:lvksh/recommended",
+        "plugin:react/recommended",
+        "plugin:jsx-a11y/recommended"
+    ],
     "ignorePatterns": ["!**/*"],
-    "plugins": ["lvksh", "react", "node"],
+    "plugins": ["lvksh", "react", "node", "jsx-a11y"],
     "env": {
         "browser": true,
         "node": true,
