@@ -1,9 +1,7 @@
 import { createClient } from 'redis';
 
-import { Globals } from './index';
-
 export const CACHE = createClient({
-    url: Globals.REDIS_IP,
+    url: process.env.REDIS_IP,
 });
 
 (async () => {
