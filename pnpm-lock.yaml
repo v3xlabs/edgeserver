@@ -171,12 +171,14 @@ importers:
 
   apps/dns-validate:
     specifiers:
+      '@edgelabs/env': workspace:^0.0.1
       '@edgelabs/log': workspace:^0.0.1
       '@edgelabs/types': workspace:^1.0.6
       '@lvksh/logger': ^1.6.3
       '@types/redis': ^4.0.11
       '@typescript-eslint/parser': ^5.38.0
       chalk: 4.0.0
+      dotenv: ^16.0.1
       eslint: ^8.23.1
       eslint-plugin-v3xlabs: ^1.5.2
       kleur: ^4.1.5
@@ -185,11 +187,13 @@ importers:
       ts-node: ^10.8.1
       typescript: ^4.8.3
     dependencies:
+      '@edgelabs/env': link:../../packages/env
       '@edgelabs/log': link:../../packages/log
       '@edgelabs/types': link:../../packages/types
       '@lvksh/logger': 1.6.3
       '@types/redis': 4.0.11
       chalk: 4.0.0
+      dotenv: 16.0.1
       kleur: 4.1.5
       redis: 4.2.0
       scyllo: 1.5.0
@@ -468,12 +472,16 @@ importers:
     specifiers:
       '@edgelabs/log': workspace:^0.0.1
       '@edgelabs/types': workspace:*
+      '@types/node': ^18.0.0
+      kleur: ^4.1.5
       tsup: ^6.2.2
       typescript: ^4.7.4
     dependencies:
       '@edgelabs/log': link:../log
       '@edgelabs/types': link:../types
+      kleur: 4.1.5
     devDependencies:
+      '@types/node': 18.7.8
       tsup: 6.2.2_typescript@4.8.3
       typescript: 4.8.3
 

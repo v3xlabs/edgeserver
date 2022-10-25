@@ -22,11 +22,13 @@
         "typescript": "^4.8.3"
     },
     "dependencies": {
+        "@edgelabs/env": "workspace:^0.0.1",
         "@edgelabs/log": "workspace:^0.0.1",
         "@edgelabs/types": "workspace:^1.0.6",
         "@lvksh/logger": "^1.6.3",
         "@types/redis": "^4.0.11",
         "chalk": "4.0.0",
+        "dotenv": "^16.0.1",
         "kleur": "^4.1.5",
         "redis": "^4.1.0",
         "scyllo": "v1.5.0",

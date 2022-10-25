@@ -21,11 +21,13 @@
   "author": "",
   "license": "LGPL-3",
   "devDependencies": {
+    "@types/node": "^18.0.0",
     "tsup": "^6.2.2",
     "typescript": "^4.7.4"
   },
   "dependencies": {
     "@edgelabs/log": "workspace:^0.0.1",
-    "@edgelabs/types": "workspace:*"
+    "@edgelabs/types": "workspace:*",
+    "kleur": "^4.1.5"
   }
 }

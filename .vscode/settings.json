@@ -5,7 +5,7 @@
     "pnpm-lock.yaml": true,
     "**/node_modules": true,
     "**/.turbo": true,
-    "**/.env": true,
+    "**/.env": false,
     "**/.changeset": true,
   },
   "files.eol": "\n"

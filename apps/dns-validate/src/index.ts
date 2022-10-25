@@ -5,7 +5,15 @@ import { DB } from './lib/database';
 import { log } from './lib/logger';
 import { verifyDNS } from './tasks/verifyDNS';
 
-const client = createClient();
+import { config } from 'dotenv';
+
+import { parseENV, CONFIG } from '@edgelabs/env';
+
+config();
+
+export const Global = parseENV([CONFIG.CASSANDRA, CONFIG.REDIS]);
+
+const client = createClient({ url: Global.REDIS_IP });
 
 await client.connect();
 await DB.awaitConnection();
