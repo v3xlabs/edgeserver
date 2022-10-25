@@ -7,6 +7,7 @@ import {
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { BrowserRouter } from 'react-router-dom';
 import { chain, configureChains, createClient, WagmiConfig } from 'wagmi';
+import { jsonRpcProvider } from 'wagmi/providers/jsonRpc';
 import { publicProvider } from 'wagmi/providers/public';
 
 import { App } from './App';
@@ -14,7 +15,27 @@ import { LoginFacade } from './components/LoginFacade';
 
 const { chains, provider } = configureChains(
     [chain.mainnet, chain.polygon, chain.optimism, chain.arbitrum],
-    [publicProvider()]
+    [
+        jsonRpcProvider({
+            rpc: (chain) => {
+                if (chain.id == 1) return { http: 'https://rpc.ankr.com/eth' };
+
+                // eslint-disable-next-line unicorn/no-null
+                return null;
+            },
+        }),
+        jsonRpcProvider({
+            rpc: (chain) => {
+                if (chain.id == 1)
+                    return { http: 'https://ethereum.publicnode.com' };
+
+                // eslint-disable-next-line unicorn/no-null
+                return null;
+            },
+        }),
+
+        publicProvider(),
+    ]
 );
 
 const { connectors } = getDefaultWallets({
