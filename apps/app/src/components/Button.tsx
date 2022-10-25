@@ -8,7 +8,7 @@ const styles: Record<Variants, string> = {
     primary:
         'bg-blue-700 hover:bg-blue-600 dark:hover:bg-blue-800 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 text-white focus:ring-blue-300',
     secondary:
-        'text-blue-700 hover:text-blue-600 dark:hover:text-blue-800 dark:text-blue-600 dark:hover:text-blue-700 dark:focus:ring-blue-800 focus:ring-blue-300',
+        'text-blue-700 bg-neutral-700 hover:text-blue-600 dark:hover:text-blue-800 dark:text-blue-600 dark:hover:text-blue-700 dark:focus:ring-blue-800 focus:ring-blue-300',
     disabled:
         'cursor-not-allowed bg-neutral-300 dark:bg-neutral-700 dark:text-neutral-400 dark:text-white',
     delete: 'bg-red-700 hover:bg-red-800 text-white focus:ring-red-300',

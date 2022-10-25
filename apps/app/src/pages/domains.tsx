@@ -1,16 +1,20 @@
+import { AddDomainModal } from '@components/AddDomainModal/AddDomainModal';
 import { Button } from '@components/Button';
-import { useDomains } from '@utils/queries/useDomains';
-import { FC, useState } from 'react';
 import { Domain, UnverifiedDomain } from '@edgelabs/types';
+import { useDomains } from '@utils/queries/useDomains';
 import { useUnverifiedDomains } from '@utils/queries/useUnverifiedDomains';
-import { Link } from 'react-router-dom';
+import { FC, useState } from 'react';
 import { Check } from 'react-feather';
+import { Link } from 'react-router-dom';
 
 const DomainCard: FC<{
     domain: Domain;
 }> = ({ domain }) => {
     return (
-        <Link className="hover:bg-neutral-800" to={'/domain/' + domain.domain_id}>
+        <Link
+            className="hover:bg-neutral-800"
+            to={'/domain/' + domain.domain_id}
+        >
             <div className="flex justify-between p-4 gap-4 w-full items-center">
                 <div className="h-full">
                     <h2 className="text-lg font-bold">{domain.domain}</h2>
@@ -44,6 +48,7 @@ const DomainList: FC = () => {
         isLoading: isLoadingUnverified,
         isSuccess: isSuccessUnverified,
     } = useUnverifiedDomains();
+    const [addDomainModalOpen, setAddDomainModalOpen] = useState(false);
 
     return (
         <div className="containerd">
@@ -54,6 +59,17 @@ const DomainList: FC = () => {
                         dataUnverified.map((project) => (
                             <UDomainCard domain={project} key={project.name} />
                         ))}
+                </div>
+                <div>
+                    <Button
+                        label="Add Domain"
+                        onClick={() => setAddDomainModalOpen(true)}
+                    />
+                    {addDomainModalOpen && (
+                        <AddDomainModal
+                            onClose={() => setAddDomainModalOpen(false)}
+                        />
+                    )}
                 </div>
                 {data &&
                     isSuccess &&
