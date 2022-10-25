@@ -2,13 +2,15 @@ import { cx } from '@utils/cx';
 import { FC, ReactNode, useRef } from 'react';
 import { AriaButtonProps, FocusableOptions, useButton } from 'react-aria';
 import { Loader } from 'react-feather';
+import { Link } from 'react-router-dom';
 
 type Variants = 'primary' | 'delete' | 'add';
 
 const styles: Record<Variants, string> = {
-    primary: 'text-white bg-blue-600 hover:bg-blue-700 focus:ring-blue-300',
-    delete: 'bg-red-500 hover:bg-red-600 focus:ring-red-300',
-    add: 'bg-green-600 hover:bg-green-700 focus:ring-green-300',
+    primary:
+        'text-white bg-blue-700 hover:bg-blue-600 dark:hover:bg-blue-800 dark:bg-blue-600 dark:hover:bg-blue-700 focus:ring-blue-300 dark:focus:ring-blue-800',
+    delete: 'bg-red-700 hover:bg-red-800 text-white focus:ring-red-300',
+    add: 'bg-green-700 hover:bg-green-800 text-white focus:ring-green-300',
 };
 
 export interface ButtonProperties extends AriaButtonProps, FocusableOptions {
@@ -33,10 +35,11 @@ export const Button: FC<ButtonProperties> = (properties) => {
         reference
     );
 
-    const Element = properties.href ? 'a' : 'button';
+    const Element = properties.href ? Link : 'button';
 
     return (
         <Element
+            to={properties.href || ''}
             {...buttonProps}
             ref={reference as any}
             className={cx(
