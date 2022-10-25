@@ -1,6 +1,6 @@
 import { createClient } from 'redis';
 
-import { Globals } from '.';
+import { Globals } from './index';
 
 export const CACHE = createClient({
     url: Globals.REDIS_IP,
