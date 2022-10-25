@@ -1,6 +1,9 @@
 name: Deploy App to Production
 
-on: workflow_dispatch
+on:
+  push:
+    tags:
+      - '@edgelabs/app@**'
 
 jobs:
   zip-files:
