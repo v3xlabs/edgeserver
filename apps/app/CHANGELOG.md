@@ -1,5 +1,11 @@
 # @edgelabs/app
 
+## 1.1.6
+
+### Patch Changes
+
+- [#145](https://github.com/v3xlabs/edgeserver/pull/145) [`e77d50a`](https://github.com/v3xlabs/edgeserver/commit/e77d50a7e7d17af145c77ed5ad6a449d8cfc1774) Thanks [@Jontes-Tech](https://github.com/Jontes-Tech)! - Change "Signal Edge" to "EdgeServer" in html <title>
+
 ## 1.1.5
 
 ### Patch Changes
