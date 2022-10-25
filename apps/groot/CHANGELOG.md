@@ -1,5 +1,11 @@
 # @web/ipedge
 
+## 3.10.6
+
+### Patch Changes
+
+- [`0843f88`](https://github.com/v3xlabs/edgeserver/commit/0843f8871a095222936e03de4136045df5b6f9eb) Thanks [@lucemans](https://github.com/lucemans)! - Redis Debug
+
 ## 3.10.5
 
 ### Patch Changes
