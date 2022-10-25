@@ -1,9 +1,14 @@
 import { resolveTxt } from 'node:dns/promises';
 import { RedisClientType } from 'redis';
+import { DB } from '../lib/database';
 
 import { log } from '../lib/logger';
 
 const DNS_REGEX = /a=(0x[\dA-Za-z]{40})/g;
+
+import { generateSunflake } from 'sunflake';
+
+const snowflake = generateSunflake();
 
 export const verifyDNS = async (domain: string, client: RedisClientType) => {
     const edgeRecords = await resolveTxt(`_edge.${domain}`).catch(() => []);
@@ -47,6 +52,18 @@ export const verifyDNS = async (domain: string, client: RedisClientType) => {
         log.info('Domain given to user');
         // TODO: Add domain in db
         // TODO: Notify user
+        const owner = await DB.selectOneFrom('owners', ['user_id'], { address });
+
+        if (!owner) {
+            log.warning('No owner could be found')
+            return;
+        }
+
+        DB.insertInto('domains', {
+            domain_id: BigInt(snowflake()),
+            domain: domain,
+            user_id: owner.user_id
+        });
 
         return true;
     }
