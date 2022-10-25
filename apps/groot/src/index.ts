@@ -42,6 +42,7 @@ export const Globals = {
     ENVIRONMENT: process.env.ENVIRONMENT || 'dev',
     SENTRY_SAMPLE_RATE: process.env.ENVIRONMENT == 'production' ? 0.1 : 1,
     INSTANCE_ID: process.env.INSTANCE_ID || 'localhost',
+    REDIS_IP: process.env.REDIS_IP || 'redis://127.0.0.1:6379'
 };
 
 export const StorageBackend: GenericStorage = new SignalStorage();
@@ -63,7 +64,8 @@ export const StorageBackend: GenericStorage = new SignalStorage();
                 ? chalk.gray(Globals.SENTRY_DSN)
                 : chalk.red('MISSING')),
         'SAMPLE RATE ' + chalk.gray(Globals.SENTRY_SAMPLE_RATE),
-        'INSTANCE_ID ' + chalk.gray(Globals.INSTANCE_ID)
+        'INSTANCE_ID ' + chalk.gray(Globals.INSTANCE_ID),
+        'REDIS_IP ' + chalk.gray(Globals.REDIS_IP),
     );
     log.empty();
 
