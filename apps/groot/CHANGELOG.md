@@ -1,5 +1,11 @@
 # @web/ipedge
 
+## 3.10.8
+
+### Patch Changes
+
+- [`a644cdf`](https://github.com/v3xlabs/edgeserver/commit/a644cdf20346529d31e0d541926fc01531155394) Thanks [@lucemans](https://github.com/lucemans)! - Yes
+
 ## 3.10.7
 
 ### Patch Changes
