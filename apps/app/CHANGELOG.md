@@ -1,5 +1,11 @@
 # @edgelabs/app
 
+## 1.2.0
+
+### Minor Changes
+
+- [#152](https://github.com/v3xlabs/edgeserver/pull/152) [`d4efd45`](https://github.com/v3xlabs/edgeserver/commit/d4efd4589a681e13613a6db83dacad586dbee3c6) Thanks [@Antony1060](https://github.com/Antony1060)! - Add back button to app
+
 ## 1.1.6
 
 ### Patch Changes
