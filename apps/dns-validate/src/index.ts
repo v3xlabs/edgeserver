@@ -1,7 +1,7 @@
 import { createClient, RedisClientType } from 'redis';
 
 import { CHANNELS, TIME } from './lib/constants';
-import { DB } from './lib/database';
+import { DB, setupDB } from './lib/database';
 import { log } from './lib/logger';
 import { verifyDNS } from './tasks/verifyDNS';
 
@@ -16,6 +16,9 @@ export const Global = parseENV([CONFIG.CASSANDRA, CONFIG.REDIS]);
 const client = createClient({ url: Global.REDIS_IP });
 
 await client.connect();
+
+await setupDB();
+
 await DB.awaitConnection();
 
 process.on('SIGTERM', async () => {
