@@ -8,6 +8,7 @@ import { ApplicationListData } from '@utils/queries/useApps';
 import { useDeployments } from '@utils/queries/useDeployments';
 import { useJWT } from '@utils/useAuth';
 import { FC, useEffect, useState } from 'react';
+import { ChevronLeft } from 'react-feather';
 import { Link } from 'react-router-dom';
 
 import { DeploymentLink } from './deployments';
@@ -52,9 +53,15 @@ export const AppPage: FC = () => {
 
     return (
         <div className="containerd">
-            <div className="containerc pt-8 flex flex-col gap-4">
+            <div className="containerc pt-8 flex flex-col gap-4 relative">
                 <link rel="shortcut icon" href={app.favicon_url} />
-                <div className="flex">
+                <Link
+                    to="/"
+                    className="absolute -left-10 p-1 rounded-full hover:bg-black-700 transition-all hidden lg:block"
+                >
+                    <ChevronLeft size={24} />
+                </Link>
+                <div>
                     <h2 className="text-2xl flex-grow block">{app.name}</h2>
                 </div>
                 <Tabs
