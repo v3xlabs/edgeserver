@@ -1,5 +1,11 @@
 # @web/ipedge
 
+## 3.10.7
+
+### Patch Changes
+
+- [`16a02b9`](https://github.com/v3xlabs/edgeserver/commit/16a02b9b08f1ab9c8ad58674e9f26fa3534e8d44) Thanks [@lucemans](https://github.com/lucemans)! - Import Fixes
+
 ## 3.10.6
 
 ### Patch Changes
