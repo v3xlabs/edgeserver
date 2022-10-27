@@ -1,8 +1,9 @@
-import { Button } from '@components/Common/Button/Button';
-import { Checkbox } from '@components/Common/Checkbox/Checkbox';
-import { CodeBlock } from '@components/Common/CodeBlock/CodeBlock';
-import { Hyperlink } from '@components/Common/Hyperlink/Hyperlink';
-import { TextField } from '@components/Common/TextField/TextField';
+// import { Button } from '../../packages/ui/Common/Button/Button';
+// import { Checkbox } from '../../packages/ui/Common/Checkbox/Checkbox';
+// import { CodeBlock } from '../../packages/ui/Common/CodeBlock/CodeBlock';
+// import { Hyperlink } from '../../packages/ui/Common/Hyperlink/Hyperlink';
+// import { TextField } from '../../packages/ui/Common/TextField/TextField';
+import {} from '@edgelabs/ui';
 import { FC, ReactNode } from 'react';
 
 const ItemsContainer: FC<{ children?: ReactNode }> = (properties) => {

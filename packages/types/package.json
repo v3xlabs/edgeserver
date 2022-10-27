@@ -14,7 +14,7 @@
   "types": "./dist/index.d.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "tsup src/index.ts --format cjs,esm --dts --clean",
+    "build": "tsup --format cjs,esm --dts --clean",
     "pub": "pnpm publish --access public || true"
   },
   "keywords": [],

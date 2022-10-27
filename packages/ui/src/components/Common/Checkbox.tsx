@@ -36,7 +36,7 @@ export interface CheckboxProperties
     loading?: boolean;
 }
 
-export const Checkbox: FC<CheckboxProperties> = (properties) => {
+const Checkbox: FC<CheckboxProperties> = (properties) => {
     const state = useToggleState(properties);
     const reference = useRef<HTMLInputElement>(null);
     const { inputProps } = useCheckbox(properties, state, reference);
@@ -92,3 +92,5 @@ export const Checkbox: FC<CheckboxProperties> = (properties) => {
         </label>
     );
 };
+
+export default Checkbox;

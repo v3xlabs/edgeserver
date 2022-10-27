@@ -1,5 +1,5 @@
 import { cx } from '@utils/cx';
-import React, { ChangeEventHandler, FC, useRef } from 'react';
+import { ChangeEventHandler, FC, useRef } from 'react';
 import {
     AriaTextFieldProps,
     chain,
@@ -11,7 +11,7 @@ export interface TextFieldProperties
         FocusableOptions {
     className?: string;
 
-    onChange: ChangeEventHandler<HTMLInputElement>;
+    onChange?: ChangeEventHandler<HTMLInputElement>;
     // 'aria-label': string;
 
     // Custom props
@@ -25,7 +25,7 @@ export interface TextFieldProperties
     label?: string;
 }
 
-export const TextField: FC<TextFieldProperties> = (properties) => {
+const TextField: FC<TextFieldProperties> = (properties) => {
     const reference = useRef<HTMLInputElement>(null);
 
     const { inputProps } = useTextField(properties as any, reference);
@@ -67,3 +67,5 @@ export const TextField: FC<TextFieldProperties> = (properties) => {
         </div>
     );
 };
+
+export default TextField;

@@ -1,6 +1,5 @@
+/** @type {import('tailwindcss').Config} */
 module.exports = {
-    darkMode: 'class',
-    content: ['./src/**/*.{html,js,ts,jsx,tsx}'],
     theme: {
         extend: {
             colors: {
@@ -17,7 +16,6 @@ module.exports = {
                 blue: {
                     600: '#066bff',
                     700: 'rgb(0 107 214)',
-                    // 800: '#102841',
                 },
                 accent: {
                     blue: {
@@ -28,19 +26,4 @@ module.exports = {
             },
         },
     },
-    plugins: [],
-};
-
-
-
-module.exports = {
-    darkMode: 'class',
-    content: ['./src/**/*.{html,js,ts,jsx,tsx}'],
-    theme: {
-        ...defaultTheme(),
-
-        
-    }
-    },
-    plugins: [],
 };

@@ -1,7 +1,7 @@
 import { cx } from '@utils/cx';
 import { FC, ReactNode } from 'react';
 
-export const Container: FC<{
+const Container: FC<{
     padding?: boolean;
     children: ReactNode;
     size?: 'normal' | 'small';
@@ -18,3 +18,5 @@ export const Container: FC<{
         </div>
     );
 };
+
+export default Container;

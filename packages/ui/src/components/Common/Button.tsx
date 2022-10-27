@@ -28,7 +28,7 @@ export interface ButtonProperties extends AriaButtonProps, FocusableOptions {
     loading?: boolean;
 }
 
-export const Button: FC<ButtonProperties> = (properties) => {
+const Button: FC<ButtonProperties> = (properties) => {
     const reference = useRef<HTMLButtonElement>(null);
     const { buttonProps } = useButton(
         { ...properties, elementType: properties.href ? 'a' : 'button' },
@@ -59,3 +59,5 @@ export const Button: FC<ButtonProperties> = (properties) => {
         </Element>
     );
 };
+
+export default Button;

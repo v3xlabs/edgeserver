@@ -19,6 +19,7 @@
         ]
     },
     "dependencies": {
+        "@edgelabs/ui": "workspace:*",
         "@babel/core": "^7.18.2",
         "@edgelabs/log": "workspace:^0.0.1",
         "@edgelabs/types": "workspace:^1.0.6",

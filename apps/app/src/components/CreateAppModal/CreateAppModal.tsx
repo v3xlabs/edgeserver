@@ -1,7 +1,7 @@
 /* eslint-disable sonarjs/no-duplicate-string */
-import { Button } from '@components/Common/Button/Button';
-import { CodeBlock } from '@components/Common/CodeBlock/CodeBlock';
-import { TextField } from '@components/Common/TextField/TextField';
+import { Button } from '../../packages/ui/Common/Button/Button';
+import { CodeBlock } from '../../packages/ui/Common/CodeBlock/CodeBlock';
+import { TextField } from '../../packages/ui/Common/TextField/TextField';
 import { Modal } from '@components/Modal';
 import { environment } from '@utils/enviroment';
 import { useJWT } from '@utils/useAuth';

@@ -11,7 +11,7 @@ export interface HyperlinkProperties extends AriaLinkOptions, FocusableOptions {
     className?: string;
 }
 
-export const Hyperlink: FC<HyperlinkProperties> = (properties) => {
+const Hyperlink: FC<HyperlinkProperties> = (properties) => {
     const reference = useRef<HTMLAnchorElement>(null);
     const { linkProps } = useLink(properties, reference);
 
@@ -30,3 +30,5 @@ export const Hyperlink: FC<HyperlinkProperties> = (properties) => {
         </a>
     );
 };
+
+export default Hyperlink;
