@@ -149,19 +149,19 @@ code {
 }
 
 button:hover .leavebtn::before {
-    content: "🚶";
+    content: '🚶';
 }
 
 .leavebtn::before {
-    content: "🚪";
+    content: '🚪';
 }
 
 body .themebtn::before {
-    content: "🌞";
+    content: '🌞';
 }
 
 body.dark .themebtn::before {
-    content: "🌙";
+    content: '🌙';
 }
 
 .skeleton {

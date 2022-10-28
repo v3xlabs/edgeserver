@@ -1,7 +1,4 @@
-/* eslint-disable sonarjs/no-duplicate-string */
-import { Button } from '../../packages/ui/Common/Button/Button';
-import { CodeBlock } from '../../packages/ui/Common/CodeBlock/CodeBlock';
-import { TextField } from '../../packages/ui/Common/TextField/TextField';
+import { CodeBlock, TextField, Button } from '@edgelabs/components';
 import { Modal } from '@components/Modal';
 import { environment } from '@utils/enviroment';
 import { useJWT } from '@utils/useAuth';
