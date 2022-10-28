@@ -1,30 +1,44 @@
 {
-    "$schema": "https://turborepo.org/schema.json",
-    "globalDependencies": [
-        "$SIGNALFS_IP",
-        "$DB_DATACENTER",
-        "$DB_IP",
-        "$SIGNAL_MASTER",
-        "$SIGNAL_HOST",
-        "$SENTRY_DSN",
-        "$ENVIRONMENT",
-        "$INSTANCE_ID",
-        "$REDIS_IP",
-        "$DEBUG"
-    ],
-    "pipeline": {
-        "build": {
-            "dependsOn": ["^build"],
-            "outputs": ["dist/**", ".next/**"]
-        },
-        "lint": {
-            "outputs": []
-        },
-        "dev": {
-            "cache": false
-        },
-        "pub": {
-            "dependsOn": ["build"]
-        }
+  "$schema": "https://turborepo.org/schema.json",
+  "globalDependencies": [
+    ".env",
+    "tsconfig.json"
+  ],
+  "pipeline": {
+    "build": {
+      "dependsOn": [
+        "^build"
+      ],
+      "outputs": [
+        "dist/**",
+        ".next/**"
+      ]
+    },
+    "lint": {
+      "outputs": []
+    },
+    "dev": {
+      "cache": false,
+      "dependsOn": [
+        "^build"
+      ]
+    },
+    "pub": {
+      "dependsOn": [
+        "build"
+      ]
     }
+  },
+  "globalEnv": [
+    "SIGNALFS_IP",
+    "DB_DATACENTER",
+    "DB_IP",
+    "SIGNAL_MASTER",
+    "SIGNAL_HOST",
+    "SENTRY_DSN",
+    "ENVIRONMENT",
+    "INSTANCE_ID",
+    "REDIS_IP",
+    "DEBUG"
+  ]
 }
