@@ -1,7 +1,13 @@
 {
-  "name": "@edgelabs/ui",
-  "private": true,
-  "version": "0.0.0",
+  "name": "@edgelabs/components",
+  "description": "Shared components",
+  "version": "1.0.0",
+  "keywords": [],
+  "license": "LGPL-3",
+  "author": {
+    "name": "v3xlabs",
+    "url": "https://v3x.company"
+  },
   "scripts": {
     "dev": "vite",
     "build": "tsup",
@@ -11,15 +17,7 @@
   "files": [
     "dist"
   ],
-  "exports": {
-    ".": {
-      "import": "./dist/index.es.js",
-      "require": "./dist/index.umd.js",
-      "types": "./dist/index.d.ts"
-    }
-  },
-  "main": "./dist/index.umd.js",
-  "module": "./dist/index.es.js",
+  "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "dependencies": {
     "classnames": "^2.3.2",
@@ -29,6 +27,7 @@
     "react-stately": "^3.18.0"
   },
   "devDependencies": {
+    "@edgelabs/core-ui": "workspace:^1.0.0",
     "@types/node": "^18.0.0",
     "@types/react": "^18.0.17",
     "@types/react-dom": "^18.0.6",
