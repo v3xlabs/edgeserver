@@ -217,7 +217,6 @@ export const CreateAppModal: FC<{ onClose: () => void }> = ({ onClose }) => {
                     type="submit"
                     isDisabled={isSubmitting || !isValid}
                     loading={isSubmitting}
-                    className="w-full whitespace-pre justify-center"
                 >
                     {isValid
                         ? isSubmitting

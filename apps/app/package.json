@@ -67,6 +67,7 @@
         "zustand": "^4.0.0-rc.1"
     },
     "devDependencies": {
+        "@edgelabs/core-ui": "workspace:^1.0.0",
         "@types/ms": "^0.7.31",
         "@types/react": "^18.0.9",
         "@types/react-dom": "^18.0.5",

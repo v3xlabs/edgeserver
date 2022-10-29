@@ -78,9 +78,9 @@ export const Document = () => {
                 <QueryClientProvider client={queryClient}>
                     <BrowserRouter>
                         <div className="dark:text-white text-black-800 w-full min-h-screen">
-                            <LoginFacade>
+                            {/* <LoginFacade> */}
                                 <App />
-                            </LoginFacade>
+                            {/* </LoginFacade> */}
                         </div>
                     </BrowserRouter>
                 </QueryClientProvider>
