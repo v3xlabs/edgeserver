@@ -1,3 +1,4 @@
+/* eslint-disable sonarjs/no-identical-functions */
 import { cx } from '@utils/cx';
 import { useAppByID } from '@utils/queries/useAppByID';
 import { useApps } from '@utils/queries/useApps';
@@ -98,6 +99,22 @@ export const Navbar: FC = () => {
                             </div>
                         </NavLink>
                     ))}
+
+                    {!app_id && userData?.admin && (
+                        <NavLink
+                            to={'/admin'}
+                            className={({ isActive }) =>
+                                cx(
+                                    'h-full block relative',
+                                    (isActive && 'navlink-active') || ''
+                                )
+                            }
+                        >
+                            <div className="flex items-center w-fit h-full border-r border-neutral-300 dark:border-neutral-700 pl-4 pr-4 cursor-pointer hover:bg-neutral-100 dark:hover:bg-neutral-800">
+                                <div className="navtext">Admin</div>
+                            </div>
+                        </NavLink>
+                    )}
                     {/* <NavDropdown
                         list={[
                             { label: 'Dashboard', id: 0 },
