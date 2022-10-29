@@ -100,7 +100,7 @@ export const Navbar: FC = () => {
                         </NavLink>
                     ))}
 
-                    {!app_id && userData?.admin === true && (
+                    {!app_id && userData?.admin && (
                         <NavLink
                             to={'/admin'}
                             className={({ isActive }) =>
