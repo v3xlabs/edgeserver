@@ -2,4 +2,4 @@
 "@edgelabs/app": patch
 ---
 
-Allow Modals to be closed using Escape
+Update width of Admin UI 
