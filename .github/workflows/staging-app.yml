@@ -1,12 +1,13 @@
 name: Deploy App to Staging
 
-on:
-  push:
-    branches:
-      - master
-    paths:
-      - "apps/app/**"
-      - ".github/workflows/staging-app.yml"
+on: workflow_dispatch
+# on:
+#   push:
+#     branches:
+#       - master
+#     paths:
+#       - "apps/app/**"
+#       - ".github/workflows/staging-app.yml"
 
 jobs:
   zip-files:
@@ -41,11 +42,11 @@ jobs:
       - name: Build
         run: pnpm turbo run build --filter @edgelabs/app
         env:
-          VITE_API_URL: 'https://api.edgeserver.dev'
+          VITE_API_URL: "https://api.edgeserver.dev"
       - name: Edgeserver Upload
         uses: lvkdotsh/edgeserver-action@master
         with:
-          app_id: '61535119206256640'
+          app_id: "61535119206256640"
           server: https://api.edgeserver.io
           token: ${{ secrets.SIGNAL_TOKEN }}
           directory: apps/app/dist
