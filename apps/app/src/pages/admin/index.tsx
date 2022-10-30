@@ -1,20 +1,36 @@
-// import { Button } from '@components/Button';
 import { Button } from '@components/Button';
 import { UsersModal } from '@components/UsersModal/UsersModal';
 import { User, useUsers } from '@utils/queries/useUsers';
 import { FC, useState } from 'react';
-import { useEnsName } from 'wagmi';
+import { Shield } from 'react-feather';
+import { useEnsAvatar, useEnsName } from 'wagmi';
 
 const UserRow: FC<{ value: User }> = ({ value }) => {
     const ensName = useEnsName({
         address: value.address,
     });
+    const ensAvatar = useEnsAvatar({
+        addressOrName: ensName.data || '',
+        enabled: !!ensName.data,
+    });
 
     return (
-        <tr className="border border-neutral-600 h-12 text-center">
+        <tr className="border border-neutral-600 h-12 text-left">
+            <td className="p-4 flex gap-2 items-center">
+                <div className="w-8 h-8 rounded-full overflow-hidden">
+                    {ensAvatar.data && (
+                        <img
+                            src={ensAvatar.data}
+                            className="w-full h-full"
+                            alt={ensName.data || ''}
+                        />
+                    )}
+                </div>
+                <span>{ensName.data || value.address}</span>
+                {value.admin && <Shield />}
+            </td>
             <td className="p-4">{value.user_id}</td>
-            <td className="p-4">{ensName.data || value.address}</td>
-            <td className="p-4">{value.admin ? 'Yes' : 'No'}</td>
+            <td className="p-4"></td>
         </tr>
     );
 };
@@ -25,10 +41,10 @@ const UsersTable: FC = () => {
     return (
         <table className="w-full">
             <thead>
-                <tr>
-                    <th className="p-4">User ID</th>
+                <tr className="text-left">
                     <th className="p-4">Address</th>
-                    <th className="p-4">Admin</th>
+                    <th className="p-4">User ID</th>
+                    <th className="p-4">Actions</th>
                 </tr>
             </thead>
             <tbody>
