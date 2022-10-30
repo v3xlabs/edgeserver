@@ -1,9 +1,10 @@
 name: Deploy Landing to Production
 
-on:
-  push:
-    tags:
-      - '@edgelabs/landing@*.*.*'
+on: workflow_dispatch
+# on:
+#   push:
+#     tags:
+#       - '@edgelabs/landing@*.*.*'
 
 jobs:
   build-staging:
