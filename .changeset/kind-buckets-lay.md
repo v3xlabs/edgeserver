@@ -2,4 +2,4 @@
 "@edgelabs/app": patch
 ---
 
-Fixed Admin UI Width
+Added Dynamically Closing Modals using Escape
