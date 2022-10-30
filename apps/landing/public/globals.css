@@ -1,0 +1,53 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+    box-sizing: border-box;
+}
+
+:root {
+    font-size: 16px;
+    color-scheme: dark;
+}
+
+html,
+body {
+    width: 100vw;
+    height: 100vh;
+    padding: 0;
+    margin: 0;
+    font-family: "Inter", monospace, sans-serif;
+    overflow: hidden;
+}
+
+body {
+    overflow-y: scroll;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+.hvr-hover.hvr-regular {
+    display: block;
+}
+.hvr-hover.hvr-alt {
+    display: none;
+}
+
+.hvr-hover:hover.hvr-regular {
+    display: none;
+}
+.hvr-hover:hover.hvr-alt {
+    display: block;
+}
+
+.bluebutton:hover {
+    --tw-scale-x: 1.02;
+    --tw-scale-y: 1.02;
+    transform: translate(var(--tw-translate-x), var(--tw-translate-y))
+        rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y))
+        scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+}

@@ -276,7 +276,7 @@ importers:
       '@types/styled-components': ^5.1.15
       '@typescript-eslint/parser': ^5.26.0
       '@vitejs/plugin-react': ^2.0.1
-      autoprefixer: ^10.4.7
+      autoprefixer: ^10.4.8
       eslint: ^8.16.0
       eslint-plugin-jsx-a11y: ^6.6.1
       eslint-plugin-lvksh: ^1.4.1
@@ -289,7 +289,7 @@ importers:
       rollup-plugin-polyfill-node: ^0.10.2
       sass: ^1.52.1
       styled-components: ^5.3.3
-      tailwindcss: ^3.0.24
+      tailwindcss: ^3.1.8
       typescript: ^4.7.2
       util: ^0.12.4
       vite: ^3.0.8
