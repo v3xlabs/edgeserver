@@ -9,6 +9,10 @@
 			"path": "apps/app"
 		},
 		{
+			"name": "😎 @edgelabs/renderer",
+			"path": "apps/renderer"
+		},
+		{
 			"name": "⚙️ @edgelabs/groot",
 			"path": "apps/groot"
 		},
