@@ -10,6 +10,4 @@ RUN tar zxvf ./edgelabs-dns-validate-*.tgz
 
 WORKDIR /app/package
 
-RUN pnpm install
-
 CMD ["pnpm", "start"]
