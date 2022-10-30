@@ -2,4 +2,4 @@
 "@edgelabs/app": patch
 ---
 
-Add information section and small fixes
+Add information section to the Admin page
