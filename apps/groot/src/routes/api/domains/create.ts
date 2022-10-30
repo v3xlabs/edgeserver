@@ -1,12 +1,11 @@
-import { DomainV1 } from '@edgelabs/types';
 import { Static, Type } from '@sinclair/typebox';
 import { FastifyPluginAsync } from 'fastify';
 
+import { CACHE } from '../../../cache';
 import { DB } from '../../../database';
 import { SafeError } from '../../../util/error/SafeError';
 import { useAuth } from '../../../util/http/useAuth';
 import { KeyPerms, usePerms } from '../../../util/permissions';
-import { generateSnowflake } from '.';
 
 export const DomainCreateRoute: FastifyPluginAsync = async (
     router,
@@ -39,17 +38,16 @@ export const DomainCreateRoute: FastifyPluginAsync = async (
             if (old_domain)
                 throw new SafeError(409, '', 'domain-create-exists');
 
-            const domain_id = BigInt(generateSnowflake());
+            const user = await DB.selectOneFrom('owners', ['address'], { user_id });
 
-            const domain: Partial<DomainV1> = {
-                domain_id,
-                domain: host,
-                user_id,
-            };
+            if (!user)
+                throw new SafeError(409, '', 'domain-create-user-not-exist');
 
-            await DB.insertInto('domains', domain);
+            await CACHE.SADD('dns:domains:' + host, user.address);
+            await CACHE.SADD('dns:users:' + user.address, host);
+            await CACHE.LPUSH('dns:iqueue', host);
 
-            reply.send({ domain_id });
+            reply.send({ status: 'OK' })
         }
     );
 };

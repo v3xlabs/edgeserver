@@ -3,6 +3,7 @@ import '@rainbow-me/rainbowkit/styles.css';
 import { AdminPage } from '@pages/admin';
 import { AppPage } from '@pages/app';
 import { AppContainer } from '@pages/app/_container';
+import { CreateAppPage } from '@pages/app/create/create';
 import { DeploymentPage } from '@pages/app/deploy/deployment';
 import { AppDeploymentsPage } from '@pages/app/deployments';
 import { AppSettingsPage } from '@pages/app/settings';
@@ -13,6 +14,8 @@ import { Route, Routes } from 'react-router';
 
 import { Navbar } from './components/Navbar/Navbar';
 import { Home } from './pages';
+import { DomainsPage } from '@pages/domains';
+import { DomainContainer } from '@pages/domain/_container';
 
 export const App: FC = () => {
     return (
@@ -23,6 +26,7 @@ export const App: FC = () => {
                 <Route path="keys" element={<KeysPage />} />
                 <Route path="settings" element={<SettingsPage />} />
                 <Route path="admin" element={<AdminPage />} />
+                <Route path="app/new" element={<CreateAppPage />} />
                 <Route path="app/:app_id" element={<AppContainer />}>
                     <Route path="" element={<AppPage />} />
                     <Route
@@ -33,6 +37,11 @@ export const App: FC = () => {
                         path="deployment/:deploy_id"
                         element={<DeploymentPage />}
                     />
+                    <Route path="settings" element={<AppSettingsPage />} />
+                </Route>
+                <Route path="domains" element={<DomainsPage />} />
+                <Route path="domain/:app_id" element={<DomainContainer />}>
+                    <Route path="" element={<AppPage />} />
                     <Route path="settings" element={<AppSettingsPage />} />
                 </Route>
             </Routes>

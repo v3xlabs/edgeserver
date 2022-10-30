@@ -3,6 +3,10 @@
     "node_modules": true,
     "packages/groot/tmp": true,
     "pnpm-lock.yaml": true,
+    "**/node_modules": true,
+    "**/.turbo": true,
+    "**/.env": false,
+    "**/.changeset": true,
   },
   "files.eol": "\n"
 }

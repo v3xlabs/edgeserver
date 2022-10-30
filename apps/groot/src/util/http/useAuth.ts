@@ -19,14 +19,16 @@ const JWTAuthKeySchema = object().shape({
     app_id: string().optional(),
 });
 
-export type AuthData = { user_id: bigint; key_id: string; permissions: bigint };
+export type AuthData = { user_id: bigint; key_id: string; permissions: bigint, address: string | undefined };
 
-export type OptionsData = {
+export type OptionsData = Partial<{
     adminOnly: boolean;
-};
+    getAddress: boolean;
+}>;
 
 const defaultOptions: OptionsData = {
     adminOnly: false,
+    getAddress: false,
 };
 
 export const useAuth: (
@@ -77,9 +79,17 @@ export const useAuth: (
         if (!data?.admin) throw new SafeError(403, '', 'auth-not-admin');
     }
 
+    const { address } = options.getAddress
+        && (
+              await DB.selectOneFrom('owners', ['address'], {
+                  user_id: key.owner_id,
+              })
+          ) || { address: undefined };
+
     return {
         user_id: key.owner_id,
         key_id: key.key,
         permissions: key.permissions,
+        address,
     };
 };
