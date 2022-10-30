@@ -1,8 +1,10 @@
-name: Build Groot Docker Container
-on:
-  push:
-    tags:
-      - '@edgelabs/groot@**'
+name: Build DNS Validate Docker Container
+
+on: workflow_dispatch
+# on:
+#   push:
+#     tags:
+#       - '@edgelabs/dns-validate@**'
 
 jobs:
   build:
@@ -15,7 +17,7 @@ jobs:
         uses: docker/metadata-action@v4
         with:
           images: |
-            ghcr.io/v3xlabs/edgeserver
+            ghcr.io/v3xlabs/edge-dns
           tags: |
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
@@ -48,11 +50,11 @@ jobs:
         run: pnpm install
 
       - name: Build
-        run: pnpm turbo run build --filter @edgelabs/groot
+        run: pnpm turbo run build --filter @edgelabs/dns-validate
 
       - name: Build
         run: |
-          cd apps/groot
+          cd apps/dns-validate
           pnpm pack
 
       - name: Build and push
@@ -62,5 +64,5 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          file: .deploy/groot.dockerfile
+          file: .deploy/edge-dns.dockerfile
           context: .
