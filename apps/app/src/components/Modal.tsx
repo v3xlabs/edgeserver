@@ -1,10 +1,11 @@
 import { cx } from '@utils/cx';
-import { FC, PropsWithChildren } from 'react';
+import { FC, PropsWithChildren, useEffect, useRef } from 'react';
 
 type ModalComponent = {
     label: string;
     onClose: () => void;
     className?: string;
+    escapeClose: boolean;
 } & PropsWithChildren;
 
 export const Modal: FC<ModalComponent> = ({
@@ -12,9 +13,28 @@ export const Modal: FC<ModalComponent> = ({
     onClose,
     children,
     className = '',
+    escapeClose = true,
 }) => {
+    const reference = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        if (reference.current) {
+            reference.current.focus();
+        }
+    }, [reference]);
+
     return (
-        <div>
+        // eslint-disable-next-line jsx-a11y/no-static-element-interactions
+        <div
+            // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
+            tabIndex={0}
+            ref={reference}
+            onKeyDown={(event) => {
+                console.log(event);
+
+                event.key == 'Escape' && escapeClose && onClose();
+            }}
+        >
             <div
                 id="authentication-modal"
                 tabIndex={-1}
