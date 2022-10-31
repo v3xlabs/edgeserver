@@ -1,21 +1,21 @@
 import '@rainbow-me/rainbowkit/styles.css';
 
-import { AdminPage } from '@pages/admin';
-import { AppPage } from '@pages/app';
-import { AppContainer } from '@pages/app/_container';
-import { CreateAppPage } from '@pages/app/create/create';
-import { DeploymentPage } from '@pages/app/deploy/deployment';
-import { AppDeploymentsPage } from '@pages/app/deployments';
-import { AppSettingsPage } from '@pages/app/settings';
-import { KeysPage } from '@pages/keys';
-import { SettingsPage } from '@pages/settings';
+import { AdminPage } from '@pages/admin/page';
+import { AppContainer } from '@pages/app/[app]/_container';
+import { CreateAppPage } from '@pages/app/[app]/create/create';
+import { DeploymentPage } from '@pages/app/[app]/deploy/deployment';
+import { AppDeploymentsPage } from '@pages/app/[app]/deployments';
+import { AppPage } from '@pages/app/[app]/page';
+import { AppSettingsPage } from '@pages/app/[app]/settings';
+import { DomainContainer } from '@pages/domains/[domain]/_container';
+import { DomainsPage } from '@pages/domains/page';
+import { KeysPage } from '@pages/keys/page';
+import { SettingsPage } from '@pages/settings/page';
 import { FC } from 'react';
 import { Route, Routes } from 'react-router';
 
 import { Navbar } from './components/Navbar/Navbar';
-import { Home } from './pages';
-import { DomainsPage } from '@pages/domains';
-import { DomainContainer } from '@pages/domain/_container';
+import { Home } from './pages/page';
 
 export const App: FC = () => {
     return (
