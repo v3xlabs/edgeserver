@@ -1,4 +1,4 @@
-import { Login } from '@pages/login/Login';
+import { Login } from '@pages/login/page';
 import { useAuth, useJWT } from '@utils/useAuth';
 import { FC, useEffect } from 'react';
 
