@@ -25,12 +25,6 @@ export default defineConfig({
             formats: ['es', 'umd'],
             fileName: (format) => `index.${format}.js`,
         },
-        // rollupOptions: {
-        //     external: [...Object.keys(packageJson.peerDependencies)],
-        // },
-        // rollupOptions: {
-        //     plugins: [nodePolyfills()],
-        // },
         commonjsOptions: {
             transformMixedEsModules: true,
         },

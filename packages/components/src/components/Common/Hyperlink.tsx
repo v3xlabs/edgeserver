@@ -16,19 +16,33 @@ const Hyperlink: FC<HyperlinkProperties> = (properties) => {
     const reference = useRef<HTMLAnchorElement>(null);
     const { linkProps } = useLink(properties, reference);
 
+    const properties_ = {
+        ...linkProps,
+        ref: reference,
+        target: properties.target,
+        className: cx(
+            !properties.nodefaultstyle && 'text-blue-600 hover:underline',
+            properties.className
+        ),
+    };
+
     return (
-        <Link
-            {...linkProps}
-            to={properties.href}
-            ref={reference}
-            target={properties.target}
-            className={cx(
-                !properties.nodefaultstyle && 'text-blue-600 hover:underline',
-                properties.className
-            )}
-        >
-            {properties.children}
-        </Link>
+        <>
+            {properties.href.indexOf('http:/') === 0 ||
+                (properties.href.indexOf('https:/') === 0 ? (
+                    <>
+                        <a {...properties_} href={properties.href}>
+                            {properties.children}
+                        </a>
+                    </>
+                ) : (
+                    <>
+                        <Link {...properties_} to={properties.href}>
+                            {properties.children}
+                        </Link>
+                    </>
+                ))}
+        </>
     );
 };
 

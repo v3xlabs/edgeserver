@@ -32,9 +32,10 @@ export const Components: FC = () => {
                     Dark mode
                 </Checkbox>
                 <h1 className="text-5xl">Welcome to @edgelabs/ui</h1>
-                <div>
+                <div className="flex flex-col gap-2">
                     <h1 className="text-3xl">Link component</h1>
                     <Hyperlink href="https://og.ax">Hello world</Hyperlink>
+                    <Hyperlink href="wow">Internal link</Hyperlink>
                 </div>
 
                 <div className="flex flex-col gap-5">
