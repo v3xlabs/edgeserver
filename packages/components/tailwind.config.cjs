@@ -1,8 +1,8 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-    presets: [require('@edgelabs/core-ui/defaultTheme')], // Only for this package, others use package/defaultTheme
+    presets: [require('@edgelabs/core-ui/theme').defaultTheme],
     darkMode: 'class',
-    content: ['./src/**/*.{html,js,ts,jsx,tsx}'],
+    content: ['./src/**/*.{html,js,ts,jsx,tsx}', './index.html'],
 
     plugins: [],
 };
