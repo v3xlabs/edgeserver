@@ -1,4 +1,4 @@
-import { Button } from '@components/Button';
+import { Button } from '@edgelabs/components';
 import { cx } from '@utils/cx';
 import { environment } from '@utils/enviroment';
 import { useJWT } from '@utils/useAuth';
@@ -45,7 +45,7 @@ export const DNSAddModalSection: FC = () => {
         },
     });
     const { token } = useJWT();
-    const onSubmit = useCallback(async (data: { domain: string }) => {
+    const onSubmit = useCallback(async (data: { domain?: string }) => {
         console.log(data);
         await new Promise<void>((accept) => setTimeout(accept, 1000));
 
@@ -141,17 +141,16 @@ export const DNSAddModalSection: FC = () => {
 
                 <Button
                     type="submit"
-                    disabled={isSubmitting || !isValid}
-                    pending={isSubmitting}
+                    isDisabled={isSubmitting || !isValid}
+                    loading={isSubmitting}
                     className="w-full whitespace-pre justify-center"
-                    label={
-                        isValid
-                            ? isSubmitting
-                                ? 'Pending...'
-                                : 'Launch  🚀'
-                            : 'Incorrect URL'
-                    }
-                />
+                >
+                    {isValid
+                        ? isSubmitting
+                            ? 'Pending...'
+                            : 'Launch  🚀'
+                        : 'Incorrect URL'}
+                </Button>
             </form>
         </div>
     );

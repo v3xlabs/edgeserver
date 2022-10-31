@@ -1,7 +1,7 @@
-import { Button } from '@components/Button';
+import { Button } from '@edgelabs/components';
 import { FC } from 'react';
 
-import { CreateAppDomainState } from './domain';
+import { CreateAppDomainState } from './domain'; // LUC what is this???
 
 export const CreateStageConfirm: FC<{
     data: { name: string; domains: CreateAppDomainState[] };
@@ -14,7 +14,9 @@ export const CreateStageConfirm: FC<{
                 <p>Name: {data.name}</p>
                 <p>Domains: {JSON.stringify(data.domains)}</p>
             </pre>
-            <Button label="Create" onClick={next} className="self-end" />
+            <Button onPress={next} className="self-end">
+                Create
+            </Button>
         </>
     );
 };

@@ -1,5 +1,5 @@
-import { Button } from '@components/Button';
 import { Modal } from '@components/Modal';
+import { Button } from '@edgelabs/components';
 import { environment } from '@utils/enviroment';
 import { ApplicationListData } from '@utils/queries/useApps';
 import { useJWT } from '@utils/useAuth';
@@ -26,11 +26,9 @@ const DeleteButton: FC<{ app_id: string }> = ({ app_id }) => {
     );
 
     return (
-        <Button
-            onClick={() => mutate()}
-            label="Yes, delete my app"
-            variant="delete"
-        ></Button>
+        <Button onPress={() => mutate()} variant="delete">
+            Yes, delete my app
+        </Button>
     );
 };
 

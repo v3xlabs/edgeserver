@@ -1,12 +1,14 @@
-import { Button } from '@components/Button';
+import { Button, TextField } from '@edgelabs/components';
+import { DomainVerificationRequest } from '@edgelabs/types';
 import { FC, useState } from 'react';
 import { generateSunflake } from 'sunflake';
 import { useAccount, useEnsAddress } from 'wagmi';
-import { DomainVerificationRequest } from '@edgelabs/types';
 
 const gen = generateSunflake();
 
-const ValidatedENS: FC<{ domain: DomainVerificationRequest }> = ({ domain }) => {
+const ValidatedENS: FC<{ domain: DomainVerificationRequest }> = ({
+    domain,
+}) => {
     const { data } = useEnsAddress({ name: domain.name });
     const { data: addressData } = useAccount();
 
@@ -22,8 +24,9 @@ const StagedDomain: FC<{
     domain: DomainVerificationRequest;
 }> = ({ domain, update }) => {
     return (
-        <div key={domain.id} className="flex gap-2">
+        <div key={domain.id} className="flex gap-4">
             <select
+                className="h-full"
                 onChange={(event) => {
                     update({ ...domain, type: event.target.value as '' });
                 }}
@@ -33,9 +36,10 @@ const StagedDomain: FC<{
                 <option value="dns">DNS</option>
             </select>
             <div>
-                <input
-                    onChange={(event) => {
-                        update({ ...domain, name: event.target.value });
+                <TextField
+                    aria-label="Enter domain"
+                    onChange={(value) => {
+                        update({ ...domain, name: value });
                     }}
                 />
             </div>
@@ -57,38 +61,42 @@ export const CreateStageDomain: FC<{
                 {domains.length === 0 && (
                     <div className="flex gap-2">
                         <Button
-                            label="ENS"
-                            onClick={() =>
+                            onPress={() =>
                                 setDomains([
                                     { type: 'ens', name: '', id: gen() },
                                 ])
                             }
-                        />
+                        >
+                            ENS
+                        </Button>
                         <Button
-                            label="DNS"
-                            onClick={() =>
+                            onPress={() =>
                                 setDomains([
                                     { type: 'dns', name: '', id: gen() },
                                 ])
                             }
-                        />
+                        >
+                            DNS
+                        </Button>
                     </div>
                 )}
                 {domains.length > 0 && (
-                    <div>
+                    <div className="flex gap-5 flex-col">
                         <div className="w-full flex justify-between">
-                            <h2>Domains</h2>
+                            <h2 className="text-xl">Domains</h2>
                             <Button
-                                label="+"
-                                onClick={() => {
+                                className="w-fit"
+                                onPress={() => {
                                     setDomains([
                                         ...domains,
                                         { type: 'dns', name: '', id: gen() },
                                     ]);
                                 }}
-                            />
+                            >
+                                +
+                            </Button>
                         </div>
-                        <div className="flex flex-col">
+                        <div className="flex flex-col gap-3">
                             {domains.map((value, index) => (
                                 <StagedDomain
                                     key={value.id}
@@ -106,17 +114,20 @@ export const CreateStageDomain: FC<{
                     </div>
                 )}
             </div>
-            <div className="w-full flex justify-between">
-                <Button label="Back" onClick={back} variant="secondary" />
+            <div className="w-full flex justify-between gap-16">
+                <Button onPress={back} variant="delete">
+                    Back
+                </Button>
                 <Button
-                    label="Next"
-                    onClick={() => {
+                    onPress={() => {
                         // Validate
                         console.log(domains);
                         // Proceed
                         next(domains);
                     }}
-                />
+                >
+                    Next
+                </Button>
             </div>
         </>
     );

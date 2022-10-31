@@ -1,5 +1,5 @@
 import { AddDomainModal } from '@components/AddDomainModal/AddDomainModal';
-import { Button } from '@components/Button';
+import { Button } from '@edgelabs/components';
 import { FC, useState } from 'react';
 
 import { UnverifiedDomainList } from './unverified_domain_list';
@@ -20,10 +20,9 @@ export const DomainsPage: FC = () => {
                             </div>
                         </div>
                         <div>
-                            <Button
-                                label="Add Domain"
-                                onClick={() => setAddDomainModalOpen(true)}
-                            />
+                            <Button onPress={() => setAddDomainModalOpen(true)}>
+                                Add Domain
+                            </Button>
                             {addDomainModalOpen && (
                                 <AddDomainModal
                                     onClose={() => setAddDomainModalOpen(false)}

@@ -1,7 +1,8 @@
 /* eslint-disable sonarjs/no-duplicate-string */
-import { Button } from '@components/Button';
 import { Modal } from '@components/Modal';
+import { Button, Hyperlink } from '@edgelabs/components';
 import { FC, useState } from 'react';
+
 import { DNSAddModalSection } from './DNSAddModalSection';
 
 export const AddDomainModal: FC<{ onClose: () => void }> = ({ onClose }) => {
@@ -17,36 +18,29 @@ export const AddDomainModal: FC<{ onClose: () => void }> = ({ onClose }) => {
                     ].map((system) => (
                         <Button
                             className="flex-grow"
-                            variant={
-                                system.value == domainType
-                                    ? 'primary'
-                                    : 'secondary'
-                            }
-                            onClick={() =>
+                            onPress={() =>
                                 setDomainType(system.value as 'ens' | 'dns')
                             }
                             key={system.value}
-                            label={system.name}
                         >
                             <img src={system.logo} alt={system.name} />
+                            {system.name}
                         </Button>
                     ))}
                 </div>
                 {domainType == 'ens' && (
                     <div>
-                        {/* TODO: Use UI Library */}
                         Support for ENS names is still under development.
                         <br />
                         <br />
                         Feel free to follow our progress over{' '}
-                        <a
+                        <Hyperlink
                             href="https://github.com/v3xlabs/edgeserver/issues/155"
                             target="_blank"
-                            rel="noreferrer"
                             className="text-blue-500"
                         >
                             here
-                        </a>
+                        </Hyperlink>
                         .
                     </div>
                 )}

@@ -1,6 +1,6 @@
 /* eslint-disable sonarjs/no-duplicate-string */
-import { Button } from '@components/Button';
 import { Modal } from '@components/Modal';
+import { Button } from '@edgelabs/components';
 import { cx } from '@utils/cx';
 import { environment } from '@utils/enviroment';
 import { useJWT } from '@utils/useAuth';
@@ -151,38 +151,38 @@ export const UsersModal: FC<{ onClose: () => void }> = ({ onClose }) => {
                 {!errors.address && (
                     <Button
                         type="submit"
-                        disabled={
+                        isDisabled={
                             isSubmitting ||
                             !isValid ||
                             ensAddress.isLoading ||
                             debounceCtl.isPending()
                         }
-                        pending={
+                        loading={
                             isSubmitting ||
                             ensAddress.isLoading ||
                             debounceCtl.isPending()
                         }
                         variant="primary"
                         className="w-full whitespace-pre justify-center"
-                        label={
-                            isValid
-                                ? isSubmitting
-                                    ? 'Pending...'
-                                    : 'Add'
-                                : 'Enter Address'
-                        }
-                    />
+                    >
+                        {isValid
+                            ? isSubmitting
+                                ? 'Pending...'
+                                : 'Add'
+                            : 'Enter Address'}
+                    </Button>
                 )}
 
                 {errors.address && (
                     <Button
                         type="submit"
-                        disabled
-                        pending={isSubmitting}
+                        isDisabled
+                        loading={isSubmitting}
                         variant="delete"
                         className="w-full whitespace-pre justify-center"
-                        label="Invalid Input"
-                    />
+                    >
+                        Invalid Input
+                    </Button>
                 )}
             </form>
         </Modal>

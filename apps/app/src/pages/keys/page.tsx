@@ -1,7 +1,7 @@
 // import { Button } from '@components/Button';
-import { Button } from '@components/Button';
 import { CreateKeyModal } from '@components/CreateKeyModal/CreateKeyModal';
 import { KeyModal } from '@components/KeyModal/KeyModal';
+import { Button } from '@edgelabs/components';
 import { useKeys } from '@utils/queries/useKeys';
 import { formatDistance } from 'date-fns';
 import { FC, useMemo, useReducer, useState } from 'react';
@@ -170,10 +170,9 @@ export const KeysPage: FC = () => {
                     </p>
                 </div>
                 <div>
-                    <Button
-                        label={'Create Key ➜'}
-                        onClick={() => setIsModalCreateOpen(true)}
-                    />
+                    <Button onPress={() => setIsModalCreateOpen(true)}>
+                        Create Key ➜
+                    </Button>
                     {isModalCreateOpen && (
                         <CreateKeyModal
                             onClose={() => setIsModalCreateOpen(false)}

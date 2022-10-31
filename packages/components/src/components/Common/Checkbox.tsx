@@ -1,5 +1,6 @@
 import { cx } from '@utils/cx';
-import { FC, ReactNode, useRef } from 'react';
+import { registerOrEmpty } from '@utils/registerOrEmpty';
+import { FC, useRef } from 'react';
 import {
     AriaCheckboxProps,
     FocusableOptions,
@@ -9,6 +10,8 @@ import {
     VisuallyHidden,
 } from 'react-aria';
 import { useToggleState } from 'react-stately';
+
+import { BaseFormComponent } from '../templates';
 
 type Variants = 'primary' | 'delete' | 'add';
 
@@ -20,11 +23,9 @@ const styles: Record<Variants, string> = {
 };
 
 export interface CheckboxProperties
-    extends AriaCheckboxProps,
+    extends BaseFormComponent,
+        AriaCheckboxProps,
         FocusableOptions {
-    children: ReactNode;
-    className?: string;
-
     /**
      * @default primary
      */
@@ -49,6 +50,7 @@ const Checkbox: FC<CheckboxProperties> = (properties) => {
                 <input
                     {...mergeProps(inputProps, focusProps)}
                     ref={reference}
+                    {...registerOrEmpty(properties.register, properties.id!)}
                 />
             </VisuallyHidden>
             <div

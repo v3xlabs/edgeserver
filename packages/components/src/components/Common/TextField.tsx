@@ -1,17 +1,22 @@
 import { cx } from '@utils/cx';
-import { ChangeEventHandler, FC, useRef } from 'react';
+import { registerOrEmpty } from '@utils/registerOrEmpty';
+import { FC, useRef } from 'react';
 import {
     AriaTextFieldProps,
     chain,
     FocusableOptions,
     useTextField,
 } from 'react-aria';
+
+import { BaseRegisterComponent } from '../templates';
+
 export interface TextFieldProperties
-    extends Omit<AriaTextFieldProps, 'onChange'>,
-        FocusableOptions {
+    extends AriaTextFieldProps,
+        FocusableOptions,
+        BaseRegisterComponent {
     className?: string;
 
-    onChange?: ChangeEventHandler<HTMLInputElement>;
+    // onChange?: ChangeEventHandler<HTMLInputElement>;
     // 'aria-label': string;
 
     // Custom props
@@ -47,7 +52,7 @@ const TextField: FC<TextFieldProperties> = (properties) => {
             <input
                 {...inputProps}
                 // onChange={properties.onChange}
-                onChange={chain(inputProps.onChange, properties.onChange)}
+                onChange={chain(inputProps.onChange)}
                 className={cx(
                     'text-sm rounded-md block w-full py-2.5 px-4 border outline-none focus:ring-1',
                     'bg-neutral-100 dark:bg-neutral-800',
@@ -62,6 +67,7 @@ const TextField: FC<TextFieldProperties> = (properties) => {
                         'border-neutral-300 dark:border-neutral-600',
                     properties.success && 'border-blue-500'
                 )}
+                {...registerOrEmpty(properties.register, properties.id!)}
             />
             <p className="text-sm text-red-500">{properties.errorMessage}</p>
         </div>

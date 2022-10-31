@@ -1,8 +1,8 @@
-import { Button } from '@components/Button';
 import { CreateDeleteAppModal } from '@components/CreateDeleteAppModal/CreateDeleteAppModal';
 import { NoDeployments } from '@components/NoDeployments/NoDeployments';
 import { ReRender } from '@components/ReRender';
 import { Tab, Tabs } from '@components/Tabs/Tabs';
+import { Button } from '@edgelabs/components';
 import { useApp } from '@utils/queries/useApp';
 import { ApplicationListData } from '@utils/queries/useApps';
 import { useDeployments } from '@utils/queries/useDeployments';
@@ -19,11 +19,9 @@ const DeleteButton: FC<{ app: ApplicationListData }> = ({ app }) => {
 
     return (
         <div>
-            <Button
-                onClick={() => setDeleteModalOpen(true)}
-                label="Delete this application"
-                variant="delete"
-            ></Button>
+            <Button onPress={() => setDeleteModalOpen(true)} variant="delete">
+                Delete this application
+            </Button>
             {deleteModalOpen && (
                 <CreateDeleteAppModal
                     app={app}
@@ -123,7 +121,7 @@ const AppDeploymentList: FC<{ app: ApplicationListData }> = ({ app }) => {
             <div className="flex justify-between">
                 <h2 className="text-2xl">Recent Deployments</h2>
                 <Link to={`/app/${app.app_id}/deployments`}>
-                    <Button label={'Deployments ➜'} />
+                    <Button>Deployments ➜</Button>
                 </Link>
             </div>
             {loading &&

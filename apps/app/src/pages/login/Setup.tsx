@@ -1,5 +1,5 @@
-import { Button } from '@components/Button';
 import { DisconnectButton } from '@components/DisconnectButton';
+import { Button } from '@edgelabs/components';
 import { capitalizeFirstLetter } from '@utils/capitalize';
 import { environment } from '@utils/enviroment';
 import { formatAddress } from '@utils/formatAddress';
@@ -103,27 +103,30 @@ export const Setup: FC = () => {
                         <div className="hvr-regular">
                             <Button
                                 className="w-full py-5 justify-center text-base"
-                                onClick={() => resetSignage()}
-                                label="Pending..."
-                                variant="disabled"
-                                pending
-                            />
+                                onPress={() => resetSignage()}
+                                isDisabled
+                                loading
+                            >
+                                Pending...
+                            </Button>
                         </div>
                         <div className="hvr-alt">
                             <Button
                                 className="w-full py-5 justify-center text-base"
-                                onClick={() => resetSignage()}
-                                label="Click to cancel"
+                                onPress={() => resetSignage()}
                                 variant="delete"
-                            />
+                            >
+                                Click to cancel
+                            </Button>
                         </div>
                     </div>
                 ) : (
                     <Button
                         className="w-full py-5 justify-center text-base"
-                        label="Configure EdgeServer"
-                        onClick={() => signMessage()}
-                    />
+                        onPress={() => signMessage()}
+                    >
+                        Configure EdgeServer
+                    </Button>
                 )}
                 <DisconnectButton label="Change account" full />
             </div>

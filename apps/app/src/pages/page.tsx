@@ -1,5 +1,4 @@
-import { Button } from '@components/Button';
-import { CreateAppModal } from '@components/CreateAppModal/CreateAppModal';
+import { Button } from '@edgelabs/components';
 import { environment } from '@utils/enviroment';
 import { ApplicationListData, useApps } from '@utils/queries/useApps';
 import { formatDistance, isValid } from 'date-fns';
@@ -147,13 +146,12 @@ const AppsList: FC = () => {
                             </div>
                         </div>
                         <div className="flex justify-center items-center flex-grow p-4 bg-white dark:bg-black-900">
-                            <div className="card border-0 p-4 gap-2 flex flex-col items-center">
+                            <div className="card border-0 p-4 gap-5 flex flex-col items-center">
                                 <p>This is the application menu</p>
                                 <Link to="/app/new">
-                                    <Button
-                                        label={'New App'}
-                                        className="px-2 py-1 text-xs"
-                                    />
+                                    <Button className="py-1 text-xs">
+                                        New App
+                                    </Button>
                                 </Link>
                             </div>
                         </div>

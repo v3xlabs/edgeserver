@@ -1,7 +1,6 @@
 /* eslint-disable sonarjs/no-duplicate-string */
-import { Button } from '@components/Button';
-import { Checkbox } from '@components/Checkbox';
 import { Modal } from '@components/Modal';
+import { Button, Checkbox } from '@edgelabs/components';
 import { cx } from '@utils/cx';
 import { environment } from '@utils/enviroment';
 import { KeyPerms } from '@utils/permissions';
@@ -198,19 +197,18 @@ export const CreateKeyModal: FC<{ onClose: () => void }> = ({ onClose }) => {
                             Key Permissions
                         </span>
                         <div className="grid items-center gap-2 text-neutral-500">
-                            <Checkbox
-                                id="Full Access"
-                                label="Full Access"
-                                register={register}
-                            />
+                            <Checkbox id="Full Access" register={register}>
+                                Full Access
+                            </Checkbox>
                             {Object.keys(Perms).map((perm) => (
                                 <Checkbox
                                     id={perm}
                                     key={perm}
-                                    label={perm}
                                     register={register}
-                                    disabled={watch('Full Access')}
-                                />
+                                    isDisabled={watch('Full Access')}
+                                >
+                                    {perm}
+                                </Checkbox>
                             ))}
 
                             {noPerms && (
@@ -227,10 +225,12 @@ export const CreateKeyModal: FC<{ onClose: () => void }> = ({ onClose }) => {
                         <div className="block w-full">
                             <Checkbox
                                 id="permanent"
-                                label="Permanent Key"
+                                // label=""
                                 // className="text-sm rounded-lg block p-2.5 border focus:ring-blue-500 focus:border-blue-500 bg-neutral-50 border-neutral-300 dark:bg-neutral-600 dark:border-neutral-500 dark:placeholder-neutral-400 dark:text-white"
                                 register={register}
-                            />
+                            >
+                                Permanent Key
+                            </Checkbox>
                         </div>
                     </div>
                     {!watch('permanent') && (
@@ -262,18 +262,17 @@ export const CreateKeyModal: FC<{ onClose: () => void }> = ({ onClose }) => {
                     )}
                     <Button
                         type="submit"
-                        disabled={isSubmitting || !isValid || noPerms}
-                        pending={isSubmitting}
+                        isDisabled={isSubmitting || !isValid || noPerms}
+                        loading={isSubmitting}
                         variant="primary"
                         className="mt-4 w-full whitespace-pre justify-center"
-                        label={
-                            isValid && !noPerms
-                                ? isSubmitting
-                                    ? 'Pending...'
-                                    : 'Create 🔑'
-                                : 'Select Permissions'
-                        }
-                    />
+                    >
+                        {isValid && !noPerms
+                            ? isSubmitting
+                                ? 'Pending...'
+                                : 'Create 🔑'
+                            : 'Select Permissions'}
+                    </Button>
                 </form>
             )}
             {generatedToken && (
@@ -310,11 +309,9 @@ export const CreateKeyModal: FC<{ onClose: () => void }> = ({ onClose }) => {
                             <Clipboard />
                         </button>
                     </div>
-                    <Button
-                        className="w-full mt-4"
-                        label="I wrote it down"
-                        onClick={onClose}
-                    />
+                    <Button className="w-full mt-4" onPress={onClose}>
+                        I wrote it down
+                    </Button>
                 </div>
             )}
         </Modal>

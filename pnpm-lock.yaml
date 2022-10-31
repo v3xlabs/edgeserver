@@ -459,6 +459,7 @@ importers:
       react-aria: ^3.20.0
       react-dom: ^18.2.0
       react-feather: ^2.0.10
+      react-hook-form: ^7.32.1
       react-router-dom: ^6.3.0
       react-stately: ^3.18.0
       tailwindcss: ^3.0.24
@@ -471,6 +472,7 @@ importers:
       classnames: 2.3.2
       react-aria: 3.20.0_biqbaboplfbrettd7655fr4n2y
       react-feather: 2.0.10_react@18.2.0
+      react-hook-form: 7.34.2_react@18.2.0
       react-router-dom: 6.3.0_biqbaboplfbrettd7655fr4n2y
       react-stately: 3.18.0_react@18.2.0
     devDependencies:
