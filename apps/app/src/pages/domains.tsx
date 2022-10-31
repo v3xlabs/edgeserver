@@ -88,7 +88,7 @@ const DomainList: FC = () => {
                             ))
                         )
                     ) : (
-                        <div>Error Loading Data</div>
+                        <div className="p-4">Error Loading Data</div>
                     )}
                 </div>
                 <h2 className="text-2xl p-4 pb-0">Domains</h2>
