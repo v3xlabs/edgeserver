@@ -92,6 +92,12 @@ const DomainList: FC = () => {
                     )}
                 </div>
                 <h2 className="text-2xl p-4 pb-0">Domains</h2>
+                <div className="flex w-full gap-4">
+                    <input
+                        className="text-lg p-4 card flex-grow"
+                        placeholder="Search..."
+                    />
+                </div>
                 <div className="card p-4">
                     {data &&
                         isSuccess &&
