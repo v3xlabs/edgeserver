@@ -1,6 +1,7 @@
 import { cx } from '@utils/cx';
 import { ComponentProps, FC, ReactNode, useRef } from 'react';
 import { AriaLinkOptions, FocusableOptions, useLink } from 'react-aria';
+import { Link } from 'react-router-dom';
 
 export interface HyperlinkProperties extends AriaLinkOptions, FocusableOptions {
     nodefaultstyle?: boolean;
@@ -16,9 +17,9 @@ const Hyperlink: FC<HyperlinkProperties> = (properties) => {
     const { linkProps } = useLink(properties, reference);
 
     return (
-        <a
+        <Link
             {...linkProps}
-            href={properties.href}
+            to={properties.href}
             ref={reference}
             target={properties.target}
             className={cx(
@@ -27,7 +28,7 @@ const Hyperlink: FC<HyperlinkProperties> = (properties) => {
             )}
         >
             {properties.children}
-        </a>
+        </Link>
     );
 };
 
