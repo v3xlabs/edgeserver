@@ -15,7 +15,9 @@ export const DomainsPage: FC = () => {
                     <div className="flex space-between w-full">
                         <div className="flex-grow">
                             <h1 className="text-2xl">Domains</h1>
-                            <div>Lorem ipsum dolor sit amet</div>
+                            <div>
+                                This is the page you use to manage your domains.
+                            </div>
                         </div>
                         <div>
                             <Button
