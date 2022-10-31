@@ -1,24 +1,23 @@
-/* eslint-disable sonarjs/no-duplicate-string */
-import { Button } from '@components/Button';
+import { CodeBlock, TextField, Button } from '@edgelabs/components';
 import { Modal } from '@components/Modal';
-import { cx } from '@utils/cx';
 import { environment } from '@utils/enviroment';
 import { useJWT } from '@utils/useAuth';
 import { FC, useCallback } from 'react';
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 
 export const CreateAppModal: FC<{ onClose: () => void }> = ({ onClose }) => {
     const {
         register,
         handleSubmit,
         watch,
+        control,
         formState: { errors, isSubmitting, isValid },
     } = useForm<{ appname: string; domain?: string }>({
         reValidateMode: 'onChange',
         delayError: 100,
         mode: 'all',
         resolver: async (values) => {
-            console.log('validating');
+            console.log('validating', values.domain);
 
             if (
                 values.domain &&
@@ -42,7 +41,9 @@ export const CreateAppModal: FC<{ onClose: () => void }> = ({ onClose }) => {
             };
         },
     });
+
     const { token } = useJWT();
+
     const onSubmit = useCallback(async (data: { domain: string }) => {
         console.log(data);
         await new Promise<void>((accept) => setTimeout(accept, 1000));
@@ -163,7 +164,7 @@ export const CreateAppModal: FC<{ onClose: () => void }> = ({ onClose }) => {
                     </label>
                     <div className="flex items-center gap-2 text-neutral-500">
                         <div>https://</div>
-                        <input
+                        {/* <input
                             type="text"
                             id="domain"
                             className={cx(
@@ -175,6 +176,27 @@ export const CreateAppModal: FC<{ onClose: () => void }> = ({ onClose }) => {
                             placeholder="edgeserver.app"
                             required
                             {...register('domain')}
+                        /> */}
+
+                        <Controller
+                            control={control as any}
+                            name="domain"
+                            defaultValue={''}
+                            render={({ field: { value, onChange } }) => (
+                                <TextField
+                                    id="domain"
+                                    value={value}
+                                    onChange={onChange}
+                                    aria-label="Url without protocol"
+                                    errorMessage={
+                                        errors.domain != undefined
+                                            ? ''
+                                            : undefined
+                                    }
+                                    placeholder="edgeserver.app"
+                                    // {...(register('domain') as any)}
+                                />
+                            )}
                         />
                     </div>
                 </div>
@@ -182,10 +204,10 @@ export const CreateAppModal: FC<{ onClose: () => void }> = ({ onClose }) => {
                     <p className="block text-sm font-medium text-neutral-900 dark:text-neutral-300 mb-2">
                         And update your DNS records to include
                     </p>
-                    <code className="p-2 bg-neutral-200 dark:bg-black-500 w-full block mt-2">
+                    <CodeBlock>
                         {(watch('domain') || 'yoursite.here') +
                             ' CNAME web.lvk.sh'}
-                    </code>
+                    </CodeBlock>
                 </div>
                 <div className="block text-sm font-medium text-neutral-900 dark:text-neutral-300 mb-2">
                     DNS Records may take up to 24 hours to update. Yes, the
@@ -193,17 +215,15 @@ export const CreateAppModal: FC<{ onClose: () => void }> = ({ onClose }) => {
                 </div>
                 <Button
                     type="submit"
-                    disabled={isSubmitting || !isValid}
-                    pending={isSubmitting}
-                    className="w-full whitespace-pre justify-center"
-                    label={
-                        isValid
-                            ? isSubmitting
-                                ? 'Pending...'
-                                : 'Launch  🚀'
-                            : 'Incorrect URL'
-                    }
-                />
+                    isDisabled={isSubmitting || !isValid}
+                    loading={isSubmitting}
+                >
+                    {isValid
+                        ? isSubmitting
+                            ? 'Pending...'
+                            : 'Launch  🚀'
+                        : 'Incorrect URL'}
+                </Button>
             </form>
         </Modal>
     );

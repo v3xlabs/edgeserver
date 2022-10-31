@@ -1,3 +1,4 @@
+import { LoginFacade } from '@components/LoginFacade';
 import {
     darkTheme,
     DisclaimerComponent,
@@ -11,7 +12,6 @@ import { jsonRpcProvider } from 'wagmi/providers/jsonRpc';
 import { publicProvider } from 'wagmi/providers/public';
 
 import { App } from './App';
-import { LoginFacade } from './components/LoginFacade';
 
 const { chains, provider } = configureChains(
     [chain.mainnet, chain.polygon, chain.optimism, chain.arbitrum],
