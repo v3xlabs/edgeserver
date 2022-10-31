@@ -53,35 +53,58 @@ const DomainList: FC = () => {
     return (
         <div className="containerd">
             <div className="containerc gap-4 flex flex-col">
-                <h1 className="text-2xl">Domains</h1>
-                <div className="">
-                    {dataUnverified &&
-                        dataUnverified.map((project) => (
-                            <UDomainCard domain={project} key={project.name} />
-                        ))}
+                <div className="card p-8">
+                    <div className="flex space-between w-full">
+                        <div className="flex-grow">
+                            <h1 className="text-2xl">Domains</h1>
+                            <div>Lorem ipsum dolor sit amet</div>
+                        </div>
+                        <div>
+                            <Button
+                                label="Add Domain"
+                                onClick={() => setAddDomainModalOpen(true)}
+                            />
+                            {addDomainModalOpen && (
+                                <AddDomainModal
+                                    onClose={() => setAddDomainModalOpen(false)}
+                                />
+                            )}
+                        </div>
+                    </div>
                 </div>
-                <div>
-                    <Button
-                        label="Add Domain"
-                        onClick={() => setAddDomainModalOpen(true)}
-                    />
-                    {addDomainModalOpen && (
-                        <AddDomainModal
-                            onClose={() => setAddDomainModalOpen(false)}
-                        />
+                <h2 className="text-2xl p-4 pb-0">Pending Domains</h2>
+                <div className="card p-4">
+                    {isLoading ? (
+                        <div>Loading...</div>
+                    ) : dataUnverified ? (
+                        dataUnverified.length === 0 ? (
+                            <div>No Domains Pending Verification</div>
+                        ) : (
+                            dataUnverified.map((project) => (
+                                <UDomainCard
+                                    domain={project}
+                                    key={project.name}
+                                />
+                            ))
+                        )
+                    ) : (
+                        <div>Error Loading Data</div>
                     )}
                 </div>
-                {data &&
-                    isSuccess &&
-                    data.map((project) => (
-                        <DomainCard
-                            key={project.domain_id.toString()}
-                            domain={project}
-                        />
-                    ))}
-                {!data &&
-                    isLoading &&
-                    Array.from({ length: 4 }).map((_, index) => <>d</>)}
+                <h2 className="text-2xl p-4 pb-0">Domains</h2>
+                <div className="card p-4">
+                    {data &&
+                        isSuccess &&
+                        data.map((project) => (
+                            <DomainCard
+                                key={project.domain_id.toString()}
+                                domain={project}
+                            />
+                        ))}
+                    {!data &&
+                        isLoading &&
+                        Array.from({ length: 4 }).map((_, index) => <>d</>)}
+                </div>
             </div>
         </div>
     );
