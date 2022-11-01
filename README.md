@@ -7,68 +7,26 @@
   </p>
 </a>
 
----
+## Introduction
 
-## Table of Contents
+[Edgeserver](https://edgeserver.io) is an open-source, self-hostable, web3-native static file hosting service that allows for seamless integration with your favourite CI/CD systems.
 
+Deployed sites are instantly available over both [http](https://www.rfc-editor.org/rfc/rfc2616) and [ipfs](https://ipfs.tech/) aswell as dynamically change [ENS](https://ens.domains/) content-hash.
 
-# EdgeServer
+## Deploy
 
-## Edgerc
+Publish your site in mere minutes using your favourite [CI/CD Integration](https://github.com/v3xlabs/edgeserver/wiki/CI-CD-Integrations) or using the [CLI](https://github.com/v3xlabs/edgeserver/wiki/CLI).
 
-You can upload a file called `edgerc.json` together with your static site files to EdgeServer.
+## Documentation
 
-The file should follow the following format:
+For details on how to use Edgeserver, have a look at the [Documentation](https://github.com/v3xlabs/edgeserver/wiki).
 
-```ts
-type EdgeRc = {
-    app_id: string;
-    config: {
-        routing: {
-            file_extensions: boolean;
-            trailing_slash: 'always' | 'never' | 'auto';
+## Self-hosting
 
-            default_route: string;
-        };
+If you would like to run your own instance of Edgeserver, refer to the [Self-hosting](https://github.com/v3xlabs/edgeserver/wiki/Self-Hosting) section in the [Documentation](https://github.com/v3xlabs/edgeserver/wiki).
 
-        // Not yet supported
-        headers: {
-            pattern: string; // Regex pattern
-            // Conditions that need to be true in order for the rule to apply
-            conditions: {
-                type: 'header' | 'cookie' | 'host' | 'query';
-                key: string;
-                value?: string;
-            }[];
-            // Headers to add when the rule is applied
-            headers: {
-                string: string;
-            };
-        }[];
+## License
 
-        redirects: {
-            pattern: string; // Regex pattern
-            // Conditions that need to be true in order for the rule to apply
-            conditions: {
-                type: 'header' | 'cookie' | 'host' | 'query';
-                key: string;
-                value?: string;
-            }[];
-            status: 301 | 302 | 307;
-            destination: string;
-        }[];
-        rewrites: {
-            pattern: string; // Regex pattern
-            // Conditions that need to be true in order for the rule to apply
-            conditions: {
-                type: 'header' | 'cookie' | 'host' | 'query';
-                key: string;
-                value?: string;
-            }[];
-            destination: string;
-        }[];
-
-        ssl: boolean;
-    };
-};
-```
+Depending on the service the following licenses are used:
+- [GNU LGPLv3](https://www.gnu.org/licenses/lgpl-3.0.en.html) - for Libraries and Utilities
+- [GNU GPLv3](https://www.gnu.org/licenses/gpl-3.0.en.html) - for Apps
