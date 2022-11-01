@@ -5,7 +5,7 @@ import { useApp } from '@utils/queries/useApp';
 import { useDeployments } from '@utils/queries/useDeployments';
 import { formatDistance, isValid } from 'date-fns';
 import { FC, useMemo, useState } from 'react';
-import { Activity } from 'react-feather';
+import { Activity, ChevronLeft } from 'react-feather';
 import { Helmet } from 'react-helmet';
 import { Link } from 'react-router-dom';
 import { Deployment } from 'src/types/Deployment';
@@ -71,7 +71,13 @@ const DeploymentList: FC = () => {
         useDeployments(app.app_id, PAGE_MAX);
 
     return (
-        <div className="gap-4 flex flex-col w-full">
+        <div className="gap-4 flex flex-col w-full containerc relative">
+            <Link
+                to={`/app/${app.app_id}`}
+                className="absolute -left-10 p-1 rounded-full hover:bg-black-700 transition-all hidden lg:block"
+            >
+                <ChevronLeft size={24} />
+            </Link>
             <h2 className="text-2xl">
                 Deployments{' '}
                 {total > 0 ? `(${deployments.length} / ${total})` : ''}
