@@ -7,8 +7,6 @@
   </p>
 </a>
 
-&nbsp;
-
 ## Introduction
 
 [Edgeserver](https://edgeserver.io) is an open-source, self-hostable, web3-native static file hosting service that allows for seamless integration with your favourite CI/CD systems.
