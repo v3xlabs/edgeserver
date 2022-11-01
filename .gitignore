@@ -8,3 +8,4 @@ apps/groot/tmp
 .env
 versions.json
 tools
+.idea

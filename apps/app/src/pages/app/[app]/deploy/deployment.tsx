@@ -1,6 +1,7 @@
 import { environment } from '@utils/enviroment';
 import { useApp } from '@utils/queries/useApp';
 import { FC } from 'react';
+import { ChevronLeft } from 'react-feather';
 import { Helmet } from 'react-helmet';
 import { useParams } from 'react-router';
 import { Link } from 'react-router-dom';
@@ -12,18 +13,18 @@ export const DeploymentPage: FC = () => {
     }>();
     const app = useApp();
 
-    // const timeDistance = useMemo(
-    //     () =>
-    //         formatDistance(new Date(), new Date(deployment.timestamp)) + ' ago',
-    //     [deployment.timestamp]
-    // );
-
     return (
         <div className="containerd">
-            <div className="containerc pt-8">
+            <div className="containerc pt-8 relative">
                 <Helmet>
                     <title>{app.name} / Deployment</title>
                 </Helmet>
+                <Link
+                    to={`/app/${app.app_id}`}
+                    className="absolute -left-10 p-1 rounded-full hover:bg-black-700 transition-all hidden lg:block"
+                >
+                    <ChevronLeft size={24} />
+                </Link>
                 <h2 className="text-xl font-bold">Deployment / {deploy_id}</h2>
                 <p>App / {app_id}</p>
                 <div className="card p-4 mt-4">
