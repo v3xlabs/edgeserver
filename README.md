@@ -7,14 +7,22 @@
   </p>
 </a>
 
----
 
-## Table of Contents
+## Introduction
 
+[Edgeserver](https://edgeserver.io) is an open-source, self-hostable, web3-native static file hosting service that allows for seamless integration with your favourite CI/CD systems.
 
-# EdgeServer
+## Selfhosting
 
-## Edgerc
+Due to the nature of edgeserver's architecture it is fully self-hostable and platform agnostic. All services are built to run as docker containers and horizontally scale to whatever demand might require. A guide for self-hosting is currently work in progress.
+
+## Deploying on Edgeserver
+
+## Storage Backend
+
+The storage of data is a very important aspect and with 
+
+## .edgerc specification
 
 You can upload a file called `edgerc.json` together with your static site files to EdgeServer.
 
@@ -26,7 +34,7 @@ type EdgeRc = {
     config: {
         routing: {
             file_extensions: boolean;
-            trailing_slash: 'always' | 'never' | 'auto';
+            trailing_slash: "always" | "never" | "auto";
 
             default_route: string;
         };
@@ -36,7 +44,7 @@ type EdgeRc = {
             pattern: string; // Regex pattern
             // Conditions that need to be true in order for the rule to apply
             conditions: {
-                type: 'header' | 'cookie' | 'host' | 'query';
+                type: "header" | "cookie" | "host" | "query";
                 key: string;
                 value?: string;
             }[];
@@ -50,7 +58,7 @@ type EdgeRc = {
             pattern: string; // Regex pattern
             // Conditions that need to be true in order for the rule to apply
             conditions: {
-                type: 'header' | 'cookie' | 'host' | 'query';
+                type: "header" | "cookie" | "host" | "query";
                 key: string;
                 value?: string;
             }[];
@@ -61,7 +69,7 @@ type EdgeRc = {
             pattern: string; // Regex pattern
             // Conditions that need to be true in order for the rule to apply
             conditions: {
-                type: 'header' | 'cookie' | 'host' | 'query';
+                type: "header" | "cookie" | "host" | "query";
                 key: string;
                 value?: string;
             }[];
