@@ -25,7 +25,7 @@ For details on how to use Edgeserver, have a look at the [Documentation](https:/
 
 ## Self-hosting
 
-If you would like to run your own instance of Edgerserver, refer to the [Self-hosting](https://github.com/v3xlabs/edgeserver/wiki/Self-Hosting) section in the [Documentation](https://github.com/v3xlabs/edgeserver/wiki).
+If you would like to run your own instance of Edgeserver, refer to the [Self-hosting](https://github.com/v3xlabs/edgeserver/wiki/Self-Hosting) section in the [Documentation](https://github.com/v3xlabs/edgeserver/wiki).
 
 ## License
 
