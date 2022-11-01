@@ -7,18 +7,28 @@
   </p>
 </a>
 
+&nbsp;
 
 ## Introduction
 
 [Edgeserver](https://edgeserver.io) is an open-source, self-hostable, web3-native static file hosting service that allows for seamless integration with your favourite CI/CD systems.
 
-## Selfhosting
+Deployed sites are instantly available over both [http](https://www.rfc-editor.org/rfc/rfc2616) and [ipfs](https://ipfs.tech/) aswell as dynamically change [ENS](https://ens.domains/) content-hash.
 
-Due to the nature of edgeserver's architecture it is fully self-hostable and platform agnostic. All services are built to run as docker containers and horizontally scale to whatever demand might require. A guide for self-hosting is currently work in progress.
+## Deploy
 
-## Deploying on Edgeserver
+Publish your site in mere minutes using your favourite [CI/CD Integration](https://github.com/v3xlabs/edgeserver/wiki/CI-CD-Integrations) or using the [CLI](https://github.com/v3xlabs/edgeserver/wiki/CLI).
 
-## Storage Backend
+## Documentation
 
-The storage of data is a very important aspect and with modularity in mind users will be able to pick 
+For details on how to use Edgeserver, have a look at the [Documentation](https://github.com/v3xlabs/edgeserver/wiki).
 
+## Self-hosting
+
+If you would like to run your own instance of Edgerserver, refer to the [Self-hosting](https://github.com/v3xlabs/edgeserver/wiki/Self-Hosting) section in the [Documentation](https://github.com/v3xlabs/edgeserver/wiki).
+
+## License
+
+Depending on the service the following licenses are used:
+- [GNU LGPLv3](https://www.gnu.org/licenses/lgpl-3.0.en.html) - for Libraries and Utilities
+- [GNU GPLv3](https://www.gnu.org/licenses/gpl-3.0.en.html) - for Apps
