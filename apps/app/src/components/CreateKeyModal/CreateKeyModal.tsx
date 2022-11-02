@@ -189,21 +189,17 @@ export const CreateKeyModal: FC<{ onClose: () => void }> = ({ onClose }) => {
                     <div>
                         <div className={titleClass}>Key Permissions</div>
                         <div className="grid items-center gap-2 text-neutral-500">
-                            <Checkbox
-                                id="Full Access"
-                                // {...register('Full Access')}
-                                register={register}
-                            >
+                            <Checkbox id="Full Access" register={register}>
                                 Full Access
                             </Checkbox>
-                            {Object.keys(Perms).map((perm) => (
+                            {Object.keys(Perms).map((permission) => (
                                 <Checkbox
-                                    id={perm}
-                                    key={perm}
+                                    id={permission}
+                                    key={permission}
                                     register={register}
                                     isDisabled={watch('Full Access')}
                                 >
-                                    {perm}
+                                    {permission}
                                 </Checkbox>
                             ))}
 
@@ -217,12 +213,7 @@ export const CreateKeyModal: FC<{ onClose: () => void }> = ({ onClose }) => {
                     <div>
                         <div className={titleClass}>Settings</div>
                         <div className="block w-full">
-                            <Checkbox
-                                id="permanent"
-                                // label=""
-                                // className="text-sm rounded-lg block p-2.5 border focus:ring-blue-500 focus:border-blue-500 bg-neutral-50 border-neutral-300 dark:bg-neutral-600 dark:border-neutral-500 dark:placeholder-neutral-400 dark:text-white"
-                                register={register}
-                            >
+                            <Checkbox id="permanent" register={register}>
                                 Permanent Key
                             </Checkbox>
                         </div>
@@ -255,7 +246,6 @@ export const CreateKeyModal: FC<{ onClose: () => void }> = ({ onClose }) => {
                         type="submit"
                         isDisabled={isSubmitting || !isValid || noPerms}
                         loading={isSubmitting}
-                        // variant="primary"
                         className="mt-4 w-full whitespace-pre"
                     >
                         {isValid && !noPerms

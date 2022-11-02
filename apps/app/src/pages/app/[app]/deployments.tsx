@@ -1,5 +1,6 @@
 import { DeploymentLinkInfo } from '@components/DeploymentLinkInfo';
 import { NoDeployments } from '@components/NoDeployments/NoDeployments';
+import { Container } from '@edgelabs/components';
 import { environment } from '@utils/enviroment';
 import { useApp } from '@utils/queries/useApp';
 import { useDeployments } from '@utils/queries/useDeployments';
@@ -125,11 +126,11 @@ export const AppDeploymentsPage: FC = () => {
     const app = useApp();
 
     return (
-        <div>
+        <Container topPadding horizontalPadding>
             <Helmet>
                 <title>{app.name} / Deployments</title>
             </Helmet>
             <DeploymentList />
-        </div>
+        </Container>
     );
 };

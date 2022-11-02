@@ -1,3 +1,4 @@
+import { Container } from '@edgelabs/components';
 import { Button } from '@edgelabs/components';
 import { environment } from '@utils/enviroment';
 import { ApplicationListData, useApps } from '@utils/queries/useApps';
@@ -104,75 +105,77 @@ const AppsList: FC = () => {
     const [isCreatingApp, setCreatingApp] = useState(false);
 
     return (
-        <div className="gap-4 flex flex-col">
-            <div className="flex">
-                <div className="card flex w-full overflow-hidden">
-                    <div className="border-r border-neutral-300 dark:border-neutral-700">
-                        <h1 className="text-2xl block flex-grow m-4 h-24">
-                            Overview
-                        </h1>
-                        <div className="w-full flex border-t border-neutral-300 dark:border-neutral-700">
-                            <div
-                                className="grid grid-cols-2 bg-neutral-300 dark:bg-neutral-700 max-w-sm"
-                                style={{ gap: '1px' }}
-                            >
-                                {[
-                                    [
-                                        'Total Applications',
-                                        data && data.length > 0
-                                            ? data.length
-                                            : '-',
-                                    ],
-                                    ['Deploys in last 30 days', '-'],
-                                    ['Total Requests', '-'],
-                                    [
-                                        'Last Login',
-                                        ((b = new Date()) =>
-                                            `${b.getHours()}:${b.getMinutes()}, ${b.getDay()}-${b.getMonth()}`)(),
-                                    ],
-                                ].map((a, index) => (
-                                    <div
-                                        key={index}
-                                        className="card-bg p-2 px-4 flex flex-col"
-                                    >
-                                        <p className="text-neutral-500 flex-grow truncate">
-                                            {a.at(0)}
-                                        </p>
-                                        <span>{a.at(1)}</span>
-                                    </div>
-                                ))}
+        <Container topPadding horizontalPadding>
+            <div className="gap-4 flex flex-col">
+                <div className="flex">
+                    <div className="card flex w-full overflow-hidden">
+                        <div className="border-r border-neutral-300 dark:border-neutral-700">
+                            <h1 className="text-2xl block flex-grow m-4 h-24">
+                                Overview
+                            </h1>
+                            <div className="w-full flex border-t border-neutral-300 dark:border-neutral-700">
+                                <div
+                                    className="grid grid-cols-2 bg-neutral-300 dark:bg-neutral-700 max-w-sm"
+                                    style={{ gap: '1px' }}
+                                >
+                                    {[
+                                        [
+                                            'Total Applications',
+                                            data && data.length > 0
+                                                ? data.length
+                                                : '-',
+                                        ],
+                                        ['Deploys in last 30 days', '-'],
+                                        ['Total Requests', '-'],
+                                        [
+                                            'Last Login',
+                                            ((b = new Date()) =>
+                                                `${b.getHours()}:${b.getMinutes()}, ${b.getDay()}-${b.getMonth()}`)(),
+                                        ],
+                                    ].map((a, index) => (
+                                        <div
+                                            key={index}
+                                            className="card-bg p-2 px-4 flex flex-col"
+                                        >
+                                            <p className="text-neutral-500 flex-grow truncate">
+                                                {a.at(0)}
+                                            </p>
+                                            <span>{a.at(1)}</span>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                        <div className="flex justify-center items-center flex-grow p-4 bg-white dark:bg-black-900">
+                            <div className="card border-0 p-4 gap-5 flex flex-col items-center">
+                                <p>This is the application menu</p>
+                                <Link to="/app/new">
+                                    <Button className="py-1 text-xs">
+                                        New App
+                                    </Button>
+                                </Link>
                             </div>
                         </div>
                     </div>
-                    <div className="flex justify-center items-center flex-grow p-4 bg-white dark:bg-black-900">
-                        <div className="card border-0 p-4 gap-5 flex flex-col items-center">
-                            <p>This is the application menu</p>
-                            <Link to="/app/new">
-                                <Button className="py-1 text-xs">
-                                    New App
-                                </Button>
-                            </Link>
-                        </div>
-                    </div>
+                </div>
+                <h2 className="text-xl">Applications</h2>
+                <div className="gap-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+                    {data &&
+                        isSuccess &&
+                        data.map((project) => (
+                            <ApplicationCard
+                                key={project.app_id}
+                                application={project}
+                            />
+                        ))}
+                    {!data &&
+                        isLoading &&
+                        Array.from({ length: 4 }).map((_, index) => (
+                            <ApplicationShadowCard key={index} />
+                        ))}
                 </div>
             </div>
-            <h2 className="text-xl">Applications</h2>
-            <div className="gap-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-                {data &&
-                    isSuccess &&
-                    data.map((project) => (
-                        <ApplicationCard
-                            key={project.app_id}
-                            application={project}
-                        />
-                    ))}
-                {!data &&
-                    isLoading &&
-                    Array.from({ length: 4 }).map((_, index) => (
-                        <ApplicationShadowCard key={index} />
-                    ))}
-            </div>
-        </div>
+        </Container>
     );
 };
 

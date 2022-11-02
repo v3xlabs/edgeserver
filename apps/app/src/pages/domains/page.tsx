@@ -1,5 +1,5 @@
 import { AddDomainModal } from '@components/AddDomainModal/AddDomainModal';
-import { Button } from '@edgelabs/components';
+import { Button, Container } from '@edgelabs/components';
 import { FC, useState } from 'react';
 
 import { UnverifiedDomainList } from './unverified_domain_list';
@@ -9,7 +9,7 @@ export const DomainsPage: FC = () => {
     const [addDomainModalOpen, setAddDomainModalOpen] = useState(false);
 
     return (
-        <div>
+        <Container topPadding horizontalPadding>
             <div className="gap-4 flex flex-col">
                 <div className="card p-8">
                     <div className="flex space-between w-full">
@@ -35,6 +35,6 @@ export const DomainsPage: FC = () => {
                 <UnverifiedDomainList />
                 <VerifiedDomainList />
             </div>
-        </div>
+        </Container>
     );
 };

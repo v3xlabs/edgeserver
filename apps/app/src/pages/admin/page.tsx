@@ -1,4 +1,5 @@
 import { UsersModal } from '@components/UsersModal/UsersModal';
+import { Container } from '@edgelabs/components';
 import { Button } from '@edgelabs/components';
 import { User, useUsers } from '@utils/queries/useUsers';
 import { FC, useState } from 'react';
@@ -163,9 +164,11 @@ const Users: FC = () => {
 
 export const AdminPage: FC = () => {
     return (
-        <div className="gap-8 flex flex-col">
-            <Information />
-            <Users />
-        </div>
+        <Container topPadding horizontalPadding>
+            <div className="gap-8 flex flex-col">
+                <Information />
+                <Users />
+            </div>
+        </Container>
     );
 };

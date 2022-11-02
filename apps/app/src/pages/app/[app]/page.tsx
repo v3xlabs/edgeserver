@@ -2,6 +2,7 @@ import { CreateDeleteAppModal } from '@components/CreateDeleteAppModal/CreateDel
 import { NoDeployments } from '@components/NoDeployments/NoDeployments';
 import { ReRender } from '@components/ReRender';
 import { Tab, Tabs } from '@components/Tabs/Tabs';
+import { Container } from '@edgelabs/components';
 import { Button } from '@edgelabs/components';
 import { useApp } from '@utils/queries/useApp';
 import { ApplicationListData } from '@utils/queries/useApps';
@@ -50,7 +51,7 @@ export const AppPage: FC = () => {
     }, [0]);
 
     return (
-        <div>
+        <Container topPadding horizontalPadding>
             <div className="flex flex-col gap-4 relative">
                 <link rel="shortcut icon" href={app.favicon_url} />
                 <Link
@@ -109,7 +110,7 @@ export const AppPage: FC = () => {
 
                 {app.last_deploy && <AppDeploymentList app={app} />}
             </div>
-        </div>
+        </Container>
     );
 };
 

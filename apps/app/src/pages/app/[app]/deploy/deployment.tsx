@@ -1,3 +1,4 @@
+import { Container } from '@edgelabs/components';
 import { environment } from '@utils/enviroment';
 import { useApp } from '@utils/queries/useApp';
 import { FC } from 'react';
@@ -14,7 +15,7 @@ export const DeploymentPage: FC = () => {
     const app = useApp();
 
     return (
-        <>
+        <Container topPadding horizontalPadding>
             <Helmet>
                 <title>{app.name} / Deployment</title>
             </Helmet>
@@ -69,6 +70,6 @@ export const DeploymentPage: FC = () => {
                     </li>
                 </ul>
             </div>
-        </>
+        </Container>
     );
 };

@@ -1,10 +1,9 @@
 import { cx } from '@utils/cx';
-import { registerOrEmpty } from '@utils/registerOrEmpty';
 import { FC, useRef } from 'react';
 import {
     AriaTextFieldProps,
-    chain,
     FocusableOptions,
+    mergeProps,
     useTextField,
 } from 'react-aria';
 
@@ -15,9 +14,6 @@ export interface TextFieldProperties
         FocusableOptions,
         BaseRegisterComponent {
     className?: string;
-
-    // onChange?: ChangeEventHandler<HTMLInputElement>;
-    // 'aria-label': string;
 
     // Custom props
     errorMessage?: string;
@@ -50,9 +46,6 @@ const TextField: FC<TextFieldProperties> = (properties) => {
                 </label>
             )}
             <input
-                {...inputProps}
-                // onChange={properties.onChange}
-                onChange={chain(inputProps.onChange)}
                 className={cx(
                     'text-sm rounded-md block w-full py-2.5 px-4 border outline-none focus:ring-1',
                     'bg-neutral-100 dark:bg-neutral-800',
@@ -69,7 +62,12 @@ const TextField: FC<TextFieldProperties> = (properties) => {
 
                     properties.className
                 )}
-                {...registerOrEmpty(properties.register, properties.id!)}
+                {...mergeProps(
+                    inputProps,
+                    properties.register !== undefined
+                        ? properties.register(properties.id!)
+                        : {}
+                )}
             />
             <p className="text-sm text-red-500">{properties.errorMessage}</p>
         </div>

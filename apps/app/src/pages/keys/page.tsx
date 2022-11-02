@@ -1,6 +1,7 @@
 // import { Button } from '@components/Button';
 import { CreateKeyModal } from '@components/CreateKeyModal/CreateKeyModal';
 import { KeyModal } from '@components/KeyModal/KeyModal';
+import { Container } from '@edgelabs/components';
 import { Button } from '@edgelabs/components';
 import { useKeys } from '@utils/queries/useKeys';
 import { formatDistance } from 'date-fns';
@@ -160,7 +161,7 @@ export const KeysPage: FC = () => {
     const [isModalCreateOpen, setIsModalCreateOpen] = useState(false);
 
     return (
-        <div>
+        <Container topPadding horizontalPadding>
             <div className="flex">
                 <h2 className="text-2xl flex-grow block">Keys</h2>
             </div>
@@ -185,6 +186,6 @@ export const KeysPage: FC = () => {
                 </div>
             </div>
             <KeysTable />
-        </div>
+        </Container>
     );
 };

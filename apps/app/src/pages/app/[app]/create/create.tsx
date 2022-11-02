@@ -51,7 +51,7 @@ export const CreateAppPage: FC = () => {
     }, [token, name, domains, nav]);
 
     return (
-        <Container size="small">
+        <Container size="small" topPadding horizontalPadding>
             <div className="w-full">
                 <div className="max-w-5xl w-full mx-auto mt-8">
                     <div className="card p-8 flex flex-col items-start gap-4">
