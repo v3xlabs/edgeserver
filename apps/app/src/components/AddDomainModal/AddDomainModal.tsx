@@ -23,7 +23,7 @@ export const AddDomainModal: FC<{ onClose: () => void }> = ({ onClose }) => {
                             }
                             key={system.value}
                         >
-                            <img src={system.logo} alt={system.name} />
+                            {/* <img src={system.logo} alt={system.name} /> */}
                             {system.name}
                         </Button>
                     ))}

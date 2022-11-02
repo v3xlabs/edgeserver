@@ -9,8 +9,8 @@ export const DomainsPage: FC = () => {
     const [addDomainModalOpen, setAddDomainModalOpen] = useState(false);
 
     return (
-        <div className="containerd pt-8">
-            <div className="containerc gap-4 flex flex-col">
+        <div>
+            <div className="gap-4 flex flex-col">
                 <div className="card p-8">
                     <div className="flex space-between w-full">
                         <div className="flex-grow">

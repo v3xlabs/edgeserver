@@ -1,5 +1,4 @@
 import { cx } from '@utils/cx';
-import { registerOrEmpty } from '@utils/registerOrEmpty';
 import { FC, useRef } from 'react';
 import {
     AriaCheckboxProps,
@@ -48,9 +47,15 @@ const Checkbox: FC<CheckboxProperties> = (properties) => {
         <label className="flex items-center relative">
             <VisuallyHidden>
                 <input
-                    {...mergeProps(inputProps, focusProps)}
+                    // type="checkbox"
                     ref={reference}
-                    {...registerOrEmpty(properties.register, properties.id!)}
+                    {...mergeProps(
+                        inputProps,
+                        focusProps,
+                        properties.register !== undefined
+                            ? properties.register(properties.id!)
+                            : {}
+                    )}
                 />
             </VisuallyHidden>
             <div
@@ -86,7 +91,9 @@ const Checkbox: FC<CheckboxProperties> = (properties) => {
             </div>
             <span
                 className={cx(
-                    properties.isDisabled ? 'text-gray-400' : 'text-gray-70'
+                    properties.isDisabled
+                        ? 'text-neutral-500'
+                        : 'text-neutral-700 dark:text-white'
                 )}
             >
                 {properties.children}

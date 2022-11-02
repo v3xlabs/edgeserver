@@ -125,7 +125,7 @@ export const AppDeploymentsPage: FC = () => {
     const app = useApp();
 
     return (
-        <div className="containerd pt-8">
+        <div>
             <Helmet>
                 <title>{app.name} / Deployments</title>
             </Helmet>

@@ -36,7 +36,7 @@ const TextField: FC<TextFieldProperties> = (properties) => {
     const { inputProps } = useTextField(properties as any, reference);
 
     return (
-        <div className="flex flex-col gap-1">
+        <div className="flex flex-col gap-1 w-full">
             {properties.label != undefined && (
                 <label
                     htmlFor={
@@ -65,7 +65,9 @@ const TextField: FC<TextFieldProperties> = (properties) => {
                     properties.errorMessage == undefined &&
                         !properties.success &&
                         'border-neutral-300 dark:border-neutral-600',
-                    properties.success && 'border-blue-500'
+                    properties.success && 'border-blue-500',
+
+                    properties.className
                 )}
                 {...registerOrEmpty(properties.register, properties.id!)}
             />

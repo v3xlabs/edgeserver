@@ -1,5 +1,5 @@
-import { CodeBlock, TextField, Button } from '@edgelabs/components';
 import { Modal } from '@components/Modal';
+import { Button, CodeBlock, TextField } from '@edgelabs/components';
 import { environment } from '@utils/enviroment';
 import { useJWT } from '@utils/useAuth';
 import { FC, useCallback } from 'react';

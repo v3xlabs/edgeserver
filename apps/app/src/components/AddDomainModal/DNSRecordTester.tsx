@@ -65,7 +65,7 @@ export const DNSRecordTester: FC<{ domain: string }> = ({ domain }) => {
     return (
         <div>
             <div className="flex justify-between">
-                <div>{domain}</div>
+                {/* <div>{domain}</div> */}
                 <Button type="button" onPress={() => mutate()}>
                     Reload
                 </Button>

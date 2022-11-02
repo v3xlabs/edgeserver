@@ -163,11 +163,9 @@ const Users: FC = () => {
 
 export const AdminPage: FC = () => {
     return (
-        <div className="containerd pt-8">
-            <div className="containerc gap-8 flex flex-col">
-                <Information />
-                <Users />
-            </div>
+        <div className="gap-8 flex flex-col">
+            <Information />
+            <Users />
         </div>
     );
 };

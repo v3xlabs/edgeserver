@@ -38,6 +38,7 @@ const StagedDomain: FC<{
             <div>
                 <TextField
                     aria-label="Enter domain"
+                    placeholder="Domain"
                     onChange={(value) => {
                         update({ ...domain, name: value });
                     }}

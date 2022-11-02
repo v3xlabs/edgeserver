@@ -50,12 +50,12 @@ export const AppPage: FC = () => {
     }, [0]);
 
     return (
-        <div className="containerd">
-            <div className="containerc pt-8 flex flex-col gap-4 relative">
+        <div>
+            <div className="flex flex-col gap-4 relative">
                 <link rel="shortcut icon" href={app.favicon_url} />
                 <Link
                     to="/"
-                    className="absolute -left-10 p-1 rounded-full hover:bg-black-700 transition-all hidden lg:block"
+                    className="absolute -left-10 p-1 rounded-full hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-all hidden lg:block"
                 >
                     <ChevronLeft size={24} />
                 </Link>

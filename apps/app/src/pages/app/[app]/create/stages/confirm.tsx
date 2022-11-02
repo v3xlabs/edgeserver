@@ -1,10 +1,9 @@
 import { Button } from '@edgelabs/components';
+import { DomainVerificationRequest } from '@edgelabs/types';
 import { FC } from 'react';
 
-import { CreateAppDomainState } from './domain'; // LUC what is this???
-
 export const CreateStageConfirm: FC<{
-    data: { name: string; domains: CreateAppDomainState[] };
+    data: { name: string; domains: DomainVerificationRequest[] };
     next: () => void;
 }> = ({ next, data }) => {
     return (

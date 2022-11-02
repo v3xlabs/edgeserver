@@ -1,3 +1,5 @@
+import { Container } from '@edgelabs/components';
+import { DomainVerificationRequest } from '@edgelabs/types';
 import { environment } from '@utils/enviroment';
 import { useJWT } from '@utils/useAuth';
 import { FC, useCallback, useState } from 'react';
@@ -6,8 +8,6 @@ import { useNavigate } from 'react-router';
 import { CreateStageConfirm } from './stages/confirm';
 import { CreateStageDomain } from './stages/domain';
 import { CreateStageName } from './stages/name';
-
-import { DomainVerificationRequest } from '@edgelabs/types';
 
 export const CreateAppPage: FC = () => {
     const { token } = useJWT();
@@ -51,34 +51,36 @@ export const CreateAppPage: FC = () => {
     }, [token, name, domains, nav]);
 
     return (
-        <div className="w-full">
-            <div className="max-w-5xl w-full mx-auto mt-8">
-                <div className="card p-8 flex flex-col items-start gap-4">
-                    {stage == 'name' && (
-                        <CreateStageName
-                            next={(_name) => {
-                                setName(_name);
-                                setStage('domain');
-                            }}
-                        />
-                    )}
-                    {stage == 'domain' && (
-                        <CreateStageDomain
-                            next={(_domains) => {
-                                setDomains(_domains);
-                                setStage('confirm');
-                            }}
-                            back={() => setStage('name')}
-                        />
-                    )}
-                    {stage == 'confirm' && (
-                        <CreateStageConfirm
-                            data={{ domains, name }}
-                            next={confirm}
-                        />
-                    )}
+        <Container size="small">
+            <div className="w-full">
+                <div className="max-w-5xl w-full mx-auto mt-8">
+                    <div className="card p-8 flex flex-col items-start gap-4">
+                        {stage == 'name' && (
+                            <CreateStageName
+                                next={(_name) => {
+                                    setName(_name);
+                                    setStage('domain');
+                                }}
+                            />
+                        )}
+                        {stage == 'domain' && (
+                            <CreateStageDomain
+                                next={(_domains) => {
+                                    setDomains(_domains);
+                                    setStage('confirm');
+                                }}
+                                back={() => setStage('name')}
+                            />
+                        )}
+                        {stage == 'confirm' && (
+                            <CreateStageConfirm
+                                data={{ domains, name }}
+                                next={confirm}
+                            />
+                        )}
+                    </div>
                 </div>
             </div>
-        </div>
+        </Container>
     );
 };
