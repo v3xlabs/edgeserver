@@ -1,4 +1,4 @@
-import { Button } from '@components/Button';
+import { Button } from '@edgelabs/components';
 import { FC, useEffect, useState } from 'react';
 import { Check } from 'react-feather';
 import { useMutation } from 'react-query';
@@ -65,13 +65,15 @@ export const DNSRecordTester: FC<{ domain: string }> = ({ domain }) => {
     return (
         <div>
             <div className="flex justify-between">
-                <div>{domain}</div>
-                <Button label="Reload" type="button" onClick={() => mutate()} />
+                {/* <div>{domain}</div> */}
+                <Button type="button" onPress={() => mutate()}>
+                    Reload
+                </Button>
             </div>
             <div>
                 {isSuccess && data ? (
                     <div>
-                        {data.at(0).name} {data.at(0).data}
+                        {data.at(0)?.name} {data.at(0)?.data}
                     </div>
                 ) : (
                     results

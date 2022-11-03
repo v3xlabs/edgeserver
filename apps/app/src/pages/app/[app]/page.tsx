@@ -1,8 +1,9 @@
-import { Button } from '@components/Button';
 import { CreateDeleteAppModal } from '@components/CreateDeleteAppModal/CreateDeleteAppModal';
 import { NoDeployments } from '@components/NoDeployments/NoDeployments';
 import { ReRender } from '@components/ReRender';
 import { Tab, Tabs } from '@components/Tabs/Tabs';
+import { Container } from '@edgelabs/components';
+import { Button } from '@edgelabs/components';
 import { useApp } from '@utils/queries/useApp';
 import { ApplicationListData } from '@utils/queries/useApps';
 import { useDeployments } from '@utils/queries/useDeployments';
@@ -19,11 +20,9 @@ const DeleteButton: FC<{ app: ApplicationListData }> = ({ app }) => {
 
     return (
         <div>
-            <Button
-                onClick={() => setDeleteModalOpen(true)}
-                label="Delete this application"
-                variant="delete"
-            ></Button>
+            <Button onPress={() => setDeleteModalOpen(true)} variant="delete">
+                Delete this application
+            </Button>
             {deleteModalOpen && (
                 <CreateDeleteAppModal
                     app={app}
@@ -52,12 +51,12 @@ export const AppPage: FC = () => {
     }, [0]);
 
     return (
-        <div className="containerd">
-            <div className="containerc pt-8 flex flex-col gap-4 relative">
+        <Container topPadding horizontalPadding>
+            <div className="flex flex-col gap-4 relative">
                 <link rel="shortcut icon" href={app.favicon_url} />
                 <Link
                     to="/"
-                    className="absolute -left-10 p-1 rounded-full hover:bg-black-700 transition-all hidden lg:block"
+                    className="absolute -left-10 p-1 rounded-full hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-all hidden lg:block"
                 >
                     <ChevronLeft size={24} />
                 </Link>
@@ -111,7 +110,7 @@ export const AppPage: FC = () => {
 
                 {app.last_deploy && <AppDeploymentList app={app} />}
             </div>
-        </div>
+        </Container>
     );
 };
 
@@ -123,7 +122,7 @@ const AppDeploymentList: FC<{ app: ApplicationListData }> = ({ app }) => {
             <div className="flex justify-between">
                 <h2 className="text-2xl">Recent Deployments</h2>
                 <Link to={`/app/${app.app_id}/deployments`}>
-                    <Button label={'Deployments ➜'} />
+                    <Button>Deployments ➜</Button>
                 </Link>
             </div>
             {loading &&

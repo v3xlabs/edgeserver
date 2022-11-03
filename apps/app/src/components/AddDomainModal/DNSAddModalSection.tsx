@@ -1,5 +1,4 @@
-import { Button } from '@components/Button';
-import { cx } from '@utils/cx';
+import { Button, TextField } from '@edgelabs/components';
 import { environment } from '@utils/enviroment';
 import { useJWT } from '@utils/useAuth';
 import { FC, useCallback } from 'react';
@@ -45,7 +44,7 @@ export const DNSAddModalSection: FC = () => {
         },
     });
     const { token } = useJWT();
-    const onSubmit = useCallback(async (data: { domain: string }) => {
+    const onSubmit = useCallback(async (data: { domain?: string }) => {
         console.log(data);
         await new Promise<void>((accept) => setTimeout(accept, 1000));
 
@@ -119,18 +118,16 @@ export const DNSAddModalSection: FC = () => {
                         Domain
                     </label>
                     <div className="flex items-center gap-2 text-neutral-500">
-                        <input
+                        <TextField
                             type="text"
                             id="domain"
-                            className={cx(
-                                'text-sm rounded-lg block w-full p-2.5 border',
-                                errors.domain
-                                    ? 'bg-red-500 dark:bg-red-900 bg-opacity-20 border-red-500 focus-visible:outine-red-500'
-                                    : 'focus:ring-blue-500 focus:border-blue-500 bg-neutral-50 border-neutral-300 dark:bg-neutral-600 dark:border-neutral-500 dark:placeholder-neutral-400 dark:text-white'
-                            )}
+                            errorMessage={
+                                errors.domain == undefined
+                                    ? undefined
+                                    : 'Invalid domain'
+                            }
                             placeholder="edgeserver.app"
-                            required
-                            {...register('domain')}
+                            register={register}
                         />
                     </div>
                 </div>
@@ -141,17 +138,16 @@ export const DNSAddModalSection: FC = () => {
 
                 <Button
                     type="submit"
-                    disabled={isSubmitting || !isValid}
-                    pending={isSubmitting}
+                    isDisabled={isSubmitting || !isValid}
+                    loading={isSubmitting}
                     className="w-full whitespace-pre justify-center"
-                    label={
-                        isValid
-                            ? isSubmitting
-                                ? 'Pending...'
-                                : 'Launch  🚀'
-                            : 'Incorrect URL'
-                    }
-                />
+                >
+                    {isValid
+                        ? isSubmitting
+                            ? 'Pending...'
+                            : 'Launch  🚀'
+                        : 'Incorrect URL'}
+                </Button>
             </form>
         </div>
     );

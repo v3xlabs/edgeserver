@@ -1,4 +1,4 @@
-import { Button } from '@components/Button';
+import { Button, TextField } from '@edgelabs/components';
 import { FC, useState } from 'react';
 
 export const CreateStageName: FC<{ next: (name: string) => void }> = ({
@@ -8,16 +8,14 @@ export const CreateStageName: FC<{ next: (name: string) => void }> = ({
 
     return (
         <>
-            <div>What should your app be named</div>
-            <input
-                value={name}
-                onChange={(event) => setName(event.target.value)}
+            <TextField
+                label="What should your app be named?"
+                placeholder="App name"
+                onChange={(value) => setName(value)}
             />
-            <Button
-                label="Next"
-                onClick={() => next(name)}
-                className="self-end"
-            />
+            <Button onPress={() => next(name)} className="self-end">
+                Next
+            </Button>
         </>
     );
 };

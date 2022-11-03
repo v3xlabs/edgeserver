@@ -1,12 +1,18 @@
 {
   "files.exclude": {
+    "**/.git": true,
+    "**/.svn": true,
+    "**/.hg": true,
+    "**/CVS": true,
+    "**/.DS_Store": true,
+    "**/Thumbs.db": true,
     "node_modules": true,
     "packages/groot/tmp": true,
     "pnpm-lock.yaml": true,
-    "**/node_modules": true,
+    "**/node_modules": false,
     "**/.turbo": true,
     "**/.env": false,
-    "**/.changeset": true,
+    "**/.changeset": true
   },
   "files.eol": "\n"
 }

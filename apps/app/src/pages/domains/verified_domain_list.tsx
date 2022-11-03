@@ -1,3 +1,4 @@
+import { TextField } from '@edgelabs/components';
 import { Domain } from '@edgelabs/types';
 import { useDomains } from '@utils/queries/useDomains';
 import { FC, useState } from 'react';
@@ -10,14 +11,14 @@ const DomainCard: FC<{
 }> = ({ domain }) => {
     return (
         <Link to={'/domain/' + domain.domain_id} key={domain.domain}>
-            <div className="flex hover:bg-neutral-700 rounded-md justify-between p-4 gap-4 w-full items-center">
+            <div className="flex hover:bg-neutral-200 dark:hover:bg-neutral-700 rounded-md justify-between p-4 gap-4 w-full items-center">
                 <div className="h-full">
                     <h2 className="text-lg font-bold">{domain.domain}</h2>
                     <p className="text-sm opacity-50">
                         {domain.domain_id.toString()}
                     </p>
                 </div>
-                <div className="bg-neutral-800 w-fit h-fit px-2 py-2 rounded-full">
+                <div className="bg-neutral-400 dark:bg-neutral-800 w-fit h-fit px-2 py-2 rounded-full text-white">
                     <Check size={'1rem'} />
                 </div>
             </div>
@@ -56,11 +57,11 @@ export const VerifiedDomainList: FC = () => {
         <div className="flex flex-col gap-4">
             <h2 className="text-2xl p-4 pb-0">Domains</h2>
             <div className="flex w-full gap-4">
-                <input
-                    className="text-lg p-4 card flex-grow"
+                <TextField
+                    className="text-lg p-4 flex-grow w-full"
                     placeholder="Search..."
                     value={search}
-                    onChange={(event) => setSearch(event.currentTarget.value)}
+                    onChange={(value) => setSearch(value)}
                 />
             </div>
             <div className="card p-4">

@@ -1,6 +1,6 @@
 /* eslint-disable sonarjs/no-duplicate-string */
-import { Button } from '@components/Button';
 import { Modal } from '@components/Modal';
+import { Button } from '@edgelabs/components';
 import { environment } from '@utils/enviroment';
 import { useJWT } from '@utils/useAuth';
 import { formatDistance } from 'date-fns';
@@ -81,19 +81,21 @@ export const KeyModal: FC<{
                 ) : (
                     <div className="flex justify-around gap-4">
                         <Button
-                            label="Delete"
                             variant="delete"
                             className="w-full text-center"
-                            onClick={() => {
+                            onPress={() => {
                                 deleteKey();
                             }}
-                        />
+                        >
+                            Delete
+                        </Button>
                         <Button
-                            label="Cancel"
                             variant="add"
                             className="w-full text-center"
-                            onClick={() => setDeleteOpen(false)}
-                        />
+                            onPress={() => setDeleteOpen(false)}
+                        >
+                            Cancel
+                        </Button>
                     </div>
                 )}
             </div>

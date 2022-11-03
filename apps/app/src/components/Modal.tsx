@@ -5,7 +5,7 @@ type ModalComponent = {
     label: string;
     onClose: () => void;
     className?: string;
-    escapeClose: boolean;
+    escapeClose?: boolean;
 } & PropsWithChildren;
 
 export const Modal: FC<ModalComponent> = ({

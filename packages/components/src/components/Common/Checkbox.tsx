@@ -1,5 +1,5 @@
 import { cx } from '@utils/cx';
-import { FC, ReactNode, useRef } from 'react';
+import { FC, useRef } from 'react';
 import {
     AriaCheckboxProps,
     FocusableOptions,
@@ -9,6 +9,8 @@ import {
     VisuallyHidden,
 } from 'react-aria';
 import { useToggleState } from 'react-stately';
+
+import { BaseFormComponent } from '../templates';
 
 type Variants = 'primary' | 'delete' | 'add';
 
@@ -20,11 +22,9 @@ const styles: Record<Variants, string> = {
 };
 
 export interface CheckboxProperties
-    extends AriaCheckboxProps,
+    extends BaseFormComponent,
+        AriaCheckboxProps,
         FocusableOptions {
-    children: ReactNode;
-    className?: string;
-
     /**
      * @default primary
      */
@@ -47,8 +47,15 @@ const Checkbox: FC<CheckboxProperties> = (properties) => {
         <label className="flex items-center relative">
             <VisuallyHidden>
                 <input
-                    {...mergeProps(inputProps, focusProps)}
+                    // type="checkbox"
                     ref={reference}
+                    {...mergeProps(
+                        inputProps,
+                        focusProps,
+                        properties.register !== undefined
+                            ? properties.register(properties.id!)
+                            : {}
+                    )}
                 />
             </VisuallyHidden>
             <div
@@ -84,7 +91,9 @@ const Checkbox: FC<CheckboxProperties> = (properties) => {
             </div>
             <span
                 className={cx(
-                    properties.isDisabled ? 'text-gray-400' : 'text-gray-70'
+                    properties.isDisabled
+                        ? 'text-neutral-500'
+                        : 'text-neutral-700 dark:text-white'
                 )}
             >
                 {properties.children}

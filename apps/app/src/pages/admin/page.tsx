@@ -1,5 +1,6 @@
-import { Button } from '@components/Button';
 import { UsersModal } from '@components/UsersModal/UsersModal';
+import { Container } from '@edgelabs/components';
+import { Button } from '@edgelabs/components';
 import { User, useUsers } from '@utils/queries/useUsers';
 import { FC, useState } from 'react';
 import { Shield } from 'react-feather';
@@ -143,10 +144,9 @@ const Users: FC = () => {
                         </p>
                     </div>
                     <div>
-                        <Button
-                            label={'Add User ➜'}
-                            onClick={() => setIsModalCreateOpen(true)}
-                        />
+                        <Button onPress={() => setIsModalCreateOpen(true)}>
+                            Add User ➜
+                        </Button>
                         {isModalCreateOpen && (
                             <UsersModal
                                 onClose={() => setIsModalCreateOpen(false)}
@@ -164,11 +164,11 @@ const Users: FC = () => {
 
 export const AdminPage: FC = () => {
     return (
-        <div className="containerd pt-8">
-            <div className="containerc gap-8 flex flex-col">
+        <Container topPadding horizontalPadding>
+            <div className="gap-8 flex flex-col">
                 <Information />
                 <Users />
             </div>
-        </div>
+        </Container>
     );
 };

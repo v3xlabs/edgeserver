@@ -1,7 +1,8 @@
 // import { Button } from '@components/Button';
-import { Button } from '@components/Button';
 import { CreateKeyModal } from '@components/CreateKeyModal/CreateKeyModal';
 import { KeyModal } from '@components/KeyModal/KeyModal';
+import { Container } from '@edgelabs/components';
+import { Button } from '@edgelabs/components';
 import { useKeys } from '@utils/queries/useKeys';
 import { formatDistance } from 'date-fns';
 import { FC, useMemo, useReducer, useState } from 'react';
@@ -112,18 +113,20 @@ const KeysTable: FC = () => {
                 </h3>
                 {/* <hr className="border-t-black-500 border-t-2" /> */}
                 <table className="w-full">
-                    <tr>
-                        <th className="px-4 py-2 text-left">Name</th>
-                        <th className="px-4 py-2 text-left">Last Used</th>
-                        <th className="px-4 py-2 text-left">Status</th>
-                    </tr>
-                    {keys.active.map((value) => (
-                        <KeysTableRow
-                            key={value.key}
-                            auth_key={value}
-                            onDelete={addOptimisticDelete}
-                        />
-                    ))}
+                    <tbody>
+                        <tr>
+                            <th className="px-4 py-2 text-left">Name</th>
+                            <th className="px-4 py-2 text-left">Last Used</th>
+                            <th className="px-4 py-2 text-left">Status</th>
+                        </tr>
+                        {keys.active.map((value) => (
+                            <KeysTableRow
+                                key={value.key}
+                                auth_key={value}
+                                onDelete={addOptimisticDelete}
+                            />
+                        ))}
+                    </tbody>
                 </table>
             </div>
 
@@ -132,20 +135,22 @@ const KeysTable: FC = () => {
                     Volatile Keys
                 </h3>
                 <table className="w-full">
-                    <tr>
-                        <th className="px-4 py-2 text-left">Name</th>
-                        <th className="px-4 py-2 text-left">Last Used</th>
-                        <th className="px-4 py-2 text-left">Status</th>
-                    </tr>
+                    <tbody>
+                        <tr>
+                            <th className="px-4 py-2 text-left">Name</th>
+                            <th className="px-4 py-2 text-left">Last Used</th>
+                            <th className="px-4 py-2 text-left">Status</th>
+                        </tr>
 
-                    {/* eslint-disable-next-line sonarjs/no-identical-functions */}
-                    {keys.volatile.map((value) => (
-                        <KeysTableRow
-                            key={value.key}
-                            auth_key={value}
-                            onDelete={addOptimisticDelete}
-                        />
-                    ))}
+                        {/* eslint-disable-next-line sonarjs/no-identical-functions */}
+                        {keys.volatile.map((value) => (
+                            <KeysTableRow
+                                key={value.key}
+                                auth_key={value}
+                                onDelete={addOptimisticDelete}
+                            />
+                        ))}
+                    </tbody>
                 </table>
             </div>
         </>
@@ -156,7 +161,7 @@ export const KeysPage: FC = () => {
     const [isModalCreateOpen, setIsModalCreateOpen] = useState(false);
 
     return (
-        <div className="containerd pt-8">
+        <Container topPadding horizontalPadding>
             <div className="flex">
                 <h2 className="text-2xl flex-grow block">Keys</h2>
             </div>
@@ -170,10 +175,9 @@ export const KeysPage: FC = () => {
                     </p>
                 </div>
                 <div>
-                    <Button
-                        label={'Create Key ➜'}
-                        onClick={() => setIsModalCreateOpen(true)}
-                    />
+                    <Button onPress={() => setIsModalCreateOpen(true)}>
+                        Create Key ➜
+                    </Button>
                     {isModalCreateOpen && (
                         <CreateKeyModal
                             onClose={() => setIsModalCreateOpen(false)}
@@ -182,6 +186,6 @@ export const KeysPage: FC = () => {
                 </div>
             </div>
             <KeysTable />
-        </div>
+        </Container>
     );
 };

@@ -1,8 +1,11 @@
 import { cx } from '@utils/cx';
-import { FC, ReactNode, useRef } from 'react';
+import { registerOrEmpty } from '@utils/registerOrEmpty';
+import { FC, useRef } from 'react';
 import { AriaButtonProps, FocusableOptions, useButton } from 'react-aria';
 import { Loader } from 'react-feather';
 import { Link } from 'react-router-dom';
+
+import { BaseFormComponent } from '../templates';
 
 type Variants = 'primary' | 'delete' | 'add';
 
@@ -13,10 +16,10 @@ const styles: Record<Variants, string> = {
     add: 'bg-green-700 hover:bg-green-800 text-white focus:ring-green-300',
 };
 
-export interface ButtonProperties extends AriaButtonProps, FocusableOptions {
-    children: ReactNode;
-    className?: string;
-
+export interface ButtonProperties
+    extends BaseFormComponent,
+        AriaButtonProps,
+        FocusableOptions {
     /**
      * @default primary
      */
@@ -51,6 +54,7 @@ const Button: FC<ButtonProperties> = (properties) => {
                     : styles[properties.variant!],
                 properties.className
             )}
+            {...registerOrEmpty(properties.register, properties.id!)}
         >
             {properties.loading && (
                 <Loader className="animate-spin -mt-2 -mb-2" height={'1.5em'} />

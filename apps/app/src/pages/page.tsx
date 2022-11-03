@@ -1,5 +1,5 @@
-import { Button } from '@components/Button';
-import { CreateAppModal } from '@components/CreateAppModal/CreateAppModal';
+import { Container } from '@edgelabs/components';
+import { Button } from '@edgelabs/components';
 import { environment } from '@utils/enviroment';
 import { ApplicationListData, useApps } from '@utils/queries/useApps';
 import { formatDistance, isValid } from 'date-fns';
@@ -105,8 +105,8 @@ const AppsList: FC = () => {
     const [isCreatingApp, setCreatingApp] = useState(false);
 
     return (
-        <div className="containerd">
-            <div className="containerc gap-4 flex flex-col">
+        <Container topPadding horizontalPadding>
+            <div className="gap-4 flex flex-col">
                 <div className="flex">
                     <div className="card flex w-full overflow-hidden">
                         <div className="border-r border-neutral-300 dark:border-neutral-700">
@@ -147,13 +147,12 @@ const AppsList: FC = () => {
                             </div>
                         </div>
                         <div className="flex justify-center items-center flex-grow p-4 bg-white dark:bg-black-900">
-                            <div className="card border-0 p-4 gap-2 flex flex-col items-center">
+                            <div className="card border-0 p-4 gap-5 flex flex-col items-center">
                                 <p>This is the application menu</p>
                                 <Link to="/app/new">
-                                    <Button
-                                        label={'New App'}
-                                        className="px-2 py-1 text-xs"
-                                    />
+                                    <Button className="py-1 text-xs">
+                                        New App
+                                    </Button>
                                 </Link>
                             </div>
                         </div>
@@ -176,7 +175,7 @@ const AppsList: FC = () => {
                         ))}
                 </div>
             </div>
-        </div>
+        </Container>
     );
 };
 
@@ -186,9 +185,5 @@ export const Home: FC = () => {
         // @ts-ignore
         ?.setAttribute('href', window.OG_FAVICON || '');
 
-    return (
-        <div className="containerd pt-8">
-            <AppsList />
-        </div>
-    );
+    return <AppsList />;
 };

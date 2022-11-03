@@ -1,10 +1,9 @@
-import { Button } from '@components/Button';
+import { Button } from '@edgelabs/components';
+import { DomainVerificationRequest } from '@edgelabs/types';
 import { FC } from 'react';
 
-import { CreateAppDomainState } from './domain';
-
 export const CreateStageConfirm: FC<{
-    data: { name: string; domains: CreateAppDomainState[] };
+    data: { name: string; domains: DomainVerificationRequest[] };
     next: () => void;
 }> = ({ next, data }) => {
     return (
@@ -14,7 +13,9 @@ export const CreateStageConfirm: FC<{
                 <p>Name: {data.name}</p>
                 <p>Domains: {JSON.stringify(data.domains)}</p>
             </pre>
-            <Button label="Create" onClick={next} className="self-end" />
+            <Button onPress={next} className="self-end">
+                Create
+            </Button>
         </>
     );
 };

@@ -86,18 +86,6 @@ a {
     }
 }
 
-.containerd {
-    @apply w-full px-8;
-}
-
-.containerc {
-    @apply w-full max-w-5xl mx-auto;
-}
-
-.link {
-    @apply text-neutral-400 hover:brightness-75 hover:underline;
-}
-
 .human-slider {
     width: 100%;
     height: 2rem;
@@ -129,11 +117,6 @@ a {
     background-color: #111111;
     // background: linear-gradient(to bottom, rgba(url("../assets/hideout.svg"), 0.0), url("../assets/hideout.svg"), 1.0);
     // background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23696969' fill-opacity='0.32'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-}
-
-code {
-    @apply bg-neutral-200 dark:bg-neutral-800 p-2;
-    border-radius: 6px;
 }
 
 .logincard {

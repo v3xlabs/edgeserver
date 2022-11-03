@@ -1,18 +1,19 @@
 import { cx } from '@utils/cx';
-import { ChangeEventHandler, FC, useRef } from 'react';
+import { FC, useRef } from 'react';
 import {
     AriaTextFieldProps,
-    chain,
     FocusableOptions,
+    mergeProps,
     useTextField,
 } from 'react-aria';
-export interface TextFieldProperties
-    extends Omit<AriaTextFieldProps, 'onChange'>,
-        FocusableOptions {
-    className?: string;
 
-    onChange?: ChangeEventHandler<HTMLInputElement>;
-    // 'aria-label': string;
+import { BaseRegisterComponent } from '../templates';
+
+export interface TextFieldProperties
+    extends AriaTextFieldProps,
+        FocusableOptions,
+        BaseRegisterComponent {
+    className?: string;
 
     // Custom props
     errorMessage?: string;
@@ -31,7 +32,7 @@ const TextField: FC<TextFieldProperties> = (properties) => {
     const { inputProps } = useTextField(properties as any, reference);
 
     return (
-        <div className="flex flex-col gap-1">
+        <div className="flex flex-col gap-1 w-full">
             {properties.label != undefined && (
                 <label
                     htmlFor={
@@ -45,9 +46,6 @@ const TextField: FC<TextFieldProperties> = (properties) => {
                 </label>
             )}
             <input
-                {...inputProps}
-                // onChange={properties.onChange}
-                onChange={chain(inputProps.onChange, properties.onChange)}
                 className={cx(
                     'text-sm rounded-md block w-full py-2.5 px-4 border outline-none focus:ring-1',
                     'bg-neutral-100 dark:bg-neutral-800',
@@ -60,7 +58,15 @@ const TextField: FC<TextFieldProperties> = (properties) => {
                     properties.errorMessage == undefined &&
                         !properties.success &&
                         'border-neutral-300 dark:border-neutral-600',
-                    properties.success && 'border-blue-500'
+                    properties.success && 'border-blue-500',
+
+                    properties.className
+                )}
+                {...mergeProps(
+                    inputProps,
+                    properties.register !== undefined
+                        ? properties.register(properties.id!)
+                        : {}
                 )}
             />
             <p className="text-sm text-red-500">{properties.errorMessage}</p>

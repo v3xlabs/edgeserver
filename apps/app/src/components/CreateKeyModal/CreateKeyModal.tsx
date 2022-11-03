@@ -1,8 +1,6 @@
 /* eslint-disable sonarjs/no-duplicate-string */
-import { Button } from '@components/Button';
-import { Checkbox } from '@components/Checkbox';
 import { Modal } from '@components/Modal';
-import { cx } from '@utils/cx';
+import { Button, Checkbox, TextField } from '@edgelabs/components';
 import { environment } from '@utils/enviroment';
 import { KeyPerms } from '@utils/permissions';
 import { useJWT } from '@utils/useAuth';
@@ -14,6 +12,8 @@ import { Clipboard } from 'react-feather';
 import { FieldErrors, useForm } from 'react-hook-form';
 import { useDebounce } from 'use-debounce';
 import { useSignMessage } from 'wagmi';
+
+const titleClass = 'text-neutral-700 dark:text-neutral-300 mb-1 text-lg';
 
 const Perms = {
     'Read Applications': KeyPerms.APPS_READ,
@@ -171,46 +171,36 @@ export const CreateKeyModal: FC<{ onClose: () => void }> = ({ onClose }) => {
             {!generatedToken && (
                 <form className="space-y-5" onSubmit={handleSubmit(onSubmit)}>
                     <div>
-                        <label
-                            htmlFor="name"
-                            className="block text-sm font-medium text-neutral-900 dark:text-neutral-300 mb-2"
-                        >
-                            Name
-                        </label>
-                        <div className="flex items-center gap-2 text-neutral-500">
-                            <input
+                        <div className={titleClass}>
+                            <TextField
+                                label="Name"
                                 type="text"
                                 id="name"
-                                className={cx(
-                                    'text-sm rounded-lg block w-full p-2.5 border',
-                                    errors.name
-                                        ? 'bg-red-900 bg-opacity-20 border-red-500 focus-visible:outine-red-500'
-                                        : 'focus:ring-blue-500 focus:border-blue-500 bg-neutral-50 border-neutral-300 dark:bg-neutral-600 dark:border-neutral-500 dark:placeholder-neutral-400 dark:text-white'
-                                )}
+                                errorMessage={
+                                    errors.name == undefined
+                                        ? undefined
+                                        : 'Invalid name'
+                                }
                                 placeholder="My Awesome Key"
-                                required
-                                {...register('name')}
+                                register={register}
                             />
                         </div>
                     </div>
                     <div>
-                        <span className="block text-base font-medium text-neutral-900 dark:text-neutral-300 mb-2">
-                            Key Permissions
-                        </span>
+                        <div className={titleClass}>Key Permissions</div>
                         <div className="grid items-center gap-2 text-neutral-500">
-                            <Checkbox
-                                id="Full Access"
-                                label="Full Access"
-                                register={register}
-                            />
-                            {Object.keys(Perms).map((perm) => (
+                            <Checkbox id="Full Access" register={register}>
+                                Full Access
+                            </Checkbox>
+                            {Object.keys(Perms).map((permission) => (
                                 <Checkbox
-                                    id={perm}
-                                    key={perm}
-                                    label={perm}
+                                    id={permission}
+                                    key={permission}
                                     register={register}
-                                    disabled={watch('Full Access')}
-                                />
+                                    isDisabled={watch('Full Access')}
+                                >
+                                    {permission}
+                                </Checkbox>
                             ))}
 
                             {noPerms && (
@@ -221,35 +211,27 @@ export const CreateKeyModal: FC<{ onClose: () => void }> = ({ onClose }) => {
                         </div>
                     </div>
                     <div>
-                        <span className="block text-base font-medium text-neutral-900 dark:text-neutral-300 mb-2">
-                            Settings
-                        </span>
+                        <div className={titleClass}>Settings</div>
                         <div className="block w-full">
-                            <Checkbox
-                                id="permanent"
-                                label="Permanent Key"
-                                // className="text-sm rounded-lg block p-2.5 border focus:ring-blue-500 focus:border-blue-500 bg-neutral-50 border-neutral-300 dark:bg-neutral-600 dark:border-neutral-500 dark:placeholder-neutral-400 dark:text-white"
-                                register={register}
-                            />
+                            <Checkbox id="permanent" register={register}>
+                                Permanent Key
+                            </Checkbox>
                         </div>
                     </div>
                     {!watch('permanent') && (
                         <div>
-                            <label htmlFor="expiresIn">Expires In</label>
-
-                            <div className="flex items-center gap-2 text-neutral-500">
-                                <input
+                            <div className={titleClass}>
+                                <TextField
+                                    label="Expires In"
                                     type="text"
                                     id="expiresIn"
-                                    className={cx(
-                                        'text-sm rounded-lg block w-full p-2.5 border',
-                                        errors.expiresIn
-                                            ? 'bg-red-900 bg-opacity-20 border-red-500 focus-visible:outine-red-500'
-                                            : 'focus:ring-blue-500 focus:border-blue-500 bg-neutral-50 border-neutral-300 dark:bg-neutral-600 dark:border-neutral-500 dark:placeholder-neutral-400 dark:text-white'
-                                    )}
+                                    errorMessage={
+                                        errors.expiresIn == undefined
+                                            ? undefined
+                                            : 'Invalid date'
+                                    }
                                     placeholder="10h"
-                                    required
-                                    {...register('expiresIn')}
+                                    register={register}
                                 />
                             </div>
 
@@ -262,18 +244,16 @@ export const CreateKeyModal: FC<{ onClose: () => void }> = ({ onClose }) => {
                     )}
                     <Button
                         type="submit"
-                        disabled={isSubmitting || !isValid || noPerms}
-                        pending={isSubmitting}
-                        variant="primary"
-                        className="mt-4 w-full whitespace-pre justify-center"
-                        label={
-                            isValid && !noPerms
-                                ? isSubmitting
-                                    ? 'Pending...'
-                                    : 'Create 🔑'
-                                : 'Select Permissions'
-                        }
-                    />
+                        isDisabled={isSubmitting || !isValid || noPerms}
+                        loading={isSubmitting}
+                        className="mt-4 w-full whitespace-pre"
+                    >
+                        {isValid && !noPerms
+                            ? isSubmitting
+                                ? 'Pending...'
+                                : 'Create 🔑'
+                            : 'Select Permissions'}
+                    </Button>
                 </form>
             )}
             {generatedToken && (
@@ -310,11 +290,9 @@ export const CreateKeyModal: FC<{ onClose: () => void }> = ({ onClose }) => {
                             <Clipboard />
                         </button>
                     </div>
-                    <Button
-                        className="w-full mt-4"
-                        label="I wrote it down"
-                        onClick={onClose}
-                    />
+                    <Button className="w-full mt-4" onPress={onClose}>
+                        I wrote it down
+                    </Button>
                 </div>
             )}
         </Modal>

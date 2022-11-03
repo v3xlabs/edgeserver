@@ -1,5 +1,10 @@
+import { Container } from '@edgelabs/components';
 import { FC } from 'react';
 
 export const SettingsPage: FC = () => {
-    return <div className="containerd pt-8">User Settings</div>;
+    return (
+        <Container topPadding horizontalPadding>
+            User Settings
+        </Container>
+    );
 };
