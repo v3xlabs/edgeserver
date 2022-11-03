@@ -1,4 +1,4 @@
-package services
+package cache
 
 type Setter[K any] func(key string, value K) error
 type Resolver[K any] func(key string) (*K, error)

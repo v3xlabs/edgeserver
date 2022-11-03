@@ -4,7 +4,7 @@ import (
 	"embed"
 	"github.com/v3xlabs/edgeserver/apps/router/db"
 	"github.com/v3xlabs/edgeserver/apps/router/router"
-	"github.com/v3xlabs/edgeserver/apps/router/services"
+	"github.com/v3xlabs/edgeserver/apps/router/services/cache"
 	"github.com/v3xlabs/edgeserver/apps/router/storage"
 	"log"
 	"net/http"
@@ -23,8 +23,8 @@ func main() {
 	signal := storage.NewSignalFS("http://127.0.0.1:8000")
 	storage.Set(signal)
 
-	services.SetupLocalCache()
-	err = services.SetupRedisCache()
+	cache.SetupLocalCache()
+	err = cache.SetupRedisCache()
 	if err != nil {
 		log.Fatal(err)
 	}

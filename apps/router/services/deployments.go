@@ -5,6 +5,7 @@ import (
 	"github.com/scylladb/gocqlx/v2/qb"
 	"github.com/v3xlabs/edgeserver/apps/router/db"
 	"github.com/v3xlabs/edgeserver/apps/router/models"
+	"github.com/v3xlabs/edgeserver/apps/router/services/cache"
 	"log"
 )
 
@@ -19,12 +20,12 @@ import (
 //}
 
 func GetDeploymentData(deployId int64) (*models.DeploymentStruct, error) {
-	return UseCache(
+	return cache.UseCache(
 		fmt.Sprintf("deployment_%d", deployId),
-		[]ResolverSetter[models.DeploymentStruct]{
-			UseLocalCache[models.DeploymentStruct](),
-			UseRedisCache[models.DeploymentStruct](),
-			ResolverSetter[models.DeploymentStruct]{
+		[]cache.ResolverSetter[models.DeploymentStruct]{
+			cache.UseLocalCache[models.DeploymentStruct](),
+			cache.UseRedisCache[models.DeploymentStruct](),
+			cache.ResolverSetter[models.DeploymentStruct]{
 				Resolver: func(key string) (*models.DeploymentStruct, error) {
 					session := db.Get()
 					data := models.DeploymentStruct{}
@@ -37,5 +38,4 @@ func GetDeploymentData(deployId int64) (*models.DeploymentStruct, error) {
 				},
 			},
 		})
-
 }
