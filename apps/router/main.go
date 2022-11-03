@@ -1,12 +1,16 @@
 package main
 
 import (
+	"embed"
 	"github.com/v3xlabs/edgeserver/apps/router/db"
 	"github.com/v3xlabs/edgeserver/apps/router/router"
 	"github.com/v3xlabs/edgeserver/apps/router/storage"
 	"log"
 	"net/http"
 )
+
+//go:embed static/*
+var staticFiles embed.FS
 
 func main() {
 	stopDB, err := db.Setup()
@@ -17,6 +21,8 @@ func main() {
 
 	signal := storage.NewSignalFS("http://127.0.0.1:8000")
 	storage.Set(signal)
+
+	router.StaticFiles = staticFiles
 
 	http.HandleFunc("/", router.Router)
 

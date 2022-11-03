@@ -7,11 +7,10 @@ import (
 	"net/http"
 )
 
-//go:embed static/*
-var staticFiles embed.FS
+var StaticFiles embed.FS
 
 func sendErrorPage(w http.ResponseWriter, r *http.Request, code int) {
-	fileBytes, err := staticFiles.ReadFile(fmt.Sprintf("static/%d.html", code))
+	fileBytes, err := StaticFiles.ReadFile(fmt.Sprintf("static/%d.html", code))
 	if err != nil {
 		log.Panicln(err)
 	}
