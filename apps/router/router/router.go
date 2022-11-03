@@ -19,6 +19,8 @@ func Router(w http.ResponseWriter, r *http.Request) {
 	//fmt.Println(baseUrl, pathUrl)
 	log.Printf("baseUrl: %s, pathUrl: %s", baseUrl, pathUrl)
 
+	// ==================== Get Site Data ====================
+
 	siteData, err := services.GetSiteData(baseUrl)
 
 	if err == gocql.ErrNotFound {
@@ -30,6 +32,45 @@ func Router(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(err)
 		return
 	}
+
+	// ==================== Get HRR Rules ====================
+
+	headerRules, redirectRules, rewriteRules := services.GetHrrRules(siteData.DeployId)
+
+	// ==================== Handle Redirects ====================
+
+	matchedRedirectRule := services.MatchRedirects(redirectRules, pathUrl)
+
+	if matchedRedirectRule != nil {
+		redirectCode := matchedRedirectRule.Status
+		if redirectCode == 0 {
+			redirectCode = 301
+		}
+
+		log.Println("Redirecting")
+		http.Redirect(w, r, matchedRedirectRule.Destination, redirectCode)
+		return
+	}
+
+	// ==================== Handle Headers ====================
+
+	matchedHeaderRule := services.MatchHeaders(headerRules, pathUrl)
+
+	if matchedHeaderRule != nil {
+		for key, value := range matchedHeaderRule.Headers {
+			w.Header().Set(key, value)
+		}
+	}
+
+	// ==================== Handle Rewrites ====================
+
+	matchedRewriteRule := services.MatchRewrites(rewriteRules, pathUrl)
+
+	if matchedRewriteRule != nil {
+		pathUrl = matchedRewriteRule.Destination
+	}
+
+	// ==================== Get Deployment Data ====================
 
 	deployment, err := services.GetDeploymentData(siteData.DeployId)
 
@@ -43,6 +84,7 @@ func Router(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// ================== Resolve route ==================
 	storageProvider := storage.Get()
 
 	fileData, err := services.ResolveRoute(storageProvider, deployment.Sid, pathUrl, "/index.html")
@@ -53,6 +95,8 @@ func Router(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	defer fileData.Close()
+
+	// ================== Send response ==================
 
 	w.Header().Set("Content-Type", fileData.ContentType)
 	w.Header().Set("X-Server", "edgeserver.io")

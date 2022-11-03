@@ -13,3 +13,10 @@ type DeploymentStruct struct {
 	Sid      string
 	Context  string
 }
+
+type DeploymentConfigsStruct struct {
+	Headers   string
+	Rewrites  string
+	Redirects string
+	DeployId  int64
+}
