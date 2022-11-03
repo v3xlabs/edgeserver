@@ -11,6 +11,8 @@ import (
 )
 
 func Router(w http.ResponseWriter, r *http.Request) {
+	log.Println("======================================")
+
 	baseUrl := r.Host
 	pathUrl := r.URL.EscapedPath()
 
