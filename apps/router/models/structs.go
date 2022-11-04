@@ -18,5 +18,6 @@ type DeploymentConfigsStruct struct {
 	Headers   string
 	Rewrites  string
 	Redirects string
+	Routing   string
 	DeployId  int64
 }

@@ -28,14 +28,24 @@ func Router(w http.ResponseWriter, r *http.Request) {
 		sendErrorPage(w, r, 404)
 		return
 	} else if err != nil {
-		sendErrorPage(w, r, 503)
+		sendErrorPage(w, r, 502)
 		fmt.Println(err)
 		return
 	}
 
-	// ==================== Get HRR Rules ====================
+	// ==================== Get HRR Rules & Routing config ====================
 
 	headerRules, redirectRules, rewriteRules := services.GetHrrRules(siteData.DeployId)
+
+	routingConfig, err := services.GetRoutingConfig(siteData.DeployId)
+
+	log.Printf("routingConfig: %v", routingConfig)
+
+	if err != nil {
+		sendErrorPage(w, r, 502)
+		fmt.Println(err)
+		return
+	}
 
 	// ==================== Handle Redirects ====================
 
@@ -62,6 +72,15 @@ func Router(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+	// ==================== Handle Trailing SLash ====================
+
+	trailingSlashRedirect := services.TrailingSlashRedirect(routingConfig, pathUrl)
+
+	if trailingSlashRedirect != "" {
+		http.Redirect(w, r, trailingSlashRedirect, 301)
+		return
+	}
+
 	// ==================== Handle Rewrites ====================
 
 	matchedRewriteRule := services.MatchRewrites(rewriteRules, pathUrl)
@@ -79,15 +98,15 @@ func Router(w http.ResponseWriter, r *http.Request) {
 		sendErrorPage(w, r, 404)
 		return
 	} else if err != nil {
+		log.Printf("Error getting deployment data: %v", err)
 		sendErrorPage(w, r, 502)
-		fmt.Println(err)
 		return
 	}
 
 	// ================== Resolve route ==================
 	storageProvider := storage.Get()
 
-	fileData, err := services.ResolveRoute(storageProvider, deployment.Sid, pathUrl, "/index.html")
+	fileData, err := services.ResolveRoute(storageProvider, deployment.Sid, pathUrl, routingConfig.DefaultRoute)
 	if err != nil {
 		// TODO: Better error handling
 		log.Println("Filedata error:", err)
