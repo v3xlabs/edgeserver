@@ -71,7 +71,8 @@ export const AppEntryDeleteRoute: FastifyPluginAsync = async (
             );
         }
 
-        if (BigInt(payload.owner_id) !== user_id) {
+        // user_id has type of bigint while not being, to protect against a future fix, we make sure it's a string
+        if (payload.owner_id !== String(user_id)) {
             throw new SafeError(
                 500,
                 '',
