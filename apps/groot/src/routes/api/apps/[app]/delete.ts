@@ -16,7 +16,7 @@ export const AppEntryDeleteRoute: FastifyPluginAsync = async (
     const SiwePayload = Type.Object({
         message: Type.String(),
         payload: Type.Object({
-            action: Type.Literal('CREATE_KEY'),
+            action: Type.Literal('DELETE_APP'),
             owner_id: Type.String(),
             instance_id: Type.Literal(Globals.INSTANCE_ID),
             app_id: Type.String(),
