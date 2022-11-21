@@ -1,5 +1,6 @@
 import { cx } from '@utils/cx';
-import { FC, PropsWithChildren, ReactNode, useState } from 'react';
+import { FC, PropsWithChildren, ReactNode } from 'react';
+import { Link } from 'react-router-dom';
 
 export const Tab: FC<PropsWithChildren & { className?: string }> = ({
     children,
@@ -18,34 +19,39 @@ export const Tab: FC<PropsWithChildren & { className?: string }> = ({
 };
 
 export const Tabs: FC<{
-    children: ReactNode[];
-    labels: string[];
-    defaultTab?: number;
-}> = ({ labels, children, defaultTab = 0 }) => {
-    const [tab, setTab] = useState(defaultTab);
-
+    children: ReactNode;
+    data: { label: string; page: string }[];
+    indexPage: string;
+    activePage: string;
+}> = ({ data, children, indexPage, activePage }) => {
     return (
-        <div className="">
+        <div>
             <div
                 className="flex border-r border-b border-neutral-300 dark:border-neutral-700 w-fit"
                 style={{ marginBottom: '-1px' }}
             >
-                {labels.map((label, index) => (
-                    <button
+                {data.map((item, index) => (
+                    <Link
                         key={index}
+                        to={(
+                            indexPage +
+                            '/' +
+                            item.page
+                                .replace(/([^:]\/)\/+/g, '$1')
+                                .replace(/\/$/, '')
+                        ).replace(/\/$/, '')}
                         className={cx(
                             'border border-neutral-300 dark:border-neutral-700 px-4 py-2 flex items-center border-r-0 border-b-0',
-                            tab === index
+                            activePage == item.page
                                 ? 'tab'
                                 : 'dark:bg-black-800 dark:hover:bg-neutral-800 hover:bg-neutral-100 bg-neutral-50 cursor-pointer'
                         )}
-                        onClick={() => setTab(index)}
                     >
-                        <div className="tabtext pb-1">{label}</div>
-                    </button>
+                        <div className="tabtext pb-1">{item.label}</div>
+                    </Link>
                 ))}
             </div>
-            <div className="w-full">{children[tab]}</div>
+            <div className="w-full">{children}</div>
         </div>
     );
 };
