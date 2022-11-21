@@ -3,10 +3,12 @@ import '@rainbow-me/rainbowkit/styles.css';
 import { AdminPage } from '@pages/admin/page';
 import { AppContainer } from '@pages/app/[app]/_container';
 import { CreateAppPage } from '@pages/app/[app]/create/create';
+import { AppDebugPage } from '@pages/app/[app]/debug';
 import { DeploymentPage } from '@pages/app/[app]/deploy/deployment';
 import { AppDeploymentsPage } from '@pages/app/[app]/deployments';
-import { AppPage } from '@pages/app/[app]/page';
+import { AppInformationPage } from '@pages/app/[app]/information';
 import { AppSettingsPage } from '@pages/app/[app]/settings';
+import { AppSetupPage } from '@pages/app/[app]/setup';
 import { DomainContainer } from '@pages/domains/[domain]/_container';
 import { DomainsPage } from '@pages/domains/page';
 import { KeysPage } from '@pages/keys/page';
@@ -29,7 +31,14 @@ export const App: FC = () => {
                 <Route path="admin" element={<AdminPage />} />
                 <Route path="app/new" element={<CreateAppPage />} />
                 <Route path="app/:app_id" element={<AppContainer />}>
-                    <Route path="" element={<AppPage />} />
+                    <Route path="" element={<AppSetupPage />} />
+
+                    <Route
+                        path="information"
+                        element={<AppInformationPage />}
+                    />
+                    <Route path="debug" element={<AppDebugPage />} />
+
                     <Route
                         path="deployments"
                         element={<AppDeploymentsPage />}
@@ -42,8 +51,8 @@ export const App: FC = () => {
                 </Route>
                 <Route path="domains" element={<DomainsPage />} />
                 <Route path="domain/:app_id" element={<DomainContainer />}>
-                    <Route path="" element={<AppPage />} />
-                    <Route path="settings" element={<AppSettingsPage />} />
+                    {/* <Route path="" element={<AppPage />} /> */}
+                    {/* <Route path="settings" element={<AppSettingsPage />} /> */}
                 </Route>
             </Routes>
             <div className="w-full h-28 flex flex-end justify-center items-end pb-8 brightness-50">
