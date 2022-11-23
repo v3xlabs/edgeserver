@@ -9,3 +9,6 @@ apps/groot/tmp
 versions.json
 tools
 .idea
+
+# To prevent accidental changes
+.vscode
