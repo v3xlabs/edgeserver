@@ -3,10 +3,12 @@ import { extname } from 'node:path';
 
 export const shouldSlashRedirect = (
     config: RoutingConfig,
-    path_url: string,
+    path_url: string
 ): string | undefined => {
     // ignore query parameters
-    const path_url_no_query = path_url.split('?').at(0);
+    const [path_url_no_query, query] = path_url.split('?');
+
+    let newUrl: string | undefined;
 
     if (!path_url_no_query) return undefined;
 
@@ -17,14 +19,17 @@ export const shouldSlashRedirect = (
     if (config.trailing_slash === 'always') {
         if (path_url_no_query.endsWith('/')) return undefined;
 
-        return path_url_no_query + '/';
-    }
-
-    if (config.trailing_slash === 'never') {
+        newUrl = path_url_no_query + '/';
+    } else if (config.trailing_slash === 'never') {
         if (!path_url_no_query.endsWith('/')) return undefined;
 
-        return path_url_no_query.slice(0, -1);
-    }
+        newUrl = path_url_no_query.slice(0, -1);
+    } else 
+        return undefined;
+    
 
-    return undefined;
+    if (query) 
+        newUrl += '?' + query;
+
+    return newUrl;
 };
