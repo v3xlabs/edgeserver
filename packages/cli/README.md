@@ -1,1 +1,0 @@
-# sigcli-node
