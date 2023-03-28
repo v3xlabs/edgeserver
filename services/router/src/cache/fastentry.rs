@@ -1,5 +1,9 @@
+use std::{collections::HashMap, sync::Arc, ops::Deref};
+
+use redis::Commands;
 use tracing::instrument;
 
+#[derive(Debug, Clone)]
 pub struct CacheEntry {
     // Example: http://edgeserver.io/example/path.yes
     path: String,
@@ -11,17 +15,20 @@ pub struct CacheEntry {
 }
 
 pub async fn generate_compound_cache_key() -> String {
-    "".to_string()
+    "test".to_string()
 }
 
 #[instrument]
 pub async fn get_entry(
-    client: &redis::Client,
+    client: Arc<redis::Client>,
 ) -> Result<Option<CacheEntry>, Box<dyn std::error::Error + 'static>> {
+    let key = generate_compound_cache_key().await;
+
     // Get request from redis
-    // let data = client.hgetall("");
+    let data: HashMap<String, String> = client.deref().to_owned().hgetall(key).unwrap();
 
     //
+    println!("{:?}", data);
 
     let entry = CacheEntry {
         path: "http://edgeserver.io/example/path.yes".to_string(),

@@ -1,54 +1,36 @@
-use hyper::{Body, Request, Response, Server};
+use hyper::Server;
 use opentelemetry::{
     global,
-    trace::{Span, TraceContextExt, Tracer},
-    Context, KeyValue,
+    trace::{Span, Tracer},
+    KeyValue, sdk::propagation::TraceContextPropagator,
 };
 use opentelemetry_http::HeaderExtractor;
+use tracing_subscriber::prelude::__tracing_subscriber_SubscriberExt;
 
 use std::{net::SocketAddr, sync::Arc};
 
 mod cache;
+mod metrics;
+mod routing;
+mod legacy;
 
 #[derive(Clone, Debug)]
-struct AppState {
+pub struct AppState {
     tracer: Arc<opentelemetry::sdk::trace::Tracer>,
     // metrics: Arc<MyMetrics>,
     redis: Arc<redis::Client>,
 }
 
-
-async fn hello_world(
-    req: Request<Body>,
-    span: opentelemetry::sdk::trace::Span,
-    state: Arc<AppState>,
-) -> Result<Response<Body>, hyper::Error> {
-    let cx = Context::current_with_span(span);
-    let new_span = state.tracer.start_with_context("Check Cache", &cx);
-
-    let _entry = cache::fastentry::get_entry(&state.redis).await.unwrap().unwrap();
-
-    drop(new_span);
-
-    let body = "Hello, world!";
-    Ok(Response::new(Body::from(body)))
-}
-
 #[tokio::main]
 async fn main() {
-    // Create a new tracing pipeline
-    let tracer = opentelemetry_jaeger::new_agent_pipeline()
-        .with_service_name("router")
-        .install_simple()
-        // .install_batch(opentelemetry::runtime::Tokio)
-        .unwrap();
+    let tracer = metrics::init();
 
     let redis = redis::Client::open("redis://0.0.0.0:6379").expect("Failed to connect to redis");
 
     let state = AppState {
         tracer: Arc::new(tracer),
-        // metrics: Arc::new(MyMetrics::new()),
         redis: Arc::new(redis),
+        // metrics: Arc::new(MyMetrics::new()),
     };
 
     let state_arc = Arc::new(state);
@@ -66,15 +48,15 @@ async fn main() {
                     propagator.extract(&HeaderExtractor(req.headers()))
                 });
 
-                let mut span = tracer
-                    .start_with_context(format!("Request {}", req.uri()), &parent_cx);
+                let mut span =
+                    tracer.start_with_context(format!("Request {}", req.uri()), &parent_cx);
 
                 // Add some attributes to the span
                 span.set_attribute(KeyValue::new("http.method", req.method().to_string()));
                 span.set_attribute(KeyValue::new("http.uri", req.uri().to_string()));
                 span.set_attribute(KeyValue::new("http.route", req.uri().path().to_string()));
 
-                hello_world(req, span, state_arc.clone())
+                routing::handle(req, span, state_arc.clone())
             }))
         }
     }));
