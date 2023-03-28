@@ -1,10 +1,14 @@
 use hyper::{Body, Request, Response, Server};
 use opentelemetry::{
-    trace::{mark_span_as_active, FutureExt, Span, TraceContextExt, Tracer},
+    global,
+    trace::{Span, TraceContextExt, Tracer},
     Context, KeyValue,
 };
+use opentelemetry_http::HeaderExtractor;
 
 use std::{net::SocketAddr, sync::Arc};
+
+mod cache;
 
 #[derive(Clone, Debug)]
 struct AppState {
@@ -13,61 +17,21 @@ struct AppState {
     redis: Arc<redis::Client>,
 }
 
-struct CacheEntry {
-    // Example: http://edgeserver.io/example/path.yes
-    path: String,
-    fs: String, // 's1' | 's3' | 'nfs'
-    // Example:
-    location: String,
-    // headers: String,
-}
 
-#[tracing::instrument]
-async fn get_cached_entry(
-    client: &redis::Client,
-) -> Result<Option<CacheEntry>, Box<dyn std::error::Error + 'static>> {
-    // Get request from redis
-
-    //
-
-    let entry = CacheEntry {
-        path: "http://edgeserver.io/example/path.yes".to_string(),
-        fs: "s1".to_string(),
-        location: "http://s1.example.com/example/path.yes".to_string(),
-    };
-
-    Ok(Some(entry))
-}
-
-#[tracing::instrument]
 async fn hello_world(
     req: Request<Body>,
+    span: opentelemetry::sdk::trace::Span,
     state: Arc<AppState>,
 ) -> Result<Response<Body>, hyper::Error> {
-    // Get the current span from the request context
+    let cx = Context::current_with_span(span);
+    let new_span = state.tracer.start_with_context("Check Cache", &cx);
 
-    let mut span = state.tracer.start("hello_world");
+    let _entry = cache::fastentry::get_entry(&state.redis).await.unwrap().unwrap();
 
-    // // Add some attributes to the span
-    // span.set_attribute(KeyValue::new("http.method", req.method().to_string()));
-    // span.set_attribute(KeyValue::new("http.route", req.uri().path().to_string()));
-
-    let f = get_cached_entry(&state.redis).await.unwrap().unwrap();
+    drop(new_span);
 
     let body = "Hello, world!";
     Ok(Response::new(Body::from(body)))
-
-    // Do some work here...
-    // let mut prnt_context = Context::current_with_span(span);
-    // {
-    //     let mut child = tracer.start_with_context("childddd", &prnt_context);
-
-    //     child.set_attribute(KeyValue::new("http.thing", req.method().to_string()));
-    // }
-
-    // let span = prnt_context.span();
-
-    // span.set_attribute(KeyValue::new("http.status_code", 200));
 }
 
 #[tokio::main]
@@ -79,8 +43,6 @@ async fn main() {
         // .install_batch(opentelemetry::runtime::Tokio)
         .unwrap();
 
-    let telemetry = tracing_opentelemetry().with_tracer(tracer);
-
     let redis = redis::Client::open("redis://0.0.0.0:6379").expect("Failed to connect to redis");
 
     let state = AppState {
@@ -91,7 +53,6 @@ async fn main() {
 
     let state_arc = Arc::new(state);
 
-    // Create a new Hyper server with tracing middleware
     let addr = SocketAddr::from(([127, 0, 0, 1], 1234));
 
     // Initialize and trace requests using hyper server
@@ -100,14 +61,20 @@ async fn main() {
         let tracer = state_arc.tracer.clone();
 
         async move {
-            Ok::<_, hyper::Error>(hyper::service::service_fn(move |mut req| {
-                let cx = req.extensions_mut();
+            Ok::<_, hyper::Error>(hyper::service::service_fn(move |req| {
+                let parent_cx = global::get_text_map_propagator(|propagator| {
+                    propagator.extract(&HeaderExtractor(req.headers()))
+                });
 
-                // I hate this clone but im sure we can make it go poof
-                cx.insert(tracer.clone());
+                let mut span = tracer
+                    .start_with_context(format!("Request {}", req.uri()), &parent_cx);
 
-                // cx.insert(tracer.clone());
-                hello_world(req, state_arc.clone())
+                // Add some attributes to the span
+                span.set_attribute(KeyValue::new("http.method", req.method().to_string()));
+                span.set_attribute(KeyValue::new("http.uri", req.uri().to_string()));
+                span.set_attribute(KeyValue::new("http.route", req.uri().path().to_string()));
+
+                hello_world(req, span, state_arc.clone())
             }))
         }
     }));
