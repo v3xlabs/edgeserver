@@ -2,7 +2,7 @@ use hyper::{server::conn::http1, service::service_fn};
 
 use serde::Deserialize;
 use tokio::net::TcpListener;
-
+use tracing::{debug, error, info, trace, warn};
 
 use std::{net::SocketAddr, sync::Arc};
 
@@ -10,7 +10,7 @@ mod cache;
 mod legacy;
 mod metrics;
 mod storage;
-mod routing;
+mod network;
 
 #[derive(Clone, Debug)]
 pub struct MinioState {
@@ -34,10 +34,13 @@ pub struct RequestData {
 
 #[tokio::main]
 async fn main() {
+    // Load environment variables
     dotenvy::dotenv().unwrap();
 
+    // Initialize tracing
     let tracer = metrics::init();
 
+    // Initialize redis
     let redis = redis::Client::open("redis://0.0.0.0:6379").expect("Failed to connect to redis");
 
     let minio_url = std::env::var("MINIO_URL").expect("MINIO_URL not set");
@@ -63,6 +66,8 @@ async fn main() {
 
     let state_arc = Arc::new(state);
 
+    info!("Listening on {}", addr);
+
     loop {
         let state_arc = state_arc.clone();
 
@@ -72,12 +77,12 @@ async fn main() {
             let handle = http1::Builder::new()
                 .serve_connection(
                     stream,
-                    service_fn(|req| routing::handle_svc(req, &state_arc)),
+                    service_fn(|req| network::handle_svc(req, &state_arc)),
                 )
                 .await;
 
             if let Err(err) = handle {
-                println!("Error serving connection: {:?}", err);
+                error!("Error serving connection: {:?}", err);
             }
         });
     }

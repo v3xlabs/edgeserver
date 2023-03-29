@@ -1,10 +1,9 @@
-use std::ops::{Deref, DerefMut};
 use std::sync::Arc;
 
 use http::{Request, Response};
 use http_body_util::Full;
 use hyper::body::{Bytes, Incoming};
-use opentelemetry::trace::{Tracer, Span, SpanRef};
+use opentelemetry::trace::{Tracer, Span};
 use opentelemetry::KeyValue;
 use opentelemetry::{trace::TraceContextExt, Context};
 
@@ -19,7 +18,6 @@ pub async fn handle(
 ) -> Result<(Response<Full<Bytes>>, Context), hyper::Error> {
     let cx = Context::current_with_span(span);
 
-    
     let key = generate_compound_cache_key(&data.host, req.uri().to_string().as_str(), "http").await;
 
     println!("{}", key);
@@ -40,11 +38,6 @@ pub async fn handle(
 
         let entry = entry.unwrap();
 
-        // entry.fs == 'http'
-        // return Ok(Response::new(Full::new(Bytes::from(format!(
-        //     "{:?}",
-        //     entry.unwrap()
-        // )))));
         let file_stream = {
             let mut span2 = state.tracer.start_with_context("Request File", &cx);
 
@@ -52,7 +45,7 @@ pub async fn handle(
 
             println!("Requesting file from {}", entry.location);
 
-            crate::storage::http::request(&state.http, entry.location.as_str()).await.unwrap()
+            crate::storage::request( state.clone(), &entry.fs, &entry.location).await.unwrap()
         };
 
         return Ok((Response::new(Full::new(file_stream)), cx));
@@ -63,8 +56,8 @@ pub async fn handle(
 
     let learned_entry = CacheEntry::new(
         "localhost:1234/".to_string(),
-        "http".to_string(),
-        "https://media.tenor.com/o656qFKDzeUAAAAC/rick-astley-never-gonna-give-you-up.gif"
+        "minio".to_string(),
+        "index.html"
             .to_string(),
     );
 
@@ -95,7 +88,5 @@ pub async fn handle(
         res.bytes().await.unwrap()
     };
 
-    let span = cx.span();
-    
     Ok((Response::new(Full::new(file_stream)), cx))
 }

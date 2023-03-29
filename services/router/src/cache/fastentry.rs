@@ -1,7 +1,7 @@
 use std::{collections::HashMap, ops::Deref, sync::Arc};
 
 use blake::Blake;
-use redis::{AsyncCommands, Commands};
+use redis::{Commands};
 use tracing::instrument;
 
 #[derive(Debug, Clone)]
@@ -14,6 +14,8 @@ pub struct CacheEntry {
     // headers: String,
     // ssl: // '' | 'letsencrypt' | 'selfsigned'
 }
+
+
 
 impl CacheEntry {
     pub fn new(path: String, fs: String, location: String) -> Self {
