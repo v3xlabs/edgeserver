@@ -1,26 +1,30 @@
-use http::{Request, Response};
 use hyper::{server::conn::http1, service::service_fn};
-use opentelemetry::{
-    global,
-    sdk::propagation::TraceContextPropagator,
-    trace::{Span, Tracer},
-    KeyValue,
-};
-use tokio::net::TcpListener;
-use tracing_subscriber::prelude::__tracing_subscriber_SubscriberExt;
 
-use std::{convert::Infallible, net::SocketAddr, ops::Deref, sync::Arc};
+use serde::Deserialize;
+use tokio::net::TcpListener;
+
+
+use std::{net::SocketAddr, sync::Arc};
 
 mod cache;
 mod legacy;
 mod metrics;
+mod storage;
 mod routing;
+
+#[derive(Clone, Debug)]
+pub struct MinioState {
+    url: String,
+    bucket: String,
+}
 
 #[derive(Clone, Debug)]
 pub struct AppState {
     tracer: Arc<opentelemetry::sdk::trace::Tracer>,
     // metrics: Arc<MyMetrics>,
     redis: Arc<redis::Client>,
+    http: reqwest::Client,
+    minio: Option<Arc<MinioState>>,
 }
 
 #[derive(Debug)]
@@ -30,9 +34,19 @@ pub struct RequestData {
 
 #[tokio::main]
 async fn main() {
+    dotenvy::dotenv().unwrap();
+
     let tracer = metrics::init();
 
     let redis = redis::Client::open("redis://0.0.0.0:6379").expect("Failed to connect to redis");
+
+    let minio_url = std::env::var("MINIO_URL").expect("MINIO_URL not set");
+    let minio_bucket = std::env::var("MINIO_BUCKET").expect("MINIO_BUCKET not set");
+
+    let minio_state = MinioState {
+        url: minio_url,
+        bucket: minio_bucket,
+    };
 
     let addr = SocketAddr::from(([127, 0, 0, 1], 1234));
 
@@ -42,6 +56,8 @@ async fn main() {
     let state = AppState {
         tracer: Arc::new(tracer),
         redis: Arc::new(redis),
+        http: reqwest::Client::new(),
+        minio: Some(Arc::new(minio_state)),
         // metrics: Arc::new(MyMetrics::new()),
     };
 
@@ -53,13 +69,14 @@ async fn main() {
         let (stream, _) = listener.accept().await.unwrap();
 
         tokio::task::spawn(async move {
-            if let Err(err) = http1::Builder::new()
+            let handle = http1::Builder::new()
                 .serve_connection(
                     stream,
                     service_fn(|req| routing::handle_svc(req, &state_arc)),
                 )
-                .await
-            {
+                .await;
+
+            if let Err(err) = handle {
                 println!("Error serving connection: {:?}", err);
             }
         });

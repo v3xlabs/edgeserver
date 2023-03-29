@@ -7,21 +7,17 @@ use tracing::instrument;
 #[derive(Debug, Clone)]
 pub struct CacheEntry {
     // Example: http://edgeserver.io/example/path.yes
-    path: String,
-    fs: String, // 's1' | 's3' | 'nfs'
+    pub path: String,
+    pub fs: String, // 's1' | 's3' | 'nfs'
     // Example:
-    location: String,
+    pub location: String,
     // headers: String,
     // ssl: // '' | 'letsencrypt' | 'selfsigned'
 }
 
 impl CacheEntry {
     pub fn new(path: String, fs: String, location: String) -> Self {
-        Self {
-            path,
-            fs,
-            location,
-        }
+        Self { path, fs, location }
     }
 }
 
@@ -54,10 +50,12 @@ pub async fn get_entry(
         return Ok(None);
     }
 
+    let data = data;
+
     let entry = CacheEntry {
-        path: "http://edgeserver.io/example/path.yes".to_string(),
-        fs: "http".to_string(),
-        location: "http://localhost:".to_string(),
+        path: data.get("path").unwrap().to_string(),
+        fs: data.get("fs").unwrap().to_string(),
+        location: data.get("location").unwrap().to_string(),
     };
 
     Ok(Some(entry))
@@ -69,19 +67,17 @@ pub async fn set_entry(
     key: &str,
     data: CacheEntry,
 ) -> Result<CacheEntry, Box<dyn std::error::Error + 'static>> {
-    let mut map: Vec<(&str, &str)> = Vec::new();
-
-    map.push(("path", data.path.as_str()));
-    map.push(("fs", data.fs.as_str()));
-    map.push(("location", data.location.as_str()));
+    let map = vec![
+        ("path", data.path.as_str()),
+        ("fs", data.fs.as_str()),
+        ("location", data.location.as_str()),
+    ];
 
     let mut c = client.deref().to_owned();
 
     // let mut con = client.get_async_connection().await.unwrap();
 
-    redis::pipe()
-        .atomic()
-            .del(key).execute(&mut c);
+    redis::pipe().atomic().del(key).execute(&mut c);
 
     redis::pipe()
         .atomic()

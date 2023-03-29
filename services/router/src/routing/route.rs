@@ -1,9 +1,10 @@
+use std::ops::{Deref, DerefMut};
 use std::sync::Arc;
 
 use http::{Request, Response};
 use http_body_util::Full;
 use hyper::body::{Bytes, Incoming};
-use opentelemetry::trace::Tracer;
+use opentelemetry::trace::{Tracer, Span, SpanRef};
 use opentelemetry::KeyValue;
 use opentelemetry::{trace::TraceContextExt, Context};
 
@@ -15,12 +16,13 @@ pub async fn handle(
     data: RequestData,
     span: opentelemetry::sdk::trace::Span,
     state: Arc<AppState>,
-) -> Result<Response<Full<Bytes>>, hyper::Error> {
-    let mut cx = Context::current_with_span(span);
+) -> Result<(Response<Full<Bytes>>, Context), hyper::Error> {
+    let cx = Context::current_with_span(span);
 
-    println!("Request Received at {}{}", data.host, req.uri());
-
+    
     let key = generate_compound_cache_key(&data.host, req.uri().to_string().as_str(), "http").await;
+
+    println!("{}", key);
 
     let entry = {
         let _span = state.tracer.start_with_context("Check Cache", &cx);
@@ -36,26 +38,64 @@ pub async fn handle(
         cx.span()
             .set_attribute(KeyValue::new("fastcache".to_string(), "true".to_string()));
 
+        let entry = entry.unwrap();
+
         // entry.fs == 'http'
-        return Ok(Response::new(Full::new(Bytes::from(format!(
-            "{:?}",
-            entry.unwrap()
-        )))));
+        // return Ok(Response::new(Full::new(Bytes::from(format!(
+        //     "{:?}",
+        //     entry.unwrap()
+        // )))));
+        let file_stream = {
+            let mut span2 = state.tracer.start_with_context("Request File", &cx);
+
+            span2.set_attribute(KeyValue::new("url".to_string(), entry.location.to_string()));
+
+            println!("Requesting file from {}", entry.location);
+
+            crate::storage::http::request(&state.http, entry.location.as_str()).await.unwrap()
+        };
+
+        return Ok((Response::new(Full::new(file_stream)), cx));
     }
 
     //
     crate::legacy::serve().await;
 
-    let learned_entry = CacheEntry::new("path".to_string(), "fs".to_string(), "loc".to_string());
+    let learned_entry = CacheEntry::new(
+        "localhost:1234/".to_string(),
+        "http".to_string(),
+        "https://media.tenor.com/o656qFKDzeUAAAAC/rick-astley-never-gonna-give-you-up.gif"
+            .to_string(),
+    );
 
+    let entry = learned_entry.clone();
+
+    let _span = state.tracer.start_with_context("Set Cache (Async)", &cx);
+    let temp_redis = state.redis.clone();
     tokio::spawn(async move {
-        let _span = state.tracer.start_with_context("Set Cache (Async)", &cx);
 
-        crate::cache::fastentry::set_entry(state.redis.clone(), key.as_str(), learned_entry)
+        crate::cache::fastentry::set_entry(temp_redis, key.as_str(), entry)
             .await
-            .unwrap()
+            .unwrap();
+
+        drop(_span);
     });
 
-    let body = "Hello, world!";
-    Ok(Response::new(Full::new(Bytes::from(body))))
+    // Request the file from learned_entry.loc using reqwest streams and return it as response.
+    let file_stream = {
+        let _span = state.tracer.start_with_context("Request File", &cx);
+
+        let client = reqwest::Client::new();
+        let res = client
+            .get(learned_entry.location.as_str())
+            .send()
+            .await
+            .unwrap();
+
+        res.bytes().await.unwrap()
+    };
+
+    let span = cx.span();
+    
+    Ok((Response::new(Full::new(file_stream)), cx))
 }
