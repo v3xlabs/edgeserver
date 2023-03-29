@@ -1,18 +1,20 @@
-use hyper::Server;
+use http::{Request, Response};
+use hyper::{server::conn::http1, service::service_fn};
 use opentelemetry::{
     global,
+    sdk::propagation::TraceContextPropagator,
     trace::{Span, Tracer},
-    KeyValue, sdk::propagation::TraceContextPropagator,
+    KeyValue,
 };
-use opentelemetry_http::HeaderExtractor;
+use tokio::net::TcpListener;
 use tracing_subscriber::prelude::__tracing_subscriber_SubscriberExt;
 
-use std::{net::SocketAddr, sync::Arc};
+use std::{convert::Infallible, net::SocketAddr, ops::Deref, sync::Arc};
 
 mod cache;
+mod legacy;
 mod metrics;
 mod routing;
-mod legacy;
 
 #[derive(Clone, Debug)]
 pub struct AppState {
@@ -21,12 +23,22 @@ pub struct AppState {
     redis: Arc<redis::Client>,
 }
 
+#[derive(Debug)]
+pub struct RequestData {
+    host: String,
+}
+
 #[tokio::main]
 async fn main() {
     let tracer = metrics::init();
 
     let redis = redis::Client::open("redis://0.0.0.0:6379").expect("Failed to connect to redis");
 
+    let addr = SocketAddr::from(([127, 0, 0, 1], 1234));
+
+    let listener = TcpListener::bind(addr).await.unwrap();
+
+    // Create state and create an Arc for the state
     let state = AppState {
         tracer: Arc::new(tracer),
         redis: Arc::new(redis),
@@ -35,34 +47,21 @@ async fn main() {
 
     let state_arc = Arc::new(state);
 
-    let addr = SocketAddr::from(([127, 0, 0, 1], 1234));
-
-    // Initialize and trace requests using hyper server
-    let server = Server::bind(&addr).serve(hyper::service::make_service_fn(move |_| {
+    loop {
         let state_arc = state_arc.clone();
-        let tracer = state_arc.tracer.clone();
 
-        async move {
-            Ok::<_, hyper::Error>(hyper::service::service_fn(move |req| {
-                let parent_cx = global::get_text_map_propagator(|propagator| {
-                    propagator.extract(&HeaderExtractor(req.headers()))
-                });
+        let (stream, _) = listener.accept().await.unwrap();
 
-                let mut span =
-                    tracer.start_with_context(format!("Request {}", req.uri()), &parent_cx);
-
-                // Add some attributes to the span
-                span.set_attribute(KeyValue::new("http.method", req.method().to_string()));
-                span.set_attribute(KeyValue::new("http.uri", req.uri().to_string()));
-                span.set_attribute(KeyValue::new("http.route", req.uri().path().to_string()));
-
-                routing::handle(req, span, state_arc.clone())
-            }))
-        }
-    }));
-
-    println!("Listening on http://{}", addr);
-    if let Err(e) = server.await {
-        eprintln!("server error: {}", e);
+        tokio::task::spawn(async move {
+            if let Err(err) = http1::Builder::new()
+                .serve_connection(
+                    stream,
+                    service_fn(|req| routing::handle_svc(req, &state_arc)),
+                )
+                .await
+            {
+                println!("Error serving connection: {:?}", err);
+            }
+        });
     }
 }

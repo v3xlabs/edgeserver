@@ -7,8 +7,8 @@ edition = "2021"
 # Web
 http = "0.2.9"
 http-body-util = "0.1.0-rc.2"
-hyper = { version = "0.14.25", features = ["full"] }
-redis = "0.22.3"
+hyper = { version = "1.0.0-rc.3", features = ["full"] }
+redis = { version = "0.22.3", features = ["aio", "ahash", "tokio-comp"] }
 tokio = { version = "1.26.0", features = ["full"] }
 tower-http = { version = "0.4.0", features = ["trace"] }
 
@@ -29,3 +29,7 @@ atty = "0.2"
 opentelemetry-jaeger = { version = "0.17.0", features = [
     "rt-tokio",
 ], default-features = false }
+ahash = "0.8.3"
+base64 = "0.21.0"
+blake = "2.0.2"
+thousands = "0.2.0"

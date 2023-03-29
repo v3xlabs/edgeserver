@@ -1,39 +1,49 @@
-use std::sync::Arc;
+use std::{convert::Infallible, sync::Arc};
 
 use http::{Request, Response};
-use hyper::Body;
-use opentelemetry::{
-    trace::{TraceContextExt, Tracer},
-    Context,
+use http_body_util::Full;
+use hyper::{
+    body::{Bytes, Incoming},
 };
+use opentelemetry::{
+    trace::{Span, Tracer},
+    KeyValue
+};
+use tokio::time::Instant;
+use thousands::Separable;
 
-use crate::{cache, AppState};
+use crate::{AppState, RequestData};
 
-pub async fn handle(
-    req: Request<Body>,
-    span: opentelemetry::sdk::trace::Span,
-    state: Arc<AppState>,
-) -> Result<Response<Body>, hyper::Error> {
-    let cx = Context::current_with_span(span);
-    let new_span = state.tracer.start_with_context("Check Cache", &cx);
+pub mod route;
+pub mod util;
 
-    println!("Request Received at {}", req.uri());
+pub async fn handle_svc(
+    request: Request<Incoming>,
+    state: &Arc<AppState>,
+) -> Result<Response<Full<Bytes>>, hyper::Error> {
+    let start_time = Instant::now();
 
-    let entry = cache::fastentry::get_entry(state.redis.clone())
-        .await
-        .unwrap();
+    let (req, host) = util::extract_host(request).unwrap();
 
-    if entry.is_some() {
-        println!("FastCache exists, using quick response.");
+    let mut span = state.tracer.start(format!("{} {}", req.method(), &host));
 
-        // entry.fs == 'http'
-    }
+    // Add some attributes to the span
+    span.set_attribute(KeyValue::new("http.host", host.clone()));
+    span.set_attribute(KeyValue::new("http.method", req.method().to_string()));
+    span.set_attribute(KeyValue::new("http.uri", req.uri().to_string()));
+    span.set_attribute(KeyValue::new("http.route", req.uri().path().to_string()));
 
-    // 
-    crate::legacy::serve().await;
+    let data = RequestData { host };
 
-    drop(new_span);
+    let response = route::handle(req, data, span, state.clone()).await;
 
-    let body = "Hello, world!";
-    Ok(Response::new(Body::from(body)))
+    let duration = start_time.elapsed();
+
+    let micros = duration.as_micros();
+
+    let micros_float = micros as f64;
+
+    println!("Successfully completed request in {:.3}ms", (micros_float / 1000.0));
+
+    response
 }

@@ -3,6 +3,29 @@
 version = 3
 
 [[package]]
+name = "ahash"
+version = "0.7.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "fcb51a0695d8f838b1ee009b3fbf66bda078cd64590202a864a8f3e8c4315c47"
+dependencies = [
+ "getrandom",
+ "once_cell",
+ "version_check",
+]
+
+[[package]]
+name = "ahash"
+version = "0.8.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2c99f64d1e06488f620f932677e24bc6e2897582980441ae90a671415bd7ec2f"
+dependencies = [
+ "cfg-if",
+ "getrandom",
+ "once_cell",
+ "version_check",
+]
+
+[[package]]
 name = "anyhow"
 version = "1.0.70"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -71,7 +94,7 @@ dependencies = [
  "futures-util",
  "http",
  "http-body 0.4.5",
- "hyper",
+ "hyper 0.14.25",
  "itoa",
  "matchit",
  "memchr",
@@ -110,10 +133,26 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9e1b586273c5702936fe7b7d6896644d8be71e6314cfe09d3167c95f712589e8"
 
 [[package]]
+name = "base64"
+version = "0.21.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a4a4ddaa51a5bc52a6948f74c06d20aaaddb71924eab79b8c97a8c556e942d6a"
+
+[[package]]
 name = "bitflags"
 version = "1.3.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "bef38d45163c2f1dde094a7dfd33ccf595c92905c8f8f4fdc18d06fb1037718a"
+
+[[package]]
+name = "blake"
+version = "2.0.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ee55e9ca33be1f257d8356cfb29b10b1c8f86dc38cf1344ca01525464356cd0c"
+dependencies = [
+ "cc",
+ "libc",
+]
 
 [[package]]
 name = "bumpalo"
@@ -152,7 +191,11 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "35ed6e9d84f0b51a7f52daf1c7d71dd136fd7a3f41a8462b8cdb8c78d920fad4"
 dependencies = [
  "bytes",
+ "futures-core",
  "memchr",
+ "pin-project-lite",
+ "tokio",
+ "tokio-util",
 ]
 
 [[package]]
@@ -487,12 +530,34 @@ dependencies = [
 ]
 
 [[package]]
+name = "hyper"
+version = "1.0.0-rc.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7b75264b2003a3913f118d35c586e535293b3e22e41f074930762929d071e092"
+dependencies = [
+ "bytes",
+ "futures-channel",
+ "futures-core",
+ "futures-util",
+ "h2",
+ "http",
+ "http-body 1.0.0-rc.2",
+ "httparse",
+ "httpdate",
+ "itoa",
+ "pin-project-lite",
+ "tokio",
+ "tracing",
+ "want",
+]
+
+[[package]]
 name = "hyper-timeout"
 version = "0.4.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "bbb958482e8c7be4bc3cf272a766a2b0bf1a6755e7a6ae777f017a31d11b13b1"
 dependencies = [
- "hyper",
+ "hyper 0.14.25",
  "pin-project-lite",
  "tokio",
  "tokio-io-timeout",
@@ -1033,11 +1098,18 @@ version = "0.22.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "aa8455fa3621f6b41c514946de66ea0531f57ca017b2e6c7cc368035ea5b46df"
 dependencies = [
+ "ahash 0.7.6",
+ "async-trait",
+ "bytes",
  "combine",
+ "futures-util",
  "itoa",
  "percent-encoding",
+ "pin-project-lite",
  "ryu",
  "sha1_smol",
+ "tokio",
+ "tokio-util",
  "url",
 ]
 
@@ -1078,16 +1150,20 @@ checksum = "f162c6dd7b008981e4d40210aca20b4bd0f9b60ca9271061b07f78537722f2e1"
 name = "router"
 version = "0.1.0"
 dependencies = [
+ "ahash 0.8.3",
  "atty",
+ "base64 0.21.0",
+ "blake",
  "http",
  "http-body-util",
- "hyper",
+ "hyper 1.0.0-rc.3",
  "opentelemetry",
  "opentelemetry-jaeger",
  "opentelemetry-otlp",
  "opentelemetry-prometheus",
  "prometheus",
  "redis",
+ "thousands",
  "tokio",
  "tower-http",
  "tracing",
@@ -1245,6 +1321,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "thousands"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3bf63baf9f5039dadc247375c29eb13706706cfde997d0330d05aa63a77d8820"
+
+[[package]]
 name = "thread_local"
 version = "1.1.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1393,14 +1475,14 @@ dependencies = [
  "async-stream",
  "async-trait",
  "axum",
- "base64",
+ "base64 0.13.1",
  "bytes",
  "futures-core",
  "futures-util",
  "h2",
  "http",
  "http-body 0.4.5",
- "hyper",
+ "hyper 0.14.25",
  "hyper-timeout",
  "percent-encoding",
  "pin-project",
@@ -1622,6 +1704,12 @@ name = "valuable"
 version = "0.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "830b7e5d4d90034032940e4ace0d9a9a057e7a45cd94e6c007832e39edb82f6d"
+
+[[package]]
+name = "version_check"
+version = "0.9.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "49874b5167b65d7193b8aba1567f5c7d93d001cafc34600cee003eda787e483f"
 
 [[package]]
 name = "want"
