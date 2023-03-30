@@ -1,4 +1,4 @@
-use std::{sync::Arc};
+use std::sync::Arc;
 
 use http::{Request, Response};
 use http_body_util::Full;
@@ -24,9 +24,7 @@ pub async fn handle_svc(
 
     let span_name = format!("{} {}{}", request.method(), host, request.uri().path());
 
-    let mut span = state
-        .tracer
-        .start(span_name);
+    let mut span = state.tracer.start(span_name);
 
     // Add some attributes to the span
     span.set_attribute(KeyValue::new("http.host", host.clone()));

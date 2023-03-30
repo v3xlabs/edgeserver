@@ -9,8 +9,8 @@ use std::{net::SocketAddr, sync::Arc};
 mod cache;
 mod legacy;
 mod metrics;
-mod storage;
 mod network;
+mod storage;
 
 #[derive(Clone, Debug)]
 pub struct MinioState {

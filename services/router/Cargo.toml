@@ -17,6 +17,7 @@ prometheus-core = { package = "prometheus", version = "0.13" }
 opentelemetry = { version = "0.18", features = ["metrics", "rt-tokio"] }
 opentelemetry-prometheus = "0.11"
 opentelemetry-otlp = "0.11"
+opentelemetry-jaeger = { version = "0.17.0", features = ["rt-tokio"], default-features = false }
 
 # Logging
 tracing = "0.1"
@@ -25,10 +26,7 @@ tracing-appender = "0.2"
 tracing-opentelemetry = { version = "0.18", features = ["async-trait"] }
 atty = "0.2"
 
-# opentelemetry-http = { version = "0.8.0", features = ["hyper", "tokio", "reqwest"] }
-opentelemetry-jaeger = { version = "0.17.0", features = [
-    "rt-tokio",
-], default-features = false }
+# Misc
 ahash = "0.8.3"
 base64 = "0.21.0"
 blake = "2.0.2"

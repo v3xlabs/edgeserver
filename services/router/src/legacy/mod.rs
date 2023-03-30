@@ -1,4 +1,1 @@
-
-pub async fn serve() {
-    
-}
+pub async fn serve() {}

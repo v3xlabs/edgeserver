@@ -1,6 +1,4 @@
-use opentelemetry::{
-    sdk::trace::Tracer as SdkTracer,
-};
+use opentelemetry::sdk::trace::Tracer as SdkTracer;
 use tracing_subscriber::{fmt, prelude::__tracing_subscriber_SubscriberExt, Registry};
 
 // Create a new tracing pipeline
@@ -12,8 +10,7 @@ pub fn init() -> SdkTracer {
         .unwrap();
     // .install_batch(opentelemetry::runtime::Tokio)
 
-    let subscriber = Registry::default()
-    .with(fmt::Layer::default());
+    let subscriber = Registry::default().with(fmt::Layer::default());
 
     tracing::subscriber::set_global_default(subscriber).unwrap();
 

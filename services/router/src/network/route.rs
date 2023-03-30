@@ -3,7 +3,7 @@ use std::sync::Arc;
 use http::{Request, Response};
 use http_body_util::Full;
 use hyper::body::{Bytes, Incoming};
-use opentelemetry::trace::{Tracer, Span};
+use opentelemetry::trace::{Span, Tracer};
 use opentelemetry::KeyValue;
 use opentelemetry::{trace::TraceContextExt, Context};
 
@@ -45,7 +45,9 @@ pub async fn handle(
 
             println!("Requesting file from {}", entry.location);
 
-            crate::storage::request( state.clone(), &entry.fs, &entry.location).await.unwrap()
+            crate::storage::request(state.clone(), &entry.fs, &entry.location)
+                .await
+                .unwrap()
         };
 
         return Ok((Response::new(Full::new(file_stream)), cx));
@@ -57,8 +59,7 @@ pub async fn handle(
     let learned_entry = CacheEntry::new(
         "localhost:1234/".to_string(),
         "minio".to_string(),
-        "index.html"
-            .to_string(),
+        "index.html".to_string(),
     );
 
     let entry = learned_entry.clone();
@@ -66,7 +67,6 @@ pub async fn handle(
     let _span = state.tracer.start_with_context("Set Cache (Async)", &cx);
     let temp_redis = state.redis.clone();
     tokio::spawn(async move {
-
         crate::cache::fastentry::set_entry(temp_redis, key.as_str(), entry)
             .await
             .unwrap();

@@ -2,10 +2,7 @@ use std::{convert::Infallible, sync::Arc};
 
 use hyper::body::Bytes;
 
-pub async fn request(
-    state: Arc<crate::AppState>,
-    path: &str,
-) -> Result<Bytes, Infallible> {
+pub async fn request(state: Arc<crate::AppState>, path: &str) -> Result<Bytes, Infallible> {
     let minio = state.minio.clone().unwrap();
 
     let url = format!("{}/{}/{}", minio.url, minio.bucket, path);
@@ -13,10 +10,7 @@ pub async fn request(
     crate::storage::http::request(&state.http, &url).await
 }
 
-pub async fn exists(
-    state: Arc<crate::AppState>,
-    path: &str,
-) -> Result<bool, Infallible> {
+pub async fn exists(state: Arc<crate::AppState>, path: &str) -> Result<bool, Infallible> {
     let minio = state.minio.clone().unwrap();
 
     let url = format!("{}/{}/{}", minio.url, minio.bucket, path);

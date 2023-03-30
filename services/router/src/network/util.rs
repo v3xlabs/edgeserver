@@ -12,7 +12,7 @@ pub fn extract_host<T>(req: Request<T>) -> Result<(Request<T>, String), Error> {
         Some(host) => {
             let host = host.to_str().unwrap().to_string();
             Ok((req, host))
-        },
+        }
         None => Err(Error::NoHost),
     }
 }
