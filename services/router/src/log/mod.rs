@@ -1,5 +1,11 @@
-use opentelemetry::sdk::trace::Tracer as SdkTracer;
-use tracing_subscriber::{fmt, prelude::__tracing_subscriber_SubscriberExt, Registry};
+use {
+    opentelemetry::sdk::trace::Tracer as SdkTracer,
+    tracing_subscriber::{fmt, prelude::__tracing_subscriber_SubscriberExt, Registry},
+};
+
+pub mod prelude {
+    pub use tracing::{debug, error, info, trace, warn};
+}
 
 // Create a new tracing pipeline
 pub fn init() -> SdkTracer {

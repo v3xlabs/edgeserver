@@ -1333,6 +1333,7 @@ name = "router"
 version = "0.1.0"
 dependencies = [
  "ahash 0.8.3",
+ "async-trait",
  "atty",
  "base64 0.21.0",
  "blake",
@@ -1350,6 +1351,7 @@ dependencies = [
  "reqwest",
  "serde",
  "serde_json",
+ "thiserror",
  "thousands",
  "tokio",
  "tower-http",

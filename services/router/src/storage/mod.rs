@@ -1,32 +1,60 @@
-use std::{convert::Infallible, sync::Arc};
-
-use hyper::body::Bytes;
+use {
+    crate::{
+        error::{Error, Result},
+        state::AppState,
+        storage::{http::HttpStorage, minio::MinioStorage},
+    },
+    async_trait::async_trait,
+    hyper::body::Bytes,
+    std::sync::Arc,
+};
 
 pub mod http;
 pub mod minio;
 
-pub async fn request(
-    app_state: Arc<crate::AppState>,
-    storage_backend: &str,
-    location: &str,
-) -> Result<Bytes, Infallible> {
-    // Figure out what storage backend
-    match storage_backend {
-        "minio" => minio::request(app_state, location).await,
-        "http" => http::request(&app_state.http, location).await,
-        _ => panic!("Unknown storage backend"),
-    }
+#[derive(Clone, Debug)]
+pub struct StorageProviders<M, H>
+where
+    M: Storage,
+    H: Storage,
+{
+    pub(crate) minio: Option<Arc<M>>,
+    pub(crate) http: Arc<H>,
 }
 
-pub async fn exists(
-    app_state: Arc<crate::AppState>,
-    storage_backend: &str,
-    location: &str,
-) -> Result<bool, Infallible> {
-    // Figure out what storage backend
-    match storage_backend {
-        "minio" => minio::exists(app_state, location).await,
-        "http" => http::exists(app_state, location).await,
-        _ => panic!("Unknown storage backend"),
+impl StorageProviders<MinioStorage, HttpStorage> {
+    pub async fn request(
+        &self,
+        app_state: &Arc<AppState>,
+        fs: &str,
+        location: &str,
+    ) -> Result<Bytes> {
+        match fs {
+            "minio" => match &self.minio {
+                Some(minio) => minio.request(&app_state, location).await,
+                None => Err(Error::UnsupportedBackend("minio".to_string())),
+            },
+            "http" => self.http.request(&app_state, location).await,
+            backend => Err(Error::UnknownBackend(backend.to_string())),
+        }
     }
+
+    // TODO: uncomment if used or delete
+    // pub async fn exists(&self, app_state: &Arc<AppState>, fs: &str, location:
+    // &str) -> Result<bool> {     match fs {
+    //         "minio" => match &self.minio {
+    //             Some(minio) => minio.exists(&app_state, location).await,
+    //             None => Err(Error::UnsupportedBackend("minio".to_string()))
+    //         },
+    //         "http" => self.http.exists(&app_state, location).await,
+    //         backend => Err(Error::UnknownBackend(backend.to_string())),
+    //     }
+    // }
+}
+
+#[async_trait]
+pub trait Storage {
+    async fn request(&self, app_state: &Arc<AppState>, location: &str) -> Result<Bytes>;
+
+    async fn exists(&self, app_state: &Arc<AppState>, location: &str) -> Result<bool>;
 }

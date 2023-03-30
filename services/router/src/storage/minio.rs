@@ -1,19 +1,27 @@
-use std::{convert::Infallible, sync::Arc};
+use {
+    crate::{error::Result, storage::Storage, AppState},
+    async_trait::async_trait,
+    hyper::body::Bytes,
+    std::sync::Arc,
+};
 
-use hyper::body::Bytes;
-
-pub async fn request(state: Arc<crate::AppState>, path: &str) -> Result<Bytes, Infallible> {
-    let minio = state.minio.clone().unwrap();
-
-    let url = format!("{}/{}/{}", minio.url, minio.bucket, path);
-
-    crate::storage::http::request(&state.http, &url).await
+#[derive(Clone, Debug)]
+pub struct MinioStorage {
+    pub(crate) url: String,
+    pub(crate) bucket: String,
 }
 
-pub async fn exists(state: Arc<crate::AppState>, path: &str) -> Result<bool, Infallible> {
-    let minio = state.minio.clone().unwrap();
+#[async_trait]
+impl Storage for MinioStorage {
+    async fn request(&self, app_state: &Arc<AppState>, path: &str) -> Result<Bytes> {
+        let url = format!("{}/{}/{}", self.url, self.bucket, path);
 
-    let url = format!("{}/{}/{}", minio.url, minio.bucket, path);
+        app_state.storage.http.request(&app_state, &url).await
+    }
 
-    crate::storage::http::exists(state, &url).await
+    async fn exists(&self, app_state: &Arc<AppState>, path: &str) -> Result<bool> {
+        let url = format!("{}/{}/{}", self.url, self.bucket, path);
+
+        app_state.storage.http.exists(&app_state, &url).await
+    }
 }

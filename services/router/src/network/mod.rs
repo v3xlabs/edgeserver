@@ -1,18 +1,37 @@
-use std::sync::Arc;
-
-use http::{Request, Response};
-use http_body_util::Full;
-use hyper::body::{Bytes, Incoming};
-use opentelemetry::{
-    trace::{Span, TraceContextExt, Tracer},
-    KeyValue,
+use {
+    crate::{AppState, RequestData},
+    http::{Request, Response},
+    http_body_util::Full,
+    hyper::body::{Bytes, Incoming},
+    opentelemetry::{
+        trace::{Span, TraceContextExt, Tracer},
+        KeyValue,
+    },
+    std::sync::Arc,
+    tokio::time::Instant,
 };
-use tokio::time::Instant;
-
-use crate::{AppState, RequestData};
 
 pub mod route;
-pub mod util;
+
+use crate::error::Error;
+
+#[derive(Debug, thiserror::Error)]
+pub enum NetworkError {
+    #[error("Missing host")]
+    NoHost,
+}
+
+pub fn extract_host<T>(req: Request<T>) -> Result<(Request<T>, String), Error> {
+    let host = req.headers().get("Host");
+
+    match host {
+        Some(host) => {
+            let host = host.to_str().unwrap().to_string();
+            Ok((req, host))
+        }
+        None => Err(Error::NetworkError(NetworkError::NoHost)),
+    }
+}
 
 pub async fn handle_svc(
     request: Request<Incoming>,
@@ -20,7 +39,7 @@ pub async fn handle_svc(
 ) -> Result<Response<Full<Bytes>>, hyper::Error> {
     let start_time = Instant::now();
 
-    let (request, host) = util::extract_host(request).unwrap();
+    let (request, host) = extract_host(request).unwrap();
 
     let span_name = format!("{} {}{}", request.method(), host, request.uri().path());
 

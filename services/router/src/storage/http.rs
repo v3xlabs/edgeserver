@@ -1,18 +1,39 @@
-use std::{convert::Infallible, sync::Arc};
+use {
+    crate::{
+        error::{Error, Result},
+        storage::Storage,
+        AppState,
+    },
+    async_trait::async_trait,
+    hyper::body::Bytes,
+    reqwest::Client,
+    std::sync::Arc,
+};
 
-use hyper::body::Bytes;
-use reqwest::Client;
-
-use crate::AppState;
-
-pub async fn request(client: &Client, url: &str) -> Result<Bytes, Infallible> {
-    let res = client.get(url).send().await.unwrap();
-
-    Ok(res.bytes().await.unwrap())
+#[derive(Debug, Clone)]
+pub struct HttpStorage {
+    client: Client,
 }
 
-pub async fn exists(client: Arc<AppState>, url: &str) -> Result<bool, Infallible> {
-    let res = client.http.head(url).send().await.unwrap();
+impl Default for HttpStorage {
+    fn default() -> Self {
+        HttpStorage {
+            client: Default::default(),
+        }
+    }
+}
 
-    Ok(res.status().is_success())
+#[async_trait]
+impl Storage for HttpStorage {
+    async fn request(&self, _app_state: &Arc<AppState>, url: &str) -> Result<Bytes> {
+        let res = self.client.get(url).send().await?;
+
+        res.bytes().await.map_err(|e| Error::Reqwest(e))
+    }
+
+    async fn exists(&self, _app_state: &Arc<AppState>, url: &str) -> Result<bool> {
+        let res = self.client.head(url).send().await.unwrap();
+
+        Ok(res.status().is_success())
+    }
 }

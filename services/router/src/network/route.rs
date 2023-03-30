@@ -1,14 +1,20 @@
-use std::sync::Arc;
-
-use http::{Request, Response};
-use http_body_util::Full;
-use hyper::body::{Bytes, Incoming};
-use opentelemetry::trace::{Span, Tracer};
-use opentelemetry::KeyValue;
-use opentelemetry::{trace::TraceContextExt, Context};
-
-use crate::cache::fastentry::{generate_compound_cache_key, CacheEntry};
-use crate::{cache, AppState, RequestData};
+use {
+    crate::{
+        cache,
+        cache::fastentry::{generate_compound_cache_key, CacheEntry},
+        AppState,
+        RequestData,
+    },
+    http::{Request, Response},
+    http_body_util::Full,
+    hyper::body::{Bytes, Incoming},
+    opentelemetry::{
+        trace::{Span, TraceContextExt, Tracer},
+        Context,
+        KeyValue,
+    },
+    std::sync::Arc,
+};
 
 pub async fn handle(
     req: Request<Incoming>,
@@ -45,7 +51,9 @@ pub async fn handle(
 
             println!("Requesting file from {}", entry.location);
 
-            crate::storage::request(state.clone(), &entry.fs, &entry.location)
+            state
+                .storage
+                .request(&state, &entry.fs, &entry.location)
                 .await
                 .unwrap()
         };
@@ -74,7 +82,8 @@ pub async fn handle(
         drop(_span);
     });
 
-    // Request the file from learned_entry.loc using reqwest streams and return it as response.
+    // Request the file from learned_entry.loc using reqwest streams and return it
+    // as response.
     let file_stream = {
         let _span = state.tracer.start_with_context("Request File", &cx);
 

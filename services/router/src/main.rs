@@ -1,31 +1,18 @@
-use hyper::{server::conn::http1, service::service_fn};
-
-use serde::Deserialize;
-use tokio::net::TcpListener;
-use tracing::{debug, error, info, trace, warn};
-
-use std::{net::SocketAddr, sync::Arc};
+use {
+    crate::{log::prelude::*, state::AppState},
+    hyper::{server::conn::http1, service::service_fn},
+    std::{net::SocketAddr, sync::Arc},
+    tokio::net::TcpListener,
+};
 
 mod cache;
+mod environment;
+mod error;
 mod legacy;
-mod metrics;
+mod log;
 mod network;
+mod state;
 mod storage;
-
-#[derive(Clone, Debug)]
-pub struct MinioState {
-    url: String,
-    bucket: String,
-}
-
-#[derive(Clone, Debug)]
-pub struct AppState {
-    tracer: Arc<opentelemetry::sdk::trace::Tracer>,
-    // metrics: Arc<MyMetrics>,
-    redis: Arc<redis::Client>,
-    http: reqwest::Client,
-    minio: Option<Arc<MinioState>>,
-}
 
 #[derive(Debug)]
 pub struct RequestData {
@@ -37,34 +24,23 @@ async fn main() {
     // Load environment variables
     dotenvy::dotenv().unwrap();
 
-    // Initialize tracing
-    let tracer = metrics::init();
+    // Get Config
+    let config = environment::get_config().expect("Failed to get configuration");
+
+    // Define vars
+    let redis_url = config.redis_url.clone();
+    let port = config.port.clone();
 
     // Initialize redis
-    let redis = redis::Client::open("redis://0.0.0.0:6379").expect("Failed to connect to redis");
+    let redis = redis::Client::open(redis_url).expect("Failed to connect to redis");
 
-    let minio_url = std::env::var("MINIO_URL").expect("MINIO_URL not set");
-    let minio_bucket = std::env::var("MINIO_BUCKET").expect("MINIO_BUCKET not set");
+    let addr = SocketAddr::from(([127, 0, 0, 1], port));
 
-    let minio_state = MinioState {
-        url: minio_url,
-        bucket: minio_bucket,
-    };
-
-    let addr = SocketAddr::from(([127, 0, 0, 1], 1234));
-
-    let listener = TcpListener::bind(addr).await.unwrap();
-
-    // Create state and create an Arc for the state
-    let state = AppState {
-        tracer: Arc::new(tracer),
-        redis: Arc::new(redis),
-        http: reqwest::Client::new(),
-        minio: Some(Arc::new(minio_state)),
-        // metrics: Arc::new(MyMetrics::new()),
-    };
+    let state = AppState::new(config, redis);
 
     let state_arc = Arc::new(state);
+
+    let listener = TcpListener::bind(addr).await.unwrap();
 
     info!("Listening on {}", addr);
 

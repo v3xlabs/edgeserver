@@ -1,8 +1,9 @@
-use std::{collections::HashMap, ops::Deref, sync::Arc};
-
-use blake::Blake;
-use redis::Commands;
-use tracing::instrument;
+use {
+    blake::Blake,
+    redis::Commands,
+    std::{collections::HashMap, ops::Deref, sync::Arc},
+    tracing::instrument,
+};
 
 #[derive(Debug, Clone)]
 pub struct CacheEntry {
