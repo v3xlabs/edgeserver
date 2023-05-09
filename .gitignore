@@ -12,3 +12,5 @@ tools
 
 # To prevent accidental changes
 .vscode
+
+target/

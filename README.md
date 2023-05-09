@@ -1,8 +1,8 @@
 <a href="https://edgeserver.io" target="_blank">
   <p align="center">
     <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="./assets/edgeserver_light.png#" />
-      <img alt="edgeserver.io bridging web2 to web3" src="./assets/edgeserver_dark.png#" width="100%" />
+      <source media="(prefers-color-scheme: dark)" srcset="./assets/edgeserver_light3.png#" />
+      <img alt="edgeserver.io bridging web2 to web3" src="./assets/edgeserver_dark3.png#" width="100%" />
     </picture>
   </p>
 </a>

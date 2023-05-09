@@ -1,0 +1,35 @@
+{
+    "root": true,
+    "parser": "@typescript-eslint/parser",
+    "parserOptions": {
+        "ecmaVersion": 2022
+    },
+    "extends": [
+        "plugin:v3xlabs/recommended",
+        "plugin:react/recommended",
+        "plugin:jsx-a11y/recommended",
+        "plugin:tailwindcss/recommended"
+    ],
+    "ignorePatterns": ["!**/*"],
+    "plugins": ["v3xlabs", "react", "node", "jsx-a11y"],
+    "env": {
+        "browser": true,
+        "node": true,
+        "es2022": true
+    },
+    "settings": {
+        "react": {
+            "version": "detect"
+        }
+    },
+    "globals": {
+        "JSX": "readonly"
+    },
+    "rules": {
+        "react/react-in-jsx-scope": "off",
+        "node/no-process-env": "error",
+        "unicorn/no-nested-ternary": "off",
+        "unused-imports/no-unused-vars": "off",
+        "tailwindcss/no-custom-classname": "off"
+    }
+}
