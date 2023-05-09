@@ -1,9 +1,0 @@
-.DS_Store
-.idea
-*.cpuprofile
-*.local
-*.log
-dist
-node_modules
-.eslintcache
-dist

@@ -1,5 +1,0 @@
-wontfix: [".gitignore", "LICENSE"]
-"edgelabs/app": ["apps/app/**/*"]
-"edgelabs/groot": ["apps/groot/**/*"]
-"edgelabs/cli": ["packages/cli/**/*"]
-"edgelabs/types": ["packages/types/**/*"]

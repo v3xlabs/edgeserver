@@ -1,0 +1,51 @@
+{
+    "name": "@edgelabs/api",
+    "private": true,
+    "version": "0.0.1",
+    "description": "The API of Edgeserver",
+    "type": "module",
+    "main": "src/index.ts",
+    "author": {
+        "name": "V3X Labs",
+        "url": "https://v3x.company"
+    },
+    "scripts": {
+        "dev": "nodemon --watch './**/*.ts' --exec 'node --experimental-specifier-resolution=node --loader ts-node/esm' src/index.ts",
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "lint": "eslint -c .eslintrc.json --ext .ts ./src",
+        "build": "tsc"
+    },
+    "keywords": [],
+    "license": "GPL-3.0",
+    "dependencies": {
+        "@edgelabs/types": "workspace:*",
+        "@fastify/cors": "^8.2.1",
+        "@hookform/resolvers": "^3.1.0",
+        "@lvksh/logger": "^1.6.4",
+        "@spruceid/siwe-parser": "^2.0.2",
+        "chalk": "^5.2.0",
+        "eslint-import-resolver-typescript": "^3.5.5",
+        "eslint-plugin-import": "^2.27.5",
+        "eslint-plugin-node": "^11.1.0",
+        "ethers": "^5.7.2",
+        "fastify": "^4.17.0",
+        "jsonwebtoken": "^9.0.0",
+        "permissio": "2.0.1-beta.1",
+        "scyllo": "^1.8.0",
+        "siwe": "^2.1.4",
+        "sunflake": "^0.6.0",
+        "zod": "^3.21.4"
+    },
+    "devDependencies": {
+        "@types/jsonwebtoken": "^9.0.2",
+        "@typescript-eslint/parser": "^5.59.2",
+        "eslint": "^8.39.0",
+        "eslint-plugin-v3xlabs": "^1.6.0",
+        "nodemon": "^2.0.22",
+        "ts-node": "^10.9.1",
+        "typescript": "^5.0.4"
+    },
+    "engines": {
+        "node": ">=20.0.0"
+    }
+}
