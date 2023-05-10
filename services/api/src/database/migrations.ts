@@ -6,6 +6,7 @@ import { initial_create } from './migrations/00_initial_create.js';
 import { create_deployments } from './migrations/01_create_deployments.js';
 import { create_user_membership } from './migrations/02_create_user_membership.js';
 import { create_domains } from './migrations/03_create_domains.js';
+import { create_deployment_data } from './migrations/04_create_deployment_data.js';
 
 export type MigrationState = {
     instance_id: string;
@@ -76,4 +77,6 @@ export const Migrations: Migration<TableScheme>[] = [
     create_user_membership,
     // Create Domains
     create_domains,
+    // Create Deployment Data
+    create_deployment_data,
 ];

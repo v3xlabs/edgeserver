@@ -11,7 +11,7 @@ pub async fn get_domain_lookup(session: &Session, base_url: &str) -> Option<(i64
 
     let result = session
         .query(
-            "SELECT deploy_id, app_id FROM signal.dlt WHERE base_url = ? LIMIT 1",
+            "SELECT site_id FROM edgeserver.domains WHERE domain = ? LIMIT 1",
             (base_url,),
         )
         .await
