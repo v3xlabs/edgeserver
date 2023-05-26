@@ -17,7 +17,7 @@ mod storage;
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Load environment variables
-    dotenvy::dotenv().unwrap();
+    dotenvy::dotenv().ok();
 
     // Init tracer
     let tracer = metrics::init();
