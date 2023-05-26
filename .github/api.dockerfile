@@ -4,6 +4,12 @@ WORKDIR /app
 
 COPY . .
 
-RUN npm install
+RUN npm install -g pnpm
 
-CMD ["cd", "services/api", "&&", "npm", "dev"]
+RUN pnpm install
+
+WORKDIR /app/services/api
+
+RUN pnpm install
+
+CMD ["pnpm", "run", "dev"]
