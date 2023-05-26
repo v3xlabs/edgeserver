@@ -1,4 +1,4 @@
-FROM node:20-buster
+FROM node:20-buster as builder
 
 WORKDIR /app
 
@@ -6,10 +6,14 @@ COPY . .
 
 RUN npm install -g pnpm
 
-RUN pnpm install
+RUN pnpm install --filter=@edgelabs/api...
+RUN pnpm --filter=@edgelabs/api... build
+RUN pnpm --filter=@edgelabs/api deploy service_api
 
-WORKDIR /app/services/api
+FROM node:20-buster
 
-RUN pnpm install
+WORKDIR /app
 
-CMD ["pnpm", "run", "dev"]
+COPY --from=builder /app/service_api .
+
+CMD ["node", "dist/index.js"]

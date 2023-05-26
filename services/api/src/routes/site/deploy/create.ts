@@ -18,6 +18,9 @@ export const PostDeployRoute: RouteHandler<SiteParameters> = async (
         site_id,
         deploy_id: snowflake(),
         created_at: new Date().toISOString(),
+        resolution: '',
+        storage: '',
+        storage_id: '',
     };
 
     await DB.insertInto('deployments', deployment);
