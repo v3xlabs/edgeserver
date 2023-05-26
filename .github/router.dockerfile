@@ -5,6 +5,10 @@ FROM rust:latest AS builder
 
 RUN update-ca-certificates
 
+RUN apt update && apt upgrade -y
+
+RUN apt install -y protobuf-compiler libprotobuf-dev
+
 WORKDIR /router
 
 COPY ./services/router/Cargo.toml .
