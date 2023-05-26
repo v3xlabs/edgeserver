@@ -1,5 +1,7 @@
 import { onRequestHookHandler } from 'fastify';
-import { verify } from 'jsonwebtoken';
+import jwt from 'jsonwebtoken';
+const { verify } = jwt;
+
 import { generatePermissions } from 'permissio';
 import { z } from 'zod';
 
