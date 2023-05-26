@@ -1,5 +1,5 @@
 import { onRequestHookHandler } from 'fastify';
-import * as jwt from 'jsonwebtoken';
+import { verify } from 'jsonwebtoken';
 import { generatePermissions } from 'permissio';
 import { z } from 'zod';
 
@@ -35,7 +35,7 @@ export const authRoute: onRequestHookHandler = async (request, reply) => {
         if (!raw_token) reply.status(400);
 
         // Decode token
-        const data = jwt.verify(raw_token, 'SECRET');
+        const data = verify(raw_token, 'SECRET');
 
         // Validate token
         const { token_id, edge_address, edge_domain } = tokenSchema.parse(data);
