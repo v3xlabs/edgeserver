@@ -30,13 +30,13 @@ log.settings(
     'DB_IP ' + chalk.gray(globals.DB_IP),
     'DB_DATACENTER ' + chalk.gray(globals.DB_DATACENTER),
     'SIGNAL_MASTER ' +
-        (globals.SIGNAL_MASTER
-            ? chalk.gray(obfusicate(globals.SIGNAL_MASTER))
-            : chalk.red('MISSING')),
+    (globals.SIGNAL_MASTER
+        ? chalk.gray(obfusicate(globals.SIGNAL_MASTER))
+        : chalk.red('MISSING')),
     'SENTRY_DSN ' +
-        (globals.SENTRY_DSN
-            ? chalk.gray(globals.SENTRY_DSN)
-            : chalk.red('MISSING')),
+    (globals.SENTRY_DSN
+        ? chalk.gray(globals.SENTRY_DSN)
+        : chalk.red('MISSING')),
     'SAMPLE RATE ' + chalk.gray(globals.SENTRY_SAMPLE_RATE),
     'INSTANCE_ID ' + chalk.gray(globals.INSTANCE_ID),
     'REDIS_IP ' + chalk.gray(globals.REDIS_IP)
@@ -59,6 +59,10 @@ server.register(Cors, {
 
 server.addHook('onError', (request, reply, error) => {
     log.error(error);
+
+    if (reply.sent) return;
+
+    reply.status(500).send(error);
 });
 
 server.register(ApiRoute, { prefix: '/' });
