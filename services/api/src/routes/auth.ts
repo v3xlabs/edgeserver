@@ -34,7 +34,7 @@ export const authRoute: onRequestHookHandler = async (request, reply) => {
         const raw_token = request.headers.authorization?.split(' ')[1];
 
         // If there is no token
-        if (!raw_token) reply.status(400);
+        if (!raw_token) return reply.status(400);
 
         // Decode token
         const data = verify(raw_token, 'SECRET');
@@ -74,5 +74,7 @@ export const authRoute: onRequestHookHandler = async (request, reply) => {
     } catch (error) {
         log.error('Invalid Auth Attempt', error);
         reply.status(500);
+
+        return reply;
     }
 };
