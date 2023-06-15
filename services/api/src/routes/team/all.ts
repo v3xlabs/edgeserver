@@ -5,6 +5,8 @@ import { DB } from '../../database/index.js';
 
 export const AllTeamRoute: FastifyPluginAsync = async (router) => {
     router.get('/', async (request, reply) => {
+        if (!request.token) return reply.status(401).send('Unauthorized');
+
         // Get a list of all teams the user is in
         const user_data = await DB.selectOneFrom('users', ['teams'], {
             user_id: request.token.address,

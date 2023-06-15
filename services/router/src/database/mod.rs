@@ -20,7 +20,11 @@ pub async fn get_domain_lookup(session: &Session, base_url: &str) -> Option<(i64
     if let Some(rows) = result.rows {
         let row = rows.into_typed::<(i64, i64)>().next();
 
-        let row = row.unwrap();
+        if !(let row = row.unwrap()) {
+            error!("Detected malformed domain row for input {}", base_url);
+
+            return None;
+        }
 
         if row.is_err() {
             error!("Detected malformed DLT row for input {}", base_url);
