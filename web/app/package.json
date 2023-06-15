@@ -40,7 +40,7 @@
         "ethers": "^5.6.5",
         "events": "^3.3.0",
         "framer-motion": "^10.12.8",
-        "jsonwebtoken": "^8.5.1",
+        "jsonwebtoken": "^9.0.0",
         "jwt-decode": "^3.1.2",
         "keccak": "^3.0.2",
         "ms": "^2.1.3",
