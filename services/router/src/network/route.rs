@@ -1,6 +1,7 @@
 use std::time::SystemTime;
 
-use http::HeaderValue;
+use http::{HeaderValue, StatusCode};
+use opentelemetry::trace::Status;
 use tracing::debug;
 
 use crate::network::resolve;
@@ -8,6 +9,8 @@ use crate::network::resolve;
 use futures::future::{BoxFuture, FutureExt};
 
 use super::RequestData;
+
+static NOTFOUND: &[u8] = b"Not Found";
 
 use {
     crate::{cache, cache::fastentry::generate_compound_cache_key, AppState},
@@ -20,6 +23,14 @@ use {
     },
     std::sync::Arc,
 };
+
+/// HTTP status code 404
+fn not_found() -> Response<Full<Bytes>> {
+    Response::builder()
+        .status(StatusCode::NOT_FOUND)
+        .body(Full::new(NOTFOUND.into()))
+        .unwrap()
+}
 
 pub async fn handle(
     req: Request<Incoming>,
@@ -46,17 +57,24 @@ pub async fn handle(
     };
 
     // Get the cache entry or resolve if it isn't available
-    let entry = match cached_entry {
-        Some(entry) => entry,
-        None => {
-            cached = false;
+    if cached_entry.is_none() {
+        return Ok((not_found(), cx));
+    }
 
-            // Resolve the request
-            crate::legacy::serve(state.clone(), &data.host, &req.uri().to_string(), &cx)
-                .await
-                .unwrap()
-        }
-    };
+    let entry = cached_entry.unwrap();
+
+    // let entry = match cached_entry {
+    //     Some(entry) => entry,
+    //     None => {
+    //         cached = false;
+
+    //         None
+
+    //         // Resolve the request
+    //         // crate::legacy::serve(state.clone(), &data.host, &req.uri().to_string(), &cx)
+    //         //     .await
+    //     }
+    // };
 
     // Get the file stream
     let (file_stream, mime_type) = resolve::entry_to_bytes(&state, entry, &cx).await;
@@ -79,7 +97,7 @@ pub async fn handle(
     // Set the cache-control header to a sensible defaults (5 minutes)
     headers.append(
         "Cache-Control",
-        HeaderValue::from_str("public, max-age=300, immutable").unwrap(),  
+        HeaderValue::from_str("public, max-age=300, immutable").unwrap(),
     );
 
     // Set the server header

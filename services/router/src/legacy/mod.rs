@@ -9,10 +9,16 @@ use crate::{
 
 mod traverse;
 
-pub async fn serve(state: Arc<AppState>, base_url: &str, path: &str, cx: &opentelemetry::Context) -> Result<CacheEntry, Infallible> {
+#[derive(Debug)]
+pub enum ServeError {
+    NotFound,
+    InternalError,
+}
+
+pub async fn serve(state: Arc<AppState>, base_url: &str, path: &str, cx: &opentelemetry::Context) -> Result<CacheEntry, ServeError> {
     debug!("LEGACY ROUTER REPORT");
 
-    let (deploy_id, app_id) = get_domain_lookup(&state.database, base_url).await.unwrap();
+    let (deploy_id, app_id) = get_domain_lookup(&state.database, base_url).await.ok_or(ServeError::NotFound)?;
 
     debug!("Deploy ID: {}", deploy_id);
     debug!("App ID: {}", app_id);
