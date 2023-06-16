@@ -19,11 +19,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Load environment variables
     dotenvy::dotenv().ok();
 
-    // Init tracer
-    let tracer = metrics::init();
-
     // Get Config
     let config = environment::get_config();
+
+    // Init tracer
+    let tracer = metrics::init();
 
     // Bootstrap Redis
     let redis = cache::bootstrap(&config.redis_url).await;

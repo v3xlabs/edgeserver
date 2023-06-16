@@ -1,10 +1,6 @@
 use std::sync::Arc;
 
 use hyper::body::Bytes;
-use opentelemetry::{
-    trace::{Span, Tracer},
-    Context, KeyValue,
-};
 use tracing::Level;
 
 use crate::{cache::fastentry::CacheEntry, debug, state::AppState};
@@ -20,7 +16,7 @@ pub async fn entry_to_bytes(
 
     state
         .storage
-        .request(&state, &data.fs, data.signal_cid.unwrap(), data.location)
+        .request(state, &data.fs, data.signal_cid.unwrap(), data.location)
         .await
         .unwrap()
 }
