@@ -6,14 +6,12 @@ use {
     std::sync::Arc,
 };
 
-use http::{header::ToStrError, HeaderMap, HeaderValue};
+use http::header::ToStrError;
 use tokio::time::Instant;
 use tracing::Level;
 
 pub mod resolve;
 pub mod route;
-
-use crate::error::Error;
 
 #[derive(Debug)]
 pub struct RequestData {

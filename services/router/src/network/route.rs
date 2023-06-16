@@ -1,12 +1,6 @@
-use std::time::SystemTime;
-
 use http::{HeaderValue, StatusCode};
-use opentelemetry::trace::Status;
-use tracing::debug;
 
 use crate::network::resolve;
-
-use futures::future::{BoxFuture, FutureExt};
 
 use super::RequestData;
 
@@ -17,10 +11,6 @@ use {
     http::{Request, Response},
     http_body_util::Full,
     hyper::body::{Bytes, Incoming},
-    opentelemetry::{
-        trace::{Span, TraceContextExt, Tracer},
-        Context, KeyValue,
-    },
     std::sync::Arc,
 };
 

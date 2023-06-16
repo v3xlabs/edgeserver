@@ -15,6 +15,8 @@ use opentelemetry_prometheus::PrometheusExporter;
 use prometheus_core::TextEncoder;
 use tracing_subscriber::EnvFilter;
 
+use crate::environment::{self, Config};
+
 use {
     opentelemetry::sdk::trace::Tracer as SdkTracer,
     tracing_subscriber::{fmt, prelude::__tracing_subscriber_SubscriberExt, Registry},
@@ -34,10 +36,11 @@ pub struct Metrics {
 }
 
 // Create a new tracing pipeline
-pub fn init() -> SdkTracer {
+pub fn init(config: &Config) -> SdkTracer {
     // Create a new Jaeger exporter pipeline
     let tracer: SdkTracer = opentelemetry_jaeger::new_agent_pipeline()
         .with_service_name("edgerouter.rs")
+        .with_endpoint(config.jaeger_url)
         .install_simple()
         .unwrap();
     // .install_batch(opentelemetry::runtime::Tokio)
