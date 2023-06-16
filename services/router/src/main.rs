@@ -23,7 +23,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let config = environment::get_config();
 
     // Init tracer
-    let tracer = metrics::init();
+    let tracer = metrics::init(&config);
 
     // Bootstrap Redis
     let redis = cache::bootstrap(&config.redis_url).await;
