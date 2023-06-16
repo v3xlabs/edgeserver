@@ -6,9 +6,11 @@ use {
     std::sync::Arc,
 };
 
+use tracing::span;
+
 pub mod measure;
-pub mod route;
 pub mod resolve;
+pub mod route;
 
 use crate::error::Error;
 
@@ -42,16 +44,17 @@ pub async fn handle_svc(
 ) -> Result<Response<Full<Bytes>>, hyper::Error> {
     // Start metrics recording and extract host
     let (start_time, request, host, span) = measure::record_metrics(request, state).await;
+    let _guard = span.enter();
 
     let data = RequestData { host };
 
     // Handle the request
-    let (response, cx) = route::handle(request, data, span, state.clone())
+    let response = route::handle(request, data, state.clone())
         .await
         .unwrap();
 
     // Post metrics
-    let _span = measure::post_metrics(&response, &cx, start_time);
+    let _span = measure::post_metrics(&response, start_time);
 
     // Return the response
     Ok(response)

@@ -1,57 +1,47 @@
 use std::sync::Arc;
 
 use http::Request;
-use opentelemetry::{sdk::trace, trace::{Tracer, Span, TraceContextExt, SpanRef}, KeyValue};
+use opentelemetry::{
+    sdk::trace,
+    trace::{Span, SpanRef, TraceContextExt, Tracer},
+    KeyValue,
+};
 use tokio::time::Instant;
+use tracing::Level;
 
-use crate::{info, state::AppState, network::extract_host};
+use tracing::info;
+
+use crate::{network::extract_host, state::AppState};
 
 pub async fn record_metrics<T>(
     request: Request<T>,
     state: &Arc<AppState>,
-) -> (Instant, Request<T>, String, trace::Span) {
+) -> (Instant, Request<T>, String, tracing::Span) {
     let start_time = Instant::now();
 
     let (request, host) = extract_host(request).unwrap();
 
-    let span_name = format!("{} {}{}", request.method(), host, request.uri().path());
-
-    info!("{}", span_name);
-
-    let mut span = state.tracer.start(span_name);
-
-    // Add some attributes to the span
-    span.set_attribute(KeyValue::new("http.host", host.clone()));
-    span.set_attribute(KeyValue::new("http.method", request.method().to_string()));
-    span.set_attribute(KeyValue::new("http.uri", request.uri().to_string()));
-    span.set_attribute(KeyValue::new(
-        "http.route",
-        request.uri().path().to_string(),
-    ));
+    let mut span = tracing::span!(
+        Level::INFO,
+        "Request",
+        method = request.method().as_str(),
+        host = host,
+        uri = request.uri().to_string(),
+        route = request.uri().path().to_string()
+    );
 
     (start_time, request, host, span)
 }
 
-pub fn post_metrics<'a,T>(
-    response: &http::Response<T>,
-    context: &'a opentelemetry::Context,
-    time: Instant,
-) -> SpanRef<'a> {
-
+pub fn post_metrics<T>(response: &http::Response<T>, time: Instant) {
     let duration = time.elapsed().as_micros() as f64;
-    
+
     info!("-> {:.3}ms", (duration / 1000.0));
 
-    let span: SpanRef = context.span();
-
-    span.set_attribute(KeyValue::new(
-        "http.status_code",
-        response.status().as_u16().to_string(),
-    ));
-    span.set_attribute(KeyValue::new(
-        "http.response_time",
-        format!("{:.3}ms", (duration / 1000.0)),
-    ));
-
-    span
+    tracing::span!(
+        Level::INFO,
+        "Request Complete",
+        http.response_time = format!("{:.3}ms", (duration / 1000.0)),
+        http.status_code = response.status().as_u16(),
+    );
 }

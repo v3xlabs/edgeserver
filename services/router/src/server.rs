@@ -1,4 +1,5 @@
 use std::{net::SocketAddr, sync::Arc};
+use tracing::span;
 
 use hyper::{server::conn::http1, service::service_fn};
 use tokio::net::TcpListener;
@@ -21,6 +22,9 @@ pub async fn bootstrap(state_arc: Arc<AppState>) {
 
         // Spawn thread for each HTTP request
         tokio::task::spawn(async move {
+            let span = span!(tracing::Level::INFO, "http_connection");
+            let _guard = span.enter();
+
             // Handle the connection
             let handle = http1::Builder::new()
                 .serve_connection(
