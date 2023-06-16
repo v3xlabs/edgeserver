@@ -40,7 +40,7 @@ pub fn init(config: &Config) -> SdkTracer {
     // Create a new Jaeger exporter pipeline
     let tracer: SdkTracer = opentelemetry_jaeger::new_agent_pipeline()
         .with_service_name("edgerouter.rs")
-        .with_endpoint(config.jaeger_url)
+        .with_endpoint(config.jaeger_url.clone())
         .install_simple()
         .unwrap();
     // .install_batch(opentelemetry::runtime::Tokio)
