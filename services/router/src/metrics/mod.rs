@@ -1,6 +1,7 @@
 use std::convert::Infallible;
 
 use opentelemetry::{
+    global,
     metrics::Counter,
     sdk::{
         self,
@@ -8,7 +9,7 @@ use opentelemetry::{
         metrics::{processors, selectors},
         Resource,
     },
-    KeyValue,
+    Context, KeyValue,
 };
 use opentelemetry_prometheus::PrometheusExporter;
 use prometheus_core::TextEncoder;
@@ -41,11 +42,16 @@ pub fn init() -> SdkTracer {
         .unwrap();
     // .install_batch(opentelemetry::runtime::Tokio)
 
+    let opentelemetry = tracing_opentelemetry::layer().with_tracer(tracer.clone());
+
     let subscriber = Registry::default()
+        .with(opentelemetry)
         .with(EnvFilter::try_from_default_env().unwrap_or_else(|_| "info,router=debug".into()))
         .with(fmt::Layer::default());
 
     tracing::subscriber::set_global_default(subscriber).unwrap();
+
+    global::set_text_map_propagator(opentelemetry_jaeger::Propagator::new());
 
     tracer
 }
@@ -79,9 +85,9 @@ impl Metrics {
         })
     }
 
-    pub fn record_request(&self, cx: &opentelemetry::Context, cached: bool, host: String) {
+    pub fn record_request(&self, cached: bool, host: String) {
         self.requests.add(
-            cx,
+            &Context::current(),
             1,
             &[KeyValue::new("cached", cached), KeyValue::new("host", host)],
         );

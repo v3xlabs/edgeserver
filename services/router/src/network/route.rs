@@ -35,21 +35,18 @@ fn not_found() -> Response<Full<Bytes>> {
 pub async fn handle(
     req: Request<Incoming>,
     data: RequestData,
-    span: opentelemetry::sdk::trace::Span,
     state: Arc<AppState>,
-) -> Result<(Response<Full<Bytes>>, Context), hyper::Error> {
-    let cx = Context::current_with_span(span);
-
+) -> Result<Response<Full<Bytes>>, hyper::Error> {
     // Get the cache key
     let key = generate_compound_cache_key(&data.host, req.uri().to_string().as_str(), "http").await;
 
-    crate::debug!("Key {}", key);
+    crate::debug!("key={}", key);
 
     let mut cached = true;
 
     // Get the cache entry if it exists
     let cached_entry = {
-        let _span = state.tracer.start_with_context("Check Cache", &cx);
+        let _span = tracing::span!(tracing::Level::INFO, "cache", key = key.as_str());
 
         cache::fastentry::get_entry(state.redis.clone(), key.as_str())
             .await
@@ -58,7 +55,7 @@ pub async fn handle(
 
     // Get the cache entry or resolve if it isn't available
     if cached_entry.is_none() {
-        return Ok((not_found(), cx));
+        return Ok(not_found());
     }
 
     let entry = cached_entry.unwrap();
@@ -77,10 +74,10 @@ pub async fn handle(
     // };
 
     // Get the file stream
-    let (file_stream, mime_type) = resolve::entry_to_bytes(&state, entry, &cx).await;
+    let (file_stream, mime_type) = resolve::entry_to_bytes(&state, entry).await;
 
     // Record metrics
-    state.metrics.record_request(&cx, cached, data.host);
+    state.metrics.record_request(cached, data.host);
 
     // Create the response
     let mut response = Response::new(Full::new(file_stream));
@@ -106,5 +103,5 @@ pub async fn handle(
         HeaderValue::from_str("edgeserver.io").unwrap(),
     );
 
-    Ok((response, cx))
+    Ok(response)
 }

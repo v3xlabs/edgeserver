@@ -6,9 +6,12 @@ use {
     std::sync::Arc,
 };
 
-pub mod measure;
-pub mod route;
+use http::{header::ToStrError, HeaderMap, HeaderValue};
+use tokio::time::Instant;
+use tracing::Level;
+
 pub mod resolve;
+pub mod route;
 
 use crate::error::Error;
 
@@ -21,18 +24,24 @@ pub struct RequestData {
 pub enum NetworkError {
     #[error("Missing host")]
     NoHost,
+    #[error("Malformatted host")]
+    MalformattedHost(ToStrError),
 }
 
-pub fn extract_host<T>(req: Request<T>) -> Result<(Request<T>, String), Error> {
-    let host = req.headers().get("Host");
+// Implement into for NetworkError into ResponseStatusCode
 
-    match host {
-        Some(host) => {
-            let host = host.to_str().unwrap().to_string();
-            Ok((req, host))
-        }
-        None => Err(Error::NetworkError(NetworkError::NoHost)),
-    }
+pub fn extract_headers_and_host<T>(
+    req: Request<T>,
+) -> Result<(Request<T>, String), NetworkError> {
+    let headers = req.headers().to_owned();
+
+    let host = headers
+        .get("Host")
+        .ok_or(NetworkError::NoHost)?
+        .to_str()
+        .map_err(NetworkError::MalformattedHost)?.to_string();
+
+    Ok((req, host))
 }
 
 // Handle incoming HTTP requests
@@ -40,18 +49,45 @@ pub async fn handle_svc(
     request: Request<Incoming>,
     state: &Arc<AppState>,
 ) -> Result<Response<Full<Bytes>>, hyper::Error> {
-    // Start metrics recording and extract host
-    let (start_time, request, host, span) = measure::record_metrics(request, state).await;
+    let start_time: Instant = Instant::now();
 
-    let data = RequestData { host };
+    // Extract the headers and host and return StatusCode::NOT_FOUND on error
+    let (request, host) = match extract_headers_and_host(request) {
+        Ok(x) => x,
+        Err(e) => {
+            tracing::event!(Level::ERROR, error = %e);
+            return Ok(Response::builder()
+                .status(http::StatusCode::NOT_FOUND)
+                .body(Full::from(Bytes::from("Not Found")))
+                .unwrap());
+        }
+    };
+
+    let span = tracing::span!(
+        Level::INFO,
+        "Request",
+        method = request.method().as_str(),
+        host = host,
+        uri = request.uri().to_string(),
+        route = request.uri().path().to_string()
+    );
+    let _guard = span.enter();
+
+    let data = RequestData {
+        host: host.to_string(),
+    };
 
     // Handle the request
-    let (response, cx) = route::handle(request, data, span, state.clone())
-        .await
-        .unwrap();
+    let response = route::handle(request, data, state.clone()).await?;
 
     // Post metrics
-    let _span = measure::post_metrics(&response, &cx, start_time);
+    let duration = start_time.elapsed().as_micros() as f64;
+
+    tracing::event!(
+        Level::INFO,
+        http.response_time = format!("{:.3}ms", (duration / 1000.0)),
+        http.status_code = response.status().as_u16(),
+    );
 
     // Return the response
     Ok(response)
