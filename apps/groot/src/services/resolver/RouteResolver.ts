@@ -14,22 +14,25 @@ export const resolveRoute = async (
     for (let index = pathList.length - 1; index > 0; index--) {
         const fileToCheck = pathList[index];
         // check exact match, if file extension, use that, if not, use html
-        const pathToCheck =
-            pathList.slice(0, index).join('/') +
-            '/' +
-            (fileToCheck.length === 0
-                ? 'index.html'
-                : fileToCheck.split('.').length > 1
-                ? fileToCheck
-                : fileToCheck + '.html');
+        const prefix = pathList.slice(0, index).join('/') +
+            '/';
 
-        log.debug({ pathToCheck });
-        const steve = await storage.exists(sid, pathToCheck);
+        const pathsToCheck = [
+            prefix + fileToCheck,
+            prefix + fileToCheck + '.html',
+            prefix + fileToCheck + '/index.html',
+            prefix + 'index.html'
+        ];
 
-        if (steve) {
-            log.debug({ pathExists: true });
+        for (const pathToCheck of pathsToCheck) {
+            log.debug({ pathToCheck });
+            const steve = await storage.exists(sid, pathToCheck);
 
-            return await storage.get(sid, pathToCheck);
+            if (steve) {
+                log.debug({ pathExists: true });
+
+                return await storage.get(sid, pathToCheck);
+            }
         }
     }
 
