@@ -14,25 +14,30 @@ export const resolveRoute = async (
     for (let index = pathList.length - 1; index > 0; index--) {
         const fileToCheck = pathList[index];
         // check exact match, if file extension, use that, if not, use html
-        const prefix = pathList.slice(0, index).join('/') +
-            '/';
+        const prefix = pathList.slice(0, index).join('/');
 
-        const pathsToCheck = [
-            prefix + fileToCheck,
-            prefix + fileToCheck + '.html',
-            prefix + fileToCheck + '/index.html',
-            prefix + 'index.html'
-        ];
+        const pathsToCheck = (fileToCheck.length === 0 ? ['index.html'] : [
+            prefix + '/' + fileToCheck + '.html',
+            prefix + '/' + fileToCheck + '/index.html',
+            prefix + '/' + fileToCheck,
+            prefix + '/' + 'index.html',
+        ]);
+
+        log.debug({ pathsToCheck });
 
         for (const pathToCheck of pathsToCheck) {
             log.debug({ pathToCheck });
-            const steve = await storage.exists(sid, pathToCheck);
 
-            if (steve) {
-                log.debug({ pathExists: true });
+            // if total count of slashes in pathToCheck is 1, we should strip it
+            const pathToCheck2 = pathToCheck.split('/').length === 1 ? pathToCheck.slice(1) : pathToCheck;
 
-                return await storage.get(sid, pathToCheck);
-            }
+            const steve = await storage.exists(sid, pathToCheck2);
+
+            log.debug({ pathExists: !!steve });
+
+            if (steve)
+                return await storage.get(sid, pathToCheck2);
+
         }
     }
 
