@@ -1,5 +1,4 @@
 import GlobalPolyFill from '@esbuild-plugins/node-globals-polyfill';
-import inject from '@rollup/plugin-inject';
 import react from '@vitejs/plugin-react';
 import nodePolyfills from 'rollup-plugin-polyfill-node';
 import { defineConfig } from 'vite';
@@ -23,15 +22,20 @@ export default defineConfig({
         commonjsOptions: {
             transformMixedEsModules: true,
         },
+        target: ['esnext'],
     },
     optimizeDeps: {
         esbuildOptions: {
+            target: 'esnext',
             // Node.js global to browser globalThis
             define: {
                 global: 'globalThis',
             },
             // Enable esbuild polyfill plugins
             plugins: [GlobalPolyFill({ process: true, buffer: true })],
+            supported: {
+                bigint: true,
+            },
         },
     },
     resolve: {

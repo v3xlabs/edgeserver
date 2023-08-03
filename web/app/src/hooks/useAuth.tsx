@@ -1,5 +1,3 @@
-import { SIWESession, useSIWE } from 'connectkit';
-import { StatusState } from 'connectkit/build/siwe/SIWEContext';
 import { useAccount } from 'wagmi';
 import create from 'zustand';
 import { persist } from 'zustand/middleware';
@@ -35,38 +33,26 @@ export type useAuthResult = {
     signOut?: () => Promise<boolean>;
 };
 
-type POLYFILL_HOOK_PROP = {
-    isSignedIn: boolean;
-    data?: SIWESession;
-    status: StatusState;
-    error?: Error | any;
-    isRejected: boolean;
-    isError: boolean;
-    isLoading: boolean;
-    isSuccess: boolean;
-    isReady: boolean;
-    reset: () => void;
-    signIn: () => Promise<boolean>;
-    signOut: () => Promise<boolean>;
-};
-
 export const useAuth = (): useAuthResult => {
     const { auth_token, setAuthToken } = useAuthState();
     const { address } = useAccount();
-    const { isSignedIn, data, status, signOut, signIn } =
-        useSIWE() as POLYFILL_HOOK_PROP;
+    // const { isSignedIn, data, status, signOut, signIn } =
+    //     useSIWE() as POLYFILL_HOOK_PROP;
 
-    if (!auth_token || !address || !isSignedIn) {
-        return {
-            state: AuthState.LoggedOut,
-            user: address,
-            signIn,
-        };
-    }
+    // if (!auth_token || !address || !isSignedIn) {
+    //     return {
+    //         state: AuthState.LoggedOut,
+    //         user: address,
+    //         signIn,
+    //     };
+    // }
 
+    // return {
+    //     state: AuthState.LoggedIn,
+    //     user: address,
+    //     signOut,
+    // };
     return {
-        state: AuthState.LoggedIn,
-        user: address,
-        signOut,
+        state: AuthState.LoggedOut,
     };
 };
