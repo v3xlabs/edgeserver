@@ -6,7 +6,6 @@ import { initDB } from './database/index.js';
 import { ApiRoute } from './routes/index.js';
 import { polyfillBigInt } from './utils/bigintJSON.js';
 import { log } from './utils/logger.js';
-import { obfusicate } from './utils/obfusicate.js';
 
 polyfillBigInt();
 
@@ -15,9 +14,6 @@ const globals = {
     SIGNALFS_HOST: process.env.SIGNALFS_HOST,
     DB_IP: process.env.DB_IP,
     DB_DATACENTER: process.env.DB_DATACENTER,
-    SIGNAL_MASTER: process.env.SIGNAL_MASTER,
-    SENTRY_DSN: process.env.SENTRY_DSN,
-    SENTRY_SAMPLE_RATE: process.env.SENTRY_SAMPLE_RATE,
     INSTANCE_ID: process.env.INSTANCE_ID,
     REDIS_IP: process.env.REDIS_IP,
 };
@@ -29,15 +25,6 @@ log.settings(
     'SIGNALFS_HOST ' + chalk.gray(globals.SIGNALFS_HOST),
     'DB_IP ' + chalk.gray(globals.DB_IP),
     'DB_DATACENTER ' + chalk.gray(globals.DB_DATACENTER),
-    'SIGNAL_MASTER ' +
-    (globals.SIGNAL_MASTER
-        ? chalk.gray(obfusicate(globals.SIGNAL_MASTER))
-        : chalk.red('MISSING')),
-    'SENTRY_DSN ' +
-    (globals.SENTRY_DSN
-        ? chalk.gray(globals.SENTRY_DSN)
-        : chalk.red('MISSING')),
-    'SAMPLE RATE ' + chalk.gray(globals.SENTRY_SAMPLE_RATE),
     'INSTANCE_ID ' + chalk.gray(globals.INSTANCE_ID),
     'REDIS_IP ' + chalk.gray(globals.REDIS_IP)
 );
