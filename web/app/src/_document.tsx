@@ -15,6 +15,7 @@ const config = createConfig({
         chain: mainnet,
         transport: http(),
     }),
+    connectors: [],
 });
 
 export const Document = () => {
