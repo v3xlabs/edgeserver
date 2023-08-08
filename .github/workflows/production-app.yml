@@ -4,6 +4,7 @@ on:
   push:
     tags:
       - '@edgelabs/app@**'
+  workflow_dispatch:
 
 jobs:
   zip-files:
