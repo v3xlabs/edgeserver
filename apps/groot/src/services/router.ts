@@ -92,12 +92,12 @@ export const routeGeneric = async (
 
     // Apply redirecting routing data (eg trailingSlash)
     // check if basepath ends with slashiething, do logic, redirect if needed
-    const slashRedirectPath =
-        configData.status == 'fulfilled' &&
-        configData.value &&
-        shouldSlashRedirect(configData.value, path_url);
+    // const slashRedirectPath =
+    //     configData.status == 'fulfilled' &&
+    //     configData.value &&
+    //     shouldSlashRedirect(configData.value, path_url);
 
-    if (slashRedirectPath) throw new SafeError(307, slashRedirectPath);
+    // if (slashRedirectPath) throw new SafeError(307, slashRedirectPath);
 
     // If we should rewrite, alter path
     const shouldRewriteURL =

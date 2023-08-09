@@ -48,7 +48,7 @@ export type EdgeRcConfig = {
 export const defaultEdgeRcConfig: EdgeRcConfig = {
     routing: {
         file_extensions: true,
-        trailing_slash: 'always',
+        trailing_slash: 'never',
 
         default_route: '/index.html',
     },
