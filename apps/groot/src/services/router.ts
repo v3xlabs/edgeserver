@@ -38,7 +38,6 @@ import {
 } from './hrr';
 // import RE2 from 're2';
 import { resolveRoute } from './resolver/RouteResolver';
-import { shouldSlashRedirect } from './routing/trailing_slash';
 
 const getSteve = () =>
     new Writable({
@@ -53,7 +52,8 @@ export const routeGeneric = async (
 ) => {
     // both urls subject to change
     const base_url = request.hostname; // example.com
-    const path_url = request.url; // /foo
+    const v = request.url.indexOf('?');
+    const path_url = request.url.slice(0, Math.max(0, v === -1 ? request.url.length : v)); // /foo
     const resolve_path = path_url;
 
     const siteData = await getSiteData(base_url);
