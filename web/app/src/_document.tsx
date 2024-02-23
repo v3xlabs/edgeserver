@@ -4,18 +4,18 @@ import { localStorageProvider } from '@utils/swrStorage';
 import { BrowserRouter } from 'react-router-dom';
 import { SWRConfig } from 'swr';
 import { createPublicClient, http } from 'viem';
-import { createConfig, mainnet, WagmiConfig } from 'wagmi';
+import { WagmiProvider, createConfig } from 'wagmi';
 
 import { App } from './App';
 import { useAuthState } from './hooks/useAuth';
+import { mainnet } from 'viem/chains';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 const config = createConfig({
-    autoConnect: true,
-    publicClient: createPublicClient({
-        chain: mainnet,
-        transport: http(),
-    }),
+    chains: [mainnet]
 });
+
+const queryClient = new QueryClient({});
 
 export const Document = () => {
     return (
@@ -40,7 +40,8 @@ export const Document = () => {
                 },
             }}
         >
-            <WagmiConfig config={config}>
+            <QueryClientProvider client={queryClient}>
+            <WagmiProvider config={config}>
                 <BrowserRouter>
                     <div className="text-black-800 min-h-screen w-full dark:text-white">
                         <LoginFacade>
@@ -48,7 +49,8 @@ export const Document = () => {
                         </LoginFacade>
                     </div>
                 </BrowserRouter>
-            </WagmiConfig>
+            </WagmiProvider>
+            </QueryClientProvider>
         </SWRConfig>
     );
 };

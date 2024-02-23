@@ -1,6 +1,7 @@
-import { useAccount } from 'wagmi';
-import create from 'zustand';
+import { useAccount, useConnect } from 'wagmi';
+import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { injected } from '@wagmi/connectors';
 
 export const useAuthState = create(
     persist<{
@@ -38,21 +39,33 @@ export const useAuth = (): useAuthResult => {
     const { address } = useAccount();
     // const { isSignedIn, data, status, signOut, signIn } =
     //     useSIWE() as POLYFILL_HOOK_PROP;
+    const { connect } = useConnect();
 
-    // if (!auth_token || !address || !isSignedIn) {
-    //     return {
-    //         state: AuthState.LoggedOut,
-    //         user: address,
-    //         signIn,
-    //     };
-    // }
-
-    // return {
-    //     state: AuthState.LoggedIn,
-    //     user: address,
-    //     signOut,
-    // };
-    return {
-        state: AuthState.LoggedOut,
+    const isSignedIn = address !== undefined;
+    const signIn = async () => {
+        console.log('signing in');
+        connect({ connector: injected({}) });
+        return true;
     };
+    const signOut = async () => {
+        console.log('signing out');
+        return true;
+    };
+
+    if (!auth_token || !address || !isSignedIn) {
+        return {
+            state: AuthState.LoggedOut,
+            user: address,
+            signIn,
+        };
+    }
+
+    return {
+        state: AuthState.LoggedIn,
+        user: address,
+        signOut,
+    };
+    // return {
+    //     state: AuthState.LoggedOut,
+    // };
 };

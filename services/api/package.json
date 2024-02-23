@@ -27,7 +27,6 @@
         "eslint-import-resolver-typescript": "^3.5.5",
         "eslint-plugin-import": "^2.27.5",
         "eslint-plugin-node": "^11.1.0",
-        "ethers": "^5.7.2",
         "fastify": "^4.17.0",
         "jsonwebtoken": "^9.0.0",
         "permissio": "2.0.1-beta.1",
