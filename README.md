@@ -7,6 +7,9 @@
   </p>
 </a>
 
+> ⚠️ This branch is currently undergoing a rewrite.
+> Please see the [stable](https://github.com/v3xlabs/edgeserver/tree/stable) branch for the latest stable release.
+
 ## Introduction
 
 [Edgeserver](https://edgeserver.io) is an open-source, self-hostable, web3-native static file hosting service that allows for seamless integration with your favourite CI/CD systems.
