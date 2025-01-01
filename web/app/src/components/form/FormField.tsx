@@ -1,5 +1,5 @@
-import { Input } from '@components/input/Input';
-import { cx } from '@utils/cx';
+import { Input } from '@/components/input/Input';
+import { cx } from '@/utils/cx';
 import { FC } from 'react';
 
 export const FormField: FC<{ label: string; properties: any }> = ({

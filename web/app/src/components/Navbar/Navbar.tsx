@@ -1,32 +1,26 @@
-import { AvatarOrGradient } from '@components/avatar/AvatarOrGradient';
-import { formatAddress } from 'ens-tools';
+import { Link } from '@tanstack/react-router';
 import { AnimatePresence } from 'framer-motion';
-import { Link } from 'react-router-dom';
 import { useActiveFocus } from 'src/hooks/useActiveFocus';
 import { useAuth } from 'src/hooks/useAuth';
-import { useEnsAvatar, useEnsName } from 'wagmi';
+
+import { AvatarOrGradient } from '@/components/avatar/AvatarOrGradient';
 
 import { InteractiveNavigator } from './InteractiveNavigator';
 import { Subbar } from './Subbar';
 
 const UserProfile = () => {
     const { user, signOut } = useAuth();
-    const { data: ensName } = useEnsName({
-        address: (user as any) || '',
-        enabled: !!user,
-    });
-    const { data: ensAvatar } = useEnsAvatar({
-        address: (user as any) || '',
-    });
+    const name = 'John Doe';
+    const avatar = '';
 
     return (
         <div className="group relative flex h-full items-end">
             <div className="flex h-full w-fit items-center px-2 group-hover:bg-black/10">
-                <span>{ensName || formatAddress(user || '')}</span>
+                <span>{name}</span>
                 <AvatarOrGradient
-                    src={ensAvatar || ''}
+                    src={avatar}
                     hash={user || ''}
-                    className="ml-2 h-8 w-8 overflow-hidden rounded-full bg-white"
+                    className="ml-2 size-8 overflow-hidden rounded-full bg-white"
                 />
             </div>
             <div className="absolute right-0 top-full hidden w-fit flex-col overflow-hidden whitespace-nowrap rounded-b-md bg-white group-hover:flex">
@@ -54,7 +48,7 @@ export const Navbar = () => {
                                 to="/"
                                 className="flex h-full items-center hover:scale-105"
                             >
-                                <div className="h-8 w-8">
+                                <div className="size-8">
                                     <AvatarOrGradient
                                         src=""
                                         hash="logo"

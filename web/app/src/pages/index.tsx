@@ -1,11 +1,11 @@
-import { AvatarOrGradient } from '@components/avatar/AvatarOrGradient';
-import { SiteList } from '@components/sites/sitelist';
-import { Team } from '@edgelabs/types';
-import { buffercnvrt } from '@utils/buffercnvrt';
+import { Link } from '@tanstack/react-router';
 import { FC, useEffect } from 'react';
-import { Link } from 'react-router-dom';
 import { useActiveTeam } from 'src/hooks/useTeam';
 import { useTeams } from 'src/hooks/useTeams';
+
+import { AvatarOrGradient } from '@/components/avatar/AvatarOrGradient';
+import { SiteList } from '@/components/sites/sitelist';
+import { buffercnvrt } from '@/utils/buffercnvrt';
 
 export const Home = () => {
     const { setActiveTeam } = useActiveTeam();
@@ -43,7 +43,7 @@ export const TeamEntry: FC<{
                 <AvatarOrGradient
                     src={buffercnvrt(team.icon as any) || ''}
                     hash={team.team_id}
-                    className="h-11 w-11 overflow-hidden rounded-md"
+                    className="size-11 overflow-hidden rounded-md"
                 />
                 <Link to={`/t/${team.team_id}`} className="block p-2">
                     <h3 className="text-xl font-bold">{team.name}</h3>

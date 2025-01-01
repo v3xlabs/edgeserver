@@ -1,5 +1,5 @@
 /* eslint-disable react/display-name */
-import { toComponent } from '@utils/toComponent';
+import { toComponent } from '@/utils/toComponent';
 import { FC } from 'react';
 import { FiArrowRight } from 'react-icons/fi';
 

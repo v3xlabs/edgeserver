@@ -1,4 +1,4 @@
-import { cx } from '@utils/cx';
+import { cx } from '@/utils/cx';
 import { DetailedHTMLProps, FC, InputHTMLAttributes } from 'react';
 
 export const Input: FC<

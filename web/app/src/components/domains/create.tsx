@@ -1,7 +1,7 @@
 /* eslint-disable quotes */
-import { FormField } from '@components/form/FormField';
+import { FormField } from '@/components/form/FormField';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { environment } from '@utils/environment';
+import { environment } from '@/utils/environment';
 import { FC, useState } from 'react';
 import { useForm, useFormState } from 'react-hook-form';
 import { useAuthState } from 'src/hooks/useAuth';

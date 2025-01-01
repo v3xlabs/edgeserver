@@ -1,6 +1,5 @@
-import { Site } from '@edgelabs/types';
+import { Link } from '@tanstack/react-router';
 import { FC } from 'react';
-import { Link } from 'react-router-dom';
 import useSWR from 'swr';
 
 export const SiteList: FC<{

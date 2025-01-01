@@ -1,7 +1,8 @@
-import { cx } from '@utils/cx';
+import { Link as NavLink } from '@tanstack/react-router';
 import { motion } from 'framer-motion';
 import { FC, useEffect, useRef } from 'react';
-import { NavLink } from 'react-router-dom';
+
+import { cx } from '@/utils/cx';
 
 const SiteMap = [
     ['Overview', ''],
@@ -64,14 +65,11 @@ export const Subbar: FC<{ type: 'site' | 'team'; entry_id: string }> = ({
                                     animate={{ width: 'auto', opacity: 1 }}
                                 >
                                     <NavLink
-                                        to={`/${prefix}/${entry_id}${link}`}
-                                        end={index == 0}
-                                        className={({ isActive }) =>
-                                            cx(
-                                                'block hover:bg-black/10 px-2 py-1 rounded-lg font-medium text-sm',
-                                                isActive && 'bg-black/10'
-                                            )
-                                        }
+                                        to="/"
+                                        // to={`/${prefix}/${entry_id}${link}`}
+                                        className={cx(
+                                            'block hover:bg-black/10 px-2 py-1 rounded-lg font-medium text-sm'
+                                        )}
                                     >
                                         {label}
                                     </NavLink>

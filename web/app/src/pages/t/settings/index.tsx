@@ -1,5 +1,5 @@
-import { SettingsSection } from '@components/settings/SettingsSection';
-import { TokenManager } from '@components/token/manager';
+import { SettingsSection } from '@/components/settings/SettingsSection';
+import { TokenManager } from '@/components/token/manager';
 import { FC } from 'react';
 import { useActiveTeam } from 'src/hooks/useTeam';
 

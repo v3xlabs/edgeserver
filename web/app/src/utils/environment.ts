@@ -8,7 +8,7 @@
  *
  * Example usage:
  * ```
- * import { enviroment } from "@utils/enviroment.js"
+ * import { enviroment } from "@/utils/enviroment.js"
  * enviroment.API_URL
  * ```
  */

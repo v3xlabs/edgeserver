@@ -1,10 +1,11 @@
-import { DomainManager } from '@components/domains/DomainManager';
-import { SettingsSection } from '@components/settings/SettingsSection';
-import { TokenManager } from '@components/token/manager';
+import { Link } from '@tanstack/react-router';
 import { FC } from 'react';
-import { Link } from 'react-router-dom';
 import { useActiveSite } from 'src/hooks/useSite';
 import { useActiveTeam } from 'src/hooks/useTeam';
+
+import { DomainManager } from '@/components/domains/DomainManager';
+import { SettingsSection } from '@/components/settings/SettingsSection';
+import { TokenManager } from '@/components/token/manager';
 
 export const SiteSettingsPage: FC = () => {
     const { team_id } = useActiveTeam();

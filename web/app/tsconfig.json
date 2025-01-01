@@ -16,10 +16,7 @@
         "incremental": true,
         "baseUrl": ".",
         "paths": {
-            "@components/*": ["src/components/*"],
-            "@utils/*": ["src/utils/*"],
-            "@appTypes/*": ["src/types/*"],
-            "@pages/*": ["src/pages/*"]
+            "@/*": ["src/*"],
         }
     },
     "include": ["**/*.ts", "**/*.tsx", "**/*.d.ts", "**/*.svg"],

@@ -1,4 +1,3 @@
-import { useAccount } from 'wagmi';
 import create from 'zustand';
 import { persist } from 'zustand/middleware';
 
@@ -35,23 +34,7 @@ export type useAuthResult = {
 
 export const useAuth = (): useAuthResult => {
     const { auth_token, setAuthToken } = useAuthState();
-    const { address } = useAccount();
-    // const { isSignedIn, data, status, signOut, signIn } =
-    //     useSIWE() as POLYFILL_HOOK_PROP;
 
-    // if (!auth_token || !address || !isSignedIn) {
-    //     return {
-    //         state: AuthState.LoggedOut,
-    //         user: address,
-    //         signIn,
-    //     };
-    // }
-
-    // return {
-    //     state: AuthState.LoggedIn,
-    //     user: address,
-    //     signOut,
-    // };
     return {
         state: AuthState.LoggedOut,
     };

@@ -1,4 +1,4 @@
-import { SiteList } from '@components/sites/sitelist';
+import { SiteList } from '@/components/sites/sitelist';
 import { useActiveTeam } from 'src/hooks/useTeam';
 
 export const TeamPage = () => {

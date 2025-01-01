@@ -1,6 +1,7 @@
-import GlobalPolyFill from '@esbuild-plugins/node-globals-polyfill';
+// import GlobalPolyFill from '@esbuild-plugins/node-globals-polyfill';
+import { TanStackRouterVite } from '@tanstack/router-plugin/vite';
 import react from '@vitejs/plugin-react';
-import nodePolyfills from 'rollup-plugin-polyfill-node';
+// import nodePolyfills from 'rollup-plugin-polyfill-node';
 import { defineConfig } from 'vite';
 import tsconfigPaths from 'vite-tsconfig-paths';
 
@@ -8,31 +9,34 @@ import tsconfigPaths from 'vite-tsconfig-paths';
 export default defineConfig({
     plugins: [
         tsconfigPaths(),
+        TanStackRouterVite({
+            autoCodeSplitting: true,
+        }),
         // typescriptPaths({ tsConfigPath: './tsconfig.json' }),
         react(),
         // inject({
         //     util: 'util/',
         // }),
     ],
-    define: { global: 'globalThis' },
+    // define: { global: 'globalThis' },
     build: {
-        rollupOptions: {
-            plugins: [nodePolyfills()],
-        },
-        commonjsOptions: {
-            transformMixedEsModules: true,
-        },
-        target: ['esnext'],
+        // rollupOptions: {
+        //     plugins: [nodePolyfills()],
+        // },
+        // commonjsOptions: {
+        //     transformMixedEsModules: true,
+        // },
+        // target: ['esnext'],
     },
     optimizeDeps: {
         esbuildOptions: {
-            target: 'esnext',
+            // target: 'esnext',
             // Node.js global to browser globalThis
-            define: {
-                global: 'globalThis',
-            },
+            // define: {
+            //     global: 'globalThis',
+            // },
             // Enable esbuild polyfill plugins
-            plugins: [GlobalPolyFill({ process: true, buffer: true })],
+            // plugins: [GlobalPolyFill({ process: true, buffer: true })],
             supported: {
                 bigint: true,
             },
@@ -40,9 +44,10 @@ export default defineConfig({
     },
     resolve: {
         alias: {
-            process: 'process/browser',
-            stream: 'stream-browserify',
-            util: 'util',
+            '@': new URL('src', import.meta.url).pathname,
+            // process: 'process/browser',
+            // stream: 'stream-browserify',
+            // util: 'util',
         },
     },
 });

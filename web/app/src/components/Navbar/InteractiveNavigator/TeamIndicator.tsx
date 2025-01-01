@@ -1,10 +1,10 @@
-import { AvatarOrGradient } from '@components/avatar/AvatarOrGradient';
-import { Team } from '@edgelabs/types';
-import { buffercnvrt } from '@utils/buffercnvrt';
+import { Link } from '@tanstack/react-router';
 import { AnimatePresence, motion } from 'framer-motion';
 import { FC } from 'react';
-import { Link } from 'react-router-dom';
 import { useActiveTeam } from 'src/hooks/useTeam';
+
+import { AvatarOrGradient } from '@/components/avatar/AvatarOrGradient';
+import { buffercnvrt } from '@/utils/buffercnvrt';
 
 const TeamEntry: FC<{ team: Team }> = ({
     team: { icon, name, owner, team_id },
@@ -21,7 +21,7 @@ const TeamEntry: FC<{ team: Team }> = ({
                 to={`/t/${team_id}`}
                 className="flex h-full items-center rounded-md p-1 hover:bg-neutral-900/10"
             >
-                <div className="h-8 w-8 rounded-full bg-white">
+                <div className="size-8 rounded-full bg-white">
                     <AvatarOrGradient
                         src={buffercnvrt(icon as any)}
                         hash={team_id}
