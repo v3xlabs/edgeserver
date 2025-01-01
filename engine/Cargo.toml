@@ -5,6 +5,7 @@ edition = "2021"
 
 [dependencies]
 async-std = { version = "1", features = ["attributes", "tokio1"] }
+config = "0.15.4"
 dotenvy = "0.15.7"
 futures = "0.3.31"
 poem = "3.1.5"
