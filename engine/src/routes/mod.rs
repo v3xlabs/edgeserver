@@ -1,20 +1,37 @@
 use std::sync::Arc;
 
+use auth::AuthApi;
 use poem::{
     get, handler, listener::TcpListener, middleware::Cors, web::Html, EndpointExt, Route, Server,
 };
-use poem_openapi::{OpenApi, OpenApiService};
+use poem_openapi::{OpenApi, OpenApiService, Tags};
 use site::SiteApi;
+use team::TeamApi;
 use tracing::info;
 use user::UserApi;
 
 use crate::state::AppState;
 
+pub mod auth;
 pub mod site;
+pub mod team;
 pub mod user;
 
 fn get_api() -> impl OpenApi {
-    (SiteApi, UserApi)
+    (SiteApi, UserApi, AuthApi, TeamApi)
+}
+
+#[derive(Tags)]
+pub enum ApiTags {
+    /// Site-related endpoints
+    Site,
+    /// Team-related endpoints
+    Team,
+    /// User-related endpoints
+    User,
+    /// Authentication-related endpoints
+    #[oai(rename = "Authentication")]
+    Auth,
 }
 
 pub async fn serve(state: AppState) {
