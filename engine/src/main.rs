@@ -3,6 +3,7 @@ use tracing::info;
 pub mod models;
 pub mod routes;
 pub mod state;
+pub mod middlewares;
 
 #[async_std::main]
 async fn main() {

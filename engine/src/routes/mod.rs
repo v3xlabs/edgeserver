@@ -1,16 +1,20 @@
 use std::sync::Arc;
 
-use poem::{get, handler, listener::TcpListener, middleware::Cors, web::Html, EndpointExt, Route, Server};
+use poem::{
+    get, handler, listener::TcpListener, middleware::Cors, web::Html, EndpointExt, Route, Server,
+};
 use poem_openapi::{OpenApi, OpenApiService};
+use site::SiteApi;
 use tracing::info;
 use user::UserApi;
 
 use crate::state::AppState;
 
+pub mod site;
 pub mod user;
 
 fn get_api() -> impl OpenApi {
-    UserApi
+    (SiteApi, UserApi)
 }
 
 pub async fn serve(state: AppState) {
