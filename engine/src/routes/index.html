@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Edgeserver API</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="icon" href="/docs/favicon.png" />
+        <meta property="og:image" content="/docs/opengraph.png" />
+    </head>
+    <body>
+        <script
+            id="api-reference"
+            data-url="/openapi.json"
+        ></script>
+        <script>
+            var configuration = {
+                theme: "blue",
+            };
+
+            var apiReference = document.getElementById("api-reference");
+            apiReference.dataset.configuration = JSON.stringify(configuration);
+        </script>
+        <script src="https://cdn.jsdelivr.net/npm/@scalar/api-reference"></script>
+    </body>
+</html>
