@@ -1,0 +1,39 @@
+services:
+  postgres:
+    image: postgres:17
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: edgeserver
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+  minio:
+    image: minio/minio:latest
+    command: server --console-address ":9001" /mnt/data
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://127.0.0.1:9000/minio/health/live']
+      interval: 10s
+      start_interval: 1s
+      start_period: 10s
+    entrypoint: >
+      /bin/sh -c '
+        isAlive() { curl -sf http://127.0.0.1:9000/minio/health/live; }    # check if Minio is alive
+        minio $0 "$@" --quiet & echo $! > /tmp/minio.pid                   # start Minio in the background
+        while ! isAlive; do sleep 0.1; done                                # wait until Minio is alive
+        mc alias set minio http://127.0.0.1:9000 minioadmin minioadmin     # setup Minio client
+        mc mb minio/edgeserver || true                                    # create a test bucket
+        mc anonymous set public minio/edgeserver                          # make the test bucket public
+        kill -s INT $(cat /tmp/minio.pid) && rm /tmp/minio.pid             # stop Minio
+        while isAlive; do sleep 0.1; done                                  # wait until Minio is stopped
+        echo $0 "$@"
+        exec minio $0 "$@"                                                 # start Minio in the foreground
+      '
