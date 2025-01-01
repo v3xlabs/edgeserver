@@ -1,0 +1,14 @@
+[package]
+name = "edgerouter"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+async-std = { version = "1", features = ["attributes", "tokio1"] }
+dotenvy = "0.15.7"
+futures = "0.3.31"
+poem = "3.1.5"
+poem-openapi = "5.1.4"
+serde = "1.0.217"
+tracing = "0.1.41"
+tracing-subscriber = "0.3.19"
