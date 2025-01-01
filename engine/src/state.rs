@@ -1,9 +1,11 @@
 use config::{Config, Environment};
-use dotenvy::var;
 use serde::Deserialize;
+
+use crate::database::Database;
 
 pub struct AppState {
     config: AppConfig,
+    database: Database,
 }
 
 #[derive(Deserialize, Debug)]
@@ -18,7 +20,7 @@ pub struct AppConfig {
 }
 
 impl AppState {
-    pub async fn new() -> Result<Self, config::ConfigError> {
+    pub async fn new() -> Result<Self, anyhow::Error> {
         let config = Config::builder()
             .add_source(Environment::default())
             .build()?;
@@ -26,6 +28,8 @@ impl AppState {
         // Deserialize into the AppConfig struct
         let config: AppConfig = config.try_deserialize()?;
 
-        Ok(Self { config })
+        let database = Database::new(&config.database_url).await?;
+
+        Ok(Self { config, database })
     }
 }

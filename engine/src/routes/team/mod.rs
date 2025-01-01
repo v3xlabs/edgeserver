@@ -2,7 +2,7 @@ use poem::Result;
 use poem_openapi::{param::Path, payload::Json, OpenApi};
 use tracing::info;
 
-use crate::{middlewares::auth::UserAuth, models::{site::Site, team::Team}, routes::ApiTags};
+use crate::{middlewares::auth::UserAuth, models::team::{Team, UserTeamInvite}, routes::ApiTags};
 
 pub struct TeamApi;
 
@@ -17,6 +17,7 @@ impl TeamApi {
 
         Ok(Json(vec![Team {
             team_id: "1".to_string(),
+            owner_id: "1".to_string(),
             name: "John Doe".to_string(),
         }]))
     }
@@ -31,6 +32,27 @@ impl TeamApi {
     #[oai(path = "/team/:team_id", method = "get", tag = "ApiTags::Team")]
     pub async fn get_team(&self, user: UserAuth, team_id: Path<String>) -> Result<Json<Team>> {
         info!("Getting team: {:?} for user: {:?}", team_id.0, user);
+
+        todo!();
+    }
+
+    #[oai(path = "/team/:team_id/invite", method = "get", tag = "ApiTags::Team")]
+    pub async fn get_team_invites(&self, user: UserAuth, team_id: Path<String>) -> Result<Json<Vec<UserTeamInvite>>> {
+        info!("Getting team invites for team: {:?} for user: {:?}", team_id.0, user);
+
+        todo!();
+    }
+
+    #[oai(path = "/team/:team_id/invite", method = "post", tag = "ApiTags::Team")]
+    pub async fn invite_user_to_team(&self, user: UserAuth, team_id: Path<String>) -> Result<Json<UserTeamInvite>> {
+        info!("Inviting user to team: {:?} for user: {:?}", team_id.0, user);
+
+        todo!();
+    }
+
+    #[oai(path = "/team/:team_id/invite/:invite_id", method = "delete", tag = "ApiTags::Team")]
+    pub async fn delete_team_invite(&self, user: UserAuth, team_id: Path<String>, invite_id: Path<String>) -> Result<Json<UserTeamInvite>> {
+        info!("Deleting team invite: {:?} for user: {:?}", invite_id.0, user);
 
         todo!();
     }

@@ -1,6 +1,7 @@
 use state::AppState;
 use tracing::{error, info};
 
+pub mod database;
 pub mod middlewares;
 pub mod models;
 pub mod routes;

@@ -1,6 +1,4 @@
-use std::fmt::Display;
-
-use poem::{web::Data, Error, FromRequest, Request, RequestBody, Result};
+use poem::{web::Data, FromRequest, Request, RequestBody, Result};
 use poem_openapi::{
     registry::{MetaSecurityScheme, Registry},
     ApiExtractor, ApiExtractorType, ExtractParamOptions,

@@ -18,6 +18,7 @@ impl SiteApi {
         Ok(Json(vec![Site {
             site_id: "1".to_string(),
             name: "John Doe".to_string(),
+            team_id: "1".to_string(),
         }]))
     }
 

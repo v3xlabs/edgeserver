@@ -4,12 +4,47 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+sqlx = { version = "0", features = [
+    "runtime-async-std",
+    "tls-rustls",
+    "postgres",
+    "uuid",
+    "chrono",
+    "json",
+    "ipnetwork",
+] }
+tracing = "0.1.41"
+anyhow = "1.0.95"
 async-std = { version = "1", features = ["attributes", "tokio1"] }
 config = "0.15.4"
 dotenvy = "0.15.7"
 futures = "0.3.31"
-poem = "3.1.5"
-poem-openapi = "5.1.4"
+poem = { version = "3.0.4", git = "https://github.com/poem-web/poem", branch = "master", features = [
+    "rustls",
+    "sse"
+] }
+poem-openapi = { version = "5", git = "https://github.com/poem-web/poem", branch = "master", features = [
+    "chrono",
+    "uuid",
+    "sqlx",
+    "url",
+    "email",
+    "email_address",
+    "redoc",
+    "static-files",
+] }
 serde = "1.0.217"
-tracing = "0.1.41"
 tracing-subscriber = "0.3.19"
+url = { version = "2.5.2", features = ["serde"] }
+thiserror = "2.0.3"
+rustls = "0.23.19"
+bigdecimal = { version = "0.4.5", features = ["serde"] }
+reqwest = { version = "0.12.5", features = [
+    "rustls-tls",
+    # Add back the default features excluding native-tls
+    "charset",
+    "http2",
+    "macos-system-configuration",
+], default-features = false }
+chrono = "0.4.39"
+serde_with = { version = "3.9.0", features = ["json", "chrono"] }
