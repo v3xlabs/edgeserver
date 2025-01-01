@@ -5,3 +5,13 @@ export const preflightAuth = async () => {
     // }
     // return true;
 };
+
+export const useAuth = () => {
+    return { token: '123' };
+};
+
+useAuth.getState = () => {
+    return {
+        token: '123', clearAuthToken: () => { alert('clearing token') }
+    }
+}

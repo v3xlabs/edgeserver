@@ -65,7 +65,7 @@ export const Subbar: FC<{ type: 'site' | 'team'; entry_id: string }> = ({
                                     animate={{ width: 'auto', opacity: 1 }}
                                 >
                                     <NavLink
-                                        to="/"
+                                        to={link}
                                         // to={`/${prefix}/${entry_id}${link}`}
                                         className={cx(
                                             'block hover:bg-black/10 px-2 py-1 rounded-lg font-medium text-sm'

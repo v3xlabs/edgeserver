@@ -8,63 +8,193 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
+import { createFileRoute } from '@tanstack/react-router'
+
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
-import { Route as IndexImport } from './routes/index'
+import { Route as LoginImport } from './routes/login'
+import { Route as AuthedImport } from './routes/_authed'
+import { Route as AuthedIndexImport } from './routes/_authed/index'
+import { Route as AuthedSettingsSImport } from './routes/_authed/settings/_s'
+import { Route as AuthedSettingsSIndexImport } from './routes/_authed/settings/_s.index'
+
+// Create Virtual Routes
+
+const AuthedSettingsImport = createFileRoute('/_authed/settings')()
 
 // Create/Update Routes
 
-const IndexRoute = IndexImport.update({
+const LoginRoute = LoginImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const AuthedRoute = AuthedImport.update({
+  id: '/_authed',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const AuthedSettingsRoute = AuthedSettingsImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AuthedRoute,
+} as any)
+
+const AuthedIndexRoute = AuthedIndexImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => AuthedRoute,
+} as any)
+
+const AuthedSettingsSRoute = AuthedSettingsSImport.update({
+  id: '/_s',
+  getParentRoute: () => AuthedSettingsRoute,
+} as any)
+
+const AuthedSettingsSIndexRoute = AuthedSettingsSIndexImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AuthedSettingsSRoute,
 } as any)
 
 // Populate the FileRoutesByPath interface
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
+    '/_authed': {
+      id: '/_authed'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof AuthedImport
+      parentRoute: typeof rootRoute
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginImport
+      parentRoute: typeof rootRoute
+    }
+    '/_authed/': {
+      id: '/_authed/'
       path: '/'
       fullPath: '/'
-      preLoaderRoute: typeof IndexImport
-      parentRoute: typeof rootRoute
+      preLoaderRoute: typeof AuthedIndexImport
+      parentRoute: typeof AuthedImport
+    }
+    '/_authed/settings': {
+      id: '/_authed/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof AuthedSettingsImport
+      parentRoute: typeof AuthedImport
+    }
+    '/_authed/settings/_s': {
+      id: '/_authed/settings/_s'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof AuthedSettingsSImport
+      parentRoute: typeof AuthedSettingsRoute
+    }
+    '/_authed/settings/_s/': {
+      id: '/_authed/settings/_s/'
+      path: '/'
+      fullPath: '/settings/'
+      preLoaderRoute: typeof AuthedSettingsSIndexImport
+      parentRoute: typeof AuthedSettingsSImport
     }
   }
 }
 
 // Create and export the route tree
 
+interface AuthedSettingsSRouteChildren {
+  AuthedSettingsSIndexRoute: typeof AuthedSettingsSIndexRoute
+}
+
+const AuthedSettingsSRouteChildren: AuthedSettingsSRouteChildren = {
+  AuthedSettingsSIndexRoute: AuthedSettingsSIndexRoute,
+}
+
+const AuthedSettingsSRouteWithChildren = AuthedSettingsSRoute._addFileChildren(
+  AuthedSettingsSRouteChildren,
+)
+
+interface AuthedSettingsRouteChildren {
+  AuthedSettingsSRoute: typeof AuthedSettingsSRouteWithChildren
+}
+
+const AuthedSettingsRouteChildren: AuthedSettingsRouteChildren = {
+  AuthedSettingsSRoute: AuthedSettingsSRouteWithChildren,
+}
+
+const AuthedSettingsRouteWithChildren = AuthedSettingsRoute._addFileChildren(
+  AuthedSettingsRouteChildren,
+)
+
+interface AuthedRouteChildren {
+  AuthedIndexRoute: typeof AuthedIndexRoute
+  AuthedSettingsRoute: typeof AuthedSettingsRouteWithChildren
+}
+
+const AuthedRouteChildren: AuthedRouteChildren = {
+  AuthedIndexRoute: AuthedIndexRoute,
+  AuthedSettingsRoute: AuthedSettingsRouteWithChildren,
+}
+
+const AuthedRouteWithChildren =
+  AuthedRoute._addFileChildren(AuthedRouteChildren)
+
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
+  '': typeof AuthedRouteWithChildren
+  '/login': typeof LoginRoute
+  '/': typeof AuthedIndexRoute
+  '/settings': typeof AuthedSettingsSRouteWithChildren
+  '/settings/': typeof AuthedSettingsSIndexRoute
 }
 
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
+  '/login': typeof LoginRoute
+  '/': typeof AuthedIndexRoute
+  '/settings': typeof AuthedSettingsSIndexRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
-  '/': typeof IndexRoute
+  '/_authed': typeof AuthedRouteWithChildren
+  '/login': typeof LoginRoute
+  '/_authed/': typeof AuthedIndexRoute
+  '/_authed/settings': typeof AuthedSettingsRouteWithChildren
+  '/_authed/settings/_s': typeof AuthedSettingsSRouteWithChildren
+  '/_authed/settings/_s/': typeof AuthedSettingsSIndexRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths: '' | '/login' | '/' | '/settings' | '/settings/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/login' | '/' | '/settings'
+  id:
+    | '__root__'
+    | '/_authed'
+    | '/login'
+    | '/_authed/'
+    | '/_authed/settings'
+    | '/_authed/settings/_s'
+    | '/_authed/settings/_s/'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
+  AuthedRoute: typeof AuthedRouteWithChildren
+  LoginRoute: typeof LoginRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
+  AuthedRoute: AuthedRouteWithChildren,
+  LoginRoute: LoginRoute,
 }
 
 export const routeTree = rootRoute
@@ -77,11 +207,41 @@ export const routeTree = rootRoute
     "__root__": {
       "filePath": "__root.tsx",
       "children": [
-        "/"
+        "/_authed",
+        "/login"
       ]
     },
-    "/": {
-      "filePath": "index.tsx"
+    "/_authed": {
+      "filePath": "_authed.tsx",
+      "children": [
+        "/_authed/",
+        "/_authed/settings"
+      ]
+    },
+    "/login": {
+      "filePath": "login.tsx"
+    },
+    "/_authed/": {
+      "filePath": "_authed/index.tsx",
+      "parent": "/_authed"
+    },
+    "/_authed/settings": {
+      "filePath": "_authed/settings",
+      "parent": "/_authed",
+      "children": [
+        "/_authed/settings/_s"
+      ]
+    },
+    "/_authed/settings/_s": {
+      "filePath": "_authed/settings/_s.tsx",
+      "parent": "/_authed/settings",
+      "children": [
+        "/_authed/settings/_s/"
+      ]
+    },
+    "/_authed/settings/_s/": {
+      "filePath": "_authed/settings/_s.index.tsx",
+      "parent": "/_authed/settings/_s"
     }
   }
 }
