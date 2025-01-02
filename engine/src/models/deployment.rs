@@ -10,3 +10,15 @@ pub struct Deployment {
     pub storage: String,
     pub created_at: DateTime<Utc>,
 }
+
+impl Deployment {
+    // pub fn new(deployment_id: String, site_id: String, hash: String, storage: String) -> Self {
+    //     Self {
+    //         deployment_id,
+    //         site_id,
+    //         hash,
+    //         storage,
+    //         created_at: Utc::now(),
+    //     }
+    // }
+}

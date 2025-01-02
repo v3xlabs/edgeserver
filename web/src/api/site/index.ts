@@ -52,3 +52,25 @@ export const getSite = (siteId?: string) =>
 export const useSite = (siteId?: string) => {
     return useQuery(getSite(siteId));
 };
+
+export const getSiteDeployments = (siteId?: string) =>
+    queryOptions({
+        queryKey: ['site', '{siteId}', siteId, 'deployments'],
+        queryFn: async () => {
+            if (!siteId) return;
+
+            const response = await apiRequest(
+                '/site/{site_id}/deployments',
+                'get',
+                {
+                    path: { site_id: siteId },
+                }
+            );
+
+            return response.data;
+        },
+    });
+
+export const useSiteDeployments = (siteId?: string) => {
+    return useQuery(getSiteDeployments(siteId));
+};

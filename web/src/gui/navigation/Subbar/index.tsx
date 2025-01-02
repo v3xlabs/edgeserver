@@ -6,7 +6,8 @@ import { FC, useEffect, useRef } from 'react';
 const SiteMap = [
     ['Overview', ''],
     ['Analytics', '/analytics'],
-    ['Members', '/members'],
+    ['Deployments', '/deployments'],
+    // ['Members', '/members'],
     ['Settings', '/settings'],
 ];
 
@@ -74,6 +75,10 @@ export const Subbar: FC<{ type: 'site' | 'team'; entry_id: string }> = ({
                                         className={clsx(
                                             'block rounded-lg px-2 py-1 text-sm font-medium hover:bg-black/10'
                                         )}
+                                        activeProps={{
+                                            className: 'bg-neutral-800/5',
+                                        }}
+                                        activeOptions={{ exact: index === 0 }}
                                     >
                                         {label}
                                     </NavLink>

@@ -3,7 +3,7 @@ use poem_openapi::Object;
 use serde::{Deserialize, Serialize};
 use sqlx::query_as;
 
-use crate::{database::Database, utils::id::{generate_id, IdType}};
+use crate::{database::Database, models::deployment::Deployment, utils::id::{generate_id, IdType}};
 
 #[derive(Debug, Serialize, Deserialize, Object)]
 pub struct Site {
@@ -54,6 +54,16 @@ impl Site {
             Site,
             "SELECT * FROM sites WHERE team_id IN (SELECT team_id FROM user_teams WHERE user_id = $1) OR team_id = (SELECT team_id FROM teams WHERE owner_id = $1)",
             user_id.as_ref()
+        )
+        .fetch_all(&db.pool)
+        .await
+    }
+
+    pub async fn get_deployments(db: &Database, site_id: impl AsRef<str>) -> Result<Vec<Deployment>, sqlx::Error> {
+        query_as!(
+            Deployment,
+            "SELECT * FROM deployments WHERE site_id = $1",
+            site_id.as_ref()
         )
         .fetch_all(&db.pool)
         .await

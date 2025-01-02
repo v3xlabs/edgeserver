@@ -140,6 +140,42 @@ export type paths = {
         patch?: never;
         trace?: never;
     };
+    "/site/{site_id}/deployments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    site_id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json; charset=utf-8": components["schemas"]["Deployment"][];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/user": {
         parameters: {
             query?: never;
@@ -618,6 +654,14 @@ export type components = {
         };
         CreateTeamRequest: {
             name: string;
+        };
+        Deployment: {
+            deployment_id: string;
+            site_id: string;
+            hash: string;
+            storage: string;
+            /** Format: date-time */
+            created_at: string;
         };
         LoginRequest: {
             username: string;

@@ -5,7 +5,7 @@ use tracing::info;
 
 use crate::{
     middlewares::auth::UserAuth,
-    models::{site::Site, team::Team},
+    models::{deployment::Deployment, site::Site, team::Team},
     routes::ApiTags,
     state::State,
 };
@@ -73,6 +73,26 @@ impl SiteApi {
         info!("Getting site: {:?} for user: {:?}", site_id.0, user);
 
         Site::get_by_id(&state.database, &site_id.0)
+            .await
+            .map_err(HttpError::from)
+            .map(Json)
+            .map_err(poem::Error::from)
+    }
+
+    #[oai(path = "/site/:site_id/deployments", method = "get", tag = "ApiTags::Site")]
+    pub async fn get_site_deployments(
+        &self,
+        user: UserAuth,
+        state: Data<&State>,
+        site_id: Path<String>,
+    ) -> Result<Json<Vec<Deployment>>> {
+        let site = Site::get_by_id(&state.database, &site_id.0)
+            .await
+            .map_err(HttpError::from)?;
+
+        user.required_member_of(&site.team_id).await.map_err(HttpError::from)?;
+
+        Site::get_deployments(&state.database, &site_id.0)
             .await
             .map_err(HttpError::from)
             .map(Json)

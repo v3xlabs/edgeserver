@@ -1,6 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router';
 
 import { getSite, useSite } from '@/api';
+import { DeploymentList } from '@/gui/deployments/DeploymentList';
 import { SCPage } from '@/layouts';
 import { queryClient } from '@/util/query';
 
@@ -19,7 +20,8 @@ function RouteComponent() {
 
     return (
         <SCPage title={site?.name ?? 'Site'}>
-            <div>Hello /_authed/site/$siteId/!</div>
+            <div className="card">This is the site page</div>
+            <DeploymentList siteId={siteId} />
         </SCPage>
     );
 }
