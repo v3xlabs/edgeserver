@@ -1,9 +1,9 @@
 import { Link } from '@tanstack/react-router';
 import { AnimatePresence } from 'framer-motion';
-import { useActiveFocus } from 'src/hooks/useActiveFocus';
 
 import { useAuth } from '@/api/auth/store';
 import { Avatar } from '@/components';
+import { useActiveTeam } from '@/hooks/useActiveTeam';
 
 import { InteractiveNavigator } from './InteractiveNavigator';
 import { Subbar } from './Subbar';
@@ -36,7 +36,9 @@ const UserProfile = () => {
 };
 
 export const Navbar = () => {
-    const { state, state_id } = useActiveFocus();
+    // const { state, state_id } = useA();
+    const state = 'team' as 'none' | 'team' | 'site';
+    const team_id = useActiveTeam();
 
     return (
         <div className="w-full">
@@ -44,20 +46,22 @@ export const Navbar = () => {
                 <div className="z-10 h-14 w-full border-b bg-white px-4">
                     <div className="w-container-dynamic flex h-full items-center justify-between">
                         <div className="flex h-full">
-                            <Link
-                                to="/"
-                                className="flex h-full items-center hover:scale-105"
-                            >
-                                <div
-                                    className="size-8"
-                                    style={{
-                                        clipPath:
-                                            'polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)',
-                                    }}
+                            <div className="relative h-full w-8">
+                                <Link
+                                    to="/"
+                                    className="absolute left-1/2 top-1/2 flex h-full origin-center -translate-x-1/2 -translate-y-1/2 items-center hover:scale-105"
                                 >
-                                    <Avatar src="" s="logo" />
-                                </div>
-                            </Link>
+                                    <div
+                                        className="size-8"
+                                        style={{
+                                            clipPath:
+                                                'polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)',
+                                        }}
+                                    >
+                                        <Avatar src="" s="logo" />
+                                    </div>
+                                </Link>
+                            </div>
                             <div className="ml-4 flex h-full items-center">
                                 <InteractiveNavigator />
                             </div>
@@ -69,7 +73,7 @@ export const Navbar = () => {
             </div>
             <AnimatePresence>
                 {state !== 'none' && (
-                    <Subbar type={state} entry_id={state_id || ''} />
+                    <Subbar type={state} entry_id={team_id || ''} />
                 )}
             </AnimatePresence>
         </div>

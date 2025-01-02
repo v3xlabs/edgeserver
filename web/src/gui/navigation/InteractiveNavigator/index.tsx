@@ -1,18 +1,20 @@
 import { FC } from 'react';
-import { useActiveSite } from 'src/hooks/useSite';
-import { useActiveTeam } from 'src/hooks/useTeam';
+
+import { useActiveTeam } from '@/hooks/useActiveTeam';
 
 import { SiteIndicator } from './SiteIndicator';
 import { TeamIndicator } from './TeamIndicator';
 
 export const InteractiveNavigator: FC = () => {
-    const { team } = useActiveTeam();
-    const { activeSite } = useActiveSite();
+    // const { team } = useActiveTeam();
+    // const { activeSite } = useActiveSite();
+    const team_id = useActiveTeam();
+    const activeSite = '1';
 
     return (
         <div className="flex items-center gap-2">
             <TeamIndicator />
-            {team && activeSite && (
+            {team_id && activeSite && (
                 <div className="h-6 w-0.5 rotate-12 bg-black" />
             )}
             <SiteIndicator />

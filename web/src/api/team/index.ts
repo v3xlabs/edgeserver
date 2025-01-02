@@ -1,6 +1,9 @@
 import { queryOptions, useQuery } from '@tanstack/react-query';
 
 import { apiRequest } from '../core';
+import { components } from '../schema.gen';
+
+export type Team = components['schemas']['Team'];
 
 export const getTeams = () =>
     queryOptions({

@@ -1,6 +1,9 @@
 import { queryOptions, useQuery } from '@tanstack/react-query';
 
 import { apiRequest } from '../core';
+import { components } from '../schema.gen';
+
+export type Site = components['schemas']['Site'];
 
 export const getSites = () =>
     queryOptions({

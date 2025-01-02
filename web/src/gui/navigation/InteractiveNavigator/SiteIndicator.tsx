@@ -1,7 +1,7 @@
-import { Site } from '@edgelabs/types';
 import { AnimatePresence, motion } from 'framer-motion';
 import { FC } from 'react';
-import { useActiveSite, useSite } from 'src/hooks/useSite';
+
+import { Site, useSite } from '@/api';
 
 const SiteEntry: FC<{ site: Site }> = ({
     site: { site_id, name, team_id },
@@ -21,7 +21,8 @@ const SiteEntry: FC<{ site: Site }> = ({
 };
 
 export const SiteIndicator: FC = () => {
-    const { activeSite } = useActiveSite();
+    // const { activeSite } = useActiveSite();
+    const activeSite = '1';
     const { data } = useSite(activeSite);
 
     return (

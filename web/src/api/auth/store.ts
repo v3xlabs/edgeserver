@@ -4,7 +4,7 @@ import { useSelector } from '@xstate/store/react';
 const loadInitial = () => {
     const auth = localStorage.getItem('@edgeserver/auth');
 
-    return auth ? JSON.parse(auth) : { token: '' };
+    return auth ? (JSON.parse(auth) as { token: string }) : { token: '' };
 };
 
 export const authStore = createStore({

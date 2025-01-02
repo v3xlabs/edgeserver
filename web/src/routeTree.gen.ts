@@ -19,6 +19,7 @@ import { Route as BootstrapImport } from './routes/bootstrap'
 import { Route as AuthedImport } from './routes/_authed'
 import { Route as AuthedIndexImport } from './routes/_authed/index'
 import { Route as AuthedSettingsSImport } from './routes/_authed/settings/_s'
+import { Route as AuthedTeamTeamIdIndexImport } from './routes/_authed/team/$teamId/index'
 import { Route as AuthedSettingsSIndexImport } from './routes/_authed/settings/_s.index'
 
 // Create Virtual Routes
@@ -65,6 +66,12 @@ const AuthedIndexRoute = AuthedIndexImport.update({
 const AuthedSettingsSRoute = AuthedSettingsSImport.update({
   id: '/_s',
   getParentRoute: () => AuthedSettingsRoute,
+} as any)
+
+const AuthedTeamTeamIdIndexRoute = AuthedTeamTeamIdIndexImport.update({
+  id: '/team/$teamId/',
+  path: '/team/$teamId/',
+  getParentRoute: () => AuthedRoute,
 } as any)
 
 const AuthedSettingsSIndexRoute = AuthedSettingsSIndexImport.update({
@@ -133,6 +140,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthedSettingsSIndexImport
       parentRoute: typeof AuthedSettingsSImport
     }
+    '/_authed/team/$teamId/': {
+      id: '/_authed/team/$teamId/'
+      path: '/team/$teamId'
+      fullPath: '/team/$teamId'
+      preLoaderRoute: typeof AuthedTeamTeamIdIndexImport
+      parentRoute: typeof AuthedImport
+    }
   }
 }
 
@@ -165,11 +179,13 @@ const AuthedSettingsRouteWithChildren = AuthedSettingsRoute._addFileChildren(
 interface AuthedRouteChildren {
   AuthedIndexRoute: typeof AuthedIndexRoute
   AuthedSettingsRoute: typeof AuthedSettingsRouteWithChildren
+  AuthedTeamTeamIdIndexRoute: typeof AuthedTeamTeamIdIndexRoute
 }
 
 const AuthedRouteChildren: AuthedRouteChildren = {
   AuthedIndexRoute: AuthedIndexRoute,
   AuthedSettingsRoute: AuthedSettingsRouteWithChildren,
+  AuthedTeamTeamIdIndexRoute: AuthedTeamTeamIdIndexRoute,
 }
 
 const AuthedRouteWithChildren =
@@ -183,6 +199,7 @@ export interface FileRoutesByFullPath {
   '/': typeof AuthedIndexRoute
   '/settings': typeof AuthedSettingsSRouteWithChildren
   '/settings/': typeof AuthedSettingsSIndexRoute
+  '/team/$teamId': typeof AuthedTeamTeamIdIndexRoute
 }
 
 export interface FileRoutesByTo {
@@ -191,6 +208,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/': typeof AuthedIndexRoute
   '/settings': typeof AuthedSettingsSIndexRoute
+  '/team/$teamId': typeof AuthedTeamTeamIdIndexRoute
 }
 
 export interface FileRoutesById {
@@ -203,6 +221,7 @@ export interface FileRoutesById {
   '/_authed/settings': typeof AuthedSettingsRouteWithChildren
   '/_authed/settings/_s': typeof AuthedSettingsSRouteWithChildren
   '/_authed/settings/_s/': typeof AuthedSettingsSIndexRoute
+  '/_authed/team/$teamId/': typeof AuthedTeamTeamIdIndexRoute
 }
 
 export interface FileRouteTypes {
@@ -215,8 +234,9 @@ export interface FileRouteTypes {
     | '/'
     | '/settings'
     | '/settings/'
+    | '/team/$teamId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/bootstrap' | '/debug' | '/login' | '/' | '/settings'
+  to: '/bootstrap' | '/debug' | '/login' | '/' | '/settings' | '/team/$teamId'
   id:
     | '__root__'
     | '/_authed'
@@ -227,6 +247,7 @@ export interface FileRouteTypes {
     | '/_authed/settings'
     | '/_authed/settings/_s'
     | '/_authed/settings/_s/'
+    | '/_authed/team/$teamId/'
   fileRoutesById: FileRoutesById
 }
 
@@ -264,7 +285,8 @@ export const routeTree = rootRoute
       "filePath": "_authed.tsx",
       "children": [
         "/_authed/",
-        "/_authed/settings"
+        "/_authed/settings",
+        "/_authed/team/$teamId/"
       ]
     },
     "/bootstrap": {
@@ -297,6 +319,10 @@ export const routeTree = rootRoute
     "/_authed/settings/_s/": {
       "filePath": "_authed/settings/_s.index.tsx",
       "parent": "/_authed/settings/_s"
+    },
+    "/_authed/team/$teamId/": {
+      "filePath": "_authed/team/$teamId/index.tsx",
+      "parent": "/_authed"
     }
   }
 }
