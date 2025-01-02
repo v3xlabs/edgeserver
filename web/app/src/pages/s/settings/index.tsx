@@ -3,9 +3,9 @@ import { FC } from 'react';
 import { useActiveSite } from 'src/hooks/useSite';
 import { useActiveTeam } from 'src/hooks/useTeam';
 
-import { DomainManager } from '@/components/domains/DomainManager';
-import { SettingsSection } from '@/components/settings/SettingsSection';
-import { TokenManager } from '@/components/token/manager';
+import { DomainManager } from '@/gui/domains/DomainManager';
+import { SettingsSection } from '@/gui/settings/SettingsSection';
+import { TokenManager } from '@/gui/token/manager';
 
 export const SiteSettingsPage: FC = () => {
     const { team_id } = useActiveTeam();

@@ -1,5 +1,5 @@
-import { LoginButton } from './components/LoginButton';
-import { toSelectableAccount } from './components/SelectableAccount';
+import { LoginButton } from './gui/LoginButton';
+import { toSelectableAccount } from './gui/SelectableAccount';
 
 export const LoginPage = () => {
     const lastAcconts = [

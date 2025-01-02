@@ -1,4 +1,4 @@
-import { SettingsNav } from '@/components/settings/SettingsNav';
+import { SettingsNav } from '@/gui/settings/SettingsNav';
 import { SidePage } from '@/layouts/SidePage';
 import {
     createFileRoute,

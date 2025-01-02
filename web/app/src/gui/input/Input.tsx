@@ -12,7 +12,7 @@ export const Input: FC<
             {...properties}
             className={cx(
                 className,
-                'px-4 py-2 outline-offset-2 outline-black/80 max-w-full'
+                'px-4 py-2 outline-offset-2 border rounded-md outline-black/80 max-w-full block'
             )}
             ref={_ref}
         />

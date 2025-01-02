@@ -1,7 +1,8 @@
+import { bootstrapPreflight } from '@/api/bootstrap';
 import { createRootRouteWithContext, Outlet } from '@tanstack/react-router';
 import { ReactNode } from 'react';
 
-// import { Toaster } from '@/components/ui/Toaster';
+// import { Toaster } from '@/gui/ui/Toaster';
 
 export interface MyRouterContext {
     title: string;
@@ -15,4 +16,11 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
             <Outlet />
         </>
     ),
+    beforeLoad: async ({ context, location }) => {
+        if (location.pathname === '/bootstrap' || location.pathname === '/debug') {
+            return;
+        }
+
+        await bootstrapPreflight();
+    },
 });

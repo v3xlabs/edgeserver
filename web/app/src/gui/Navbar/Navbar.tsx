@@ -3,7 +3,7 @@ import { AnimatePresence } from 'framer-motion';
 import { useActiveFocus } from 'src/hooks/useActiveFocus';
 import { useAuth } from 'src/hooks/useAuth';
 
-import { AvatarOrGradient } from '@/components/avatar/AvatarOrGradient';
+import { AvatarOrGradient } from '@/gui/avatar/AvatarOrGradient';
 
 import { InteractiveNavigator } from './InteractiveNavigator';
 import { Subbar } from './Subbar';

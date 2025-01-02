@@ -186,7 +186,11 @@ export type paths = {
                 path?: never;
                 cookie?: never;
             };
-            requestBody?: never;
+            requestBody: {
+                content: {
+                    "application/json; charset=utf-8": components["schemas"]["LoginRequest"];
+                };
+            };
             responses: {
                 200: {
                     headers: {
@@ -194,6 +198,62 @@ export type paths = {
                     };
                     content: {
                         "application/json; charset=utf-8": components["schemas"]["LoginResponse"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/bootstrap": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json; charset=utf-8": components["schemas"]["CanBootstrapResponse"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json; charset=utf-8": components["schemas"]["BootstrapUserRequest"];
+                };
+            };
+            responses: {
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json; charset=utf-8": components["schemas"]["BootstrapUserResponse"];
                     };
                 };
             };
@@ -242,7 +302,11 @@ export type paths = {
                 path?: never;
                 cookie?: never;
             };
-            requestBody?: never;
+            requestBody: {
+                content: {
+                    "application/json; charset=utf-8": components["schemas"]["CreateTeamRequest"];
+                };
+            };
             responses: {
                 200: {
                     headers: {
@@ -325,9 +389,7 @@ export type paths = {
                     headers: {
                         [name: string]: unknown;
                     };
-                    content: {
-                        "application/json; charset=utf-8": components["schemas"]["Team"];
-                    };
+                    content?: never;
                 };
             };
         };
@@ -418,9 +480,7 @@ export type paths = {
                     headers: {
                         [name: string]: unknown;
                     };
-                    content: {
-                        "application/json; charset=utf-8": components["schemas"]["UserTeamInvite"];
-                    };
+                    content?: never;
                 };
             };
         };
@@ -433,6 +493,24 @@ export type paths = {
 export type webhooks = Record<string, never>;
 export type components = {
     schemas: {
+        BootstrapUserRequest: {
+            username: string;
+            password: string;
+        };
+        BootstrapUserResponse: {
+            user: components["schemas"]["User"];
+            team: components["schemas"]["Team"];
+        };
+        CanBootstrapResponse: {
+            can_bootstrap: boolean;
+        };
+        CreateTeamRequest: {
+            name: string;
+        };
+        LoginRequest: {
+            username: string;
+            password: string;
+        };
         LoginResponse: {
             token: string;
         };
@@ -445,15 +523,19 @@ export type components = {
             team_id: string;
             owner_id: string;
             name: string;
+            /** Format: date-time */
+            created_at: string;
         };
         User: {
             user_id: string;
             name: string;
+            /** Format: date-time */
+            created_at: string;
         };
         UserTeamInvite: {
             invite_id: string;
-            user_id: string;
             team_id: string;
+            user_id: string;
             /** Format: date-time */
             created_at: string;
         };

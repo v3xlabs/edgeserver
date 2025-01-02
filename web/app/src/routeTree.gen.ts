@@ -14,6 +14,8 @@ import { createFileRoute } from '@tanstack/react-router'
 
 import { Route as rootRoute } from './routes/__root'
 import { Route as LoginImport } from './routes/login'
+import { Route as DebugImport } from './routes/debug'
+import { Route as BootstrapImport } from './routes/bootstrap'
 import { Route as AuthedImport } from './routes/_authed'
 import { Route as AuthedIndexImport } from './routes/_authed/index'
 import { Route as AuthedSettingsSImport } from './routes/_authed/settings/_s'
@@ -28,6 +30,18 @@ const AuthedSettingsImport = createFileRoute('/_authed/settings')()
 const LoginRoute = LoginImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const DebugRoute = DebugImport.update({
+  id: '/debug',
+  path: '/debug',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const BootstrapRoute = BootstrapImport.update({
+  id: '/bootstrap',
+  path: '/bootstrap',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -68,6 +82,20 @@ declare module '@tanstack/react-router' {
       path: ''
       fullPath: ''
       preLoaderRoute: typeof AuthedImport
+      parentRoute: typeof rootRoute
+    }
+    '/bootstrap': {
+      id: '/bootstrap'
+      path: '/bootstrap'
+      fullPath: '/bootstrap'
+      preLoaderRoute: typeof BootstrapImport
+      parentRoute: typeof rootRoute
+    }
+    '/debug': {
+      id: '/debug'
+      path: '/debug'
+      fullPath: '/debug'
+      preLoaderRoute: typeof DebugImport
       parentRoute: typeof rootRoute
     }
     '/login': {
@@ -149,6 +177,8 @@ const AuthedRouteWithChildren =
 
 export interface FileRoutesByFullPath {
   '': typeof AuthedRouteWithChildren
+  '/bootstrap': typeof BootstrapRoute
+  '/debug': typeof DebugRoute
   '/login': typeof LoginRoute
   '/': typeof AuthedIndexRoute
   '/settings': typeof AuthedSettingsSRouteWithChildren
@@ -156,6 +186,8 @@ export interface FileRoutesByFullPath {
 }
 
 export interface FileRoutesByTo {
+  '/bootstrap': typeof BootstrapRoute
+  '/debug': typeof DebugRoute
   '/login': typeof LoginRoute
   '/': typeof AuthedIndexRoute
   '/settings': typeof AuthedSettingsSIndexRoute
@@ -164,6 +196,8 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/_authed': typeof AuthedRouteWithChildren
+  '/bootstrap': typeof BootstrapRoute
+  '/debug': typeof DebugRoute
   '/login': typeof LoginRoute
   '/_authed/': typeof AuthedIndexRoute
   '/_authed/settings': typeof AuthedSettingsRouteWithChildren
@@ -173,12 +207,21 @@ export interface FileRoutesById {
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '' | '/login' | '/' | '/settings' | '/settings/'
+  fullPaths:
+    | ''
+    | '/bootstrap'
+    | '/debug'
+    | '/login'
+    | '/'
+    | '/settings'
+    | '/settings/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/login' | '/' | '/settings'
+  to: '/bootstrap' | '/debug' | '/login' | '/' | '/settings'
   id:
     | '__root__'
     | '/_authed'
+    | '/bootstrap'
+    | '/debug'
     | '/login'
     | '/_authed/'
     | '/_authed/settings'
@@ -189,11 +232,15 @@ export interface FileRouteTypes {
 
 export interface RootRouteChildren {
   AuthedRoute: typeof AuthedRouteWithChildren
+  BootstrapRoute: typeof BootstrapRoute
+  DebugRoute: typeof DebugRoute
   LoginRoute: typeof LoginRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   AuthedRoute: AuthedRouteWithChildren,
+  BootstrapRoute: BootstrapRoute,
+  DebugRoute: DebugRoute,
   LoginRoute: LoginRoute,
 }
 
@@ -208,6 +255,8 @@ export const routeTree = rootRoute
       "filePath": "__root.tsx",
       "children": [
         "/_authed",
+        "/bootstrap",
+        "/debug",
         "/login"
       ]
     },
@@ -217,6 +266,12 @@ export const routeTree = rootRoute
         "/_authed/",
         "/_authed/settings"
       ]
+    },
+    "/bootstrap": {
+      "filePath": "bootstrap.tsx"
+    },
+    "/debug": {
+      "filePath": "debug.tsx"
     },
     "/login": {
       "filePath": "login.tsx"

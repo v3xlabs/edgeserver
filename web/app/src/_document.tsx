@@ -1,4 +1,4 @@
-import { LoginFacade } from '@/components/LoginFacade';
+import { LoginFacade } from '@/gui/LoginFacade';
 
 import { App } from './App';
 

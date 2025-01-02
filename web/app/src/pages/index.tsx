@@ -3,8 +3,8 @@ import { FC, useEffect } from 'react';
 import { useActiveTeam } from 'src/hooks/useTeam';
 import { useTeams } from 'src/hooks/useTeams';
 
-import { AvatarOrGradient } from '@/components/avatar/AvatarOrGradient';
-import { SiteList } from '@/components/sites/sitelist';
+import { AvatarOrGradient } from '@/gui/avatar/AvatarOrGradient';
+import { SiteList } from '@/gui/sites/sitelist';
 import { buffercnvrt } from '@/utils/buffercnvrt';
 
 export const Home = () => {

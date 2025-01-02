@@ -10,7 +10,7 @@ import { TeamSettingsPage } from '@pages/t/settings';
 import { FC } from 'react';
 import { Route, Routes } from 'react-router';
 
-import { Navbar } from './components/Navbar/Navbar';
+import { Navbar } from './gui/Navbar/Navbar';
 import { Home } from './pages';
 
 export const App: FC = () => {

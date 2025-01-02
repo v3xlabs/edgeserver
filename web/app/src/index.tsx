@@ -10,8 +10,8 @@ import { preflightAuth } from '@/api/auth';
 import { routeTree } from '@/routeTree.gen';
 import { queryClient } from '@/util/query';
 
-import { PageErrorBoundary } from './components/PageErrorBoundary';
-import { defaultPendingComponent } from './components/Router';
+import { PageErrorBoundary } from './gui/PageErrorBoundary';
+import { defaultPendingComponent } from './gui/Router';
 
 // Create a new router instance
 const router = createRouter({

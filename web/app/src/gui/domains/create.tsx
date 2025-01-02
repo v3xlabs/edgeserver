@@ -1,5 +1,5 @@
 /* eslint-disable quotes */
-import { FormField } from '@/components/form/FormField';
+import { FormField } from '@/gui/form/FormField';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { environment } from '@/utils/environment';
 import { FC, useState } from 'react';

@@ -3,7 +3,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { FC } from 'react';
 import { useActiveTeam } from 'src/hooks/useTeam';
 
-import { AvatarOrGradient } from '@/components/avatar/AvatarOrGradient';
+import { AvatarOrGradient } from '@/gui/avatar/AvatarOrGradient';
 import { buffercnvrt } from '@/utils/buffercnvrt';
 
 const TeamEntry: FC<{ team: Team }> = ({

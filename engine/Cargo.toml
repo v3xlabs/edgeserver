@@ -49,3 +49,5 @@ reqwest = { version = "0.12.5", features = [
 chrono = "0.4.39"
 serde_with = { version = "3.9.0", features = ["json", "chrono"] }
 uuid = { version = "1.11.0", features = ["v4"] }
+sha2 = "0.10.8"
+hex = "0.4.3"

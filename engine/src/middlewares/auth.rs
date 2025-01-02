@@ -4,7 +4,7 @@ use poem_openapi::{
     ApiExtractor, ApiExtractorType, ExtractParamOptions,
 };
 
-use crate::{models::user::User, routes::error::HttpError, state::AppState};
+use crate::{models::user::User, routes::error::HttpError, state::State};
 
 #[derive(Debug)]
 pub enum UserAuth {
@@ -22,7 +22,7 @@ impl<'a> ApiExtractor<'a> for UserAuth {
         body: &mut RequestBody,
         _param_opts: ExtractParamOptions<Self::ParamType>,
     ) -> Result<Self> {
-        let state = <Data<&AppState> as FromRequest>::from_request(req, body).await?;
+        let state = <Data<&State> as FromRequest>::from_request(req, body).await?;
 
         let state = state.0;
 

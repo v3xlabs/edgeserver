@@ -1,4 +1,4 @@
-import { DeploymentList } from '@/components/deployments/list';
+import { DeploymentList } from '@/gui/deployments/list';
 import { FC } from 'react';
 import { useParams } from 'react-router';
 import { useSite } from 'src/hooks/useSite';
