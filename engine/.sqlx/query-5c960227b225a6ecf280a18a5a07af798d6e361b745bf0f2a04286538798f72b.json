@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "SELECT * FROM users WHERE user_id IN (SELECT user_id FROM user_teams WHERE team_id = $1)",
+  "query": "SELECT * FROM users WHERE user_id IN (SELECT user_id FROM user_teams WHERE team_id = $1) OR user_id = (SELECT owner_id FROM teams WHERE team_id = $1)",
   "describe": {
     "columns": [
       {
@@ -36,5 +36,5 @@
       false
     ]
   },
-  "hash": "951b74ce1b834bb221cafbd5d4a8f4a659f16dc431a82faf1e290bd6f7565ff5"
+  "hash": "5c960227b225a6ecf280a18a5a07af798d6e361b745bf0f2a04286538798f72b"
 }

@@ -16,3 +16,19 @@ export const getMe = () =>
     });
 
 export const useMe = () => useQuery(getMe());
+
+export const getUser = (user_id?: string) =>
+    queryOptions({
+        queryKey: ['user', user_id],
+        queryFn: async () => {
+            if (!user_id) return;
+
+            const response = await apiRequest('/user/{user_id}', 'get', {
+                path: { user_id },
+            });
+
+            return response.data;
+        },
+    });
+
+export const useUser = (user_id?: string) => useQuery(getUser(user_id));

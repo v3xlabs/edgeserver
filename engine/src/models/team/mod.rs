@@ -112,7 +112,7 @@ impl Team {
     ) -> Result<Vec<User>, sqlx::Error> {
         query_as!(
             User,
-            "SELECT * FROM users WHERE user_id IN (SELECT user_id FROM user_teams WHERE team_id = $1)",
+            "SELECT * FROM users WHERE user_id IN (SELECT user_id FROM user_teams WHERE team_id = $1) OR user_id = (SELECT owner_id FROM teams WHERE team_id = $1)",
             team_id.as_ref()
         )
         .fetch_all(&db.pool)
