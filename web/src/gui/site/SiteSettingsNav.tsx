@@ -4,19 +4,15 @@ import clsx from 'clsx';
 import { ReactNode, useState } from 'react';
 import { FiChevronDown } from 'react-icons/fi';
 import {
-    LuBot,
-    LuBrain,
-    LuClipboardType,
-    LuClock,
-    LuFileText,
+    LuCode,
+    LuFileWarning,
     LuFilter,
+    LuForward,
     LuGlobe,
-    LuHardDrive,
     LuKey,
-    LuMapPin,
     LuScroll,
-    LuSearch,
     LuSettings,
+    LuWebhook,
 } from 'react-icons/lu';
 
 export function isTruthy<T>(value?: T | undefined | null | false): value is T {
@@ -177,41 +173,38 @@ export const SiteSettingsNav = () => {
                     //         ],
                     //     ],
                     // ],
-                    // [
-                    //     'Authentication',
-                    //     [
-                    //         // hasUsersPermissions && [
-                    //         //     '/settings/users',
-                    //         //     'Users',
-                    //         //     <LuUsers />,
-                    //         // ],
-                    //         [
-                    //             '/settings/sessions',
-                    //             'Sessions',
-                    //             <LuClock key="sessions" />,
-                    //         ],
-                    //         [
-                    //             '/settings/pat',
-                    //             'Personal Access Token',
-                    //             <LuKey key="pat" />,
-                    //         ],
-                    //     ],
-                    // ],
-                    // [
-                    //     'System',
-                    //     [
-                    //         [
-                    //             '/settings/logs',
-                    //             'Access Logs',
-                    //             <LuScroll key="logs" />,
-                    //         ],
-                    //         [
-                    //             '/settings/build',
-                    //             'Software Info',
-                    //             <LuScroll key="build" />,
-                    //         ],
-                    //     ],
-                    // ],
+                    [
+                        'Deployment',
+                        [
+                            ['/settings/ci', 'CI/CD', <LuCode key="ci" />],
+                            [
+                                '/settings/webhooks',
+                                'Webhooks',
+                                <LuWebhook key="webhooks" />,
+                            ],
+                            ['/settings/keys', 'Keys', <LuKey key="keys" />],
+                            //         [
+                            //             '/settings/pat',
+                            //             'Personal Access Token',
+                            //             <LuKey key="pat" />,
+                            //         ],
+                        ],
+                    ],
+                    [
+                        'Administrative',
+                        [
+                            [
+                                '/settings/transfer',
+                                'Transfer',
+                                <LuForward key="transfer" />,
+                            ],
+                            [
+                                '/settings/actions',
+                                'Actions',
+                                <LuFileWarning key="delete" />,
+                            ],
+                        ],
+                    ],
                 ] as const
             ).map(([group, items]) => (
                 <div key={group}>

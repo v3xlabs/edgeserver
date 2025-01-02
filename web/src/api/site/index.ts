@@ -1,4 +1,4 @@
-import { queryOptions, useQuery } from '@tanstack/react-query';
+import { queryOptions, useMutation, useQuery } from '@tanstack/react-query';
 
 import { apiRequest } from '../core';
 import { components } from '../schema.gen';
@@ -74,3 +74,15 @@ export const getSiteDeployments = (siteId?: string) =>
 export const useSiteDeployments = (siteId?: string) => {
     return useQuery(getSiteDeployments(siteId));
 };
+
+export const useSiteCreate = () =>
+    useMutation({
+        mutationFn: async (site: { name: string; team_id: string }) => {
+            const response = await apiRequest('/site', 'post', {
+                data: site,
+                contentType: 'application/json; charset=utf-8',
+            });
+
+            return response.data;
+        },
+    });

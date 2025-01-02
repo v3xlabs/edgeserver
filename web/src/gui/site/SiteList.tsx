@@ -9,13 +9,13 @@ export const SiteList: FC<{ teamId?: string }> = ({ teamId }) => {
     const { data: sites } = teamId ? useTeamSites(teamId) : useSites();
 
     return (
-        <div className="">
+        <div className="space-y-2">
             <div className="flex items-center justify-between">
                 <h2 className="h2">Sites</h2>
                 {sites?.length != 0 && <SiteCreateButton />}
             </div>
             {sites && sites.length > 0 && (
-                <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+                <ul className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
                     {sites.map((site) => (
                         <li key={site.site_id}>
                             <SitePreview site={site} />

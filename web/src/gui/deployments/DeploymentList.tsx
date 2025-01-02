@@ -8,7 +8,7 @@ export const DeploymentList: FC<{ siteId?: string }> = ({ siteId }) => {
     const { data: deployments } = useSiteDeployments(siteId);
 
     return (
-        <div>
+        <div className="space-y-2">
             <h2 className="h2">Deployment List</h2>
             {deployments && deployments.length > 0 && (
                 <ul>
