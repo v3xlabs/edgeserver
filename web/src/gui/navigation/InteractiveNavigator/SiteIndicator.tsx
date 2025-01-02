@@ -1,3 +1,4 @@
+import { useParams } from '@tanstack/react-router';
 import { AnimatePresence, motion } from 'framer-motion';
 import { FC } from 'react';
 
@@ -21,14 +22,13 @@ const SiteEntry: FC<{ site: Site }> = ({
 };
 
 export const SiteIndicator: FC = () => {
-    // const { activeSite } = useActiveSite();
-    const activeSite = '1';
-    const { data } = useSite(activeSite);
+    const { siteId } = useParams({ strict: false });
+    const { data } = useSite(siteId);
 
     return (
         <div className="h-12 w-fit overflow-hidden pr-6 transition-all">
             <AnimatePresence>
-                {activeSite && data && <SiteEntry site={data} />}
+                {siteId && data && <SiteEntry site={data} />}
             </AnimatePresence>
         </div>
     );
