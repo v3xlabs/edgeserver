@@ -42,14 +42,6 @@ a {
     color: inherit;
 }
 
-.w-container {
-    @apply w-full max-w-6xl px-4 mx-auto;
-}
-
-.w-container-dynamic {
-    @apply w-full max-w-full lg:max-w-6xl px-4 mx-auto;
-}
-
 .tmpbtn {
     @apply bg-blue-500 text-white px-2 py-2 rounded-md hover:brightness-90;
 
@@ -81,4 +73,16 @@ a {
 
 .h3 {
     @apply text-base font-semibold px-2 py-1.5;
+}
+
+.avatar-root {
+    @apply w-full h-full;
+}
+
+.avatar-gradient {
+    @apply w-full h-full;
+}
+
+.avatar-image {
+    @apply w-full h-full;
 }
