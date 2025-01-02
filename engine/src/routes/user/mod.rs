@@ -15,6 +15,8 @@ impl UserApi {
         Ok(Json(User {
             user_id: "1".to_string(),
             name: "John Doe".to_string(),
+            created_at: chrono::Utc::now(),
+            password: "".to_string(),
         }))
     }
 }

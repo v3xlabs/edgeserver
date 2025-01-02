@@ -1,11 +1,15 @@
+use std::sync::Arc;
+
 use config::{Config, Environment};
 use serde::Deserialize;
 
 use crate::database::Database;
 
+pub type State = Arc<AppState>;
+
 pub struct AppState {
-    config: AppConfig,
-    database: Database,
+    pub config: AppConfig,
+    pub database: Database,
 }
 
 #[derive(Deserialize, Debug)]

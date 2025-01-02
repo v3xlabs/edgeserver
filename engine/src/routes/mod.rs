@@ -13,6 +13,7 @@ use user::UserApi;
 use crate::state::AppState;
 
 pub mod auth;
+pub mod error;
 pub mod site;
 pub mod team;
 pub mod user;

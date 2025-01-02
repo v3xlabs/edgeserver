@@ -4,11 +4,11 @@ use poem_openapi::{
     ApiExtractor, ApiExtractorType, ExtractParamOptions,
 };
 
-use crate::state::AppState;
+use crate::{models::user::User, routes::error::HttpError, state::AppState};
 
 #[derive(Debug)]
 pub enum UserAuth {
-    User(String),
+    User(User),
     None,
 }
 
@@ -105,5 +105,21 @@ impl<'a> ApiExtractor<'a> for UserAuth {
     }
     fn security_schemes() -> Vec<&'static str> {
         vec!["AuthToken"]
+    }
+}
+
+impl UserAuth {
+    pub fn ok(&self) -> Option<&User> {
+        match self {
+            UserAuth::User(user) => Some(user),
+            UserAuth::None => None,
+        }
+    }
+
+    pub fn required(&self) -> Result<&User> {
+        match self {
+            UserAuth::User(user) => Ok(user),
+            UserAuth::None => Err(HttpError::Forbidden.into()),
+        }
     }
 }
