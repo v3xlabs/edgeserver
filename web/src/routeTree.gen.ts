@@ -18,6 +18,7 @@ import { Route as DebugImport } from './routes/debug'
 import { Route as BootstrapImport } from './routes/bootstrap'
 import { Route as AuthedImport } from './routes/_authed'
 import { Route as AuthedIndexImport } from './routes/_authed/index'
+import { Route as AuthedTeamNewImport } from './routes/_authed/team/new'
 import { Route as AuthedSiteNewImport } from './routes/_authed/site/new'
 import { Route as AuthedSettingsSImport } from './routes/_authed/settings/_s'
 import { Route as AuthedTeamTeamIdIndexImport } from './routes/_authed/team/$teamId/index'
@@ -78,6 +79,12 @@ const AuthedSettingsRoute = AuthedSettingsImport.update({
 const AuthedIndexRoute = AuthedIndexImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => AuthedRoute,
+} as any)
+
+const AuthedTeamNewRoute = AuthedTeamNewImport.update({
+  id: '/team/new',
+  path: '/team/new',
   getParentRoute: () => AuthedRoute,
 } as any)
 
@@ -260,6 +267,13 @@ declare module '@tanstack/react-router' {
       path: '/site/new'
       fullPath: '/site/new'
       preLoaderRoute: typeof AuthedSiteNewImport
+      parentRoute: typeof AuthedImport
+    }
+    '/_authed/team/new': {
+      id: '/_authed/team/new'
+      path: '/team/new'
+      fullPath: '/team/new'
+      preLoaderRoute: typeof AuthedTeamNewImport
       parentRoute: typeof AuthedImport
     }
     '/_authed/site/$siteId/analytics': {
@@ -460,6 +474,7 @@ interface AuthedRouteChildren {
   AuthedIndexRoute: typeof AuthedIndexRoute
   AuthedSettingsRoute: typeof AuthedSettingsRouteWithChildren
   AuthedSiteNewRoute: typeof AuthedSiteNewRoute
+  AuthedTeamNewRoute: typeof AuthedTeamNewRoute
   AuthedSiteSiteIdAnalyticsRoute: typeof AuthedSiteSiteIdAnalyticsRoute
   AuthedSiteSiteIdDeploymentsRoute: typeof AuthedSiteSiteIdDeploymentsRoute
   AuthedTeamTeamIdMembersRoute: typeof AuthedTeamTeamIdMembersRoute
@@ -473,6 +488,7 @@ const AuthedRouteChildren: AuthedRouteChildren = {
   AuthedIndexRoute: AuthedIndexRoute,
   AuthedSettingsRoute: AuthedSettingsRouteWithChildren,
   AuthedSiteNewRoute: AuthedSiteNewRoute,
+  AuthedTeamNewRoute: AuthedTeamNewRoute,
   AuthedSiteSiteIdAnalyticsRoute: AuthedSiteSiteIdAnalyticsRoute,
   AuthedSiteSiteIdDeploymentsRoute: AuthedSiteSiteIdDeploymentsRoute,
   AuthedTeamTeamIdMembersRoute: AuthedTeamTeamIdMembersRoute,
@@ -493,6 +509,7 @@ export interface FileRoutesByFullPath {
   '/': typeof AuthedIndexRoute
   '/settings': typeof AuthedSettingsSRouteWithChildren
   '/site/new': typeof AuthedSiteNewRoute
+  '/team/new': typeof AuthedTeamNewRoute
   '/site/$siteId/analytics': typeof AuthedSiteSiteIdAnalyticsRoute
   '/site/$siteId/deployments': typeof AuthedSiteSiteIdDeploymentsRoute
   '/team/$teamId/members': typeof AuthedTeamTeamIdMembersRoute
@@ -518,6 +535,7 @@ export interface FileRoutesByTo {
   '/': typeof AuthedIndexRoute
   '/settings': typeof AuthedSettingsSIndexRoute
   '/site/new': typeof AuthedSiteNewRoute
+  '/team/new': typeof AuthedTeamNewRoute
   '/site/$siteId/analytics': typeof AuthedSiteSiteIdAnalyticsRoute
   '/site/$siteId/deployments': typeof AuthedSiteSiteIdDeploymentsRoute
   '/team/$teamId/members': typeof AuthedTeamTeamIdMembersRoute
@@ -544,6 +562,7 @@ export interface FileRoutesById {
   '/_authed/settings': typeof AuthedSettingsRouteWithChildren
   '/_authed/settings/_s': typeof AuthedSettingsSRouteWithChildren
   '/_authed/site/new': typeof AuthedSiteNewRoute
+  '/_authed/team/new': typeof AuthedTeamNewRoute
   '/_authed/site/$siteId/analytics': typeof AuthedSiteSiteIdAnalyticsRoute
   '/_authed/site/$siteId/deployments': typeof AuthedSiteSiteIdDeploymentsRoute
   '/_authed/team/$teamId/members': typeof AuthedTeamTeamIdMembersRoute
@@ -573,6 +592,7 @@ export interface FileRouteTypes {
     | '/'
     | '/settings'
     | '/site/new'
+    | '/team/new'
     | '/site/$siteId/analytics'
     | '/site/$siteId/deployments'
     | '/team/$teamId/members'
@@ -597,6 +617,7 @@ export interface FileRouteTypes {
     | '/'
     | '/settings'
     | '/site/new'
+    | '/team/new'
     | '/site/$siteId/analytics'
     | '/site/$siteId/deployments'
     | '/team/$teamId/members'
@@ -621,6 +642,7 @@ export interface FileRouteTypes {
     | '/_authed/settings'
     | '/_authed/settings/_s'
     | '/_authed/site/new'
+    | '/_authed/team/new'
     | '/_authed/site/$siteId/analytics'
     | '/_authed/site/$siteId/deployments'
     | '/_authed/team/$teamId/members'
@@ -677,6 +699,7 @@ export const routeTree = rootRoute
         "/_authed/",
         "/_authed/settings",
         "/_authed/site/new",
+        "/_authed/team/new",
         "/_authed/site/$siteId/analytics",
         "/_authed/site/$siteId/deployments",
         "/_authed/team/$teamId/members",
@@ -715,6 +738,10 @@ export const routeTree = rootRoute
     },
     "/_authed/site/new": {
       "filePath": "_authed/site/new.tsx",
+      "parent": "/_authed"
+    },
+    "/_authed/team/new": {
+      "filePath": "_authed/team/new.tsx",
       "parent": "/_authed"
     },
     "/_authed/site/$siteId/analytics": {

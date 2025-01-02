@@ -1,4 +1,4 @@
-import { queryOptions, useQuery } from '@tanstack/react-query';
+import { queryOptions, useMutation, useQuery } from '@tanstack/react-query';
 
 import { apiRequest } from '../core';
 import { components } from '../schema.gen';
@@ -74,3 +74,15 @@ export const getTeamMembers = (teamId: string) =>
 export const useTeamMembers = (teamId: string) => {
     return useQuery(getTeamMembers(teamId));
 };
+
+export const useTeamCreate = () =>
+    useMutation({
+        mutationFn: async (team: { name: string }) => {
+            const response = await apiRequest('/team', 'post', {
+                data: team,
+                contentType: 'application/json; charset=utf-8',
+            });
+
+            return response.data;
+        },
+    });

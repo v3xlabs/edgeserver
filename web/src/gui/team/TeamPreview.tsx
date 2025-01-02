@@ -3,6 +3,7 @@ import { FC } from 'react';
 import { FiArrowRight } from 'react-icons/fi';
 
 import { Team, useTeam } from '@/api/team';
+import { Avatar } from '@/components';
 
 export const TeamPreview: FC<{ team_id?: string; team?: Team }> = ({
     team_id: query_team_id,
@@ -21,7 +22,12 @@ export const TeamPreview: FC<{ team_id?: string; team?: Team }> = ({
             params={{ teamId: team_id }}
             className="card flex items-center justify-between"
         >
-            <div>{team?.name}</div>
+            <div className="flex items-center gap-2">
+                <div className="size-4">
+                    <Avatar s={team_id} />
+                </div>
+                <div>{team?.name}</div>
+            </div>
             <FiArrowRight />
         </Link>
     );

@@ -52,7 +52,7 @@ impl Site {
     pub async fn get_by_user_id(db: &Database, user_id: impl AsRef<str>) -> Result<Vec<Self>, sqlx::Error> {
         query_as!(
             Site,
-            "SELECT * FROM sites WHERE team_id IN (SELECT team_id FROM user_teams WHERE user_id = $1) OR team_id = (SELECT team_id FROM teams WHERE owner_id = $1)",
+            "SELECT * FROM sites WHERE team_id IN (SELECT team_id FROM user_teams WHERE user_id = $1) OR team_id IN (SELECT team_id FROM teams WHERE owner_id = $1)",
             user_id.as_ref()
         )
         .fetch_all(&db.pool)

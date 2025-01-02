@@ -44,7 +44,7 @@ impl TeamApi {
         info!("Creating team for user: {:?}", user);
         let user = user.required()?;
 
-        Team::new(&state.0.database, &user.user_id, &body.name)
+        Team::new(&state.0.database, &body.name, &user.user_id)
             .await
             .map_err(HttpError::from)
             .map(Json)
