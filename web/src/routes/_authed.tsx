@@ -5,6 +5,7 @@ import {
 } from '@tanstack/react-router';
 
 import { preflightAuth } from '@/api';
+import { CommandPalette } from '@/gui/command/CommandPalette';
 import { Navbar } from '@/gui/navigation/Navbar';
 
 export const Route = createFileRoute('/_authed')({
@@ -22,6 +23,7 @@ function RouteComponent() {
     return (
         <>
             <Navbar />
+            <CommandPalette />
             <Outlet />
         </>
     );
