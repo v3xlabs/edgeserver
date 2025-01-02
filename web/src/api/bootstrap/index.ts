@@ -1,3 +1,4 @@
+/* eslint-disable sonarjs/no-duplicate-string */
 import { queryOptions } from '@tanstack/react-query';
 import { redirect } from '@tanstack/react-router';
 
@@ -26,12 +27,16 @@ export const getCanBootstrap = () =>
         },
     });
 
-export const bootstrapPreflight = async () => {
+export const bootstrapPreflight = async (pathname: string) => {
     const { can_bootstrap } = await queryClient.ensureQueryData(
         getCanBootstrap()
     );
 
-    if (can_bootstrap) {
+    if (can_bootstrap && !['/bootstrap', '/debug'].includes(pathname)) {
         throw redirect({ to: '/bootstrap' });
+    }
+
+    if (!can_bootstrap && ['/bootstrap', '/debug'].includes(pathname)) {
+        throw redirect({ to: '/' });
     }
 };

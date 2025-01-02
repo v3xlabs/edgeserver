@@ -4,7 +4,7 @@ import {
     useRouterState,
 } from '@tanstack/react-router';
 
-import { Navbar } from '@/gui/navbar/Navbar';
+import { Navbar } from '@/gui/navigation/Navbar';
 
 export const Route = createFileRoute('/_authed')({
     component: RouteComponent,

@@ -56,6 +56,9 @@ importers:
       '@vitejs/plugin-react':
         specifier: ^2.0.1
         version: 2.2.0(vite@6.0.6(@types/node@22.10.3)(jiti@1.21.7)(sass@1.83.0)(tsx@4.19.2)(yaml@2.7.0))
+      '@xstate/store':
+        specifier: ^2.6.2
+        version: 2.6.2(react@18.3.1)
       buffer:
         specifier: ^6.0.3
         version: 6.0.3
@@ -170,6 +173,9 @@ importers:
       tailwindcss:
         specifier: ^3.3.2
         version: 3.4.17
+      ts-pattern:
+        specifier: ^5.6.0
+        version: 5.6.0
       use-debounce:
         specifier: ^8.0.1
         version: 8.0.4(react@18.3.1)
@@ -2060,6 +2066,17 @@ packages:
 
   '@web3-storage/multipart-parser@1.0.0':
     resolution: {integrity: sha512-BEO6al7BYqcnfX15W2cnGR+Q566ACXAT9UQykORCWW80lmkpWsnEob6zJS1ZVBKsSJC8+7vJkHwlp+lXG1UCdw==}
+
+  '@xstate/store@2.6.2':
+    resolution: {integrity: sha512-zznGTWU+tmhbD0UUxPLy5FmxvceBNyMsN1Tuy7UMJAH9NuaQWj4/B2L+EcO6FxI2b2CNyzk1PL5mZ8cDpBFpMw==}
+    peerDependencies:
+      react: ^18.2.0 || ^19.0.0-0
+      solid-js: ^1.7.6
+    peerDependenciesMeta:
+      react:
+        optional: true
+      solid-js:
+        optional: true
 
   '@zxing/text-encoding@0.9.0':
     resolution: {integrity: sha512-U/4aVJ2mxI0aDNI8Uq0wEhMgY+u4CNtEb0om3+y3+niDAsoTCOB33UF0sxpzqzdqXLqmvc+vZyAt4O8pPdfkwA==}
@@ -4085,6 +4102,9 @@ packages:
 
   ts-interface-checker@0.1.13:
     resolution: {integrity: sha512-Y/arvbn+rrz3JCKl9C4kVNfTfSm2/mEp5FSz5EsZSANGPSlQrpRI5M4PKF+mJnE52jOO90PnPSc3Ur3bTQw0gA==}
+
+  ts-pattern@5.6.0:
+    resolution: {integrity: sha512-SL8u60X5+LoEy9tmQHWCdPc2hhb2pKI6I1tU5Jue3v8+iRqZdcT3mWPwKKJy1fMfky6uha82c8ByHAE8PMhKHw==}
 
   tsconfig-paths@4.2.0:
     resolution: {integrity: sha512-NoZ4roiN7LnbKn9QqE1amc9DJfzvZXxF4xDavcOWt1BPkdx+m+0gJuPM+S0vCe7zTJMYUP0R8pO2XMr+Y8oLIg==}
@@ -6695,6 +6715,10 @@ snapshots:
 
   '@web3-storage/multipart-parser@1.0.0': {}
 
+  '@xstate/store@2.6.2(react@18.3.1)':
+    optionalDependencies:
+      react: 18.3.1
+
   '@zxing/text-encoding@0.9.0':
     optional: true
 
@@ -9131,6 +9155,8 @@ snapshots:
   tr46@0.0.3: {}
 
   ts-interface-checker@0.1.13: {}
+
+  ts-pattern@5.6.0: {}
 
   tsconfig-paths@4.2.0:
     dependencies:

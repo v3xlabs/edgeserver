@@ -1,27 +1,39 @@
 import { useForm } from '@tanstack/react-form';
+import { useNavigate } from '@tanstack/react-router';
+import { match } from 'ts-pattern';
 
-import { useBootstrap } from '@/api';
+import { useBootstrap, useLogin } from '@/api';
 import { Button, Input } from '@/components';
 
 export const BootstrapNewUser = () => {
-    const { mutate: createUser } = useBootstrap();
+    const { mutateAsync: createUser, isPending: isCreatingUser } =
+        useBootstrap();
+    const navigate = useNavigate();
+    const { mutateAsync: login, isPending: isLoggingIn } = useLogin();
     const { Field, Subscribe, handleSubmit } = useForm({
         defaultValues: {
             username: '',
             password: '',
             confirmPassword: '',
         },
-        onSubmit: ({ value }) => {
+        onSubmit: async ({ value }) => {
             console.log(value);
 
             if (value.password !== value.confirmPassword) {
                 return;
             }
 
-            createUser({
+            await createUser({
                 username: value.username,
                 password: value.password,
             });
+
+            await login({
+                username: value.username,
+                password: value.password,
+            });
+
+            navigate({ to: '/', reloadDocument: true });
         },
     });
 
@@ -101,11 +113,20 @@ export const BootstrapNewUser = () => {
                 {({ isValid }) => (
                     <Button
                         className="w-full"
-                        disabled={!isValid}
+                        disabled={!isValid || isCreatingUser || isLoggingIn}
                         variant="primary"
                         type="submit"
                     >
-                        Create Account
+                        {match({
+                            isCreatingUser,
+                            isLoggingIn,
+                        })
+                            .with(
+                                { isCreatingUser: true },
+                                () => 'Creating Account'
+                            )
+                            .with({ isLoggingIn: true }, () => 'Logging In')
+                            .otherwise(() => 'Create Account')}
                     </Button>
                 )}
             </Subscribe>

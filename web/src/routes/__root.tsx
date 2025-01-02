@@ -18,13 +18,6 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
         </>
     ),
     beforeLoad: async ({ context, location }) => {
-        if (
-            location.pathname === '/bootstrap' ||
-            location.pathname === '/debug'
-        ) {
-            return;
-        }
-
-        await bootstrapPreflight();
+        await bootstrapPreflight(location.pathname);
     },
 });

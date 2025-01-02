@@ -6,7 +6,7 @@ import {
     useQuery,
 } from '@tanstack/react-query';
 
-import { useAuth } from './auth';
+import { authStore, useAuth } from './auth/store';
 import { paths } from './schema.gen';
 
 export const BASE_URL =
@@ -275,7 +275,7 @@ export const apiRequest = async <
         }
     }
 
-    const { token, clearAuthToken } = useAuth.getState();
+    const { token } = authStore.getSnapshot().context;
 
     if (token) {
         headers.set('Authorization', 'Bearer ' + token);
@@ -295,7 +295,7 @@ export const apiRequest = async <
     if (response.status === 401) {
         if (token) {
             console.log('Token expired, clearing token');
-            clearAuthToken();
+            authStore.send({ type: 'clearAuthToken' });
         }
 
         throw new ApiError('Token expired', 401);
@@ -385,7 +385,7 @@ export type HttpOptions = {
 export const getHttp =
     <T>(url: string, options?: HttpOptions) =>
     async () => {
-        const { token, clearAuthToken } = useAuth.getState();
+        const { token, clearAuthToken } = authStore.getState();
         const { auth = 'ignore' } = options || {};
 
         const headers = new Headers();

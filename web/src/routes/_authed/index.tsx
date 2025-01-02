@@ -1,13 +1,18 @@
 import { createFileRoute } from '@tanstack/react-router';
 
-import { useSites } from '@/api';
+import { useTeams } from '@/api';
+import { SCPage } from '@/layouts';
 
 export const Route = createFileRoute('/_authed/')({
     component: RouteComponent,
 });
 
 function RouteComponent() {
-    const { data: sites } = useSites();
+    const { data: teams } = useTeams();
 
-    return <div>Hello {JSON.stringify(sites)}</div>;
+    return (
+        <SCPage title="Home">
+            <div className="card">Hello {JSON.stringify(teams)}</div>
+        </SCPage>
+    );
 }

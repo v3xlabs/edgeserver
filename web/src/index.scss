@@ -42,6 +42,10 @@ a {
     color: inherit;
 }
 
+.w-container-dynamic {
+    @apply w-full max-w-6xl mx-auto;
+}
+
 .card {
     @apply bg-white border-neutral-200 border rounded-md;
 }

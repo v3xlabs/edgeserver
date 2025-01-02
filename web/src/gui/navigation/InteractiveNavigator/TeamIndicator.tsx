@@ -3,8 +3,9 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { FC } from 'react';
 import { useActiveTeam } from 'src/hooks/useTeam';
 
-import { AvatarOrGradient } from '@/gui/avatar/AvatarOrGradient';
-import { buffercnvrt } from '@/utils/buffercnvrt';
+import { Avatar } from '@/components';
+// import { AvatarOrGradient } from '@/gui/avatar/AvatarOrGradient';
+import { buffercnvrt } from '@/util/buffer';
 
 const TeamEntry: FC<{ team: Team }> = ({
     team: { icon, name, owner, team_id },
@@ -22,10 +23,7 @@ const TeamEntry: FC<{ team: Team }> = ({
                 className="flex h-full items-center rounded-md p-1 hover:bg-neutral-900/10"
             >
                 <div className="size-8 rounded-full bg-white">
-                    <AvatarOrGradient
-                        src={buffercnvrt(icon as any)}
-                        hash={team_id}
-                    />
+                    <Avatar src={buffercnvrt(icon as any)} s={team_id} />
                 </div>
                 <div className="ml-2 flex flex-col justify-center">
                     <p className="text-sm font-semibold">{name}</p>
