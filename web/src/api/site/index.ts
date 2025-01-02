@@ -1,5 +1,7 @@
 import { queryOptions, useMutation, useQuery } from '@tanstack/react-query';
 
+import { queryClient } from '@/util/query';
+
 import { apiRequest } from '../core';
 import { components } from '../schema.gen';
 
@@ -81,6 +83,11 @@ export const useSiteCreate = () =>
             const response = await apiRequest('/site', 'post', {
                 data: site,
                 contentType: 'application/json; charset=utf-8',
+            });
+
+            queryClient.invalidateQueries({ queryKey: ['sites'] });
+            queryClient.invalidateQueries({
+                queryKey: ['team', '{teamId}', site.team_id, 'sites'],
             });
 
             return response.data;

@@ -2,6 +2,7 @@ import { queryOptions, useMutation, useQuery } from '@tanstack/react-query';
 
 import { apiRequest } from '../core';
 import { components } from '../schema.gen';
+import { queryClient } from '@/util/query';
 
 export type Team = components['schemas']['Team'];
 
@@ -82,6 +83,8 @@ export const useTeamCreate = () =>
                 data: team,
                 contentType: 'application/json; charset=utf-8',
             });
+
+            queryClient.invalidateQueries({ queryKey: ['teams'] });
 
             return response.data;
         },
