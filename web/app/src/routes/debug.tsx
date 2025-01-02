@@ -1,6 +1,16 @@
 import { createFileRoute } from '@tanstack/react-router';
 
-import { Avatar, Button } from '@/components';
+import {
+    Avatar,
+    Button,
+    ModalClose,
+    ModalContent,
+    ModalDescription,
+    ModalFooter,
+    ModalRoot,
+    ModalTitle,
+    ModalTrigger,
+} from '@/components';
 import { SCPage } from '@/layouts';
 
 export const Route = createFileRoute('/debug')({
@@ -24,7 +34,25 @@ function RouteComponent() {
                         </div>
                     ))}
                 </div>
-                <Button className="tmpbtn">Test</Button>
+                <Button variant="ghost">Test</Button>
+            </div>
+            <div className="card">
+                <ModalRoot>
+                    <ModalTrigger>
+                        <Button>Test</Button>
+                    </ModalTrigger>
+                    <ModalContent>
+                        <ModalTitle>Title of the Modal</ModalTitle>
+                        <ModalDescription>
+                            Description of the Modal
+                        </ModalDescription>
+                        <ModalFooter>
+                            <ModalClose>
+                                <Button>Close</Button>
+                            </ModalClose>
+                        </ModalFooter>
+                    </ModalContent>
+                </ModalRoot>
             </div>
         </SCPage>
     );
