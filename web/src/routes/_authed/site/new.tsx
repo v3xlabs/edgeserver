@@ -7,6 +7,15 @@ import { SCPage } from '@/layouts/SimpleCenterPage';
 
 export const Route = createFileRoute('/_authed/site/new')({
     component: RouteComponent,
+    validateSearch: (search: Record<string, unknown>): { team_id?: string } => {
+        if (search.team_id) {
+            return {
+                team_id: search.team_id as string,
+            };
+        }
+
+        return {};
+    },
 });
 
 type FormData = {
@@ -18,11 +27,12 @@ function RouteComponent() {
     const { data: teams } = useTeams();
     const { mutateAsync: createSite } = useSiteCreate();
     const navigate = useNavigate();
+    const { team_id } = Route.useSearch();
 
     const { Field, Subscribe, handleSubmit } = useForm<FormData>({
         defaultValues: {
             name: '',
-            team_id: teams?.[0]?.team_id ?? '',
+            team_id: team_id ?? teams?.[0]?.team_id ?? '',
         },
         onSubmit: async ({ value }) => {
             const site = await createSite({
