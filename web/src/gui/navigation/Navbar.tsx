@@ -1,10 +1,9 @@
-import { Link } from '@tanstack/react-router';
+import { Link, useParams } from '@tanstack/react-router';
 import { AnimatePresence } from 'framer-motion';
 
 import { useMe } from '@/api';
 import { authStore, useAuth } from '@/api/auth/store';
 import { Avatar } from '@/components';
-import { useActiveTeam } from '@/hooks/useActiveTeam';
 
 import { InteractiveNavigator } from './InteractiveNavigator';
 import { Subbar } from './Subbar';
@@ -38,9 +37,8 @@ const UserProfile = () => {
 };
 
 export const Navbar = () => {
-    // const { state, state_id } = useA();
-    const state = 'team' as 'none' | 'team' | 'site';
-    const team_id = useActiveTeam();
+    const { teamId, siteId } = useParams({ strict: false });
+    const state = siteId ? 'site' : teamId ? 'team' : 'none';
 
     return (
         <div className="w-full">
@@ -75,7 +73,7 @@ export const Navbar = () => {
             </div>
             <AnimatePresence>
                 {state !== 'none' && (
-                    <Subbar type={state} entry_id={team_id || ''} />
+                    <Subbar type={state} entry_id={teamId || siteId || ''} />
                 )}
             </AnimatePresence>
         </div>

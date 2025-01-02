@@ -5,7 +5,7 @@ use tracing::info;
 
 use crate::{
     middlewares::auth::UserAuth,
-    models::{site::Site, team::{invite::UserTeamInvite, Team}},
+    models::{site::Site, team::{invite::UserTeamInvite, Team}, user::User},
     routes::{error::HttpError, ApiTags},
     state::State,
 };
@@ -154,7 +154,27 @@ impl TeamApi {
         state: Data<&State>,
         team_id: Path<String>,
     ) -> Result<Json<Vec<Site>>> {
+        info!("Getting sites for team: {:?} for user: {:?}", team_id.0, user);
+
+        user.required_member_of(&team_id.0).await?;
+
         Site::get_by_team_id(&state.0.database, &team_id.0)
+            .await
+            .map_err(HttpError::from)
+            .map(Json)
+            .map_err(poem::Error::from)
+    }
+
+    #[oai(path = "/team/:team_id/members", method = "get", tag = "ApiTags::Team")]
+    pub async fn get_team_members(
+        &self,
+        user: UserAuth,
+        state: Data<&State>,
+        team_id: Path<String>,
+    ) -> Result<Json<Vec<User>>> {
+        user.required_member_of(&team_id.0).await?;
+
+        Team::get_members(&state.0.database, &team_id.0)
             .await
             .map_err(HttpError::from)
             .map(Json)

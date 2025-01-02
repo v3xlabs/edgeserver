@@ -21,7 +21,7 @@ export const Subbar: FC<{ type: 'site' | 'team'; entry_id: string }> = ({
     entry_id,
 }) => {
     const map = type === 'site' ? SiteMap : TeamMap;
-    const prefix = type === 'site' ? 's' : 't';
+    const prefix = type === 'site' ? 'site/$siteId' : 'team/$teamId';
 
     const reference = useRef<HTMLDivElement>(null);
 
@@ -64,8 +64,13 @@ export const Subbar: FC<{ type: 'site' | 'team'; entry_id: string }> = ({
                                     animate={{ width: 'auto', opacity: 1 }}
                                 >
                                     <NavLink
-                                        to={link}
-                                        // to={`/${prefix}/${entry_id}${link}`}
+                                        to={`/${prefix}/${link}` as any}
+                                        params={
+                                            {
+                                                siteId: entry_id,
+                                                teamId: entry_id,
+                                            } as any
+                                        }
                                         className={clsx(
                                             'block rounded-lg px-2 py-1 text-sm font-medium hover:bg-black/10'
                                         )}

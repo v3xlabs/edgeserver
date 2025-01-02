@@ -7,6 +7,7 @@ use crate::database::Database;
 
 pub type State = Arc<AppState>;
 
+#[derive(Debug)]
 pub struct AppState {
     pub config: AppConfig,
     pub database: Database,

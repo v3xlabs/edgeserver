@@ -14,9 +14,9 @@ function RouteComponent() {
 
     return (
         <SCPage title="Home">
-            <div className="card">Hello {JSON.stringify(teams)}</div>
-            <TeamList />
+            <div className="card">Hello</div>
             <SiteList />
+            <TeamList />
         </SCPage>
     );
 }

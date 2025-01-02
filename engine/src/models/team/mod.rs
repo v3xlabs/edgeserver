@@ -1,11 +1,10 @@
 use chrono::{DateTime, Utc};
 use poem_openapi::Object;
 use serde::{Deserialize, Serialize};
-use sqlx::{query, query_as};
+use sqlx::{query, query_as, query_scalar};
 
 use crate::{
-    database::Database,
-    utils::id::{generate_id, IdType},
+    database::Database, models::user::User, utils::id::{generate_id, IdType}
 };
 
 pub mod invite;
@@ -90,5 +89,33 @@ impl Team {
         .fetch_optional(&db.pool)
         .await?
         .is_some())
+    }
+
+    pub async fn is_member(
+        db: &Database,
+        team_id: impl AsRef<str>,
+        user_id: impl AsRef<str>,
+    ) -> Result<bool, sqlx::Error> {
+        Ok(query_scalar!(
+            "SELECT EXISTS (SELECT 1 FROM user_teams WHERE team_id = $1 AND user_id = $2) OR EXISTS (SELECT 1 FROM teams WHERE team_id = $1 AND owner_id = $2)",
+            team_id.as_ref(),
+            user_id.as_ref()
+        )
+        .fetch_one(&db.pool)
+        .await?
+        .unwrap_or(false))
+    }
+
+    pub async fn get_members(
+        db: &Database,
+        team_id: impl AsRef<str>,
+    ) -> Result<Vec<User>, sqlx::Error> {
+        query_as!(
+            User,
+            "SELECT * FROM users WHERE user_id IN (SELECT user_id FROM user_teams WHERE team_id = $1)",
+            team_id.as_ref()
+        )
+        .fetch_all(&db.pool)
+        .await
     }
 }

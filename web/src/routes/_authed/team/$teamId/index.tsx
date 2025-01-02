@@ -20,7 +20,7 @@ function RouteComponent() {
 
     return (
         <SCPage title={team?.name ?? 'Team'}>
-            <div>Hello /_authed/team/$teamId/!</div>
+            <div className="card">This is your team&quot;s page</div>
             <SiteList teamId={teamId} />
         </SCPage>
     );

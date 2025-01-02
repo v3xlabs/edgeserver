@@ -64,14 +64,19 @@ impl SiteApi {
     }
 
     #[oai(path = "/site/:site_id", method = "get", tag = "ApiTags::Site")]
-    pub async fn get_site_certs(
+    pub async fn get_site(
         &self,
         user: UserAuth,
+        state: Data<&State>,
         site_id: Path<String>,
     ) -> Result<Json<Site>> {
         info!("Getting site: {:?} for user: {:?}", site_id.0, user);
 
-        todo!();
+        Site::get_by_id(&state.database, &site_id.0)
+            .await
+            .map_err(HttpError::from)
+            .map(Json)
+            .map_err(poem::Error::from)
     }
 
     #[oai(path = "/site/:site_id", method = "put", tag = "ApiTags::Site")]

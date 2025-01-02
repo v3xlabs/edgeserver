@@ -1,8 +1,8 @@
-import { Link } from '@tanstack/react-router';
+import { Link, useParams } from '@tanstack/react-router';
 import { AnimatePresence, motion } from 'framer-motion';
 import { FC } from 'react';
 
-import { useTeam } from '@/api';
+import { useSite, useTeam } from '@/api';
 import { Avatar } from '@/components';
 import { useActiveTeam } from '@/hooks/useActiveTeam';
 // import { AvatarOrGradient } from '@/gui/avatar/AvatarOrGradient';
@@ -46,13 +46,15 @@ const EmptyTeamEntry: FC = () => {
 };
 
 export const TeamIndicator: FC = () => {
-    const team_id = useActiveTeam();
+    const { teamId: baseTeamId, siteId } = useParams({ strict: false });
+    const { data: site } = useSite(siteId);
+    const teamId = baseTeamId || site?.team_id;
 
     return (
         <div className="h-12 w-fit overflow-hidden transition-all">
             <AnimatePresence>
                 {/* {!team && !team_id && <EmptyTeamEntry />} */}
-                {team_id && <TeamEntry team_id={team_id} />}
+                {teamId && <TeamEntry team_id={teamId} />}
             </AnimatePresence>
         </div>
     );

@@ -35,10 +35,12 @@ export const useTeamSites = (teamId: string) => {
     return useQuery(getTeamSites(teamId));
 };
 
-export const getSite = (siteId: string) =>
+export const getSite = (siteId?: string) =>
     queryOptions({
         queryKey: ['site', '{siteId}', siteId],
         queryFn: async () => {
+            if (!siteId) return;
+
             const response = await apiRequest('/site/{site_id}', 'get', {
                 path: { site_id: siteId },
             });
@@ -47,6 +49,6 @@ export const getSite = (siteId: string) =>
         },
     });
 
-export const useSite = (siteId: string) => {
+export const useSite = (siteId?: string) => {
     return useQuery(getSite(siteId));
 };

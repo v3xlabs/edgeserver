@@ -5,13 +5,16 @@ use poem_openapi::{
 };
 
 use crate::{
-    models::session::Session, routes::error::HttpError, state::State, utils::hash::hash_session,
+    models::{session::Session, team::Team},
+    routes::error::HttpError,
+    state::State,
+    utils::hash::hash_session,
 };
 
 #[derive(Debug)]
 pub enum UserAuth {
-    User(Session),
-    None,
+    User(Session, State),
+    None(State),
 }
 
 impl<'a> ApiExtractor<'a> for UserAuth {
@@ -40,7 +43,7 @@ impl<'a> ApiExtractor<'a> for UserAuth {
 
         // Token could either be a session token or a pat token
         if token.is_none() {
-            return Ok(UserAuth::None);
+            return Ok(UserAuth::None(state.clone()));
         }
 
         let token = token.unwrap();
@@ -55,8 +58,9 @@ impl<'a> ApiExtractor<'a> for UserAuth {
                 .unwrap()
                 .ok_or(HttpError::Unauthorized)?;
 
-            Ok(UserAuth::User(session)) as Result<UserAuth>
-        }.await;
+            Ok(UserAuth::User(session, state.clone())) as Result<UserAuth>
+        }
+        .await;
 
         // let is_pat = async {
         //     let pat = UserApiKey::find_by_token(&state.database, &token)
@@ -110,22 +114,38 @@ impl<'a> ApiExtractor<'a> for UserAuth {
 impl UserAuth {
     pub fn ok(&self) -> Option<&Session> {
         match self {
-            UserAuth::User(session) => Some(session),
-            UserAuth::None => None,
+            UserAuth::User(session, _) => Some(session),
+            UserAuth::None(_) => None,
         }
     }
 
     pub fn required(&self) -> Result<&Session> {
         match self {
-            UserAuth::User(session) => Ok(session),
-            UserAuth::None => Err(HttpError::Unauthorized.into()),
+            UserAuth::User(session, _) => Ok(session),
+            UserAuth::None(_) => Err(HttpError::Unauthorized.into()),
         }
     }
 
     pub fn user_id(&self) -> Option<&str> {
         match self {
-            UserAuth::User(session) => Some(&session.user_id),
-            UserAuth::None => None,
+            UserAuth::User(session, _) => Some(&session.user_id),
+            UserAuth::None(_) => None,
+        }
+    }
+
+    pub async fn required_member_of(&self, team_id: impl AsRef<str>) -> Result<(), HttpError> {
+        match self {
+            UserAuth::User(session, state) => {
+                if !Team::is_member(&state.database, &team_id, &session.user_id)
+                    .await
+                    .map_err(HttpError::from)?
+                {
+                    return Err(HttpError::Forbidden);
+                }
+
+                Ok(())
+            }
+            UserAuth::None(_) => Err(HttpError::Unauthorized),
         }
     }
 }
