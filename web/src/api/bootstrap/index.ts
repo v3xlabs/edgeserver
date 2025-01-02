@@ -20,6 +20,8 @@ export const getCanBootstrap = () =>
         // Otherwise, we want to cache the result for 24 hours
         staleTime(query) {
             if (query.state.data?.can_bootstrap) {
+                console.log('caching for 5 seconds');
+
                 return 1000 * 5;
             }
 

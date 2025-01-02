@@ -1,6 +1,6 @@
 import './index.scss';
 
-import { QueryClientProvider } from '@tanstack/react-query';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { createRouter, RouterProvider } from '@tanstack/react-router';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
@@ -8,10 +8,10 @@ import ReactDOM from 'react-dom/client';
 import { preflightAuth } from '@/api';
 // Import the generated route tree
 import { routeTree } from '@/routeTree.gen';
-import { queryClient } from '@/util/query';
 
 import { PageErrorBoundary } from './gui/PageErrorBoundary';
 import { defaultPendingComponent } from './gui/Router';
+import { QueryProvider } from './util/query';
 
 // Create a new router instance
 const router = createRouter({
@@ -35,8 +35,9 @@ preflightAuth();
 
 ReactDOM.createRoot(document.querySelector('#root')!).render(
     <React.StrictMode>
-        <QueryClientProvider client={queryClient}>
+        <QueryProvider>
             <RouterProvider router={router} />
-        </QueryClientProvider>
+            <ReactQueryDevtools initialIsOpen />
+        </QueryProvider>
     </React.StrictMode>
 );
