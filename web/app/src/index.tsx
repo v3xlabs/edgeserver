@@ -5,7 +5,7 @@ import { createRouter, RouterProvider } from '@tanstack/react-router';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 
-import { preflightAuth } from '@/api/auth';
+import { preflightAuth } from '@/api';
 // Import the generated route tree
 import { routeTree } from '@/routeTree.gen';
 import { queryClient } from '@/util/query';

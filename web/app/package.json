@@ -26,6 +26,7 @@
         "@headlessui/react": "^1.6.5",
         "@hookform/resolvers": "^3.1.0",
         "@radix-ui/react-accordion": "^1.2.2",
+        "@radix-ui/react-slot": "^1.1.1",
         "@rollup/plugin-inject": "^4.0.4",
         "@spruceid/siwe-parser": "^2.0.2",
         "@tanstack/react-query": "^5.x.x",

@@ -1,4 +1,4 @@
-import { cx } from '@/utils/cx';
+import clsx from 'clsx';
 import { DetailedHTMLProps, FC, InputHTMLAttributes } from 'react';
 
 export const Input: FC<
@@ -10,7 +10,7 @@ export const Input: FC<
     return (
         <input
             {...properties}
-            className={cx(
+            className={clsx(
                 className,
                 'px-4 py-2 outline-offset-2 border rounded-md outline-black/80 max-w-full block'
             )}

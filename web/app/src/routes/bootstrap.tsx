@@ -1,5 +1,5 @@
-import { Input } from '@/gui/input/Input'
-import { SCPage } from '@/layouts/SimpleCenterPage'
+import { Button, Input } from '@/components'
+import { SCPage } from '@/layouts'
 import { createFileRoute } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/bootstrap')({
@@ -27,7 +27,7 @@ function RouteComponent() {
                     <Input type="password" placeholder="Confirm Password" className='w-full' />
                 </div>
             </div>
-            <button className="tmpbtn w-full">Create Account</button>
+            <Button className="w-full">Create Account</Button>
         </div>
     </SCPage>
   )

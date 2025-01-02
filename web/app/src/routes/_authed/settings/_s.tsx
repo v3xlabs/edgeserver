@@ -1,5 +1,5 @@
 import { SettingsNav } from '@/gui/settings/SettingsNav';
-import { SidePage } from '@/layouts/SidePage';
+import { SidePage } from '@/layouts';
 import {
     createFileRoute,
     Outlet,

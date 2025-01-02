@@ -1,4 +1,4 @@
-import { SCPage } from '@/layouts/SimpleCenterPage'
+import { SCPage } from '@/layouts'
 import { createFileRoute } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/debug')({

@@ -1,4 +1,4 @@
-import { bootstrapPreflight } from '@/api/bootstrap';
+import { bootstrapPreflight } from '@/api';
 import { createRootRouteWithContext, Outlet } from '@tanstack/react-router';
 import { ReactNode } from 'react';
 
