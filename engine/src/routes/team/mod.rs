@@ -174,7 +174,7 @@ impl TeamApi {
         user: UserAuth,
         state: Data<&State>,
         team_id: Path<String>,
-    ) -> Result<Json<Team>> {
+    ) -> Result<()> {
         info!("Deleting team: {:?} for user: {:?}", team_id.0, user);
 
         let user = user.required()?;
@@ -186,6 +186,10 @@ impl TeamApi {
             Err(HttpError::Forbidden)?;
         }
 
-        todo!();
+        Team::delete_by_id(&state.0.database, &team_id.0)
+            .await
+            .map_err(HttpError::from)?;
+
+        Ok(())
     }
 }

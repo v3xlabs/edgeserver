@@ -1,3 +1,5 @@
+use std::ops::Deref;
+
 use poem::Result;
 use poem_openapi::{payload::Json, OpenApi};
 use tracing::info;
@@ -12,11 +14,8 @@ impl UserApi {
     pub async fn get_user(&self, user: UserAuth) -> Result<Json<User>> {
         info!("Getting user: {:?}", user);
 
-        Ok(Json(User {
-            user_id: "1".to_string(),
-            name: "John Doe".to_string(),
-            created_at: chrono::Utc::now(),
-            password: "".to_string(),
-        }))
+        let user = user.required()?;
+
+        Ok(Json(user.clone()))
     }
 }

@@ -1,7 +1,7 @@
 use chrono::{DateTime, Utc};
 use poem_openapi::Object;
 use serde::{Deserialize, Serialize};
-use sqlx::query_as;
+use sqlx::{query, query_as};
 
 use crate::{
     database::Database,
@@ -60,6 +60,20 @@ impl Team {
         )
         .fetch_all(&db.pool)
         .await
+    }
+
+    pub async fn delete_by_id(
+        db: &Database,
+        team_id: impl AsRef<str>,
+    ) -> Result<(), sqlx::Error> {
+        query!(
+            "DELETE FROM teams WHERE team_id = $1",
+            team_id.as_ref()
+        )
+        .execute(&db.pool)
+        .await?;
+
+        Ok(())
     }
 
     pub async fn is_owner(

@@ -10,7 +10,7 @@ use crate::{
 
 use super::team::Team;
 
-#[derive(Debug, Serialize, Deserialize, Object)]
+#[derive(Debug, Serialize, Deserialize, Object, Clone)]
 pub struct User {
     pub user_id: String,
     pub name: String,
