@@ -4,11 +4,13 @@ use poem_openapi::{
     ApiExtractor, ApiExtractorType, ExtractParamOptions,
 };
 
-use crate::{models::user::User, routes::error::HttpError, state::State};
+use crate::{
+    models::session::Session, routes::error::HttpError, state::State, utils::hash::hash_session,
+};
 
 #[derive(Debug)]
 pub enum UserAuth {
-    User(User),
+    User(Session),
     None,
 }
 
@@ -43,21 +45,18 @@ impl<'a> ApiExtractor<'a> for UserAuth {
 
         let token = token.unwrap();
 
-        // let is_user = async {
-        //     // Hash the token
-        //     let hash = hash_session(&token).unwrap();
+        let is_user = async {
+            //     // Hash the token
+            let hash = hash_session(&token);
 
-        //     // Check if active session exists with token
-        //     let session = Session::try_access(&state.database, &hash)
-        //         .await
-        //         .unwrap()
-        //         .ok_or(Error::from_string(
-        //             "Session not found, token valid but no session exists",
-        //             StatusCode::UNAUTHORIZED,
-        //         ))?;
+            //     // Check if active session exists with token
+            let session = Session::try_access(&state.database, &hash)
+                .await
+                .unwrap()
+                .ok_or(HttpError::Unauthorized)?;
 
-        //     Ok(AuthUser::User(session, state.clone())) as Result<AuthUser>
-        // };
+            Ok(UserAuth::User(session)) as Result<UserAuth>
+        }.await;
 
         // let is_pat = async {
         //     let pat = UserApiKey::find_by_token(&state.database, &token)
@@ -85,7 +84,7 @@ impl<'a> ApiExtractor<'a> for UserAuth {
         //     }
         // }
 
-        Ok(UserAuth::None)
+        is_user
     }
 
     fn register(registry: &mut Registry) {
@@ -109,17 +108,24 @@ impl<'a> ApiExtractor<'a> for UserAuth {
 }
 
 impl UserAuth {
-    pub fn ok(&self) -> Option<&User> {
+    pub fn ok(&self) -> Option<&Session> {
         match self {
-            UserAuth::User(user) => Some(user),
+            UserAuth::User(session) => Some(session),
             UserAuth::None => None,
         }
     }
 
-    pub fn required(&self) -> Result<&User> {
+    pub fn required(&self) -> Result<&Session> {
         match self {
-            UserAuth::User(user) => Ok(user),
-            UserAuth::None => Err(HttpError::Forbidden.into()),
+            UserAuth::User(session) => Ok(session),
+            UserAuth::None => Err(HttpError::Unauthorized.into()),
+        }
+    }
+
+    pub fn user_id(&self) -> Option<&str> {
+        match self {
+            UserAuth::User(session) => Some(&session.user_id),
+            UserAuth::None => None,
         }
     }
 }

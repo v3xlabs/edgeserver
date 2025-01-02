@@ -18,6 +18,9 @@ pub enum HttpError {
 
     #[error("Forbidden")]
     Forbidden,
+
+    #[error("Unauthorized")]
+    Unauthorized,
 }
 
 impl ResponseError for HttpError {
@@ -32,6 +35,7 @@ impl ResponseError for HttpError {
             HttpError::NotFound => StatusCode::NOT_FOUND,
             HttpError::AnyhowError(_) => StatusCode::INTERNAL_SERVER_ERROR,
             HttpError::DatabaseError(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            HttpError::Unauthorized => StatusCode::UNAUTHORIZED,
             _ => StatusCode::BAD_REQUEST,
         }
     }

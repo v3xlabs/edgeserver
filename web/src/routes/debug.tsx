@@ -25,6 +25,7 @@ function RouteComponent() {
                     {[
                         ['https://luc.computer/1_by_1.png', 'luc.computer'],
                         ['https://github.com/svemat01.png', 'helgesson'],
+                        ['', 'not_found'],
                     ].map(([source, s]) => (
                         <div
                             className="size-16 overflow-hidden rounded-md"
@@ -34,7 +35,7 @@ function RouteComponent() {
                         </div>
                     ))}
                 </div>
-                <Button variant="ghost">Test</Button>
+                <Button variant="primary">Test</Button>
             </div>
             <div className="card">
                 <ModalRoot>

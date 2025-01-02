@@ -42,14 +42,6 @@ a {
     color: inherit;
 }
 
-.tmpbtn {
-    @apply bg-blue-500 text-white px-2 py-2 rounded-md hover:brightness-90;
-
-    &:disabled {
-        @apply bg-gray-300 text-gray-500 cursor-not-allowed;
-    }
-}
-
 .card {
     @apply bg-white border-neutral-200 border rounded-md;
 }
@@ -61,7 +53,6 @@ a {
 .link {
     @apply text-blue-500 hover:underline;
 }
-
 
 .h1 {
     @apply text-2xl font-semibold;

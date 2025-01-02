@@ -1,11 +1,17 @@
-use poem::{web::Data, Result};
+use poem::{
+    http::HeaderMap,
+    web::{Data, RealIp},
+    Result,
+};
 use poem_openapi::{payload::Json, Object, OpenApi};
 use serde::{Deserialize, Serialize};
+use tracing::info;
 
 use crate::{
-    models::{team::Team, user::User},
+    models::{session::Session, team::Team, user::User},
     routes::ApiTags,
-    state::State, utils::hash::hash_password,
+    state::State,
+    utils::hash::hash_password,
 };
 
 use super::error::HttpError;
@@ -47,15 +53,27 @@ impl AuthApi {
         &self,
         state: Data<&State>,
         request: Json<LoginRequest>,
+        ip: RealIp,
+        headers: &HeaderMap,
     ) -> Result<Json<LoginResponse>> {
-        let user =
-            User::get_by_name_and_password(&state.0.database, &request.username, &hash_password(&request.password))
-                .await
-                .map_err(HttpError::from)?;
+        let user = User::get_by_name_and_password(
+            &state.0.database,
+            &request.username,
+            &hash_password(&request.password),
+        )
+        .await
+        .map_err(HttpError::from)?;
 
-        Ok(Json(LoginResponse {
-            token: "123".to_string(),
-        }))
+        let user_agent = headers.get("user-agent").unwrap().to_str().unwrap();
+        let user_ip = ip.0.unwrap();
+
+        let (token, session) = Session::new(&state.0.database, &user.user_id, user_agent, &user_ip)
+            .await
+            .map_err(HttpError::from)?;
+
+        info!("New session created: {:?}", session);
+
+        Ok(Json(LoginResponse { token }))
     }
 
     #[oai(path = "/auth/bootstrap", method = "get", tag = "ApiTags::Auth")]
