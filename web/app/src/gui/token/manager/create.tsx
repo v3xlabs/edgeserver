@@ -1,9 +1,10 @@
-import { FormField } from '@/gui/form/FormField';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { FC } from 'react';
 import { useForm } from 'react-hook-form';
 import { useSite } from 'src/hooks/useSite';
 import z from 'zod';
+
+import { FormField } from '@/gui/form/FormField';
 
 const schema = z.object({
     name: z.string().min(3, { message: 'Required' }),

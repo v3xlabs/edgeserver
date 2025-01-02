@@ -1,12 +1,13 @@
-import { useSites } from '@/api';
 import { createFileRoute } from '@tanstack/react-router';
+
+import { useSites } from '@/api';
 
 export const Route = createFileRoute('/_authed/')({
     component: RouteComponent,
-})
+});
 
 function RouteComponent() {
     const { data: sites } = useSites();
 
-    return <div>Hello "/_authed/"! {JSON.stringify(sites)}</div>;
+    return <div>Hello {JSON.stringify(sites)}</div>;
 }

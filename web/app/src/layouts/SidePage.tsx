@@ -5,10 +5,10 @@ import { cn } from '@/util/style';
 import { getTitle } from '@/util/title';
 
 export type SidePageProperties = PropsWithChildren<{
-  title: string,
-  suffix?: ReactNode,
-  className?: ClassValue,
-  sidebar?: ReactNode,
+    title: string;
+    suffix?: ReactNode;
+    className?: ClassValue;
+    sidebar?: ReactNode;
 }>;
 
 export const SidePage: FC<SidePageProperties> = ({

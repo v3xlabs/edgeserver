@@ -10,7 +10,7 @@
         "plugin:jsx-a11y/recommended",
         "plugin:tailwindcss/recommended"
     ],
-    "ignorePatterns": ["!**/*"],
+    "ignorePatterns": ["!**/*", "src/**/*.gen.ts"],
     "plugins": ["v3xlabs", "react", "node", "jsx-a11y"],
     "env": {
         "browser": true,
@@ -30,6 +30,7 @@
         "node/no-process-env": "error",
         "unicorn/no-nested-ternary": "off",
         "unused-imports/no-unused-vars": "off",
-        "tailwindcss/no-custom-classname": "off"
+        "tailwindcss/no-custom-classname": "off",
+        "unicorn/expiring-todo-comments": "off"
     }
 }

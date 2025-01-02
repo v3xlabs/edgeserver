@@ -4,7 +4,7 @@
  */
 
 export type paths = {
-    "/site": {
+    '/site': {
         parameters: {
             query?: never;
             header?: never;
@@ -29,7 +29,7 @@ export type paths = {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json; charset=utf-8": components["schemas"]["Site"][];
+                        'application/json; charset=utf-8': components['schemas']['Site'][];
                     };
                 };
             };
@@ -49,7 +49,7 @@ export type paths = {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json; charset=utf-8": components["schemas"]["Site"];
+                        'application/json; charset=utf-8': components['schemas']['Site'];
                     };
                 };
             };
@@ -60,7 +60,7 @@ export type paths = {
         patch?: never;
         trace?: never;
     };
-    "/site/{site_id}": {
+    '/site/{site_id}': {
         parameters: {
             query?: never;
             header?: never;
@@ -83,7 +83,7 @@ export type paths = {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json; charset=utf-8": components["schemas"]["Site"];
+                        'application/json; charset=utf-8': components['schemas']['Site'];
                     };
                 };
             };
@@ -104,7 +104,7 @@ export type paths = {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json; charset=utf-8": components["schemas"]["Site"];
+                        'application/json; charset=utf-8': components['schemas']['Site'];
                     };
                 };
             };
@@ -126,7 +126,7 @@ export type paths = {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json; charset=utf-8": components["schemas"]["Site"];
+                        'application/json; charset=utf-8': components['schemas']['Site'];
                     };
                 };
             };
@@ -136,7 +136,7 @@ export type paths = {
         patch?: never;
         trace?: never;
     };
-    "/user": {
+    '/user': {
         parameters: {
             query?: never;
             header?: never;
@@ -157,7 +157,7 @@ export type paths = {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json; charset=utf-8": components["schemas"]["User"];
+                        'application/json; charset=utf-8': components['schemas']['User'];
                     };
                 };
             };
@@ -170,7 +170,7 @@ export type paths = {
         patch?: never;
         trace?: never;
     };
-    "/auth/login": {
+    '/auth/login': {
         parameters: {
             query?: never;
             header?: never;
@@ -188,7 +188,7 @@ export type paths = {
             };
             requestBody: {
                 content: {
-                    "application/json; charset=utf-8": components["schemas"]["LoginRequest"];
+                    'application/json; charset=utf-8': components['schemas']['LoginRequest'];
                 };
             };
             responses: {
@@ -197,7 +197,7 @@ export type paths = {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json; charset=utf-8": components["schemas"]["LoginResponse"];
+                        'application/json; charset=utf-8': components['schemas']['LoginResponse'];
                     };
                 };
             };
@@ -208,7 +208,7 @@ export type paths = {
         patch?: never;
         trace?: never;
     };
-    "/auth/bootstrap": {
+    '/auth/bootstrap': {
         parameters: {
             query?: never;
             header?: never;
@@ -229,7 +229,7 @@ export type paths = {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json; charset=utf-8": components["schemas"]["CanBootstrapResponse"];
+                        'application/json; charset=utf-8': components['schemas']['CanBootstrapResponse'];
                     };
                 };
             };
@@ -244,7 +244,7 @@ export type paths = {
             };
             requestBody: {
                 content: {
-                    "application/json; charset=utf-8": components["schemas"]["BootstrapUserRequest"];
+                    'application/json; charset=utf-8': components['schemas']['BootstrapUserRequest'];
                 };
             };
             responses: {
@@ -253,7 +253,7 @@ export type paths = {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json; charset=utf-8": components["schemas"]["BootstrapUserResponse"];
+                        'application/json; charset=utf-8': components['schemas']['BootstrapUserResponse'];
                     };
                 };
             };
@@ -264,7 +264,7 @@ export type paths = {
         patch?: never;
         trace?: never;
     };
-    "/team": {
+    '/team': {
         parameters: {
             query?: never;
             header?: never;
@@ -289,7 +289,7 @@ export type paths = {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json; charset=utf-8": components["schemas"]["Team"][];
+                        'application/json; charset=utf-8': components['schemas']['Team'][];
                     };
                 };
             };
@@ -304,7 +304,7 @@ export type paths = {
             };
             requestBody: {
                 content: {
-                    "application/json; charset=utf-8": components["schemas"]["CreateTeamRequest"];
+                    'application/json; charset=utf-8': components['schemas']['CreateTeamRequest'];
                 };
             };
             responses: {
@@ -313,7 +313,7 @@ export type paths = {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json; charset=utf-8": components["schemas"]["Team"];
+                        'application/json; charset=utf-8': components['schemas']['Team'];
                     };
                 };
             };
@@ -324,7 +324,7 @@ export type paths = {
         patch?: never;
         trace?: never;
     };
-    "/team/{team_id}": {
+    '/team/{team_id}': {
         parameters: {
             query?: never;
             header?: never;
@@ -347,7 +347,7 @@ export type paths = {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json; charset=utf-8": components["schemas"]["Team"];
+                        'application/json; charset=utf-8': components['schemas']['Team'];
                     };
                 };
             };
@@ -368,7 +368,7 @@ export type paths = {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json; charset=utf-8": components["schemas"]["Team"];
+                        'application/json; charset=utf-8': components['schemas']['Team'];
                     };
                 };
             };
@@ -398,7 +398,7 @@ export type paths = {
         patch?: never;
         trace?: never;
     };
-    "/team/{team_id}/invite": {
+    '/team/{team_id}/invite': {
         parameters: {
             query?: never;
             header?: never;
@@ -421,7 +421,7 @@ export type paths = {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json; charset=utf-8": components["schemas"]["UserTeamInvite"][];
+                        'application/json; charset=utf-8': components['schemas']['UserTeamInvite'][];
                     };
                 };
             };
@@ -443,7 +443,7 @@ export type paths = {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json; charset=utf-8": components["schemas"]["UserTeamInvite"];
+                        'application/json; charset=utf-8': components['schemas']['UserTeamInvite'];
                     };
                 };
             };
@@ -454,7 +454,7 @@ export type paths = {
         patch?: never;
         trace?: never;
     };
-    "/team/{team_id}/invite/{invite_id}": {
+    '/team/{team_id}/invite/{invite_id}': {
         parameters: {
             query?: never;
             header?: never;
@@ -498,8 +498,8 @@ export type components = {
             password: string;
         };
         BootstrapUserResponse: {
-            user: components["schemas"]["User"];
-            team: components["schemas"]["Team"];
+            user: components['schemas']['User'];
+            team: components['schemas']['Team'];
         };
         CanBootstrapResponse: {
             can_bootstrap: boolean;

@@ -1,8 +1,9 @@
+/* eslint-disable react/prop-types */
 import { ErrorRouteComponent, Link } from '@tanstack/react-router';
 
-import { ApiError, BASE_URL } from '@/api/core';
-import { SCPage } from '@/layouts';
+import { ApiError } from '@/api/core';
 import { Button } from '@/components';
+import { SCPage } from '@/layouts';
 
 export const PageErrorBoundary: ErrorRouteComponent = ({
     error,

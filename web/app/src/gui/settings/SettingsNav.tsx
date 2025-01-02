@@ -16,65 +16,84 @@ import {
     LuSearch,
     LuSettings,
     LuTag,
-    LuUsers,
 } from 'react-icons/lu';
 
 export function isTruthy<T>(value?: T | undefined | null | false): value is T {
     return !!value;
 }
 
-const ExpandableItem = ({ path, label, icon }: { path: [string, string][], label: string | ReactNode, icon: ReactNode }) => {
+const ExpandableItem = ({
+    path,
+    label,
+    icon,
+}: {
+    path: [string, string][];
+    label: string | ReactNode;
+    icon: ReactNode;
+}) => {
     const x = useRouterState({
         select: (state) => state.location,
     });
-    const [state, setState] = useState(path.filter(isTruthy).some(([path]) => x.pathname.startsWith(path as string)));
+    const [state, setState] = useState(
+        path
+            .filter(isTruthy)
+            .some(([path]) => x.pathname.startsWith(path as string))
+    );
 
-    return <Accordion.Root
-        type="single"
-        collapsible
-        defaultValue={state ? label as string : undefined}
-        onValueChange={(value) => {
-            setState(value === label as string);
-        }}
-        className='w-full'
-    >
-        <Accordion.Item value={label as string ?? ''}>
-            <div className="flex w-full flex-col">
-                <Accordion.Trigger>
-                    <div className={clsx(
-                        'relative flex w-full cursor-pointer items-center justify-between gap-2 rounded-md px-2 py-1 text-neutral-700 hover:bg-neutral-100',
-                    )}>
-                        <div className='flex items-center gap-2'>
-                            {icon}
-                            {label}
-                        </div>
-                        <div>
-                            <FiChevronDown className={clsx('duration-300 ease-in-out', state && '[transform:rotateX(180deg)]')} />
-                        </div>
-                    </div>
-                </Accordion.Trigger>
-                <Accordion.Content className={
-                    'overflow-hidden'
-                }>
-                    {path.map(([path, label]) => (
-                        <Link
-                            to={path as string}
-                            activeOptions={{ exact: true }}
+    return (
+        <Accordion.Root
+            type="single"
+            collapsible
+            defaultValue={state ? (label as string) : undefined}
+            onValueChange={(value) => {
+                setState(value === (label as string));
+            }}
+            className="w-full"
+        >
+            <Accordion.Item value={(label as string) ?? ''}>
+                <div className="flex w-full flex-col">
+                    <Accordion.Trigger>
+                        <div
                             className={clsx(
-                                'relative flex cursor-pointer items-center gap-2 rounded-md px-2 py-1 pl-8 text-sm text-neutral-700 hover:bg-neutral-100',
-                                '[&.active]:bg-neutral-500/10 [&.active]:text-primary',
-                                // eslint-disable-next-line quotes
-                                "[&.active]:before:content-['']",
-                                '[&.active]:before:absolute [&.active]:before:-left-3 [&.active]:before:bottom-[12%] [&.active]:before:top-[12%] [&.active]:before:w-1 [&.active]:before:rounded-md [&.active]:before:bg-blue-500'
+                                'relative flex w-full cursor-pointer items-center justify-between gap-2 rounded-md px-2 py-1 text-neutral-700 hover:bg-neutral-100'
                             )}
                         >
-                            {label}
-                        </Link>
-                    ))}
-                </Accordion.Content>
-            </div>
-        </Accordion.Item>
-    </Accordion.Root>;
+                            <div className="flex items-center gap-2">
+                                {icon}
+                                {label}
+                            </div>
+                            <div>
+                                <FiChevronDown
+                                    className={clsx(
+                                        'duration-300 ease-in-out',
+                                        state && '[transform:rotateX(180deg)]'
+                                    )}
+                                />
+                            </div>
+                        </div>
+                    </Accordion.Trigger>
+                    <Accordion.Content className={'overflow-hidden'}>
+                        {path.map(([path, label]) => (
+                            <Link
+                                to={path as string}
+                                activeOptions={{ exact: true }}
+                                key={path as string}
+                                className={clsx(
+                                    'relative flex cursor-pointer items-center gap-2 rounded-md px-2 py-1 pl-8 text-sm text-neutral-700 hover:bg-neutral-100',
+                                    '[&.active]:text-primary [&.active]:bg-neutral-500/10',
+                                    // eslint-disable-next-line quotes
+                                    "[&.active]:before:content-['']",
+                                    '[&.active]:before:absolute [&.active]:before:inset-y-[12%] [&.active]:before:-left-3 [&.active]:before:w-1 [&.active]:before:rounded-md [&.active]:before:bg-blue-500'
+                                )}
+                            >
+                                {label}
+                            </Link>
+                        ))}
+                    </Accordion.Content>
+                </div>
+            </Accordion.Item>
+        </Accordion.Root>
+    );
 };
 
 export const SettingsNav = () => {
@@ -84,44 +103,72 @@ export const SettingsNav = () => {
         <ul className="flex flex-col divide-y">
             {(
                 [
-                    ['', [['/settings', 'General', <LuSettings />]]],
+                    [
+                        '',
+                        [
+                            [
+                                '/settings',
+                                'General',
+                                <LuSettings key="general" />,
+                            ],
+                        ],
+                    ],
                     [
                         'Organizational',
                         [
-                            ['/settings/tags', 'Tags', <LuTag />],
+                            ['/settings/tags', 'Tags', <LuTag key="tags" />],
                             [
                                 '/settings/fields',
                                 'Field Definitions',
-                                <LuClipboardType />,
+                                <LuClipboardType key="fields" />,
                             ],
                             [
                                 [
                                     ['/settings/locations', 'Overview'],
-                                    ['/settings/locations/explorer', 'Explorer'],
+                                    [
+                                        '/settings/locations/explorer',
+                                        'Explorer',
+                                    ],
                                 ],
                                 'Locations',
-                                <LuMapPin />,
+                                <LuMapPin key="locations" />,
                             ],
                         ],
                     ],
                     [
                         'Instance',
                         [
-                            ['/settings/search', 'Search', <LuSearch />],
-                            ['/settings/storage', 'Storage', <LuHardDrive />],
+                            [
+                                '/settings/search',
+                                'Search',
+                                <LuSearch key="search" />,
+                            ],
+                            [
+                                '/settings/storage',
+                                'Storage',
+                                <LuHardDrive key="storage" />,
+                            ],
                             [
                                 '/settings/intelligence',
                                 'Intelligence',
-                                <LuBrain />,
+                                <LuBrain key="intelligence" />,
                             ],
                         ],
                     ],
                     [
                         'Printing',
                         [
-                            ['/settings/operators', 'Operators', <LuBot />],
-                            ['/settings/templates', 'Templates', <LuFileText />],
-                        ]
+                            [
+                                '/settings/operators',
+                                'Operators',
+                                <LuBot key="operators" />,
+                            ],
+                            [
+                                '/settings/templates',
+                                'Templates',
+                                <LuFileText key="templates" />,
+                            ],
+                        ],
                     ],
                     [
                         'Authentication',
@@ -131,19 +178,31 @@ export const SettingsNav = () => {
                             //     'Users',
                             //     <LuUsers />,
                             // ],
-                            ['/settings/sessions', 'Sessions', <LuClock />],
+                            [
+                                '/settings/sessions',
+                                'Sessions',
+                                <LuClock key="sessions" />,
+                            ],
                             [
                                 '/settings/pat',
                                 'Personal Access Token',
-                                <LuKey />,
+                                <LuKey key="pat" />,
                             ],
                         ],
                     ],
                     [
                         'System',
                         [
-                            ['/settings/logs', 'Access Logs', <LuScroll />],
-                            ['/settings/build', 'Software Info', <LuScroll />],
+                            [
+                                '/settings/logs',
+                                'Access Logs',
+                                <LuScroll key="logs" />,
+                            ],
+                            [
+                                '/settings/build',
+                                'Software Info',
+                                <LuScroll key="build" />,
+                            ],
                         ],
                     ],
                 ] as const
@@ -158,28 +217,32 @@ export const SettingsNav = () => {
                         {items.filter(isTruthy).map(([path, label, icon]) => (
                             <li
                                 key={path as string}
-                                className={clsx('flex w-full items-center gap-1')}
+                                className={clsx(
+                                    'flex w-full items-center gap-1'
+                                )}
                             >
-                                {
-                                    Array.isArray(path) ? (
-                                        <ExpandableItem path={path} label={label} icon={icon} />
-                                    ) : (
-                                        <Link
-                                            to={path as string}
-                                            activeOptions={{ exact: true }}
-                                            className={clsx(
-                                                'relative flex w-full cursor-pointer items-center gap-2 rounded-md px-2 py-1 text-neutral-700 hover:bg-neutral-100',
-                                                '[&.active]:bg-neutral-500/10 [&.active]:text-primary',
-                                                // eslint-disable-next-line quotes
-                                                "[&.active]:before:content-['']",
-                                                '[&.active]:before:absolute [&.active]:before:-left-3 [&.active]:before:bottom-[12%] [&.active]:before:top-[12%] [&.active]:before:w-1 [&.active]:before:rounded-md [&.active]:before:bg-blue-500'
-                                            )}
-                                        >
-                                            {icon}
-                                            {label}
-                                        </Link>
-                                    )
-                                }
+                                {Array.isArray(path) ? (
+                                    <ExpandableItem
+                                        path={path}
+                                        label={label}
+                                        icon={icon}
+                                    />
+                                ) : (
+                                    <Link
+                                        to={path as string}
+                                        activeOptions={{ exact: true }}
+                                        className={clsx(
+                                            'relative flex w-full cursor-pointer items-center gap-2 rounded-md px-2 py-1 text-neutral-700 hover:bg-neutral-100',
+                                            '[&.active]:text-primary [&.active]:bg-neutral-500/10',
+                                            // eslint-disable-next-line quotes
+                                            "[&.active]:before:content-['']",
+                                            '[&.active]:before:absolute [&.active]:before:inset-y-[12%] [&.active]:before:-left-3 [&.active]:before:w-1 [&.active]:before:rounded-md [&.active]:before:bg-blue-500'
+                                        )}
+                                    >
+                                        {icon}
+                                        {label}
+                                    </Link>
+                                )}
                             </li>
                         ))}
                     </ul>

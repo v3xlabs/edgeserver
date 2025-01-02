@@ -1,7 +1,7 @@
 import { Link as NavLink } from '@tanstack/react-router';
+import clsx from 'clsx';
 import { motion } from 'framer-motion';
 import { FC, useEffect, useRef } from 'react';
-import clsx from 'clsx';
 
 const SiteMap = [
     ['Overview', ''],
@@ -67,7 +67,7 @@ export const Subbar: FC<{ type: 'site' | 'team'; entry_id: string }> = ({
                                         to={link}
                                         // to={`/${prefix}/${entry_id}${link}`}
                                         className={clsx(
-                                            'block hover:bg-black/10 px-2 py-1 rounded-lg font-medium text-sm'
+                                            'block rounded-lg px-2 py-1 text-sm font-medium hover:bg-black/10'
                                         )}
                                     >
                                         {label}

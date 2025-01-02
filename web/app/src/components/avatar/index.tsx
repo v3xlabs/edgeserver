@@ -1,17 +1,28 @@
-import { FC } from "react";
-import * as BaseAvatar from "@radix-ui/react-avatar";
-import { AvatarGradient } from "./gradient";
+import * as BaseAvatar from '@radix-ui/react-avatar';
+import { FC } from 'react';
 
-export const Avatar: FC<{src?: string, alt?: string, fallback?: string, s?: string}> = ({src, alt, fallback, s}) => {
+import { AvatarGradient } from './gradient';
 
+export const Avatar: FC<{
+    src?: string;
+    alt?: string;
+    fallback?: string;
+    s?: string;
+}> = ({ src, alt, fallback, s }) => {
     return (
         <>
             <BaseAvatar.Root className="avatar-root">
-                {src && <BaseAvatar.Image className="avatar-image" src={src} alt={alt} />}
+                {src && (
+                    <BaseAvatar.Image
+                        className="avatar-image"
+                        src={src}
+                        alt={alt}
+                    />
+                )}
                 <BaseAvatar.Fallback>
                     {fallback || <AvatarGradient s={s || src || ''} />}
                 </BaseAvatar.Fallback>
             </BaseAvatar.Root>
         </>
-    )
+    );
 };

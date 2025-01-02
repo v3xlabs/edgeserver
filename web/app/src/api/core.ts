@@ -1,3 +1,4 @@
+/* eslint-disable sonarjs/cognitive-complexity */
 /* eslint-disable sonarjs/no-duplicate-string */
 import {
     DefinedUseQueryResult,
@@ -23,8 +24,8 @@ type HTTPMethod =
 
 type PathMethods<TPath extends keyof paths> = {
     [TMethod in HTTPMethod]: paths[TPath][TMethod] extends undefined
-    ? never
-    : TMethod;
+        ? never
+        : TMethod;
 }[HTTPMethod];
 
 type AnyRequestBody = {
@@ -51,52 +52,52 @@ type AnyRoute = {
 
 export type ApiResponse<TResponses extends AnyResponses> = {
     [TStatus in keyof TResponses]: TStatus extends number
-    ? TResponses[TStatus]['content'] extends undefined
-    ? {
-        status: TStatus;
-        contentType: never;
-        data: never;
-        headers: TResponses[TStatus]['headers'] extends Record<
-            string,
-            unknown
-        >
-        ? Map<
-            keyof TResponses[TStatus]['headers'],
-            TResponses[TStatus]['headers'][keyof TResponses[TStatus]['headers']]
-        >
-        : TResponses[TStatus]['headers'];
-    }
-    : {
-        [K in keyof TResponses[TStatus]['content']]: {
-            status: TStatus;
-            contentType: K;
-            data: TResponses[TStatus]['content'][K];
-            headers: TResponses[TStatus]['headers'] extends Record<
-                string,
-                unknown
-            >
-            ? Map<
-                keyof TResponses[TStatus]['headers'],
-                TResponses[TStatus]['headers'][keyof TResponses[TStatus]['headers']]
-            >
-            : TResponses[TStatus]['headers'];
-        };
-    }[keyof TResponses[TStatus]['content']]
-    : never;
+        ? TResponses[TStatus]['content'] extends undefined
+            ? {
+                  status: TStatus;
+                  contentType: never;
+                  data: never;
+                  headers: TResponses[TStatus]['headers'] extends Record<
+                      string,
+                      unknown
+                  >
+                      ? Map<
+                            keyof TResponses[TStatus]['headers'],
+                            TResponses[TStatus]['headers'][keyof TResponses[TStatus]['headers']]
+                        >
+                      : TResponses[TStatus]['headers'];
+              }
+            : {
+                  [K in keyof TResponses[TStatus]['content']]: {
+                      status: TStatus;
+                      contentType: K;
+                      data: TResponses[TStatus]['content'][K];
+                      headers: TResponses[TStatus]['headers'] extends Record<
+                          string,
+                          unknown
+                      >
+                          ? Map<
+                                keyof TResponses[TStatus]['headers'],
+                                TResponses[TStatus]['headers'][keyof TResponses[TStatus]['headers']]
+                            >
+                          : TResponses[TStatus]['headers'];
+                  };
+              }[keyof TResponses[TStatus]['content']]
+        : never;
 }[keyof TResponses];
 
 export type ApiRequestBody<TBody extends AnyRequestBody | undefined> =
     TBody extends AnyRequestBody
-    ? {
-        [K in keyof TBody['content']]: {
-            contentType: K;
-            data: TBody['content'][K];
-        };
-    }[keyof TBody['content']]
-    : {
-        contentType?: undefined;
-        data?: undefined;
-    };
+        ? {
+              [K in keyof TBody['content']]: {
+                  contentType: K;
+                  data: TBody['content'][K];
+              };
+          }[keyof TBody['content']]
+        : {
+              contentType?: undefined;
+              data?: undefined;
+          };
 type Prettify<T> = {
     [K in keyof T]: T[K];
 } & {};
@@ -105,17 +106,17 @@ const convertBody = (
     data: any,
     contentType: string | undefined
 ): // eslint-disable-next-line no-undef
-    BodyInit | undefined => {
+BodyInit | undefined => {
     if (contentType === undefined) {
         return;
     }
 
     switch (contentType) {
-    case 'application/json':
-    case 'application/json; charset=utf-8':
-        return JSON.stringify(data);
-    default:
-        throw new Error('Unsupported content type: ' + contentType);
+        case 'application/json':
+        case 'application/json; charset=utf-8':
+            return JSON.stringify(data);
+        default:
+            throw new Error('Unsupported content type: ' + contentType);
     }
 };
 
@@ -134,8 +135,8 @@ export type ApiRequest<
     TPath extends keyof paths,
     TMethod extends PathMethods<TPath>,
     TRoute extends AnyRoute = paths[TPath][TMethod] extends AnyRoute
-    ? paths[TPath][TMethod]
-    : never
+        ? paths[TPath][TMethod]
+        : never
 > = Prettify<{
     path: TPath;
     method: TMethod;
@@ -231,13 +232,13 @@ export const apiRequest = async <
     TPath extends keyof paths,
     TMethod extends PathMethods<TPath>,
     TOptions extends TRoute['parameters'] &
-    ApiRequestBody<TRoute['requestBody']> & {
-        // eslint-disable-next-line no-undef
-        fetchOptions?: RequestInit;
-    },
+        ApiRequestBody<TRoute['requestBody']> & {
+            // eslint-disable-next-line no-undef
+            fetchOptions?: RequestInit;
+        },
     TRoute extends AnyRoute = paths[TPath][TMethod] extends AnyRoute
-    ? paths[TPath][TMethod]
-    : never
+        ? paths[TPath][TMethod]
+        : never
 >(
     path: TPath,
     method: TMethod,
@@ -311,29 +312,29 @@ export const apiRequest = async <
     const responseContentType = response.headers.get('content-type');
 
     switch (responseContentType) {
-    // eslint-disable-next-line unicorn/no-null
-    case null:
-        return {
-            status: response.status,
-            headers: response.headers,
-        } as any;
+        // eslint-disable-next-line unicorn/no-null
+        case null:
+            return {
+                status: response.status,
+                headers: response.headers,
+            } as any;
 
-    case 'text/plain; charset=utf-8':
-        return {
-            status: response.status,
-            contentType: responseContentType,
-            data: await response.text(),
-        } as any;
+        case 'text/plain; charset=utf-8':
+            return {
+                status: response.status,
+                contentType: responseContentType,
+                data: await response.text(),
+            } as any;
 
-    case 'application/json; charset=utf-8':
-        return {
-            status: response.status,
-            contentType: responseContentType,
-            data: await response.json(),
-            headers: response.headers,
-        } as any;
-    default:
-        throw new Error('Unsupported content type: ' + responseContentType);
+        case 'application/json; charset=utf-8':
+            return {
+                status: response.status,
+                contentType: responseContentType,
+                data: await response.json(),
+                headers: response.headers,
+            } as any;
+        default:
+            throw new Error('Unsupported content type: ' + responseContentType);
     }
 };
 
@@ -383,46 +384,46 @@ export type HttpOptions = {
  */
 export const getHttp =
     <T>(url: string, options?: HttpOptions) =>
-        async () => {
-            const { token, clearAuthToken } = useAuth.getState();
-            const { auth = 'ignore' } = options || {};
+    async () => {
+        const { token, clearAuthToken } = useAuth.getState();
+        const { auth = 'ignore' } = options || {};
 
-            const headers = new Headers();
+        const headers = new Headers();
 
-            if (auth === 'include' || auth === 'required') {
-                if (!token && auth === 'required') {
-                    throw new Error(
-                        'No token available but endpoint requires it, url: ' + url
-                    );
-                }
+        if (auth === 'include' || auth === 'required') {
+            if (!token && auth === 'required') {
+                throw new Error(
+                    'No token available but endpoint requires it, url: ' + url
+                );
+            }
 
+            if (token) {
+                headers.append('Authorization', 'Bearer ' + token);
+            }
+        }
+
+        try {
+            const response = await fetch(new URL(url, BASE_URL), { headers });
+
+            if (response.status === 401) {
                 if (token) {
-                    headers.append('Authorization', 'Bearer ' + token);
+                    console.log('Token expired, clearing token');
+                    clearAuthToken();
                 }
+
+                throw new Error('Token expired');
             }
 
-            try {
-                const response = await fetch(new URL(url, BASE_URL), { headers });
-
-                if (response.status === 401) {
-                    if (token) {
-                        console.log('Token expired, clearing token');
-                        clearAuthToken();
-                    }
-
-                    throw new Error('Token expired');
-                }
-
-                if (!response.ok) {
-                    throw new Error(response.statusText);
-                }
-
-                return (await response.json()) as T;
-            } catch (error) {
-                console.error(error);
-                throw error;
+            if (!response.ok) {
+                throw new Error(response.statusText);
             }
-        };
+
+            return (await response.json()) as T;
+        } catch (error) {
+            console.error(error);
+            throw error;
+        }
+    };
 
 /**
  * @deprecated Use `useQuery` instead

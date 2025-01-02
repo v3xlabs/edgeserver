@@ -1,6 +1,7 @@
-import { Input } from '@/components/input/Input';
 import clsx from 'clsx';
 import { FC } from 'react';
+
+import { Input } from '@/components/input/Input';
 
 export const FormField: FC<{ label: string; properties: any }> = ({
     label,
@@ -10,11 +11,10 @@ export const FormField: FC<{ label: string; properties: any }> = ({
         <div className="">
             <label className="block">{label}</label>
             <Input
-                className={clsx('block border rounded-md', className)}
+                className={clsx('block rounded-md border', className)}
                 {...properties}
                 _ref={ref}
             />
         </div>
     );
 };
-

@@ -1,5 +1,5 @@
 import ColorHash from 'color-hash';
-import { CSSProperties, FC, useMemo, useState } from 'react';
+import { FC } from 'react';
 
 const colorHash = new ColorHash({ saturation: 1 });
 
@@ -31,5 +31,10 @@ export const generateSVG = (s: string, size = 256): string => {
 };
 
 export const AvatarGradient: FC<{ s: string }> = ({ s }) => {
-    return <div className="avatar-gradient" dangerouslySetInnerHTML={{ __html: generateSVG(s) }} />;
+    return (
+        <div
+            className="avatar-gradient"
+            dangerouslySetInnerHTML={{ __html: generateSVG(s) }}
+        />
+    );
 };

@@ -12,6 +12,9 @@ export const useAuth = () => {
 
 useAuth.getState = () => {
     return {
-        token: '123', clearAuthToken: () => { alert('clearing token') }
-    }
-}
+        token: '123',
+        clearAuthToken: () => {
+            alert('clearing token');
+        },
+    };
+};
