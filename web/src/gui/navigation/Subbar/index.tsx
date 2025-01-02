@@ -13,7 +13,7 @@ const SiteMap = [
 
 const TeamMap = [
     ['Overview', ''],
-    ['Members', '/members'],
+    ['Sites', '/sites'],
     ['Settings', '/settings'],
 ];
 

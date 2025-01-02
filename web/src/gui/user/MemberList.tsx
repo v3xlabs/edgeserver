@@ -15,7 +15,7 @@ export const MemberList: FC<{ team_id: string }> = ({ team_id }) => {
                 <Button>Add Member</Button>
             </div>
             {members && (
-                <ul>
+                <ul className="divide-y">
                     {members.map((member) => (
                         <li key={member.user_id}>
                             <UserPreview user={member} />

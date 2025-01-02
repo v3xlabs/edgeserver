@@ -6,12 +6,10 @@ import { FiChevronDown } from 'react-icons/fi';
 import {
     LuCode,
     LuFileWarning,
-    LuFilter,
     LuForward,
-    LuGlobe,
     LuKey,
-    LuScroll,
     LuSettings,
+    LuUsers,
     LuWebhook,
 } from 'react-icons/lu';
 
@@ -93,10 +91,9 @@ const ExpandableItem = ({
     );
 };
 
-export const SiteSettingsNav = () => {
-    // const { ok: hasUsersPermissions } = useHasPolicy('user', '', 'write');
-    const { siteId } = useParams({ strict: false });
-    const prefix = '/site/$siteId';
+export const TeamSettingsNav = () => {
+    const { teamId } = useParams({ strict: false });
+    const prefix = '/team/$teamId';
 
     return (
         <ul className="flex flex-col divide-y">
@@ -110,20 +107,10 @@ export const SiteSettingsNav = () => {
                                 'General',
                                 <LuSettings key="general" />,
                             ],
-                        ],
-                    ],
-                    [
-                        'Internet Exposure',
-                        [
                             [
-                                '/settings/domains',
-                                'Domains',
-                                <LuGlobe key="domains" />,
-                            ],
-                            [
-                                '/settings/rules',
-                                'Routing Rules',
-                                <LuFilter key="rules" />,
+                                '/settings/members',
+                                'Members',
+                                <LuUsers key="members" />,
                             ],
                         ],
                     ],
@@ -179,7 +166,7 @@ export const SiteSettingsNav = () => {
                                 ) : (
                                     <Link
                                         to={(prefix + path) as string}
-                                        params={{ siteId }}
+                                        params={{ teamId }}
                                         activeOptions={{ exact: true }}
                                         className={clsx(
                                             'relative flex w-full cursor-pointer items-center gap-2 rounded-md px-2 py-1 text-neutral-700 hover:bg-neutral-100',

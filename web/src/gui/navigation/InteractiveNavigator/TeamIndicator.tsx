@@ -4,8 +4,6 @@ import { FC } from 'react';
 
 import { useSite, useTeam } from '@/api';
 import { Avatar } from '@/components';
-import { useActiveTeam } from '@/hooks/useActiveTeam';
-// import { AvatarOrGradient } from '@/gui/avatar/AvatarOrGradient';
 import { buffercnvrt } from '@/util/buffer';
 
 const TeamEntry: FC<{ team_id: string }> = ({ team_id }) => {
@@ -53,7 +51,7 @@ export const TeamIndicator: FC = () => {
     return (
         <div className="h-12 w-fit overflow-hidden transition-all">
             <AnimatePresence>
-                {/* {!team && !team_id && <EmptyTeamEntry />} */}
+                {!teamId && <EmptyTeamEntry />}
                 {teamId && <TeamEntry team_id={teamId} />}
             </AnimatePresence>
         </div>

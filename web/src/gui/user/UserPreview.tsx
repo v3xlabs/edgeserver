@@ -1,3 +1,4 @@
+import { Link } from '@tanstack/react-router';
 import { FC } from 'react';
 
 import { User, useUser } from '@/api/user';
@@ -14,11 +15,11 @@ export const UserPreview: FC<{ user_id?: string; user?: User }> = ({
     if (!userId) return;
 
     return (
-        <div className="flex items-center gap-2">
+        <Link to="/" className="card flex items-center gap-2">
             <div className="size-8 overflow-hidden rounded-md">
                 <AvatarGradient s={userId} />
             </div>
             <p>{user?.name}</p>
-        </div>
+        </Link>
     );
 };
