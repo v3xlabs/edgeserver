@@ -17,14 +17,18 @@ function RouteComponent() {
                 <div>Site Name</div>
                 <div className="flex gap-2">
                     <Input value={site?.name} />
-                    <Button>Rename</Button>
+                    <Button onClick={() => alert('Not implemented')}>
+                        Rename
+                    </Button>
                 </div>
             </div>
             <div>
                 <div>Team</div>
                 <div className="flex gap-2">
                     <Input value={site?.team_id} />
-                    <Button>Transfer</Button>
+                    <Button onClick={() => alert('Not implemented')}>
+                        Transfer
+                    </Button>
                 </div>
             </div>
         </div>

@@ -9,10 +9,12 @@ export const MemberList: FC<{ team_id: string }> = ({ team_id }) => {
     const { data: members } = useTeamMembers(team_id);
 
     return (
-        <div>
+        <div className="space-y-2">
             <div className="flex items-center justify-between">
                 <h2 className="h2">Members</h2>
-                <Button>Add Member</Button>
+                <Button onClick={() => alert('Not implemented')}>
+                    Add Member
+                </Button>
             </div>
             {members && (
                 <ul className="divide-y">
