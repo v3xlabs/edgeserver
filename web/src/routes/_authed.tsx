@@ -4,10 +4,14 @@ import {
     useRouterState,
 } from '@tanstack/react-router';
 
+import { preflightAuth } from '@/api';
 import { Navbar } from '@/gui/navigation/Navbar';
 
 export const Route = createFileRoute('/_authed')({
     component: RouteComponent,
+    beforeLoad: async () => {
+        await preflightAuth();
+    },
 });
 
 function RouteComponent() {

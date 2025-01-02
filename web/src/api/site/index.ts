@@ -19,6 +19,22 @@ export const useSites = () => {
     return useQuery(getSites());
 };
 
+export const getTeamSites = (teamId: string) =>
+    queryOptions({
+        queryKey: ['team', '{teamId}', teamId, 'sites'],
+        queryFn: async () => {
+            const response = await apiRequest('/team/{team_id}/sites', 'get', {
+                path: { team_id: teamId },
+            });
+
+            return response.data;
+        },
+    });
+
+export const useTeamSites = (teamId: string) => {
+    return useQuery(getTeamSites(teamId));
+};
+
 export const getSite = (siteId: string) =>
     queryOptions({
         queryKey: ['site', '{siteId}', siteId],

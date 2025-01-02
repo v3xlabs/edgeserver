@@ -1,7 +1,8 @@
 import { Link } from '@tanstack/react-router';
 import { AnimatePresence } from 'framer-motion';
 
-import { useAuth } from '@/api/auth/store';
+import { useMe } from '@/api';
+import { authStore, useAuth } from '@/api/auth/store';
 import { Avatar } from '@/components';
 import { useActiveTeam } from '@/hooks/useActiveTeam';
 
@@ -10,13 +11,12 @@ import { Subbar } from './Subbar';
 
 const UserProfile = () => {
     const { token } = useAuth();
-    const name = 'John Doe';
-    const avatar = '';
+    const { data: me } = useMe();
 
     return (
         <div className="group relative flex h-full items-end">
             <div className="flex h-full w-fit items-center px-2 group-hover:bg-black/10">
-                <span>{name}</span>
+                <span>{me?.name}</span>
                 {/* <AvatarOrGradient
                     src={avatar}
                     hash={user || ''}
@@ -26,7 +26,9 @@ const UserProfile = () => {
             <div className="absolute right-0 top-full hidden w-fit flex-col overflow-hidden whitespace-nowrap rounded-b-md bg-white group-hover:flex">
                 <button
                     className="flex items-start px-4 py-2 hover:bg-black/10"
-                    // onClick={signOut}
+                    onClick={() => {
+                        authStore.send({ type: 'clearAuthToken' });
+                    }}
                 >
                     Log out
                 </button>

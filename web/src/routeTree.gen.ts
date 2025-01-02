@@ -20,6 +20,7 @@ import { Route as AuthedImport } from './routes/_authed'
 import { Route as AuthedIndexImport } from './routes/_authed/index'
 import { Route as AuthedSettingsSImport } from './routes/_authed/settings/_s'
 import { Route as AuthedTeamTeamIdIndexImport } from './routes/_authed/team/$teamId/index'
+import { Route as AuthedSiteSiteIdIndexImport } from './routes/_authed/site/$siteId/index'
 import { Route as AuthedSettingsSIndexImport } from './routes/_authed/settings/_s.index'
 
 // Create Virtual Routes
@@ -71,6 +72,12 @@ const AuthedSettingsSRoute = AuthedSettingsSImport.update({
 const AuthedTeamTeamIdIndexRoute = AuthedTeamTeamIdIndexImport.update({
   id: '/team/$teamId/',
   path: '/team/$teamId/',
+  getParentRoute: () => AuthedRoute,
+} as any)
+
+const AuthedSiteSiteIdIndexRoute = AuthedSiteSiteIdIndexImport.update({
+  id: '/site/$siteId/',
+  path: '/site/$siteId/',
   getParentRoute: () => AuthedRoute,
 } as any)
 
@@ -140,6 +147,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthedSettingsSIndexImport
       parentRoute: typeof AuthedSettingsSImport
     }
+    '/_authed/site/$siteId/': {
+      id: '/_authed/site/$siteId/'
+      path: '/site/$siteId'
+      fullPath: '/site/$siteId'
+      preLoaderRoute: typeof AuthedSiteSiteIdIndexImport
+      parentRoute: typeof AuthedImport
+    }
     '/_authed/team/$teamId/': {
       id: '/_authed/team/$teamId/'
       path: '/team/$teamId'
@@ -179,12 +193,14 @@ const AuthedSettingsRouteWithChildren = AuthedSettingsRoute._addFileChildren(
 interface AuthedRouteChildren {
   AuthedIndexRoute: typeof AuthedIndexRoute
   AuthedSettingsRoute: typeof AuthedSettingsRouteWithChildren
+  AuthedSiteSiteIdIndexRoute: typeof AuthedSiteSiteIdIndexRoute
   AuthedTeamTeamIdIndexRoute: typeof AuthedTeamTeamIdIndexRoute
 }
 
 const AuthedRouteChildren: AuthedRouteChildren = {
   AuthedIndexRoute: AuthedIndexRoute,
   AuthedSettingsRoute: AuthedSettingsRouteWithChildren,
+  AuthedSiteSiteIdIndexRoute: AuthedSiteSiteIdIndexRoute,
   AuthedTeamTeamIdIndexRoute: AuthedTeamTeamIdIndexRoute,
 }
 
@@ -199,6 +215,7 @@ export interface FileRoutesByFullPath {
   '/': typeof AuthedIndexRoute
   '/settings': typeof AuthedSettingsSRouteWithChildren
   '/settings/': typeof AuthedSettingsSIndexRoute
+  '/site/$siteId': typeof AuthedSiteSiteIdIndexRoute
   '/team/$teamId': typeof AuthedTeamTeamIdIndexRoute
 }
 
@@ -208,6 +225,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/': typeof AuthedIndexRoute
   '/settings': typeof AuthedSettingsSIndexRoute
+  '/site/$siteId': typeof AuthedSiteSiteIdIndexRoute
   '/team/$teamId': typeof AuthedTeamTeamIdIndexRoute
 }
 
@@ -221,6 +239,7 @@ export interface FileRoutesById {
   '/_authed/settings': typeof AuthedSettingsRouteWithChildren
   '/_authed/settings/_s': typeof AuthedSettingsSRouteWithChildren
   '/_authed/settings/_s/': typeof AuthedSettingsSIndexRoute
+  '/_authed/site/$siteId/': typeof AuthedSiteSiteIdIndexRoute
   '/_authed/team/$teamId/': typeof AuthedTeamTeamIdIndexRoute
 }
 
@@ -234,9 +253,17 @@ export interface FileRouteTypes {
     | '/'
     | '/settings'
     | '/settings/'
+    | '/site/$siteId'
     | '/team/$teamId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/bootstrap' | '/debug' | '/login' | '/' | '/settings' | '/team/$teamId'
+  to:
+    | '/bootstrap'
+    | '/debug'
+    | '/login'
+    | '/'
+    | '/settings'
+    | '/site/$siteId'
+    | '/team/$teamId'
   id:
     | '__root__'
     | '/_authed'
@@ -247,6 +274,7 @@ export interface FileRouteTypes {
     | '/_authed/settings'
     | '/_authed/settings/_s'
     | '/_authed/settings/_s/'
+    | '/_authed/site/$siteId/'
     | '/_authed/team/$teamId/'
   fileRoutesById: FileRoutesById
 }
@@ -286,6 +314,7 @@ export const routeTree = rootRoute
       "children": [
         "/_authed/",
         "/_authed/settings",
+        "/_authed/site/$siteId/",
         "/_authed/team/$teamId/"
       ]
     },
@@ -319,6 +348,10 @@ export const routeTree = rootRoute
     "/_authed/settings/_s/": {
       "filePath": "_authed/settings/_s.index.tsx",
       "parent": "/_authed/settings/_s"
+    },
+    "/_authed/site/$siteId/": {
+      "filePath": "_authed/site/$siteId/index.tsx",
+      "parent": "/_authed"
     },
     "/_authed/team/$teamId/": {
       "filePath": "_authed/team/$teamId/index.tsx",

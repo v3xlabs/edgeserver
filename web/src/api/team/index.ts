@@ -19,10 +19,14 @@ export const useTeams = () => {
     return useQuery(getTeams());
 };
 
-export const getTeam = (teamId: string) =>
+export const getTeam = (teamId?: string) =>
     queryOptions({
         queryKey: ['team', '{teamId}', teamId],
         queryFn: async () => {
+            if (!teamId) {
+                return;
+            }
+
             const response = await apiRequest('/team/{team_id}', 'get', {
                 path: { team_id: teamId },
             });
@@ -31,7 +35,7 @@ export const getTeam = (teamId: string) =>
         },
     });
 
-export const useTeam = (teamId: string) => {
+export const useTeam = (teamId?: string) => {
     return useQuery(getTeam(teamId));
 };
 

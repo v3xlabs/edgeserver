@@ -1,8 +1,22 @@
-use poem::Result;
-use poem_openapi::{param::Path, payload::Json, OpenApi};
+use poem::{web::Data, Result};
+use poem_openapi::{param::Path, payload::Json, Object, OpenApi};
+use serde::{Deserialize, Serialize};
 use tracing::info;
 
-use crate::{middlewares::auth::UserAuth, models::site::Site, routes::ApiTags};
+use crate::{
+    middlewares::auth::UserAuth,
+    models::{site::Site, team::Team},
+    routes::ApiTags,
+    state::State,
+};
+
+use super::error::HttpError;
+
+#[derive(Debug, Deserialize, Serialize, Object)]
+pub struct SiteCreateRequest {
+    pub name: String,
+    pub team_id: String,
+}
 
 pub struct SiteApi;
 
@@ -12,25 +26,49 @@ impl SiteApi {
     ///
     /// Gets a list of all the sites you have access to
     #[oai(path = "/site", method = "get", tag = "ApiTags::Site")]
-    pub async fn get_sites(&self, user: UserAuth) -> Result<Json<Vec<Site>>> {
+    pub async fn get_sites(&self, user: UserAuth, state: Data<&State>) -> Result<Json<Vec<Site>>> {
         info!("Getting sites for user: {:?}", user);
 
-        Ok(Json(vec![Site {
-            site_id: "1".to_string(),
-            name: "John Doe".to_string(),
-            team_id: "1".to_string(),
-        }]))
+        let user = user.required()?;
+
+        Site::get_by_user_id(&state.database, &user.user_id)
+            .await
+            .map_err(HttpError::from)
+            .map(Json)
+            .map_err(poem::Error::from)
     }
 
     #[oai(path = "/site", method = "post", tag = "ApiTags::Site")]
-    pub async fn create_site(&self, user: UserAuth) -> Result<Json<Site>> {
+    pub async fn create_site(
+        &self,
+        user: UserAuth,
+        state: Data<&State>,
+        payload: Json<SiteCreateRequest>,
+    ) -> Result<Json<Site>> {
         info!("Creating site for user: {:?}", user);
 
-        todo!();
+        let user = user.required()?;
+
+        if !Team::is_owner(&state.database, &payload.team_id, &user.user_id)
+            .await
+            .map_err(HttpError::from)?
+        {
+            Err(HttpError::Forbidden)?;
+        }
+
+        Site::new(&state.database, &payload.name, &payload.team_id)
+            .await
+            .map_err(HttpError::from)
+            .map(Json)
+            .map_err(poem::Error::from)
     }
 
     #[oai(path = "/site/:site_id", method = "get", tag = "ApiTags::Site")]
-    pub async fn get_site_certs(&self, user: UserAuth, site_id: Path<String>) -> Result<Json<Site>> {
+    pub async fn get_site_certs(
+        &self,
+        user: UserAuth,
+        site_id: Path<String>,
+    ) -> Result<Json<Site>> {
         info!("Getting site: {:?} for user: {:?}", site_id.0, user);
 
         todo!();
