@@ -1,14 +1,18 @@
 import { Link } from '@tanstack/react-router';
+import clsx from 'clsx';
 import { FC } from 'react';
 import { FiArrowRight } from 'react-icons/fi';
 
 import { Team, useTeam } from '@/api/team';
 import { Avatar } from '@/components';
 
-export const TeamPreview: FC<{ team_id?: string; team?: Team }> = ({
-    team_id: query_team_id,
-    team: query_team,
-}) => {
+export type TeamPreviewVariant = 'default' | 'compact';
+
+export const TeamPreview: FC<{
+    team_id?: string;
+    team?: Team;
+    variant?: TeamPreviewVariant;
+}> = ({ team_id: query_team_id, team: query_team, variant = 'default' }) => {
     const team_id = query_team_id ?? query_team?.team_id;
 
     if (!team_id) return;
@@ -20,7 +24,10 @@ export const TeamPreview: FC<{ team_id?: string; team?: Team }> = ({
         <Link
             to="/team/$teamId"
             params={{ teamId: team_id }}
-            className="card flex items-center justify-between"
+            className={clsx(
+                'card flex items-center justify-between',
+                variant === 'compact' && 'no-padding px-2'
+            )}
         >
             <div className="flex items-center gap-2">
                 <div className="size-4">
@@ -28,7 +35,7 @@ export const TeamPreview: FC<{ team_id?: string; team?: Team }> = ({
                 </div>
                 <div>{team?.name}</div>
             </div>
-            <FiArrowRight />
+            {variant === 'default' && <FiArrowRight />}
         </Link>
     );
 };

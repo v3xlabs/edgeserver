@@ -5,7 +5,10 @@ import { useSites, useTeamSites } from '@/api';
 import { SiteCreateButton } from './SiteCreateButton';
 import { SitePreview } from './SitePreview';
 
-export const SiteList: FC<{ teamId?: string }> = ({ teamId }) => {
+export const SiteList: FC<{ teamId?: string; external?: boolean }> = ({
+    teamId,
+    external,
+}) => {
     const { data: sites } = teamId ? useTeamSites(teamId) : useSites();
 
     return (
@@ -18,7 +21,10 @@ export const SiteList: FC<{ teamId?: string }> = ({ teamId }) => {
                 <ul className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
                     {sites.map((site) => (
                         <li key={site.site_id}>
-                            <SitePreview site={site} />
+                            <SitePreview
+                                site={site}
+                                variant={external ? 'external' : 'default'}
+                            />
                         </li>
                     ))}
                 </ul>

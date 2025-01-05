@@ -15,7 +15,7 @@ function RouteComponent() {
     return (
         <SCPage title="Home">
             <div className="card">Hello</div>
-            <SiteList />
+            <SiteList external />
             <TeamList />
         </SCPage>
     );
