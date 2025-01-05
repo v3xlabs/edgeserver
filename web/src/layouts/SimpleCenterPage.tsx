@@ -7,7 +7,7 @@ import { getTitle } from '@/util/title';
 export type SCPageProperties = PropsWithChildren<{
     title: string;
     subtext?: ReactNode;
-    width?: 'xl' | '2xl' | '3xl' | '4xl' | '5xl' | 'lg' | 'md';
+    width?: 'xl' | '2xl' | '3xl' | '4xl' | '5xl' | 'lg' | 'md' | 'dynamic';
     suffix?: ReactNode;
     className?: ClassValue;
 }>;
@@ -16,7 +16,7 @@ export const SCPage: FC<SCPageProperties> = ({
     children,
     title,
     subtext,
-    width = '4xl',
+    width = 'dynamic',
     suffix,
     className,
 }) => {
@@ -35,6 +35,7 @@ export const SCPage: FC<SCPageProperties> = ({
                 width === '5xl' && 'max-w-5xl 2xl:max-w-7xl',
                 width === 'lg' && 'max-w-lg',
                 width === 'md' && 'max-w-md',
+                width === 'dynamic' && 'w-container-dynamic',
                 className
             )}
         >
