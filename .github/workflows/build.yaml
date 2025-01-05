@@ -104,17 +104,9 @@ jobs:
                   name: engine-${{ matrix.platform.arch }}
                   path: artifacts
 
-            # 📥 Grab our web assets
-            - name: Download built web
-              uses: actions/download-artifact@v4
-              id: web
-              with:
-                  name: web
-                  path: artifacts/web
-
             - name: Prepare artifacts
               run: |
-                  chmod 755 ./artifacts/v3x-property-engine
+                  chmod 755 ./artifacts/edgeserver
                   ls -la ./artifacts
 
             # Set up QEMU for multi-arch builds
@@ -146,7 +138,7 @@ jobs:
               id: build
               with:
                   context: ./artifacts
-                  file: ./engine/.build/Dockerfile.scratch
+                  file: ./engine/Dockerfile.scratch
                   platforms: ${{ matrix.platform.docker }}
                   labels: ${{ steps.meta.outputs.labels }}
                   annotations: ${{ steps.meta.outputs.annotations }}
@@ -154,8 +146,7 @@ jobs:
                   outputs: type=image,name=${{ env.REGISTRY }}/${{ env.ENGINE_IMAGE_NAME }},push-by-digest=true,name-canonical=true,push=true
 
                   build-args: |
-                      BINARY_PATH=./v3x-property-engine
-                      WEBUI_PATH=./web
+                      BINARY_PATH=./edgeserver
                   cache-from: type=gha
                   cache-to: type=gha,mode=max
 
