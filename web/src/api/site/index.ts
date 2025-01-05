@@ -31,6 +31,7 @@ export const getTeamSites = (teamId: string) =>
 
             return response.data;
         },
+        enabled: !!teamId,
     });
 
 export const useTeamSites = (teamId: string) => {
@@ -49,6 +50,7 @@ export const getSite = (siteId?: string) =>
 
             return response.data;
         },
+        enabled: !!siteId,
     });
 
 export const useSite = (siteId?: string) => {
@@ -71,6 +73,7 @@ export const getSiteDeployments = (siteId?: string) =>
 
             return response.data;
         },
+        enabled: !!siteId,
     });
 
 export const useSiteDeployments = (siteId?: string) => {

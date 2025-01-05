@@ -1,3 +1,5 @@
+use std::fmt::Debug;
+
 use poem::{web::Data, FromRequest, Request, RequestBody, Result};
 use poem_openapi::{
     registry::{MetaSecurityScheme, Registry},
@@ -11,10 +13,15 @@ use crate::{
     utils::hash::hash_session,
 };
 
-#[derive(Debug)]
 pub enum UserAuth {
     User(Session, State),
     None(State),
+}
+
+impl Debug for UserAuth {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "UserAuth {:?}", self.user_id())
+    }
 }
 
 impl<'a> ApiExtractor<'a> for UserAuth {

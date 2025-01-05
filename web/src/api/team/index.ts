@@ -50,6 +50,7 @@ export const getTeamInvites = (teamId: string) =>
 
             return response.data;
         },
+        enabled: !!teamId,
     });
 
 export const useTeamInvites = (teamId: string) => {
@@ -70,6 +71,7 @@ export const getTeamMembers = (teamId: string) =>
 
             return response.data;
         },
+        enabled: !!teamId,
     });
 
 export const useTeamMembers = (teamId: string) => {

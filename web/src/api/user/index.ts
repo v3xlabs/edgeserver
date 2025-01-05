@@ -29,6 +29,7 @@ export const getUser = (user_id?: string) =>
 
             return response.data;
         },
+        enabled: !!user_id,
     });
 
 export const useUser = (user_id?: string) => useQuery(getUser(user_id));

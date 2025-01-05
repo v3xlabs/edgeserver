@@ -112,4 +112,15 @@ impl SiteApi {
 
         todo!();
     }
+
+    #[oai(path = "/site/:site_id/deployment", method = "post", tag = "ApiTags::Site")]
+    pub async fn create_deployment(
+        &self,
+        user: UserAuth,
+        site_id: Path<String>,
+    ) -> Result<Json<Deployment>> {
+        info!("Creating deployment for site: {:?} for user: {:?}", site_id.0, user);
+
+        todo!();
+    }
 }
