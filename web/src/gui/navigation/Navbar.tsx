@@ -71,11 +71,16 @@ export const Navbar = () => {
                     </div>
                 </div>
             </div>
-            <AnimatePresence>
-                {state !== 'none' && (
-                    <Subbar type={state} entry_id={teamId || siteId || ''} />
-                )}
-            </AnimatePresence>
+            <div className="h-7">
+                <AnimatePresence>
+                    {state !== 'none' && (
+                        <Subbar
+                            type={state}
+                            entry_id={teamId || siteId || ''}
+                        />
+                    )}
+                </AnimatePresence>
+            </div>
         </div>
     );
 };
