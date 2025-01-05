@@ -11,7 +11,7 @@ export const DeploymentList: FC<{ siteId?: string }> = ({ siteId }) => {
         <div className="space-y-2">
             <h2 className="h2">Deployment List</h2>
             {deployments && deployments.length > 0 && (
-                <ul>
+                <ul className="space-y-2">
                     {deployments.map((deployment) => (
                         <li key={deployment.deployment_id}>
                             <DeploymentPreview deployment={deployment} />

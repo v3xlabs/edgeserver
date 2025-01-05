@@ -71,6 +71,7 @@
         "react-icons": "^4.8.0",
         "react-query": "^3.39.1",
         "react-stately": "^3.18.0",
+        "react-timeago-i18n": "^2.3.0",
         "rollup-plugin-polyfill-node": "^0.10.2",
         "rollup-plugin-typescript-paths": "^1.4.0",
         "sass": "^1.52.1",

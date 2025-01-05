@@ -1,0 +1,49 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO deployments (deployment_id, site_id, hash, storage) VALUES ($1, $2, $3, $4) RETURNING *",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "deployment_id",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 1,
+        "name": "site_id",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 2,
+        "name": "hash",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 3,
+        "name": "storage",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 4,
+        "name": "created_at",
+        "type_info": "Timestamptz"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Text",
+        "Text",
+        "Text",
+        "Text"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "b784c24d01494bd7e82d2d248f5077c9af9bfe34e713c77f13dae01fdeff890e"
+}

@@ -6,6 +6,7 @@ pub mod middlewares;
 pub mod models;
 pub mod routes;
 pub mod state;
+pub mod storage;
 pub mod utils;
 
 #[async_std::main]

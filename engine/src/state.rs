@@ -3,7 +3,7 @@ use std::sync::Arc;
 use config::{Config, Environment};
 use serde::Deserialize;
 
-use crate::database::Database;
+use crate::{database::Database, storage::Storage};
 
 pub type State = Arc<AppState>;
 
@@ -11,6 +11,7 @@ pub type State = Arc<AppState>;
 pub struct AppState {
     pub config: AppConfig,
     pub database: Database,
+    pub storage: Storage,
 }
 
 #[derive(Deserialize, Debug)]
@@ -35,6 +36,8 @@ impl AppState {
 
         let database = Database::new(&config.database_url).await?;
 
-        Ok(Self { config, database })
+        let storage = Storage::from_config(&config);
+
+        Ok(Self { config, database, storage })
     }
 }

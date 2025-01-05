@@ -62,7 +62,7 @@ impl Site {
     pub async fn get_deployments(db: &Database, site_id: impl AsRef<str>) -> Result<Vec<Deployment>, sqlx::Error> {
         query_as!(
             Deployment,
-            "SELECT * FROM deployments WHERE site_id = $1",
+            "SELECT * FROM deployments WHERE site_id = $1 ORDER BY created_at DESC",
             site_id.as_ref()
         )
         .fetch_all(&db.pool)

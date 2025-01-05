@@ -158,6 +158,9 @@ importers:
       react-stately:
         specifier: ^3.18.0
         version: 3.34.0(react@18.3.1)
+      react-timeago-i18n:
+        specifier: ^2.3.0
+        version: 2.3.0(react@18.3.1)
       rollup-plugin-polyfill-node:
         specifier: ^0.10.2
         version: 0.10.2(rollup@4.29.1)
@@ -3833,6 +3836,12 @@ packages:
     peerDependenciesMeta:
       '@types/react':
         optional: true
+
+  react-timeago-i18n@2.3.0:
+    resolution: {integrity: sha512-EmW8ouFo2w7AB0z0AaYk3P1gw0fy3kn2OaHmQX6JvTW2PxUjlSNonUphnTg9w7++bAuutUuYtBfd4FflX/vuCA==}
+    engines: {node: '>=16.0.0'}
+    peerDependencies:
+      react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
 
   react@18.3.1:
     resolution: {integrity: sha512-wS+hAgJShR0KhEvPJArfuPVN1+Hz1t0Y6n5jLrGQbkb4urgPE/0Rve+1kMB1v/oWgHgm4WIcV+i7F2pTVj+2iQ==}
@@ -8916,6 +8925,10 @@ snapshots:
       tslib: 2.8.1
     optionalDependencies:
       '@types/react': 18.3.18
+
+  react-timeago-i18n@2.3.0(react@18.3.1):
+    dependencies:
+      react: 18.3.1
 
   react@18.3.1:
     dependencies:
