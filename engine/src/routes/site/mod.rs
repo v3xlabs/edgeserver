@@ -1,13 +1,7 @@
-use std::collections::HashMap;
-
-use async_std::io::BufReader;
 use async_zip::base::read::mem::ZipFileReader;
 use poem::{web::Data, Result};
 use poem_openapi::{
-    param::Path,
-    payload::{Attachment, Json},
-    types::multipart::Upload,
-    ApiResponse, Multipart, Object, OpenApi,
+    param::Path, payload::Json, types::multipart::Upload, Multipart, Object, OpenApi,
 };
 use serde::{Deserialize, Serialize};
 use tracing::info;
@@ -17,7 +11,6 @@ use crate::{
     models::{deployment::Deployment, site::Site, team::Team},
     routes::ApiTags,
     state::State,
-    utils::id::generate_id,
 };
 
 use super::error::HttpError;
@@ -207,7 +200,7 @@ impl SiteApi {
         }
 
         info!("Deployment complete");
-        
+
         Ok(Json(deployment))
     }
 }

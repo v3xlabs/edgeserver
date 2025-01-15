@@ -55,7 +55,7 @@ export const Subbar: FC<{ type: 'site' | 'team'; entry_id: string }> = ({
                 transition={{ bounce: 0 }}
                 className="w-full"
             >
-                <div className="bg-white/20 px-4 py-1.5 text-black shadow backdrop-blur-lg backdrop-saturate-150">
+                <div className="text-secondary bg-bg2 border-b px-4 py-1.5 shadow backdrop-blur-lg backdrop-saturate-150">
                     <div className="w-container-dynamic flex h-full items-center justify-between">
                         <div className="flex gap-2">
                             {map.map(([label, link], index) => (

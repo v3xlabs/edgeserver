@@ -10,7 +10,6 @@ import {
     LuForward,
     LuGlobe,
     LuKey,
-    LuScroll,
     LuSettings,
     LuWebhook,
 } from 'react-icons/lu';
@@ -52,7 +51,7 @@ const ExpandableItem = ({
                     <Accordion.Trigger>
                         <div
                             className={clsx(
-                                'relative flex w-full cursor-pointer items-center justify-between gap-2 rounded-md px-2 py-1 text-neutral-700 hover:bg-neutral-100'
+                                'text-text relative flex w-full cursor-pointer items-center justify-between gap-2 rounded-md px-2 py-1 hover:bg-neutral-100'
                             )}
                         >
                             <div className="flex items-center gap-2">
@@ -76,7 +75,7 @@ const ExpandableItem = ({
                                 activeOptions={{ exact: true }}
                                 key={path as string}
                                 className={clsx(
-                                    'relative flex cursor-pointer items-center gap-2 rounded-md px-2 py-1 pl-8 text-sm text-neutral-700 hover:bg-neutral-100',
+                                    'text-text relative flex cursor-pointer items-center gap-2 rounded-md px-2 py-1 pl-8 text-sm hover:bg-neutral-100',
                                     '[&.active]:text-primary [&.active]:bg-neutral-500/10',
                                     // eslint-disable-next-line quotes
                                     "[&.active]:before:content-['']",
@@ -158,7 +157,7 @@ export const SiteSettingsNav = () => {
             ).map(([group, items]) => (
                 <div key={group}>
                     {group != '' && (
-                        <h3 className="px-2 pb-1 pl-4 pt-4 text-sm font-bold text-neutral-500">
+                        <h3 className="text-text px-2 pb-1 pl-4 pt-4 text-sm font-bold">
                             {group}
                         </h3>
                     )}
@@ -182,8 +181,8 @@ export const SiteSettingsNav = () => {
                                         params={{ siteId }}
                                         activeOptions={{ exact: true }}
                                         className={clsx(
-                                            'relative flex w-full cursor-pointer items-center gap-2 rounded-md px-2 py-1 text-neutral-700 hover:bg-neutral-100',
-                                            '[&.active]:text-primary [&.active]:bg-neutral-500/10',
+                                            'text-text hover:bg-bg2 relative flex w-full cursor-pointer items-center gap-2 rounded-md px-2 py-1',
+                                            '[&.active]:text-primary [&.active]:bg-bg2',
                                             // eslint-disable-next-line quotes
                                             "[&.active]:before:content-['']",
                                             '[&.active]:before:absolute [&.active]:before:inset-y-[12%] [&.active]:before:-left-3 [&.active]:before:w-1 [&.active]:before:rounded-md [&.active]:before:bg-blue-500'

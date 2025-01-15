@@ -17,6 +17,26 @@
     max-width: 100%;
 }
 
+:root {
+    --background: #fafafa;
+    --background2: #fff;
+    --border: #e2e8f0;
+    --text: #000;
+    --text-secondary: #000;
+    --link: #3b82f6;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --background: #0b0b0b;
+        --background2: #0d0d0d;
+        --border: #313131;
+        --text: #fff;
+        --text-secondary: #fff;
+        --link: #60a5fa;
+    }
+}
+
 html,
 body {
     width: 100%;
@@ -25,7 +45,8 @@ body {
     margin: 0;
     overflow: hidden;
     font-family: "Inter", monospace, sans-serif;
-    background-color: #fafafa;
+    background-color: var(--background);
+    color: var(--text);
 }
 
 body.dark {
@@ -47,7 +68,7 @@ a {
 }
 
 .card {
-    @apply bg-white border-neutral-200 border rounded-md;
+    @apply bg-bg2 border rounded-md;
 }
 
 .card:not(.no-padding) {
@@ -55,7 +76,7 @@ a {
 }
 
 .link {
-    @apply text-blue-500 hover:underline;
+    @apply text-link hover:underline;
 }
 
 .h1 {
@@ -111,13 +132,11 @@ a {
 }
 
 [cmdk-separator] {
-    @apply border-t border-neutral-200 w-full h-[1px];
+    @apply border-t w-full h-[1px];
 }
 
 [cmdk-empty] {
-
 }
 
 [cmdk-loading] {
-
 }

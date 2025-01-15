@@ -19,7 +19,7 @@ const [buttonVariants, buttonVariantsConfig] = cvax(
         variants: {
             variant: {
                 default:
-                    'bg-background text-foreground border border-solid border-border hover:bg-muted',
+                    'bg-background2 text-foreground border border-solid hover:bg-muted',
                 primary: [
                     'text-background border',
                     'bg-blue-500 hover:bg-blue-600/90 border-transparent active:bg-blue-600',

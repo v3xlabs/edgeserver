@@ -7,6 +7,15 @@ module.exports = {
         extend: {
             backgroundColor: {
                 background: 'white',
+                bg2: 'var(--background2)',
+            },
+            borderColor: {
+                DEFAULT: 'var(--border)',
+            },
+            textColor: {
+                text: 'var(--text)',
+                link: 'var(--link)',
+                secondary: 'var(--text-secondary)',
             },
         },
     },
