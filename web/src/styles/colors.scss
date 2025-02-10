@@ -12,10 +12,7 @@
 }
 
 html.dark {
-    --background: #0b0b0b;
-    --background2: #0d0d0d;
     --border: #313131;
-    --text: #fff;
     --link: #60a5fa;
     --muted: #1f1f1f;
 
@@ -25,4 +22,19 @@ html.dark {
     --bg-muted: #1f1f1f;
     --text-primary: #fff;
     --text-secondary: #fff;
+}
+
+@media (prefers-color-scheme: dark) {
+    html:not(.light) {
+        --border: #313131;
+        --link: #60a5fa;
+        --muted: #1f1f1f;
+    
+        --bg-primary: #0d0d0d;
+        --bg-secondary: #0b0b0b;
+        --bg-hover: #ffffff1a;
+        --bg-muted: #1f1f1f;
+        --text-primary: #fff;
+        --text-secondary: #fff;
+    }
 }

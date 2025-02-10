@@ -3,14 +3,21 @@ import { FiMonitor, FiMoon, FiSun } from 'react-icons/fi';
 
 import { cn } from '@/util/style';
 
+export const updateTheme = () => {
+    const theme = localStorage.getItem('theme') || 'system';
+
+    document.documentElement.classList.remove('light', 'dark');
+    document.documentElement.classList.add(theme);
+};
+
 export const ThemeSwitcher = () => {
     const theme = localStorage.getItem('theme') || 'system';
     const [currentTheme, setCurrentTheme] = useState(theme);
     const setTheme = (theme: string) => {
         localStorage.setItem('theme', theme);
         setCurrentTheme(theme);
-        document.documentElement.classList.remove('light', 'dark');
-        document.documentElement.classList.add(theme);
+
+        updateTheme();
     };
 
     return (

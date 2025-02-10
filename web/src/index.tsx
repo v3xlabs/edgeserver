@@ -10,6 +10,7 @@ import { preflightAuth } from '@/api';
 // Import the generated route tree
 import { routeTree } from '@/routeTree.gen';
 
+import { updateTheme } from './gui/navigation/ThemeSwitcher';
 import { PageErrorBoundary } from './gui/PageErrorBoundary';
 import { defaultPendingComponent } from './gui/Router';
 import { QueryProvider } from './util/query';
@@ -27,11 +28,12 @@ const router = createRouter({
 // Register the router instance for type safety
 declare module '@tanstack/react-router' {
     // eslint-disable-next-line prettier/prettier, unused-imports/no-unused-vars
-  interface Register {
+    interface Register {
         router: typeof router;
     }
 }
 
+updateTheme();
 preflightAuth();
 
 ReactDOM.createRoot(document.querySelector('#root')!).render(
