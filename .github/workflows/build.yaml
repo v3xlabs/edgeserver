@@ -152,7 +152,7 @@ jobs:
               uses: actions/download-artifact@v4
               with:
                   name: www
-                  path: artifacts
+                  path: artifacts/www
 
             # Set up QEMU for multi-arch builds
             - name: Set up QEMU
@@ -176,6 +176,9 @@ jobs:
               uses: docker/metadata-action@v5
               with:
                   images: ${{ env.REGISTRY }}/${{ env.ENGINE_IMAGE_NAME }}
+
+            - name: Ls artifacts
+              run: ls -la ./artifacts
 
             # 🚀 Build and push multi-arch Docker image
             - name: Build Docker digests
