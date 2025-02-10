@@ -6,11 +6,10 @@ use serde::{Deserialize, Serialize};
 use sqlx::query_as;
 
 use crate::{
-    database::Database,
-    utils::{
+    database::Database, middlewares::auth::{AccessibleResource, UserAuth}, routes::error::HttpError, state::State, utils::{
         hash::hash_session,
         id::{generate_id, IdType},
-    },
+    }
 };
 
 #[derive(sqlx::FromRow, Debug, Clone, Serialize, Deserialize, Object)]
@@ -116,6 +115,7 @@ impl Session {
         db: &Database,
         user_id: &str,
         invalidate_before: DateTime<Utc>,
+        user: &UserAuth,
     ) -> Result<Vec<Self>, sqlx::Error> {
         let sessions = query_as!(
             Session,
@@ -127,5 +127,10 @@ impl Session {
         .await?;
 
         Ok(sessions)
+    }
+
+    pub async fn verify_access_to(&self, state: &State, resource: &impl AccessibleResource) -> Result<(), HttpError> {
+        resource.has_access_to(state, &self.user_id).await.map_err(HttpError::from)?;
+        Ok(())
     }
 }

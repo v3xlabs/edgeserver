@@ -8,7 +8,7 @@ use tracing::info;
 
 use crate::{
     middlewares::auth::UserAuth,
-    models::{deployment::Deployment, site::Site, team::Team},
+    models::{deployment::Deployment, site::{Site, SiteId}, team::Team},
     routes::ApiTags,
     state::State,
 };
@@ -89,6 +89,8 @@ impl SiteApi {
     ) -> Result<Json<Site>> {
         info!("Getting site: {:?} for user: {:?}", site_id.0, user);
 
+        user.verify_access_to(&SiteId(&site_id.0)).await?;
+
         Site::get_by_id(&state.database, &site_id.0)
             .await
             .map_err(HttpError::from)
@@ -107,13 +109,7 @@ impl SiteApi {
         state: Data<&State>,
         site_id: Path<String>,
     ) -> Result<Json<Vec<Deployment>>> {
-        let site = Site::get_by_id(&state.database, &site_id.0)
-            .await
-            .map_err(HttpError::from)?;
-
-        user.required_member_of(&site.team_id)
-            .await
-            .map_err(HttpError::from)?;
+        user.verify_access_to(&SiteId(&site_id.0)).await?;
 
         Site::get_deployments(&state.database, &site_id.0)
             .await
@@ -126,12 +122,16 @@ impl SiteApi {
     pub async fn update_site(&self, user: UserAuth, site_id: Path<String>) -> Result<Json<Site>> {
         info!("Updating site: {:?} for user: {:?}", site_id.0, user);
 
+        user.verify_access_to(&SiteId(&site_id.0)).await?;
+
         todo!();
     }
 
     #[oai(path = "/site/:site_id", method = "delete", tag = "ApiTags::Site")]
     pub async fn delete_site(&self, user: UserAuth, site_id: Path<String>) -> Result<Json<Site>> {
         info!("Deleting site: {:?} for user: {:?}", site_id.0, user);
+
+        user.verify_access_to(&SiteId(&site_id.0)).await?;
 
         todo!();
     }
@@ -152,6 +152,8 @@ impl SiteApi {
             "Creating deployment for site: {:?} for user: {:?}",
             site_id.0, user
         );
+
+        user.verify_access_to(&SiteId(&site_id.0)).await?;
 
         let site_id = site_id.0;
 

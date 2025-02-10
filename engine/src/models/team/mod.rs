@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 use sqlx::{query, query_as, query_scalar};
 
 use crate::{
-    database::Database, models::user::User, utils::id::{generate_id, IdType}
+    database::Database, middlewares::auth::AccessibleResource, models::user::User, routes::error::HttpError, state::State, utils::id::{generate_id, IdType}
 };
 
 pub mod invite;
@@ -117,5 +117,15 @@ impl Team {
         )
         .fetch_all(&db.pool)
         .await
+    }
+}
+
+pub struct TeamId<'a>(pub &'a str);
+
+impl<'a> AccessibleResource for TeamId<'a> {
+    async fn has_access_to(&self, state: &State, user_id: &str) -> Result<bool, HttpError> {
+        let x = Team::is_member(&state.database, self.0, user_id).await.map_err(HttpError::from)?;  
+
+        Ok(x)
     }
 }

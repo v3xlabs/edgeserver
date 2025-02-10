@@ -56,10 +56,10 @@ impl<'a> ApiExtractor<'a> for UserAuth {
         let token = token.unwrap();
 
         let is_user = async {
-            //     // Hash the token
+            // Hash the token
             let hash = hash_session(&token);
 
-            //     // Check if active session exists with token
+            // Check if active session exists with token
             let session = Session::try_access(&state.database, &hash)
                 .await
                 .unwrap()
@@ -155,4 +155,19 @@ impl UserAuth {
             UserAuth::None(_) => Err(HttpError::Unauthorized),
         }
     }
+
+    pub async fn verify_access_to(&self, resource: &impl AccessibleResource) -> Result<(), HttpError> {
+        match self {
+            UserAuth::User(session, state) => match resource.has_access_to(state, &session.user_id).await.map_err(HttpError::from) {
+                Ok(true) => Ok(()),
+                Ok(false) => Err(HttpError::Forbidden),
+                Err(e) => Err(e),
+            },
+            UserAuth::None(_) => Err(HttpError::Unauthorized),
+        }
+    }
+}
+
+pub trait AccessibleResource {
+    async fn has_access_to(&self, state: &State, user_id: &str) -> Result<bool, HttpError>;
 }

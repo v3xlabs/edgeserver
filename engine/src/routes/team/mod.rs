@@ -5,7 +5,11 @@ use tracing::info;
 
 use crate::{
     middlewares::auth::UserAuth,
-    models::{site::Site, team::{invite::UserTeamInvite, Team}, user::User},
+    models::{
+        site::Site,
+        team::{invite::UserTeamInvite, Team, TeamId},
+        user::User,
+    },
     routes::{error::HttpError, ApiTags},
     state::State,
 };
@@ -59,6 +63,7 @@ impl TeamApi {
         team_id: Path<String>,
     ) -> Result<Json<Team>> {
         info!("Getting team: {:?} for user: {:?}", team_id.0, user);
+        user.verify_access_to(&TeamId(&team_id.0)).await?;
 
         Team::get_by_id(&state.0.database, &team_id.0)
             .await
@@ -79,6 +84,8 @@ impl TeamApi {
             team_id.0, user
         );
 
+        user.verify_access_to(&TeamId(&team_id.0)).await?;
+
         UserTeamInvite::find_by_team_id(&state.0.database, &team_id.0)
             .await
             .map_err(HttpError::from)
@@ -97,6 +104,8 @@ impl TeamApi {
             "Inviting user to team: {:?} for user: {:?}",
             team_id.0, user
         );
+
+        user.verify_access_to(&TeamId(&team_id.0)).await?;
 
         let user = user.required()?;
 
@@ -131,6 +140,8 @@ impl TeamApi {
             invite_id.0, user
         );
 
+        user.verify_access_to(&TeamId(&team_id.0)).await?;
+
         let user = user.required()?;
 
         if !Team::is_owner(&state.0.database, &team_id.0, &user.user_id)
@@ -154,9 +165,12 @@ impl TeamApi {
         state: Data<&State>,
         team_id: Path<String>,
     ) -> Result<Json<Vec<Site>>> {
-        info!("Getting sites for team: {:?} for user: {:?}", team_id.0, user);
+        info!(
+            "Getting sites for team: {:?} for user: {:?}",
+            team_id.0, user
+        );
 
-        user.required_member_of(&team_id.0).await?;
+        user.verify_access_to(&TeamId(&team_id.0)).await?;
 
         Site::get_by_team_id(&state.0.database, &team_id.0)
             .await
@@ -172,7 +186,7 @@ impl TeamApi {
         state: Data<&State>,
         team_id: Path<String>,
     ) -> Result<Json<Vec<User>>> {
-        user.required_member_of(&team_id.0).await?;
+        user.verify_access_to(&TeamId(&team_id.0)).await?;
 
         Team::get_members(&state.0.database, &team_id.0)
             .await
@@ -189,6 +203,8 @@ impl TeamApi {
         team_id: Path<String>,
     ) -> Result<Json<Team>> {
         info!("Updating team: {:?} for user: {:?}", team_id.0, user);
+
+        user.verify_access_to(&TeamId(&team_id.0)).await?;
 
         let user = user.required()?;
 

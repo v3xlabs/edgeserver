@@ -1,9 +1,9 @@
 use chrono::{DateTime, Utc};
 use poem_openapi::Object;
 use serde::{Deserialize, Serialize};
-use sqlx::query_as;
+use sqlx::{query_as, query_scalar};
 
-use crate::{database::Database, models::deployment::Deployment, utils::id::{generate_id, IdType}};
+use crate::{database::Database, middlewares::auth::AccessibleResource, models::deployment::Deployment, routes::error::HttpError, state::State, utils::id::{generate_id, IdType}};
 
 #[derive(Debug, Serialize, Deserialize, Object)]
 pub struct Site {
@@ -67,5 +67,25 @@ impl Site {
         )
         .fetch_all(&db.pool)
         .await
+    }
+}
+
+pub struct SiteId<'a>(pub &'a str);
+
+impl<'a> AccessibleResource for SiteId<'a> {
+    async fn has_access_to(&self, state: &State, user_id: &str) -> Result<bool, HttpError> {
+        // Verify that the user is a member of the team that owns the site
+        let part_of_site = query_scalar!(
+            "SELECT EXISTS (SELECT 1 FROM sites WHERE site_id = $1 AND team_id IN (SELECT team_id FROM user_teams WHERE user_id = $2) OR team_id IN (SELECT team_id FROM teams WHERE owner_id = $2))",
+            self.0,
+            user_id
+        )
+        .fetch_one(&state.database.pool)
+        .await
+        .map_err(HttpError::from)?;
+
+        let part_of_site = part_of_site.unwrap_or(false);
+
+        Ok(part_of_site)
     }
 }
