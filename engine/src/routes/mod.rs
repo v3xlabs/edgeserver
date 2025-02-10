@@ -49,6 +49,7 @@ pub async fn serve(state: AppState) {
     let frontend_dir = Path::new("www");
     let file_endpoint = StaticFilesEndpoint::new(frontend_dir)
         .index_file("index.html")
+        .show_files_listing()
         .fallback_to_index();
 
     let app = Route::new()
@@ -56,6 +57,7 @@ pub async fn serve(state: AppState) {
         .nest("/openapi.json", spec)
         .at("/docs", get(get_openapi_docs))
         .at("*", file_endpoint)
+        .at("*", get(not_found))
         .with(Cors::new())
         .data(state);
 
@@ -67,4 +69,10 @@ pub async fn serve(state: AppState) {
 #[handler]
 async fn get_openapi_docs() -> Html<&'static str> {
     Html(include_str!("./index.html"))
+}
+
+#[handler]
+async fn not_found() -> Html<&'static str> {
+    // inline 404 template
+    Html(include_str!("./404.html"))
 }
