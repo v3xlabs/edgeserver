@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "INSERT INTO user_team_invites (invite_id, team_id, user_id) VALUES ($1, $2, $3) RETURNING *",
+  "query": "INSERT INTO user_team_invites (invite_id, team_id, user_id, sender_id) VALUES ($1, $2, $3, $4) RETURNING *",
   "describe": {
     "columns": [
       {
@@ -22,21 +22,40 @@
         "ordinal": 3,
         "name": "created_at",
         "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 4,
+        "name": "status",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 5,
+        "name": "accepted_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 6,
+        "name": "sender_id",
+        "type_info": "Varchar"
       }
     ],
     "parameters": {
       "Left": [
         "Text",
         "Text",
-        "Text"
+        "Text",
+        "Varchar"
       ]
     },
     "nullable": [
       false,
+      true,
       false,
       false,
+      false,
+      true,
       false
     ]
   },
-  "hash": "ec085d9e6b830b3d001242a968c5fc832f8298e5cd436bf3c13377db27f1cd9a"
+  "hash": "25c2fcbab7b9c93c8331dbd6c4bfae31fb4970569dd85a904bbe8eef99f332f5"
 }

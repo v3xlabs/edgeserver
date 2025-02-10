@@ -70,7 +70,7 @@ impl<'a> ApiExtractor<'a> for UserAuth {
         .await;
 
         // let is_pat = async {
-        //     let pat = UserApiKey::find_by_token(&state.database, &token)
+        //     let pat = UserApiKey::get_by_token(&state.database, &token)
         //         .await
         //         .unwrap();
 

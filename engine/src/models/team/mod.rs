@@ -1,5 +1,5 @@
 use chrono::{DateTime, Duration, Utc};
-use futures::{future::Shared, FutureExt};
+use futures::FutureExt;
 use poem_openapi::Object;
 use serde::{Deserialize, Serialize};
 use sqlx::{query, query_as, query_scalar};

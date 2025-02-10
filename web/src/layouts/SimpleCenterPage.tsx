@@ -6,6 +6,7 @@ import { getTitle } from '@/util/title';
 
 export type SCPageProperties = PropsWithChildren<{
     title: string;
+    hideTitle?: boolean;
     subtext?: ReactNode;
     width?: 'xl' | '2xl' | '3xl' | '4xl' | '5xl' | 'lg' | 'md' | 'dynamic';
     suffix?: ReactNode;
@@ -15,6 +16,7 @@ export type SCPageProperties = PropsWithChildren<{
 export const SCPage: FC<SCPageProperties> = ({
     children,
     title,
+    hideTitle,
     subtext,
     width = 'dynamic',
     suffix,
@@ -41,7 +43,7 @@ export const SCPage: FC<SCPageProperties> = ({
         >
             <div className="flex items-end justify-between">
                 <div>
-                    <h1 className="h1 pl-4">{title}</h1>
+                    {!hideTitle && <h1 className="h1 pl-4">{title}</h1>}
                     {subtext && (
                         <div className="flex items-center gap-2 pl-4 text-sm">
                             {subtext}

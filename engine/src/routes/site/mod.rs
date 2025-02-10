@@ -173,7 +173,7 @@ impl SiteApi {
 
         // TODO: Read file stream, extract zip file (contains multiple files), upload each file to s3 at the correct relevant path relative to deployment.deployment_id + '/'
 
-        let mut zip = ZipFileReader::new(file_stream).await.unwrap();
+        let zip = ZipFileReader::new(file_stream).await.unwrap();
 
         for index in 0..zip.file().entries().len() {
             let file = zip.file().entries().get(index).unwrap();

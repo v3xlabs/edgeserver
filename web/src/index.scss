@@ -23,7 +23,9 @@
     --border: #e2e8f0;
     --text: #000;
     --text-secondary: #000;
+    --text-primary: #fff;
     --link: #3b82f6;
+    --muted: #f5f5f9;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -33,7 +35,9 @@
         --border: #313131;
         --text: #fff;
         --text-secondary: #fff;
+        --text-primary: #fff;
         --link: #60a5fa;
+        --muted: #1f1f1f;
     }
 }
 

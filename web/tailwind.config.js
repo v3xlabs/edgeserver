@@ -8,6 +8,7 @@ module.exports = {
             backgroundColor: {
                 background: 'white',
                 bg2: 'var(--background2)',
+                muted: 'var(--muted)',
             },
             borderColor: {
                 DEFAULT: 'var(--border)',
@@ -16,6 +17,7 @@ module.exports = {
                 text: 'var(--text)',
                 link: 'var(--link)',
                 secondary: 'var(--text-secondary)',
+                primary: 'var(--text-primary)',
             },
         },
     },

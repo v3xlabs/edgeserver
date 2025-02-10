@@ -16,6 +16,8 @@ impl Cache {
     }
 
     pub async fn has(&self, key: &str) -> Option<serde_json::Value> {
+        info!("Cache has: {}", key);
+
         if let Some(x) = self.raw.get(key) {
             let x = x.clone().await;
             info!("Cache hit: {}", key);

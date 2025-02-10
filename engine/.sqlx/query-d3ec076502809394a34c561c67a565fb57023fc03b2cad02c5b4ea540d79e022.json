@@ -22,6 +22,21 @@
         "ordinal": 3,
         "name": "created_at",
         "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 4,
+        "name": "status",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 5,
+        "name": "accepted_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 6,
+        "name": "sender_id",
+        "type_info": "Varchar"
       }
     ],
     "parameters": {
@@ -32,8 +47,11 @@
     },
     "nullable": [
       false,
+      true,
       false,
       false,
+      false,
+      true,
       false
     ]
   },

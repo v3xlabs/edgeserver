@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE user_team_invites SET status = 'accepted', user_id = $2, accepted_at = NOW() WHERE invite_id = $1",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Text",
+        "Text"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "6976566ee94dc7bef7c7bcbc56ae1c39da50ba709b220f50225f76362ab26e79"
+}

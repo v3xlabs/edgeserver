@@ -1,5 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
 
+import { InviteList } from '@/gui/invite/InviteList';
 import { MemberList } from '@/gui/user/MemberList';
 
 export const Route = createFileRoute(
@@ -14,6 +15,7 @@ function RouteComponent() {
     return (
         <>
             <div className="card">Hello members!</div>
+            <InviteList team_id={teamId} />
             <MemberList team_id={teamId} />
         </>
     );

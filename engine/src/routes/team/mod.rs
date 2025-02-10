@@ -72,7 +72,7 @@ impl TeamApi {
             .map_err(poem::Error::from)
     }
 
-    #[oai(path = "/team/:team_id/invite", method = "get", tag = "ApiTags::Team")]
+    #[oai(path = "/team/:team_id/invites", method = "get", tag = "ApiTags::Team")]
     pub async fn get_team_invites(
         &self,
         user: UserAuth,
@@ -86,14 +86,14 @@ impl TeamApi {
 
         user.verify_access_to(&TeamId(&team_id.0)).await?;
 
-        UserTeamInvite::find_by_team_id(&state.0.database, &team_id.0)
+        UserTeamInvite::get_by_team_id(&state.0.database, &team_id.0)
             .await
             .map_err(HttpError::from)
             .map(Json)
             .map_err(poem::Error::from)
     }
 
-    #[oai(path = "/team/:team_id/invite", method = "post", tag = "ApiTags::Team")]
+    #[oai(path = "/team/:team_id/invites", method = "post", tag = "ApiTags::Team")]
     pub async fn invite_user_to_team(
         &self,
         user: UserAuth,
@@ -116,7 +116,8 @@ impl TeamApi {
             Err(HttpError::Forbidden)?;
         }
 
-        UserTeamInvite::new(&state.0.database, &team_id.0, &user.user_id)
+        // Create "anonymous" invite (for now), replace None with user_id when we have a way to create invites for specific users
+        UserTeamInvite::new(&state.0.database, &team_id.0, None::<String>, &user.user_id)
             .await
             .map_err(HttpError::from)
             .map(Json)

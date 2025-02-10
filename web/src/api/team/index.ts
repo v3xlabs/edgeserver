@@ -1,8 +1,11 @@
 import { queryOptions, useMutation, useQuery } from '@tanstack/react-query';
 
+import { queryClient } from '@/util/query';
+
 import { apiRequest } from '../core';
 import { components } from '../schema.gen';
-import { queryClient } from '@/util/query';
+
+export * from './invite';
 
 export type Team = components['schemas']['Team'];
 
@@ -38,23 +41,6 @@ export const getTeam = (teamId?: string) =>
 
 export const useTeam = (teamId?: string) => {
     return useQuery(getTeam(teamId));
-};
-
-export const getTeamInvites = (teamId: string) =>
-    queryOptions({
-        queryKey: ['team', '{teamId}', teamId, 'invites'],
-        queryFn: async () => {
-            const response = await apiRequest('/team/{team_id}/invite', 'get', {
-                path: { team_id: teamId },
-            });
-
-            return response.data;
-        },
-        enabled: !!teamId,
-    });
-
-export const useTeamInvites = (teamId: string) => {
-    return useQuery(getTeamInvites(teamId));
 };
 
 export const getTeamMembers = (teamId: string) =>

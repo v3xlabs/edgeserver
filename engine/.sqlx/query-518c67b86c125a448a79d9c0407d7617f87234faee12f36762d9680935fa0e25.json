@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "SELECT * FROM user_team_invites WHERE team_id = $1",
+  "query": "SELECT * FROM user_team_invites WHERE invite_id = $1",
   "describe": {
     "columns": [
       {
@@ -54,5 +54,5 @@
       false
     ]
   },
-  "hash": "c92e67363eca7c6445dbfabbb85a2003aa3a22e784f5eceaaceeaeea01b6b9c7"
+  "hash": "518c67b86c125a448a79d9c0407d7617f87234faee12f36762d9680935fa0e25"
 }
