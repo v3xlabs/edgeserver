@@ -57,7 +57,6 @@ pub async fn serve(state: AppState) {
         .nest("/openapi.json", spec)
         .at("/docs", get(get_openapi_docs))
         .at("*", file_endpoint)
-        .at("*", get(not_found))
         .with(Cors::new())
         .data(state);
 
