@@ -26,6 +26,7 @@ ENV RUST_LOG="error,edgeserver=info"
 # BINARY_PATH: Path to the pre-compiled binary from GitHub Actions
 ARG BINARY_PATH
 COPY ${BINARY_PATH} /edgeserver
+COPY www /www
 
 # Network Configuration
 # -------------------
