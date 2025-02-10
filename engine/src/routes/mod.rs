@@ -49,7 +49,6 @@ pub async fn serve(state: AppState) {
     let frontend_dir = Path::new("www");
     let file_endpoint = StaticFilesEndpoint::new(frontend_dir)
         .index_file("index.html")
-        .show_files_listing()
         .fallback_to_index();
 
     let app = Route::new()
