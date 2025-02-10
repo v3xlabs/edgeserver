@@ -143,7 +143,7 @@ impl UserAuth {
     pub async fn required_member_of(&self, team_id: impl AsRef<str>) -> Result<(), HttpError> {
         match self {
             UserAuth::User(session, state) => {
-                if !Team::is_member(&state.database, &team_id, &session.user_id)
+                if !Team::is_member(&state, &team_id, &session.user_id)
                     .await
                     .map_err(HttpError::from)?
                 {

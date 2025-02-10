@@ -1,10 +1,11 @@
-use chrono::{DateTime, Utc};
+use chrono::{DateTime, Duration, Utc};
+use futures::{future::Shared, FutureExt};
 use poem_openapi::Object;
 use serde::{Deserialize, Serialize};
 use sqlx::{query, query_as, query_scalar};
 
 use crate::{
-    database::Database, middlewares::auth::AccessibleResource, models::user::User, routes::error::HttpError, state::State, utils::id::{generate_id, IdType}
+    cache::CachedValue, database::Database, middlewares::auth::AccessibleResource, models::user::User, routes::error::HttpError, state::State, utils::id::{generate_id, IdType}
 };
 
 pub mod invite;
@@ -61,16 +62,10 @@ impl Team {
         .await
     }
 
-    pub async fn delete_by_id(
-        db: &Database,
-        team_id: impl AsRef<str>,
-    ) -> Result<(), sqlx::Error> {
-        query!(
-            "DELETE FROM teams WHERE team_id = $1",
-            team_id.as_ref()
-        )
-        .execute(&db.pool)
-        .await?;
+    pub async fn delete_by_id(db: &Database, team_id: impl AsRef<str>) -> Result<(), sqlx::Error> {
+        query!("DELETE FROM teams WHERE team_id = $1", team_id.as_ref())
+            .execute(&db.pool)
+            .await?;
 
         Ok(())
     }
@@ -92,18 +87,33 @@ impl Team {
     }
 
     pub async fn is_member(
-        db: &Database,
+        state: &State,
         team_id: impl AsRef<str>,
         user_id: impl AsRef<str>,
     ) -> Result<bool, sqlx::Error> {
-        Ok(query_scalar!(
+        let cache_key = format!("team:{}:member:{}", team_id.as_ref(), user_id.as_ref());
+
+        if let Some(x) = state.cache.has(&cache_key).await {
+            return Ok(x.as_bool().unwrap_or(false));
+        }
+
+        let x = query_scalar!(
             "SELECT EXISTS (SELECT 1 FROM user_teams WHERE team_id = $1 AND user_id = $2) OR EXISTS (SELECT 1 FROM teams WHERE team_id = $1 AND owner_id = $2)",
             team_id.as_ref(),
             user_id.as_ref()
         )
-        .fetch_one(&db.pool)
+        .fetch_one(&state.database.pool)
         .await?
-        .unwrap_or(false))
+        .unwrap_or(false);
+
+        state.cache.raw.insert(
+            cache_key,
+            async move { 
+                CachedValue::new_with_ttl(serde_json::Value::from(x), Duration::seconds(30))
+             }.boxed().shared(),
+        );
+
+        Ok(x)
     }
 
     pub async fn get_members(
@@ -124,7 +134,9 @@ pub struct TeamId<'a>(pub &'a str);
 
 impl<'a> AccessibleResource for TeamId<'a> {
     async fn has_access_to(&self, state: &State, user_id: &str) -> Result<bool, HttpError> {
-        let x = Team::is_member(&state.database, self.0, user_id).await.map_err(HttpError::from)?;  
+        let x = Team::is_member(&state, self.0, user_id)
+            .await
+            .map_err(HttpError::from)?;
 
         Ok(x)
     }

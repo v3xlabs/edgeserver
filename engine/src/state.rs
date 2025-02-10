@@ -3,7 +3,7 @@ use std::sync::Arc;
 use config::{Config, Environment};
 use serde::Deserialize;
 
-use crate::{database::Database, storage::Storage};
+use crate::{cache::Cache, database::Database, storage::Storage};
 
 pub type State = Arc<AppState>;
 
@@ -12,6 +12,7 @@ pub struct AppState {
     pub config: AppConfig,
     pub database: Database,
     pub storage: Storage,
+    pub cache: Cache,
 }
 
 #[derive(Deserialize, Debug)]
@@ -38,6 +39,13 @@ impl AppState {
 
         let storage = Storage::from_config(&config);
 
-        Ok(Self { config, database, storage })
+        let cache = Cache::new();
+
+        Ok(Self {
+            config,
+            database,
+            storage,
+            cache,
+        })
     }
 }

@@ -1458,6 +1458,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "dashmap"
+version = "6.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5041cc499144891f3790297212f32a74fb938e5136a14943f338ef9e0ae276cf"
+dependencies = [
+ "cfg-if",
+ "crossbeam-utils",
+ "hashbrown 0.14.5",
+ "lock_api",
+ "once_cell",
+ "parking_lot_core",
+ "serde",
+]
+
+[[package]]
 name = "deadpool"
 version = "0.7.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1606,6 +1621,7 @@ dependencies = [
  "bigdecimal",
  "chrono",
  "config 0.15.4",
+ "dashmap 6.1.0",
  "dotenvy",
  "futures",
  "hex",
@@ -1616,6 +1632,7 @@ dependencies = [
  "rust-s3",
  "rustls 0.23.20",
  "serde",
+ "serde_json",
  "serde_with",
  "sha2 0.10.8",
  "sqlx",
@@ -2253,7 +2270,7 @@ dependencies = [
  "async-tls",
  "async-trait",
  "cfg-if",
- "dashmap",
+ "dashmap 5.5.3",
  "deadpool",
  "futures",
  "http-types",
@@ -4126,9 +4143,9 @@ dependencies = [
 
 [[package]]
 name = "serde_json"
-version = "1.0.134"
+version = "1.0.138"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d00f4175c42ee48b15416f6193a959ba3a0d67fc699a0db9ad12df9f83991c7d"
+checksum = "d434192e7da787e94a6ea7e9670b26a036d0ca41e0b7efb2676dd32bae872949"
 dependencies = [
  "itoa",
  "memchr",

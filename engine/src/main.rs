@@ -8,6 +8,7 @@ pub mod routes;
 pub mod state;
 pub mod storage;
 pub mod utils;
+pub mod cache;
 
 #[async_std::main]
 async fn main() {
