@@ -7,6 +7,7 @@ import { Avatar } from '@/components';
 
 import { InteractiveNavigator } from './InteractiveNavigator';
 import { Subbar } from './Subbar';
+import { ThemeSwitcher } from './ThemeSwitcher';
 
 const UserProfile = () => {
     const { token } = useAuth();
@@ -67,7 +68,10 @@ export const Navbar = () => {
                             </div>
                         </div>
 
-                        <UserProfile />
+                        <div className="flex h-full items-center">
+                            <ThemeSwitcher />
+                            <UserProfile />
+                        </div>
                     </div>
                 </div>
             </div>

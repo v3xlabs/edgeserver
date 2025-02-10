@@ -1,4 +1,5 @@
-import './index.scss';
+import './styles/colors.scss';
+import './styles/index.scss';
 
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { createRouter, RouterProvider } from '@tanstack/react-router';
@@ -19,7 +20,7 @@ const router = createRouter({
     defaultPendingComponent,
     defaultErrorComponent: PageErrorBoundary,
     context: {
-        title: 'Property',
+        title: ' Edgeserver',
     },
 });
 

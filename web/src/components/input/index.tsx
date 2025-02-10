@@ -12,7 +12,7 @@ export const Input: FC<
             {...properties}
             className={clsx(
                 className,
-                'block max-w-full rounded-md border px-4 py-2 outline-offset-2 outline-black/80'
+                'bg-default block max-w-full rounded-md border px-4 py-2 outline-offset-2'
             )}
             ref={_ref}
         />

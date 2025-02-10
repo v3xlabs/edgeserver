@@ -17,30 +17,6 @@
     max-width: 100%;
 }
 
-:root {
-    --background: #fafafa;
-    --background2: #fff;
-    --border: #e2e8f0;
-    --text: #000;
-    --text-secondary: #000;
-    --text-primary: #fff;
-    --link: #3b82f6;
-    --muted: #f5f5f9;
-}
-
-@media (prefers-color-scheme: dark) {
-    :root {
-        --background: #0b0b0b;
-        --background2: #0d0d0d;
-        --border: #313131;
-        --text: #fff;
-        --text-secondary: #fff;
-        --text-primary: #fff;
-        --link: #60a5fa;
-        --muted: #1f1f1f;
-    }
-}
-
 html,
 body {
     width: 100%;
@@ -49,7 +25,7 @@ body {
     margin: 0;
     overflow: hidden;
     font-family: "Inter", monospace, sans-serif;
-    background-color: var(--background);
+    background-color: var(--bg-secondary);
     color: var(--text);
 }
 
@@ -72,7 +48,7 @@ a {
 }
 
 .card {
-    @apply bg-bg2 border rounded-md;
+    @apply bg-default border rounded-md;
 }
 
 .card:not(.no-padding) {

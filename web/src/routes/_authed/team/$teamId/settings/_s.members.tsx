@@ -7,6 +7,11 @@ export const Route = createFileRoute(
     '/_authed/team/$teamId/settings/_s/members'
 )({
     component: RouteComponent,
+    context(context) {
+        return {
+            title: 'Members',
+        };
+    },
 });
 
 function RouteComponent() {
@@ -14,9 +19,8 @@ function RouteComponent() {
 
     return (
         <>
-            <div className="card">Hello members!</div>
-            <InviteList team_id={teamId} />
             <MemberList team_id={teamId} />
+            <InviteList team_id={teamId} />
         </>
     );
 }

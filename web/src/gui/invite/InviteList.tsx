@@ -35,13 +35,19 @@ export const InviteList: FC<{ team_id: string }> = ({ team_id }) => {
 const InviteListItem: FC<{ invite: Invite }> = ({ invite }) => {
     return (
         <li className="flex items-center justify-between py-2 first:pt-0 last:pb-0">
-            <span>
+            <div>
                 {invite.user_id ? (
-                    <UserPreview user_id={invite.user_id} />
+                    <div className="flex items-center gap-2">
+                        <UserPreview user_id={invite.user_id} />
+                        <div>invited by</div>
+                        <div>
+                            <UserPreview user_id={invite.sender_id} />
+                        </div>
+                    </div>
                 ) : (
                     <>Anonymous Invite Link</>
                 )}
-            </span>
+            </div>
             {invite.status === 'pending' && (
                 <>
                     <Link

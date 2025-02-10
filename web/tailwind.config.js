@@ -6,18 +6,18 @@ module.exports = {
     theme: {
         extend: {
             backgroundColor: {
-                background: 'white',
-                bg2: 'var(--background2)',
-                muted: 'var(--muted)',
+                default: 'var(--bg-primary)',
+                secondary: 'var(--bg-secondary)',
+                muted: 'var(--bg-muted)',
+                hover: 'var(--bg-hover)',
             },
             borderColor: {
                 DEFAULT: 'var(--border)',
             },
             textColor: {
-                text: 'var(--text)',
                 link: 'var(--link)',
                 secondary: 'var(--text-secondary)',
-                primary: 'var(--text-primary)',
+                default: 'var(--text-primary)',
             },
         },
     },
