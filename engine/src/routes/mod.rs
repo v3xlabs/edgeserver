@@ -1,8 +1,10 @@
 use std::sync::Arc;
 
+use async_std::path::Path;
 use auth::AuthApi;
 use poem::{
-    get, handler, listener::TcpListener, middleware::Cors, web::Html, EndpointExt, Route, Server,
+    endpoint::StaticFilesEndpoint, get, handler, listener::TcpListener, middleware::Cors,
+    web::Html, EndpointExt, Route, Server,
 };
 use poem_openapi::{OpenApi, OpenApiService, Tags};
 use site::SiteApi;
@@ -43,10 +45,17 @@ pub async fn serve(state: AppState) {
     let api_service =
         OpenApiService::new(get_api(), "Hello World", "1.0").server("http://localhost:3000/api");
     let spec = api_service.spec_endpoint();
+
+    let frontend_dir = Path::new("www");
+    let file_endpoint = StaticFilesEndpoint::new(frontend_dir)
+        .index_file("index.html")
+        .fallback_to_index();
+
     let app = Route::new()
         .nest("/api", api_service)
         .nest("/openapi.json", spec)
         .at("/docs", get(get_openapi_docs))
+        .at("/", file_endpoint)
         .with(Cors::new())
         .data(state);
 

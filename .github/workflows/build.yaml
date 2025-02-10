@@ -40,9 +40,33 @@ jobs:
                   workspaces: engine
                   key: ${{ matrix.platform.arch }}
 
+            # Setup Node & PNPM
+            - name: Setup PNPM
+              uses: pnpm/action-setup@v4
+              with:
+                run_install: false
+                standalone: true
+                package_json_file: web/package.json
+                version: 8
+      
+            - name: Setup Node
+              uses: actions/setup-node@main
+              with:
+                node-version: 21
+                cache: pnpm
+                cache-dependency-path: 'web'
+
             # Install cross
             - name: Install cross
               run: cargo install cross
+
+            - name: Install dependencies
+              working-directory: web
+              run: pnpm install
+
+            - name: Build web
+              working-directory: web
+              run: pnpm build
 
             # Update version number in engine/Cargo.toml
             # If tag is a release use that

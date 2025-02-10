@@ -9,7 +9,8 @@
     },
     "scripts": {
         "dev": "vite",
-        "build": "vite build",
+        "build": "vite build && pnpm build:copy",
+        "build:copy": "cp -r ./dist/* ../engine/www",
         "lint": "eslint -c .eslintrc.json --ext .ts,.tsx,.json ./src",
         "lint:fix": "echo Linting... && npm run lint -- --fix",
         "api-schema": "openapi-typescript http://localhost:3000/openapi.json -t -o ./src/api/schema.gen.ts"
