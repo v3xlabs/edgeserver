@@ -23,7 +23,7 @@ const UserProfile = () => {
                     className="ml-2 size-8 overflow-hidden rounded-full bg-white"
                 /> */}
             </div>
-            <div className="bg-background2 absolute right-0 top-full hidden w-fit flex-col overflow-hidden whitespace-nowrap rounded-b-md group-hover:flex">
+            <div className="bg-default absolute right-0 top-full hidden w-fit flex-col overflow-hidden whitespace-nowrap rounded-b-md group-hover:flex">
                 <button
                     className="flex items-start px-4 py-2 hover:bg-black/10"
                     onClick={() => {
@@ -44,7 +44,7 @@ export const Navbar = () => {
     return (
         <div className="w-full">
             <div className="relative z-30 h-14 w-full">
-                <div className="bg-background2 z-10 h-14 w-full border-b px-4">
+                <div className="bg-default z-10 h-14 w-full border-b px-4">
                     <div className="w-container-dynamic flex h-full items-center justify-between">
                         <div className="flex h-full">
                             <div className="relative h-full w-8">

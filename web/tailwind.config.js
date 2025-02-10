@@ -12,7 +12,10 @@ module.exports = {
                 hover: 'var(--bg-hover)',
             },
             borderColor: {
-                DEFAULT: 'var(--border)',
+                default: 'var(--border)',
+            },
+            outlineColor: {
+                default: 'var(--border)',
             },
             textColor: {
                 link: 'var(--link)',

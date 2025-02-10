@@ -39,7 +39,7 @@ impl AppState {
 
         let storage = Storage::from_config(&config);
 
-        let cache = Cache::new();
+        let cache = Cache::default();
 
         Ok(Self {
             config,

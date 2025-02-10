@@ -3,6 +3,7 @@ use futures::FutureExt;
 use poem_openapi::Object;
 use serde::{Deserialize, Serialize};
 use sqlx::{query, query_as, query_scalar};
+use tracing::info;
 
 use crate::{
     cache::CachedValue, database::Database, middlewares::auth::AccessibleResource, models::user::User, routes::error::HttpError, state::State, utils::id::{generate_id, IdType}
@@ -106,12 +107,14 @@ impl Team {
         .await?
         .unwrap_or(false);
 
+        info!("Inserting cache key: {}", cache_key);
         state.cache.raw.insert(
             cache_key,
             async move { 
-                CachedValue::new_with_ttl(serde_json::Value::from(x), Duration::seconds(30))
+                CachedValue::new_with_ttl(serde_json::Value::from(x), Duration::seconds(0))
              }.boxed().shared(),
         );
+        info!("Inserted cache key");
 
         Ok(x)
     }
@@ -134,7 +137,7 @@ pub struct TeamId<'a>(pub &'a str);
 
 impl<'a> AccessibleResource for TeamId<'a> {
     async fn has_access_to(&self, state: &State, user_id: &str) -> Result<bool, HttpError> {
-        let x = Team::is_member(&state, self.0, user_id)
+        let x = Team::is_member(state, self.0, user_id)
             .await
             .map_err(HttpError::from)?;
 

@@ -24,7 +24,7 @@ const TeamEntry: FC<{ team_id: string }> = ({ team_id }) => {
                 params={{ teamId: team_id }}
                 className="flex h-full items-center rounded-md p-1 hover:bg-neutral-900/10"
             >
-                <div className="bg-background2 size-8 rounded-full">
+                <div className="bg-default size-8 rounded-full">
                     <Avatar src={buffercnvrt(icon as any)} s={team_id} />
                 </div>
                 <div className="ml-2 flex flex-col justify-center">

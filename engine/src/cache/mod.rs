@@ -8,26 +8,30 @@ pub struct Cache {
     pub raw: DashMap<String, Shared<BoxFuture<'static, CachedValue<serde_json::Value>>>>,
 }
 
-impl Cache {
-    pub fn new() -> Self {
+impl Default for Cache {
+    fn default() -> Self {
         Self {
-            raw: DashMap::new(),
+            raw: DashMap::with_capacity(1000),
         }
     }
+}
 
+impl Cache {
     pub async fn has(&self, key: &str) -> Option<serde_json::Value> {
         info!("Cache has: {}", key);
 
         if let Some(x) = self.raw.get(key) {
-            let x = x.clone().await;
+            let x1 = x.clone().await;
+            drop(x);
+
             info!("Cache hit: {}", key);
 
-            if x.is_expired() {
+            if x1.is_expired() {
                 self.raw.remove(key);
                 return None;
             }
 
-            Some(x.value)
+            Some(x1.value)
         } else {
             info!("Cache miss: {}", key);
             None
