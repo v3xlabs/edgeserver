@@ -4,6 +4,7 @@ use chrono::{DateTime, Utc};
 use poem_openapi::Object;
 use serde::{Deserialize, Serialize};
 use sqlx::query_as;
+use tracing::instrument;
 
 use crate::{
     database::Database,

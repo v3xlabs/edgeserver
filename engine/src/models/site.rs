@@ -3,7 +3,14 @@ use poem_openapi::Object;
 use serde::{Deserialize, Serialize};
 use sqlx::{query_as, query_scalar};
 
-use crate::{database::Database, middlewares::auth::AccessibleResource, models::deployment::Deployment, routes::error::HttpError, state::State, utils::id::{generate_id, IdType}};
+use crate::{
+    database::Database,
+    middlewares::auth::AccessibleResource,
+    models::deployment::Deployment,
+    routes::error::HttpError,
+    state::State,
+    utils::id::{generate_id, IdType},
+};
 
 #[derive(Debug, Serialize, Deserialize, Object)]
 pub struct Site {
@@ -14,7 +21,11 @@ pub struct Site {
 }
 
 impl Site {
-    pub async fn new(db: &Database, name: impl AsRef<str>, team_id: impl AsRef<str>) -> Result<Self, sqlx::Error> {
+    pub async fn new(
+        db: &Database,
+        name: impl AsRef<str>,
+        team_id: impl AsRef<str>,
+    ) -> Result<Self, sqlx::Error> {
         let site_id = generate_id(IdType::SITE);
 
         query_as!(
@@ -38,7 +49,10 @@ impl Site {
         .await
     }
 
-    pub async fn get_by_team_id(db: &Database, team_id: impl AsRef<str>) -> Result<Vec<Self>, sqlx::Error> {
+    pub async fn get_by_team_id(
+        db: &Database,
+        team_id: impl AsRef<str>,
+    ) -> Result<Vec<Self>, sqlx::Error> {
         query_as!(
             Site,
             "SELECT * FROM sites WHERE team_id = $1",
@@ -49,7 +63,10 @@ impl Site {
     }
 
     // Sites where the user is a member of the team (through being the owner_id or in user_teams)
-    pub async fn get_by_user_id(db: &Database, user_id: impl AsRef<str>) -> Result<Vec<Self>, sqlx::Error> {
+    pub async fn get_by_user_id(
+        db: &Database,
+        user_id: impl AsRef<str>,
+    ) -> Result<Vec<Self>, sqlx::Error> {
         query_as!(
             Site,
             "SELECT * FROM sites WHERE team_id IN (SELECT team_id FROM user_teams WHERE user_id = $1) OR team_id IN (SELECT team_id FROM teams WHERE owner_id = $1)",
@@ -59,7 +76,10 @@ impl Site {
         .await
     }
 
-    pub async fn get_deployments(db: &Database, site_id: impl AsRef<str>) -> Result<Vec<Deployment>, sqlx::Error> {
+    pub async fn get_deployments(
+        db: &Database,
+        site_id: impl AsRef<str>,
+    ) -> Result<Vec<Deployment>, sqlx::Error> {
         query_as!(
             Deployment,
             "SELECT * FROM deployments WHERE site_id = $1 ORDER BY created_at DESC",
@@ -74,17 +94,23 @@ pub struct SiteId<'a>(pub &'a str);
 
 impl<'a> AccessibleResource for SiteId<'a> {
     async fn has_access_to(&self, state: &State, user_id: &str) -> Result<bool, HttpError> {
-        // Verify that the user is a member of the team that owns the site
-        let part_of_site = query_scalar!(
-            "SELECT EXISTS (SELECT 1 FROM sites WHERE site_id = $1 AND team_id IN (SELECT team_id FROM user_teams WHERE user_id = $2) OR team_id IN (SELECT team_id FROM teams WHERE owner_id = $2))",
-            self.0,
-            user_id
-        )
-        .fetch_one(&state.database.pool)
-        .await
-        .map_err(HttpError::from)?;
+        let cache_key = format!("site:{}", self.0);
 
-        let part_of_site = part_of_site.unwrap_or(false);
+        let part_of_site = state.cache.raw.get_with(cache_key, async {
+            // Verify that the user is a member of the team that owns the site
+            let part_of_site = query_scalar!(
+                "SELECT EXISTS (SELECT 1 FROM sites WHERE site_id = $1 AND team_id IN (SELECT team_id FROM user_teams WHERE user_id = $2) OR team_id IN (SELECT team_id FROM teams WHERE owner_id = $2))",
+                self.0,
+                user_id
+            )
+            .fetch_one(&state.database.pool)
+            .await;
+
+            let part_of_site = part_of_site.ok().flatten().unwrap_or(false);
+            serde_json::to_value(part_of_site).unwrap()
+        }).await;
+
+        let part_of_site: bool = serde_json::from_value(part_of_site).unwrap_or_default();
 
         Ok(part_of_site)
     }

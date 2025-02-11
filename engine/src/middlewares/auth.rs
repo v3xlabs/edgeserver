@@ -5,6 +5,7 @@ use poem_openapi::{
     registry::{MetaSecurityScheme, Registry},
     ApiExtractor, ApiExtractorType, ExtractParamOptions,
 };
+use tracing::info;
 
 use crate::{
     models::{session::Session, team::Team},
@@ -55,7 +56,10 @@ impl<'a> ApiExtractor<'a> for UserAuth {
 
         let token = token.unwrap();
 
-        let is_user = async {
+        let cache_key = format!("session:{}", token);
+
+        let is_user = state.cache.raw.get_with(cache_key, async {
+            info!("Cache miss for session: {}", token);
             // Hash the token
             let hash = hash_session(&token);
 
@@ -63,11 +67,17 @@ impl<'a> ApiExtractor<'a> for UserAuth {
             let session = Session::try_access(&state.database, &hash)
                 .await
                 .unwrap()
-                .ok_or(HttpError::Unauthorized)?;
+                .ok_or(HttpError::Unauthorized).unwrap();
 
-            Ok(UserAuth::User(session, state.clone())) as Result<UserAuth>
+            serde_json::to_value(session).unwrap()
+            // Ok(UserAuth::User(session, state.clone())) as Result<UserAuth>
+        }).await;
+
+        let session: Option<Session> = serde_json::from_value(is_user).ok();
+
+        if let Some(session) = session {
+            return Ok(UserAuth::User(session, state.clone()));
         }
-        .await;
 
         // let is_pat = async {
         //     let pat = UserApiKey::get_by_token(&state.database, &token)
@@ -95,7 +105,7 @@ impl<'a> ApiExtractor<'a> for UserAuth {
         //     }
         // }
 
-        is_user
+        Err(HttpError::Unauthorized.into())
     }
 
     fn register(registry: &mut Registry) {
@@ -156,9 +166,16 @@ impl UserAuth {
         }
     }
 
-    pub async fn verify_access_to(&self, resource: &impl AccessibleResource) -> Result<(), HttpError> {
+    pub async fn verify_access_to(
+        &self,
+        resource: &impl AccessibleResource,
+    ) -> Result<(), HttpError> {
         match self {
-            UserAuth::User(session, state) => match resource.has_access_to(state, &session.user_id).await.map_err(HttpError::from) {
+            UserAuth::User(session, state) => match resource
+                .has_access_to(state, &session.user_id)
+                .await
+                .map_err(HttpError::from)
+            {
                 Ok(true) => Ok(()),
                 Ok(false) => Err(HttpError::Forbidden),
                 Err(e) => Err(e),
