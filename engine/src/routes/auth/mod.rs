@@ -42,8 +42,8 @@ pub struct BootstrapUserRequest {
 
 #[derive(Serialize, Debug, Object)]
 pub struct BootstrapUserResponse {
-    user: User,
-    team: Team,
+    pub user: User,
+    pub team: Team,
 }
 
 #[OpenApi]
@@ -103,6 +103,7 @@ impl AuthApi {
             &request.username,
             &hash_password(&request.password),
             Some(true),
+            None,
         )
         .await
         .map_err(HttpError::from)?;

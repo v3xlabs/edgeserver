@@ -58,7 +58,12 @@ const CommandPaletteInternal: FC<{ requestClose: () => void }> = ({
     const navigate = useNavigate();
 
     return (
-        <Command label="Global Command Palette">
+        <Command
+            label="Global Command Palette"
+            // onValueChange={(value) => {
+            //     console.log({ value });
+            // }}
+        >
             <div className="border-b p-2">
                 <div className="flex items-center gap-2">
                     <FiChevronRight className="size-4" />
@@ -134,6 +139,7 @@ const CommandPaletteInternal: FC<{ requestClose: () => void }> = ({
                                             requestClose();
                                         }
                                     }}
+                                    on
                                     keywords={command.aliases}
                                 >
                                     <span className="flex w-full items-center gap-2">

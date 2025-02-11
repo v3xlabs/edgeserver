@@ -148,6 +148,14 @@ impl Team {
         .fetch_all(&db.pool)
         .await
     }
+
+    pub async fn add_member(db: &Database, team_id: impl AsRef<str>, user_id: impl AsRef<str>) -> Result<(), sqlx::Error> {
+        query!("INSERT INTO user_teams (team_id, user_id) VALUES ($1, $2)", team_id.as_ref(), user_id.as_ref())
+            .execute(&db.pool)
+            .await?;
+
+        Ok(())
+    }
 }
 
 pub struct TeamId<'a>(pub &'a str);

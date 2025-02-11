@@ -5,6 +5,11 @@ import { SCPage } from '@/layouts';
 
 export const Route = createFileRoute('/login')({
     component: RouteComponent,
+    validateSearch: (search) => {
+        if (search.redirect) {
+            return { redirect: search.redirect };
+        }
+    },
 });
 
 function RouteComponent() {

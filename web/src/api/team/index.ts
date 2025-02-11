@@ -11,7 +11,7 @@ export type Team = components['schemas']['Team'];
 
 export const getTeams = () =>
     queryOptions({
-        queryKey: ['teams'],
+        queryKey: ['auth', 'teams'],
         queryFn: async () => {
             const response = await apiRequest('/team', 'get', {});
 
@@ -25,7 +25,7 @@ export const useTeams = () => {
 
 export const getTeam = (teamId?: string) =>
     queryOptions({
-        queryKey: ['team', '{teamId}', teamId],
+        queryKey: ['auth', 'team', '{teamId}', teamId],
         queryFn: async () => {
             if (!teamId) {
                 return;
@@ -45,7 +45,7 @@ export const useTeam = (teamId?: string) => {
 
 export const getTeamMembers = (teamId: string) =>
     queryOptions({
-        queryKey: ['team', '{teamId}', teamId, 'members'],
+        queryKey: ['auth', 'team', '{teamId}', teamId, 'members'],
         queryFn: async () => {
             const response = await apiRequest(
                 '/team/{team_id}/members',
@@ -72,7 +72,7 @@ export const useTeamCreate = () =>
                 contentType: 'application/json; charset=utf-8',
             });
 
-            queryClient.invalidateQueries({ queryKey: ['teams'] });
+            queryClient.invalidateQueries({ queryKey: ['auth', 'teams'] });
 
             return response.data;
         },

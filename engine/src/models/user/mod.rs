@@ -26,6 +26,7 @@ impl User {
         name: impl AsRef<str>,
         password: impl AsRef<str>,
         admin: Option<bool>,
+        default_team: Option<String>,
     ) -> Result<(Self, Team), sqlx::Error> {
         let user_id = generate_id(IdType::USER);
         let name = name.as_ref();
@@ -42,10 +43,15 @@ impl User {
         .fetch_one(&db.pool)
         .await?;
 
-        let team_name = format!("{}'s Team", name);
-        let user_team = Team::new(db, team_name, user_id).await?;
-
-        Ok((user, user_team))
+        if let Some(default_team) = default_team {
+            let team = Team::get_by_id(db, default_team).await?;
+            Team::add_member(db, &team.team_id, &user_id).await?;
+            Ok((user, team))
+        } else {
+            let team_name = format!("{}'s Team", name);
+            let user_team = Team::new(db, team_name, user_id).await?;
+            Ok((user, user_team))
+        }
     }
 
     pub async fn get_by_id(db: &Database, user_id: impl AsRef<str>) -> Result<Self, sqlx::Error> {

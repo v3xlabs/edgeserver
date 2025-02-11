@@ -1,6 +1,9 @@
 use poem::{web::Data, Result};
 use poem_openapi::{
-    param::Path, payload::{Json, PlainText}, types::multipart::Upload, Multipart, Object, OpenApi,
+    param::Path,
+    payload::{Json, PlainText},
+    types::multipart::Upload,
+    Multipart, Object, OpenApi,
 };
 use serde::{Deserialize, Serialize};
 use tracing::info;
@@ -10,12 +13,14 @@ use crate::{
     models::{
         site::Site,
         team::{invite::UserTeamInvite, Team},
+        user::User,
     },
     routes::ApiTags,
     state::State,
+    utils::hash::hash_password,
 };
 
-use super::error::HttpError;
+use super::{auth::BootstrapUserResponse, error::HttpError};
 
 #[derive(Debug, Deserialize, Serialize, Object)]
 pub struct SiteCreateRequest {
@@ -31,6 +36,12 @@ pub struct TeamInviteData {
     pub team: Team,
 }
 
+#[derive(Deserialize, Debug, Object)]
+pub struct TeamInviteAcceptNewPayload {
+    username: String,
+    password: String,
+}
+
 #[OpenApi]
 impl InviteApi {
     /// Get an invite
@@ -39,13 +50,13 @@ impl InviteApi {
     #[oai(path = "/invite/:invite_id", method = "get", tag = "ApiTags::Invite")]
     pub async fn get_invite(
         &self,
-        user: UserAuth,
+        // user: UserAuth,
         state: Data<&State>,
         invite_id: Path<String>,
     ) -> Result<Json<TeamInviteData>> {
         info!("Getting invite: {:?}", invite_id.0);
 
-        user.required()?;
+        // user.required()?;
 
         let invite = UserTeamInvite::get_by_invite_id(&state.database, &invite_id.0)
             .await
@@ -61,8 +72,17 @@ impl InviteApi {
     /// Accept an invite
     ///
     /// Accepts an invite by its ID
-    #[oai(path = "/invite/:invite_id/accept", method = "post", tag = "ApiTags::Invite")]
-    pub async fn accept_invite(&self, user: UserAuth, state: Data<&State>, invite_id: Path<String>) -> Result<PlainText<String>> {
+    #[oai(
+        path = "/invite/:invite_id/accept",
+        method = "post",
+        tag = "ApiTags::Invite"
+    )]
+    pub async fn accept_invite(
+        &self,
+        user: UserAuth,
+        state: Data<&State>,
+        invite_id: Path<String>,
+    ) -> Result<PlainText<String>> {
         info!("Accepting invite: {:?}", invite_id.0);
 
         let user = user.required()?;
@@ -72,5 +92,36 @@ impl InviteApi {
             .map_err(HttpError::from)?;
 
         Ok(PlainText("Invite accepted".to_string()))
+    }
+
+    /// Accept an invite and create a user
+    ///
+    /// Accepts an invite by its ID and creates a user
+    #[oai(
+        path = "/invite/:invite_id/accept/new",
+        method = "post",
+        tag = "ApiTags::Invite"
+    )]
+    async fn bootstrap_user(
+        &self,
+        state: Data<&State>,
+        invite_id: Path<String>,
+        request: Json<TeamInviteAcceptNewPayload>,
+    ) -> Result<Json<BootstrapUserResponse>> {
+        let invite = UserTeamInvite::get_by_invite_id(&state.database, invite_id.0)
+            .await
+            .map_err(HttpError::from)?;
+
+        let (user, team) = User::new(
+            &state.0.database,
+            &request.username,
+            &hash_password(&request.password),
+            Some(false),
+            Some(invite.team_id),
+        )
+        .await
+        .map_err(HttpError::from)?;
+
+        Ok(Json(BootstrapUserResponse { user, team }))
     }
 }

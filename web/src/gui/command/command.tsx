@@ -3,6 +3,7 @@ import {
     FiBarChart,
     FiGlobe,
     FiHome,
+    FiKey,
     FiPlus,
     FiSettings,
     FiUsers,
@@ -93,7 +94,7 @@ export const team_commands: CommandEntry[] = [
         title: 'Show sites overview',
         aliases: ['show sites', 'list sites', 'goto sites', 'team'],
         slug: 'show-sites',
-        navigate_to: '/team/:team_id/sites',
+        navigate_to: '/team/$teamId/sites',
     },
     {
         icon: FiSettings,
@@ -105,12 +106,28 @@ export const team_commands: CommandEntry[] = [
             'team',
         ],
         slug: 'team-settings',
+        navigate_to: '/team/$teamId/settings',
+    },
+    {
+        icon: FiUsers,
+        title: 'Team members',
+        aliases: ['team members', 'members', 'goto team members', 'invite'],
+        slug: 'team-members',
+        navigate_to: '/team/$teamId/settings/members',
     },
     {
         icon: FiZap,
         title: 'Webhooks',
         aliases: ['webhooks', 'webhook', 'goto webhooks'],
         slug: 'webhooks',
+        navigate_to: '/team/$teamId/settings/webhooks',
+    },
+    {
+        icon: FiKey,
+        title: 'API Keys',
+        aliases: ['api keys', 'api key', 'goto api keys'],
+        slug: 'api-keys',
+        navigate_to: '/team/$teamId/settings/keys',
     },
 ];
 

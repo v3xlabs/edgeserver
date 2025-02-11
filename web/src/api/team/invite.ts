@@ -6,7 +6,7 @@ import { apiRequest } from '../core';
 
 export const getTeamInvites = (teamId: string) =>
     queryOptions({
-        queryKey: ['team', '{teamId}', teamId, 'invites'],
+        queryKey: ['auth', 'team', '{teamId}', teamId, 'invites'],
         queryFn: async () => {
             const response = await apiRequest(
                 '/team/{team_id}/invites',
@@ -38,7 +38,7 @@ export const useTeamInviteCreate = ({ teamId }: { teamId: string }) => {
             );
 
             queryClient.invalidateQueries({
-                queryKey: ['team', '{teamId}', teamId, 'invites'],
+                queryKey: ['auth', 'team', '{teamId}', teamId, 'invites'],
             });
 
             return response.data;

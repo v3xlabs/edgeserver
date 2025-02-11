@@ -4,8 +4,10 @@ import { match } from 'ts-pattern';
 
 import { useLogin } from '@/api';
 import { Button, Input } from '@/components';
+import { Route } from '@/routes/login';
 
 export const LoginForm = () => {
+    const { redirect } = Route.useSearch();
     const navigate = useNavigate();
     const { mutateAsync: login, isPending: isLoggingIn } = useLogin();
     const { Field, Subscribe, handleSubmit } = useForm({
@@ -19,7 +21,11 @@ export const LoginForm = () => {
                 password: value.password,
             });
 
-            navigate({ to: '/', reloadDocument: true });
+            if (redirect) {
+                navigate({ to: redirect, reloadDocument: false });
+            } else {
+                navigate({ to: '/', reloadDocument: false });
+            }
         },
     });
 

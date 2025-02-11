@@ -11,8 +11,10 @@ export const BASE_URL =
 export const apiRequest = createFetch<paths>({
     baseUrl: BASE_URL,
     get headers() {
+        const { token } = authStore.getSnapshot().context;
+
         return {
-            Authorization: `Bearer ${authStore.getSnapshot().context.token}`,
+            Authorization: `Bearer ${token}`,
         };
     },
     onError: (error) => {

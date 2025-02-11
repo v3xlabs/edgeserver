@@ -21,8 +21,8 @@ const [buttonVariants, buttonVariantsConfig] = cvax(
                 default:
                     'bg-default text-foreground border border-solid hover:bg-muted',
                 primary: [
-                    'text-background border',
-                    'bg-blue-500 hover:bg-blue-600/90 border-transparent active:bg-blue-600 text-default',
+                    'text-secondary border',
+                    'bg-blue-500 hover:bg-blue-600/90 border-transparent active:bg-blue-600',
                     'disabled:bg-blue-300 disabled:text-blue-500 disabled:border-blue-300 disabled:hover:bg-blue-300 disabled:hover:border-blue-300 disabled:cursor-not-allowed',
                 ],
                 secondary: [

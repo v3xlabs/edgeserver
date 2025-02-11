@@ -34,7 +34,6 @@ declare module '@tanstack/react-router' {
 }
 
 updateTheme();
-preflightAuth();
 
 ReactDOM.createRoot(document.querySelector('#root')!).render(
     <React.StrictMode>

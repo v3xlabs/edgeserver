@@ -9,7 +9,7 @@ export type Site = components['schemas']['Site'];
 
 export const getSites = () =>
     queryOptions({
-        queryKey: ['sites'],
+        queryKey: ['auth', 'sites'],
         queryFn: async () => {
             const response = await apiRequest('/site', 'get', {});
 
@@ -23,7 +23,7 @@ export const useSites = () => {
 
 export const getTeamSites = (teamId: string) =>
     queryOptions({
-        queryKey: ['team', '{teamId}', teamId, 'sites'],
+        queryKey: ['auth', 'team', '{teamId}', teamId, 'sites'],
         queryFn: async () => {
             const response = await apiRequest('/team/{team_id}/sites', 'get', {
                 path: { team_id: teamId },
@@ -40,7 +40,7 @@ export const useTeamSites = (teamId: string) => {
 
 export const getSite = (siteId?: string) =>
     queryOptions({
-        queryKey: ['site', '{siteId}', siteId],
+        queryKey: ['auth', 'site', '{siteId}', siteId],
         queryFn: async () => {
             if (!siteId) return;
 
@@ -59,7 +59,7 @@ export const useSite = (siteId?: string) => {
 
 export const getSiteDeployments = (siteId?: string) =>
     queryOptions({
-        queryKey: ['site', '{siteId}', siteId, 'deployments'],
+        queryKey: ['auth', 'site', '{siteId}', siteId, 'deployments'],
         queryFn: async () => {
             if (!siteId) return;
 
@@ -88,9 +88,9 @@ export const useSiteCreate = () =>
                 contentType: 'application/json; charset=utf-8',
             });
 
-            queryClient.invalidateQueries({ queryKey: ['sites'] });
+            queryClient.invalidateQueries({ queryKey: ['auth', 'sites'] });
             queryClient.invalidateQueries({
-                queryKey: ['team', '{teamId}', site.team_id, 'sites'],
+                queryKey: ['auth', 'team', '{teamId}', site.team_id, 'sites'],
             });
 
             return response.data;
