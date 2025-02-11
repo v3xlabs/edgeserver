@@ -13,6 +13,7 @@ export const useLogin = () => {
 
             const { token } = response.data;
 
+            console.log('setting auth token', token);
             authStore.send({ type: 'setAuthToken', token });
 
             return response.data;

@@ -108,7 +108,7 @@ impl InviteApi {
         invite_id: Path<String>,
         request: Json<TeamInviteAcceptNewPayload>,
     ) -> Result<Json<BootstrapUserResponse>> {
-        let invite = UserTeamInvite::get_by_invite_id(&state.database, invite_id.0)
+        let invite = UserTeamInvite::get_by_invite_id(&state.database, &invite_id.0)
             .await
             .map_err(HttpError::from)?;
 
@@ -121,6 +121,10 @@ impl InviteApi {
         )
         .await
         .map_err(HttpError::from)?;
+
+        UserTeamInvite::accept_invite(&state.database, &invite_id.0, &user.user_id)
+            .await
+            .map_err(HttpError::from)?;
 
         Ok(Json(BootstrapUserResponse { user, team }))
     }

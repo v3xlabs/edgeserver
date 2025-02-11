@@ -1,5 +1,6 @@
-import { createFileRoute, Link, Navigate } from '@tanstack/react-router';
-import { FC, useState } from 'react';
+import { useForm } from '@tanstack/react-form';
+import { createFileRoute, Link, Navigate, useNavigate } from '@tanstack/react-router';
+import { FC, useEffect, useState } from 'react';
 
 import {
     authStore,
@@ -17,7 +18,6 @@ import { Button } from '@/components/button';
 import { UserPreview } from '@/gui/user/UserPreview';
 import { SCPage } from '@/layouts';
 import { queryClient } from '@/util/query';
-import { useForm } from '@tanstack/react-form';
 
 export const Route = createFileRoute('/invite/$inviteId/')({
     component: RouteComponent,
@@ -41,6 +41,10 @@ function RouteComponent() {
     );
     const { token } = useAuth();
     const { data: me, isLoading } = useMe();
+
+    useEffect(() => {
+        console.log('token changed', token);
+    }, [token]);
 
     if (acceptedInvite && data?.team.team_id) {
         return (
@@ -135,9 +139,12 @@ const InviteCard: FC<{
 };
 
 const GuestSignUp = () => {
-    const { mutate: createAccount } = useCreateAccountViaInvite({
-        invite_id: Route.useParams().inviteId,
-    });
+    const { mutate: createAccount, data: createdAccount } =
+        useCreateAccountViaInvite({
+            invite_id: Route.useParams().inviteId,
+        });
+    const { token } = useAuth();
+    const navigate = useNavigate();
 
     const { Field, Subscribe, handleSubmit } = useForm({
         defaultValues: {
@@ -153,26 +160,75 @@ const GuestSignUp = () => {
         },
     });
 
+    useEffect(() => {
+        if (createdAccount && token) {
+            navigate({
+                to: '/team/$teamId',
+                params: { teamId: createdAccount.team.team_id },
+            });
+        }
+    }, [createdAccount, token]);
+
     return (
-        <div className="space-y-2">
-            <Input placeholder="Username" className="w-full" />
-            <Input
-                placeholder="Password"
-                className="w-full"
-                type="password"
-                id="password"
-                autoComplete="current-password"
-            />
-            <Input
-                placeholder="Confirm Password"
-                className="w-full"
-                type="password"
-                id="confirm-password"
-                autoComplete="current-password"
-            />
-            <Button className="w-full" variant="primary">
-                Create Account
-            </Button>
-        </div>
+        <form
+            className="space-y-2"
+            onSubmit={(event) => {
+                event.preventDefault();
+                event.stopPropagation();
+                handleSubmit();
+            }}
+        >
+            <Field name="username">
+                {({ handleBlur, handleChange, state }) => (
+                    <Input
+                        placeholder="Username"
+                        className="w-full"
+                        onChange={(event) => handleChange(event.target.value)}
+                        onBlur={handleBlur}
+                        value={state.value}
+                    />
+                )}
+            </Field>
+            <Field name="password">
+                {({ handleBlur, handleChange, state }) => (
+                    <Input
+                        placeholder="Password"
+                        className="w-full"
+                        type="password"
+                        id="password"
+                        autoComplete="new-password"
+                        onChange={(event) => handleChange(event.target.value)}
+                        onBlur={handleBlur}
+                        value={state.value}
+                    />
+                )}
+            </Field>
+            <Field name="confirmPassword">
+                {({ handleBlur, handleChange, state }) => (
+                    <Input
+                        placeholder="Confirm Password"
+                        className="w-full"
+                        type="password"
+                        id="confirm-password"
+                        autoComplete="new-password"
+                        onChange={(event) => handleChange(event.target.value)}
+                        onBlur={handleBlur}
+                        value={state.value}
+                    />
+                )}
+            </Field>
+            <Subscribe>
+                {({ isValid }) => (
+                    <Button
+                        className="w-full"
+                        variant="primary"
+                        type="submit"
+                        disabled={!isValid}
+                    >
+                        Create Account
+                    </Button>
+                )}
+            </Subscribe>
+        </form>
     );
 };

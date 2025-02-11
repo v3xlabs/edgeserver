@@ -2,9 +2,9 @@ import { queryOptions, useMutation, useQuery } from '@tanstack/react-query';
 
 import { queryClient } from '@/util/query';
 
+import { useLogin } from '../auth';
 import { apiRequest } from '../core';
 import { components } from '../schema.gen';
-import { useLogin } from '../auth';
 
 export type Invite = components['schemas']['UserTeamInvite'];
 

@@ -14,7 +14,8 @@ export const authStore = createStore({
     on: {
         clearAuthToken: (context) => {
             console.log('clearAuthToken', context);
-            queryClient.invalidateQueries({ queryKey: ['auth'] });
+            // queryClient.invalidateQueries({ queryKey: ['auth'] });
+            // queryClient.refetchQueries({ queryKey: ['auth'] });
 
             return {
                 token: '',
@@ -34,8 +35,12 @@ authStore.subscribe((snapshot) => {
 
     if (last_token !== snapshot.context.token) {
         console.log('invalidating queries due to auth token change');
-        queryClient.removeQueries({ queryKey: ['auth'] });
-        // queryClient.refetchQueries();
+
+        setTimeout(() => {
+            // queryClient.invalidateQueries({ queryKey: ['auth'] });
+            // queryClient.refetchQueries({ queryKey: ['auth'] });
+            queryClient.resetQueries({ queryKey: ['auth'] });
+        }, 10);
     }
 
     last_token = snapshot.context.token;
