@@ -32,6 +32,21 @@ impl User {
         let name = name.as_ref();
         let password = password.as_ref();
 
+        // check if no user with this name already exists
+        let exists = query_scalar!(
+            "SELECT COUNT(*) FROM users WHERE name = $1",
+            name
+        )
+        .fetch_one(&db.pool)
+        .await?
+        .unwrap_or(0)
+        > 0;
+
+        if exists {
+            // TODO: nicer `Username taken` error
+            return Err(sqlx::Error::RowNotFound);
+        }
+
         let user = query_as!(
             User,
             "INSERT INTO users (user_id, name, password, admin) VALUES ($1, $2, $3, $4) RETURNING *",
