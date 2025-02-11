@@ -1,13 +1,14 @@
-import { useParams } from '@tanstack/react-router';
+import { useNavigate, useParams } from '@tanstack/react-router';
 import { Command } from 'cmdk';
-import { useEffect, useState } from 'react';
+import { FC, useEffect, useState } from 'react';
 import { FiArrowRight, FiChevronRight } from 'react-icons/fi';
 
-import { useSite, useTeam } from '@/api';
+import { useMe, useSite, useTeam } from '@/api';
 import { ModalContent } from '@/components';
 import { ModalRoot } from '@/components/modal';
 
 import {
+    admin_commands,
     CommandEntityGroup,
     main_commands,
     site_commands,
@@ -33,17 +34,28 @@ export const CommandPalette = () => {
 
     return (
         <ModalRoot open={open} onOpenChange={setOpen}>
-            <ModalContent noPadding noCloseButton>
-                <CommandPaletteInternal />
+            <ModalContent
+                noPadding
+                noCloseButton
+                // frosted glass effect
+                // noBg
+                // className="dark:text-default bg-white/90 text-neutral-700 backdrop-blur-sm dark:bg-black/30"
+                className=""
+            >
+                <CommandPaletteInternal requestClose={() => setOpen(false)} />
             </ModalContent>
         </ModalRoot>
     );
 };
 
-const CommandPaletteInternal = () => {
+const CommandPaletteInternal: FC<{ requestClose: () => void }> = ({
+    requestClose,
+}) => {
     const routeParameters = useParams({ from: undefined as any });
     const { data: site } = useSite(routeParameters['siteId']);
     const { data: team } = useTeam(routeParameters['teamId'] || site?.team_id);
+    const { data: user } = useMe();
+    const navigate = useNavigate();
 
     return (
         <Command label="Global Command Palette">
@@ -72,17 +84,10 @@ const CommandPaletteInternal = () => {
                     )}
                 </ul>
             </div>
-            <Command.List className="p-2">
-                <Command.Empty>No results found.</Command.Empty>
-
-                {/* <Command.Group heading="Letters">
-                    {main_commands.map((command) => (
-                        <Command.Item key={command.slug}>
-                            <command.icon className="size-4" />
-                            {command.title}
-                        </Command.Item>
-                    ))}
-                </Command.Group> */}
+            <Command.List className="max-h-[50vh] overflow-y-auto p-2">
+                <Command.Empty className="text-sm">
+                    No results found.
+                </Command.Empty>
 
                 {(
                     [
@@ -102,13 +107,35 @@ const CommandPaletteInternal = () => {
                                   commands: team_commands,
                               }
                             : undefined,
+                        user?.admin
+                            ? {
+                                  title: 'Administration',
+                                  commands: admin_commands,
+                              }
+                            : undefined,
                     ] as CommandEntityGroup[]
                 )
                     .filter(Boolean)
                     .map(({ title, commands }) => (
                         <Command.Group key={title} heading={title}>
                             {commands.map((command) => (
-                                <Command.Item key={command.slug}>
+                                <Command.Item
+                                    key={command.slug}
+                                    onSelect={() => {
+                                        if (command.navigate_to) {
+                                            console.log(command.navigate_to);
+                                            navigate({
+                                                to: command.navigate_to,
+                                                params: {
+                                                    siteId: site?.site_id,
+                                                    teamId: team?.team_id,
+                                                },
+                                            });
+                                            requestClose();
+                                        }
+                                    }}
+                                    keywords={command.aliases}
+                                >
                                     <span className="flex w-full items-center gap-2">
                                         <command.icon className="size-4" />
                                         {command.title}

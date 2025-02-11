@@ -22,6 +22,11 @@
         "ordinal": 3,
         "name": "created_at",
         "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 4,
+        "name": "admin",
+        "type_info": "Bool"
       }
     ],
     "parameters": {
@@ -35,7 +40,8 @@
       false,
       false,
       false,
-      false
+      false,
+      true
     ]
   },
   "hash": "fdce7cbc7f0b0f4353c10600e949623ea7d7d8a7ddf98596f724827c6570c33f"

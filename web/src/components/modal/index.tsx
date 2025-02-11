@@ -28,10 +28,11 @@ export const ModalContent = React.forwardRef<
     React.ComponentPropsWithoutRef<typeof Dialog.Content> & {
         noPadding?: boolean;
         noCloseButton?: boolean;
+        noBg?: boolean;
     }
 >(
     (
-        { className, children, noPadding, noCloseButton, ...properties },
+        { className, children, noPadding, noCloseButton, noBg, ...properties },
         reference
     ) => (
         <Dialog.Portal>
@@ -39,8 +40,9 @@ export const ModalContent = React.forwardRef<
             <Dialog.Content
                 ref={reference}
                 className={clsx(
-                    'bg-default data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] fixed left-1/2 top-1/2 z-50 grid w-full max-w-lg -translate-x-1/2 -translate-y-1/2 gap-4 border shadow-lg duration-200 sm:rounded-lg',
+                    'data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] fixed left-1/2 top-1/2 z-50 grid w-full max-w-lg -translate-x-1/2 -translate-y-1/2 gap-4 border shadow-lg duration-200 sm:rounded-lg',
                     noPadding ? '' : 'p-6',
+                    noBg ? '' : 'bg-default',
                     className
                 )}
                 {...properties}

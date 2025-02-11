@@ -17,6 +17,7 @@ pub struct User {
     #[oai(skip)]
     pub password: String,
     pub created_at: DateTime<Utc>,
+    pub admin: Option<bool>,
 }
 
 impl User {
@@ -24,6 +25,7 @@ impl User {
         db: &Database,
         name: impl AsRef<str>,
         password: impl AsRef<str>,
+        admin: Option<bool>,
     ) -> Result<(Self, Team), sqlx::Error> {
         let user_id = generate_id(IdType::USER);
         let name = name.as_ref();
@@ -31,10 +33,11 @@ impl User {
 
         let user = query_as!(
             User,
-            "INSERT INTO users (user_id, name, password) VALUES ($1, $2, $3) RETURNING *",
+            "INSERT INTO users (user_id, name, password, admin) VALUES ($1, $2, $3, $4) RETURNING *",
             user_id,
             name,
-            password
+            password,
+            admin
         )
         .fetch_one(&db.pool)
         .await?;

@@ -102,6 +102,7 @@ impl AuthApi {
             &state.0.database,
             &request.username,
             &hash_password(&request.password),
+            Some(true),
         )
         .await
         .map_err(HttpError::from)?;

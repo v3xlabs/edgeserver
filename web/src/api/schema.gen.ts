@@ -820,6 +820,7 @@ export type components = {
             name: string;
             /** Format: date-time */
             created_at: string;
+            admin?: boolean;
         };
         UserTeamInvite: {
             invite_id: string;
