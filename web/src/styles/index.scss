@@ -87,6 +87,7 @@ a {
 }
 
 [cmdk-input] {
+    @apply py-2 outline-none;
 }
 
 [cmdk-list-sizer] {
@@ -94,21 +95,29 @@ a {
 }
 
 [cmdk-group-items] {
-    @apply space-y-2;
+    @apply space-y-0;
 }
 
 [cmdk-item] {
-    @apply px-2 py-1.5 rounded-md;
+    @apply px-2 py-2 rounded-md flex items-center gap-2 cursor-pointer;
 
     &[data-selected="true"] {
-        @apply bg-neutral-800/5;
+        @apply bg-hover;
     }
     &[data-disabled="true"] {
-        @apply bg-neutral-800/10;
+        @apply bg-muted;
     }
 }
 
+[cmdk-empty] {
+    @apply text-center py-2;
+}
+
 [cmdk-group] {
+
+}
+[cmdk-group-heading] {
+    @apply mx-1 px-1 py-1.5 border-b text-default opacity-50 text-sm;
 }
 
 [cmdk-separator] {
