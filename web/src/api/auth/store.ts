@@ -42,7 +42,8 @@ authStore.subscribe((snapshot) => {
         console.log('invalidating queries due to auth token change');
         updateAuthToken(snapshot.context.token);
         queryClient.resetQueries({ queryKey: ['auth'] });
-        queryClient.setQueriesData({ queryKey: ['auth'] }, {});
+        // eslint-disable-next-line unicorn/no-null
+        queryClient.setQueriesData({ queryKey: ['auth'] }, null);
     }
 
     last_token = snapshot.context.token;

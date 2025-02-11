@@ -151,7 +151,7 @@ export const site_commands: CommandEntry[] = [
         title: 'Domains',
         aliases: ['domains', 'domain'],
         slug: 'domains',
-        navigate_to: '/site/$siteId/domains',
+        navigate_to: '/site/$siteId/settings/domains',
     },
     {
         icon: FiSettings,

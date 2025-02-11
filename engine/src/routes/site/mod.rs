@@ -33,6 +33,7 @@ struct File {
 #[derive(Debug, Multipart)]
 pub struct UploadPayload {
     data: Upload,
+    context: Option<String>,
 }
 
 pub struct SiteApi;

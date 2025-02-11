@@ -89,7 +89,7 @@ const CommandPaletteInternal: FC<{ requestClose: () => void }> = ({
                     )}
                 </ul>
             </div>
-            <Command.List className="max-h-[50vh] overflow-y-auto p-2">
+            <Command.List className="overflow-y-auto p-2">
                 <Command.Empty className="text-sm">
                     No results found.
                 </Command.Empty>

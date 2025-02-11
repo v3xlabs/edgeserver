@@ -2,6 +2,7 @@ import { createFileRoute } from '@tanstack/react-router';
 
 import { useSite } from '@/api';
 import { Button, Input } from '@/components';
+import { TeamSelect } from '@/components/select';
 
 export const Route = createFileRoute('/_authed/site/$siteId/settings/_s/')({
     component: RouteComponent,
@@ -25,7 +26,7 @@ function RouteComponent() {
             <div>
                 <div>Team</div>
                 <div className="flex gap-2">
-                    <Input value={site?.team_id} />
+                    <TeamSelect value={site?.team_id} />
                     <Button onClick={() => alert('Not implemented')}>
                         Transfer
                     </Button>
