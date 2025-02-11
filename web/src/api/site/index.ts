@@ -42,7 +42,7 @@ export const getSite = (siteId?: string) =>
     queryOptions({
         queryKey: ['auth', 'site', '{siteId}', siteId],
         queryFn: async () => {
-            if (!siteId) return;
+            if (!siteId) throw new Error('No siteId');
 
             const response = await apiRequest('/site/{site_id}', 'get', {
                 path: { site_id: siteId },

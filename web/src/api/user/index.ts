@@ -19,9 +19,9 @@ export const getMe = (token_input?: string) =>
             return response.data;
         },
         // enabled: !!token_input,
-        initialData: undefined,
-        retry: 0,
-        placeholderData: undefined,
+        // initialData: undefined,
+        // retry: 0,
+        // placeholderData: undefined,
     });
 
 export const useMe = () => {
