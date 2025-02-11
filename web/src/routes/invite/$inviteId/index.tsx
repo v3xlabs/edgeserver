@@ -1,5 +1,10 @@
 import { useForm } from '@tanstack/react-form';
-import { createFileRoute, Link, Navigate, useNavigate } from '@tanstack/react-router';
+import {
+    createFileRoute,
+    Link,
+    Navigate,
+    useNavigate,
+} from '@tanstack/react-router';
 import { FC, useEffect, useState } from 'react';
 
 import {
@@ -33,7 +38,10 @@ export const Route = createFileRoute('/invite/$inviteId/')({
 function RouteComponent() {
     const { inviteId } = Route.useParams();
     const { data } = useInvite(inviteId);
-    const org_name = data?.team.name;
+
+    if (!data) return <div>Loading...</div>;
+
+    const org_name = data.team.name;
     const [state, setState] = useState<'undefined' | 'guest'>('undefined');
     const { mutate: acceptInvite, data: acceptedInvite } = useAcceptInvite(
         inviteId,
@@ -144,7 +152,14 @@ const GuestSignUp = () => {
             invite_id: Route.useParams().inviteId,
         });
     const { token } = useAuth();
+    const { data: me } = useMe();
     const navigate = useNavigate();
+
+    useEffect(() => {
+        console.log('token changed', token);
+        // queryClient.resetQueries({ queryKey: ['auth'] });
+        // queryClient.refetchQueries({ queryKey: ['auth'] });
+    }, [token]);
 
     const { Field, Subscribe, handleSubmit } = useForm({
         defaultValues: {
@@ -161,13 +176,13 @@ const GuestSignUp = () => {
     });
 
     useEffect(() => {
-        if (createdAccount && token) {
+        if (createdAccount && me && me.user_id == createdAccount.user.user_id) {
             navigate({
                 to: '/team/$teamId',
                 params: { teamId: createdAccount.team.team_id },
             });
         }
-    }, [createdAccount, token]);
+    }, [createdAccount, me]);
 
     return (
         <form

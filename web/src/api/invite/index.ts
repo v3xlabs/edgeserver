@@ -10,7 +10,7 @@ export type Invite = components['schemas']['UserTeamInvite'];
 
 export const getInvite = (invite_id: string) =>
     queryOptions({
-        queryKey: ['auth', 'invite', '{invite_id}', invite_id],
+        queryKey: ['invite', '{invite_id}', invite_id],
         queryFn: async () => {
             const response = await apiRequest('/invite/{invite_id}', 'get', {
                 path: { invite_id },

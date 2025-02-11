@@ -3,6 +3,8 @@ import { useSelector } from '@xstate/store/react';
 
 import { queryClient } from '@/util/query';
 
+import { updateAuthToken } from '../core';
+
 const loadInitial = () => {
     const auth = localStorage.getItem('@edgeserver/auth');
 
@@ -16,6 +18,9 @@ export const authStore = createStore({
             console.log('clearAuthToken', context);
             // queryClient.invalidateQueries({ queryKey: ['auth'] });
             // queryClient.refetchQueries({ queryKey: ['auth'] });
+
+            updateAuthToken('');
+            queryClient.removeQueries({ queryKey: ['auth'] });
 
             return {
                 token: '',
@@ -35,12 +40,9 @@ authStore.subscribe((snapshot) => {
 
     if (last_token !== snapshot.context.token) {
         console.log('invalidating queries due to auth token change');
-
-        setTimeout(() => {
-            // queryClient.invalidateQueries({ queryKey: ['auth'] });
-            // queryClient.refetchQueries({ queryKey: ['auth'] });
-            queryClient.resetQueries({ queryKey: ['auth'] });
-        }, 10);
+        updateAuthToken(snapshot.context.token);
+        queryClient.resetQueries({ queryKey: ['auth'] });
+        queryClient.setQueriesData({ queryKey: ['auth'] }, {});
     }
 
     last_token = snapshot.context.token;
