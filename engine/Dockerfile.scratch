@@ -15,6 +15,7 @@ FROM scratch
 # Security: Copy user information and switch to non-root user
 COPY --from=usersetup /etc/passwd /etc/passwd
 USER dockeruser
+WORKDIR /app
 
 # Application Configuration
 # -----------------------
@@ -25,8 +26,8 @@ ENV RUST_LOG="error,edgeserver=info"
 # -----------------
 # BINARY_PATH: Path to the pre-compiled binary from GitHub Actions
 ARG BINARY_PATH
-COPY ${BINARY_PATH} /edgeserver
-COPY www /www
+COPY ${BINARY_PATH} /app/edgeserver
+COPY www /app/www
 
 # Network Configuration
 # -------------------
@@ -35,4 +36,4 @@ EXPOSE 3000
 # Application Startup
 # -----------------
 # Using exec form of CMD as there is no shell in scratch image
-CMD ["/edgeserver"]
+CMD ["/app/edgeserver"]

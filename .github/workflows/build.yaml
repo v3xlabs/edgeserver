@@ -105,8 +105,6 @@ jobs:
               env:
                   BINARY_NAME: ${{ env.ENGINE_BINARY_NAME }}
                   SQLX_OFFLINE: true
-                  RUSTFLAGS: "-Ctarget-feature=-crt-static"
-                  RUSTUP_TOOLCHAIN: stable
               run: cross build --target ${{ matrix.platform.arch }} --release
 
             # 📦 Save our binary for later
