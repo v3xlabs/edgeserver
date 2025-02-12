@@ -4,7 +4,6 @@ use poem_openapi::{
     payload::{Json, PlainText},
     Object, OpenApi,
 };
-use reqwest::StatusCode;
 use serde::{Deserialize, Serialize};
 use tracing::info;
 
