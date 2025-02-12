@@ -16,7 +16,7 @@ RUN addgroup -g 10001 -S dockergrp && \
 FROM scratch
 
 # Copy temp directory with correct ownership
-COPY --from=usersetup --chown=dockeruser:dockergrp /tmpdir /tmp
+COPY --from=usersetup /tmpdir /tmp
 
 # Security: Copy user information and switch to non-root user
 COPY --from=usersetup /etc/passwd /etc/passwd
