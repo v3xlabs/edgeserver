@@ -4,13 +4,17 @@
 # =====================================
 FROM alpine:latest as usersetup
 RUN addgroup -g 10001 -S dockergrp && \
-    adduser -u 10001 -S dockeruser -G dockergrp
+    adduser -u 10001 -S dockeruser -G dockergrp && \
+    mkdir /tmp
 
 # =====================================
 # Stage 2: Final Image
 # Minimal scratch-based image containing only the essential components
 # =====================================
 FROM scratch
+
+# Create temp directory needed for multipart uploads
+COPY --from=usersetup /tmp /tmp
 
 # Security: Copy user information and switch to non-root user
 COPY --from=usersetup /etc/passwd /etc/passwd
@@ -21,6 +25,9 @@ WORKDIR /app
 # -----------------------
 # RUST_LOG: Logging configuration (default: error,v3x-property-engine=info)
 ENV RUST_LOG="error,edgeserver=info"
+
+# Add temp directory environment variable
+ENV TMPDIR=/tmp
 
 # Binary Installation
 # -----------------
