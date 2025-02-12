@@ -1,11 +1,13 @@
 # =====================================
 # Stage 1: User Setup
-# Creates a non-root user for running the application securely
+# Creates a non-root user and temp directory with correct permissions
 # =====================================
 FROM alpine:latest as usersetup
 RUN addgroup -g 10001 -S dockergrp && \
     adduser -u 10001 -S dockeruser -G dockergrp && \
-    mkdir /tmpdir
+    mkdir /tmpdir && \
+    chown dockeruser:dockergrp /tmpdir && \
+    chmod 700 /tmpdir
 
 # =====================================
 # Stage 2: Final Image
@@ -13,8 +15,8 @@ RUN addgroup -g 10001 -S dockergrp && \
 # =====================================
 FROM scratch
 
-# Create temp directory needed for multipart uploads
-COPY --from=usersetup /tmpdir /tmp
+# Copy temp directory with correct ownership
+COPY --from=usersetup --chown=dockeruser:dockergrp /tmpdir /tmp
 
 # Security: Copy user information and switch to non-root user
 COPY --from=usersetup /etc/passwd /etc/passwd
