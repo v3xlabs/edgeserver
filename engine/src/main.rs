@@ -1,6 +1,9 @@
+use std::os::unix::fs::PermissionsExt;
+
 use state::AppState;
 use tracing::{error, info};
 
+pub mod cache;
 pub mod database;
 pub mod middlewares;
 pub mod models;
@@ -8,7 +11,6 @@ pub mod routes;
 pub mod state;
 pub mod storage;
 pub mod utils;
-pub mod cache;
 
 #[async_std::main]
 async fn main() {
@@ -25,6 +27,11 @@ async fn main() {
             return;
         }
     };
+
+    // ensure temp directory exists
+    std::fs::create_dir_all("/tmp").ok();
+    // ensure its owned by the user and has 777 permissions
+    std::fs::set_permissions("/tmp", std::fs::Permissions::from_mode(0o777)).unwrap();
 
     routes::serve(state).await;
 }
