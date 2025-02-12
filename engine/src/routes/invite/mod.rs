@@ -2,16 +2,15 @@ use poem::{web::Data, Result};
 use poem_openapi::{
     param::Path,
     payload::{Json, PlainText},
-    types::multipart::Upload,
-    Multipart, Object, OpenApi,
+    Object, OpenApi,
 };
+use reqwest::StatusCode;
 use serde::{Deserialize, Serialize};
 use tracing::info;
 
 use crate::{
     middlewares::auth::UserAuth,
     models::{
-        site::Site,
         team::{invite::UserTeamInvite, Team},
         user::User,
     },
@@ -87,6 +86,14 @@ impl InviteApi {
 
         let user = user.required()?;
 
+        let invite = UserTeamInvite::get_by_invite_id(&state.database, &invite_id.0)
+            .await
+            .map_err(HttpError::from)?;
+
+        if invite.status != "pending" {
+            return Err(HttpError::AlreadyExists.into());
+        }
+
         UserTeamInvite::accept_invite(&state.database, &invite_id.0, &user.user_id)
             .await
             .map_err(HttpError::from)?;
@@ -111,6 +118,10 @@ impl InviteApi {
         let invite = UserTeamInvite::get_by_invite_id(&state.database, &invite_id.0)
             .await
             .map_err(HttpError::from)?;
+
+        if invite.status != "pending" {
+            return Err(HttpError::AlreadyExists.into());
+        }
 
         let (user, team) = User::new(
             &state.0.database,

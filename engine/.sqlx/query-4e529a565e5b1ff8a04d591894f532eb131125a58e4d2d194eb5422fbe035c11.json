@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "SELECT * FROM deployments WHERE site_id = $1 ORDER BY created_at DESC",
+  "query": "INSERT INTO deployments (deployment_id, site_id) VALUES ($1, $2) RETURNING *",
   "describe": {
     "columns": [
       {
@@ -21,6 +21,7 @@
     ],
     "parameters": {
       "Left": [
+        "Text",
         "Text"
       ]
     },
@@ -30,5 +31,5 @@
       false
     ]
   },
-  "hash": "aa345344d59711b24b761265244ddee4fac17be4405871b472096b08c9c470e3"
+  "hash": "4e529a565e5b1ff8a04d591894f532eb131125a58e4d2d194eb5422fbe035c11"
 }

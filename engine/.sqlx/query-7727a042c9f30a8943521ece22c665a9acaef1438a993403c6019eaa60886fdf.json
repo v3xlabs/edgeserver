@@ -1,0 +1,28 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT DISTINCT f.* \n            FROM files f\n            WHERE NOT EXISTS (\n                SELECT 1 \n                FROM deployment_files df\n                JOIN deployments d ON df.deployment_id = d.deployment_id\n                WHERE df.file_id = f.file_id \n                AND d.created_at > $1\n            )",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "file_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "file_hash",
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Timestamptz"
+      ]
+    },
+    "nullable": [
+      false,
+      false
+    ]
+  },
+  "hash": "7727a042c9f30a8943521ece22c665a9acaef1438a993403c6019eaa60886fdf"
+}

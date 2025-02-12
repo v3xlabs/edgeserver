@@ -24,6 +24,7 @@ const UserProfile = () => {
                 /> */}
             </div>
             <div className="bg-default absolute right-0 top-full hidden w-fit flex-col overflow-hidden whitespace-nowrap rounded-b-md group-hover:flex">
+                <ThemeSwitcher />
                 <button
                     className="flex items-start px-4 py-2 hover:bg-black/10"
                     onClick={() => {
@@ -69,7 +70,6 @@ export const Navbar = () => {
                         </div>
 
                         <div className="flex h-full items-center">
-                            <ThemeSwitcher />
                             <UserProfile />
                         </div>
                     </div>

@@ -1,14 +1,20 @@
 use async_zip::base::read::mem::ZipFileReader;
+use chrono::{Duration, Utc};
 use poem::{web::Data, Result};
 use poem_openapi::{
     param::Path, payload::Json, types::multipart::Upload, Multipart, Object, OpenApi,
 };
 use serde::{Deserialize, Serialize};
+use sha2::{Digest, Sha256};
 use tracing::info;
 
 use crate::{
     middlewares::auth::UserAuth,
-    models::{deployment::Deployment, site::{Site, SiteId}, team::Team},
+    models::{
+        deployment::Deployment,
+        site::{Site, SiteId},
+        team::Team,
+    },
     routes::ApiTags,
     state::State,
 };
@@ -160,14 +166,9 @@ impl SiteApi {
 
         info!("Uploading file: {:?}", payload.data);
 
-        let deployment = Deployment::new(
-            &state.database,
-            site_id,
-            "hash".to_string(),
-            "storage".to_string(),
-        )
-        .await
-        .map_err(HttpError::from)?;
+        let deployment = Deployment::new(&state.database, site_id)
+            .await
+            .map_err(HttpError::from)?;
 
         let content_type = payload.data.content_type().unwrap().to_string();
         let file_stream = payload.data.into_vec().await.unwrap();
@@ -191,19 +192,42 @@ impl SiteApi {
             let mut buf = Vec::new();
             file_content.read_to_end_checked(&mut buf).await.unwrap();
 
+            // hash the file
+            let file_hash = hash_file(&buf);
+
             info!("Uploading file: {:?}", path);
 
-            let s3_path = format!("{}/{}", deployment.deployment_id, path);
+            let s3_path = format!("{}", &file_hash);
             state
                 .storage
                 .bucket
                 .put_object_with_content_type(&s3_path, &buf, &content_type)
                 .await
                 .unwrap();
+
+            info!("Upload complete");
+
+
+            deployment
+                .upload_file(&state.database, path, &file_hash, &content_type)
+                .await
+                .unwrap();
         }
 
         info!("Deployment complete");
 
+        let cutoff_date = Utc::now() - Duration::seconds(30);
+        Deployment::cleanup_old_files(&state, cutoff_date)
+            .await
+            .unwrap();
+
         Ok(Json(deployment))
     }
+}
+
+fn hash_file(file: &[u8]) -> String {
+    let mut hasher = Sha256::new();
+    hasher.update(file);
+    let hash = hasher.finalize();
+    format!("{:x}", hash)
 }
