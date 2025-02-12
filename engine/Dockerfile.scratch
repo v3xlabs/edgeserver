@@ -5,7 +5,7 @@
 FROM alpine:latest as usersetup
 RUN addgroup -g 10001 -S dockergrp && \
     adduser -u 10001 -S dockeruser -G dockergrp && \
-    mkdir /tmp
+    mkdir /tmpdir
 
 # =====================================
 # Stage 2: Final Image
@@ -14,7 +14,7 @@ RUN addgroup -g 10001 -S dockergrp && \
 FROM scratch
 
 # Create temp directory needed for multipart uploads
-COPY --from=usersetup /tmp /tmp
+COPY --from=usersetup /tmpdir /tmp
 
 # Security: Copy user information and switch to non-root user
 COPY --from=usersetup /etc/passwd /etc/passwd
