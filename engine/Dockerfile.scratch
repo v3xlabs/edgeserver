@@ -7,7 +7,7 @@ RUN addgroup -g 10001 -S dockergrp && \
     adduser -u 10001 -S dockeruser -G dockergrp && \
     mkdir /tmpdir && \
     chown dockeruser:dockergrp /tmpdir && \
-    chmod 700 /tmpdir
+    chmod 777 /tmpdir
 
 # =====================================
 # Stage 2: Final Image
