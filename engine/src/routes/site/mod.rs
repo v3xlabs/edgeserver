@@ -207,7 +207,6 @@ impl SiteApi {
 
             info!("Upload complete");
 
-
             deployment
                 .upload_file(&state.database, path, &file_hash, &content_type)
                 .await

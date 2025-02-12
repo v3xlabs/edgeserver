@@ -19,11 +19,11 @@ async-std = { version = "1", features = ["attributes", "tokio1"] }
 config = "0.15.4"
 dotenvy = "0.15.7"
 futures = "0.3.31"
-poem = { version = "3.0.4", git = "https://github.com/poem-web/poem", branch = "master", features = [
+poem = { version = "3.1.6", git = "https://github.com/poem-web/poem", branch = "master", features = [
     "rustls",
     "sse"
 ] }
-poem-openapi = { version = "5", git = "https://github.com/poem-web/poem", branch = "master", features = [
+poem-openapi = { version = "5.1.5", git = "https://github.com/poem-web/poem", branch = "master", features = [
     "chrono",
     "uuid",
     "sqlx",
