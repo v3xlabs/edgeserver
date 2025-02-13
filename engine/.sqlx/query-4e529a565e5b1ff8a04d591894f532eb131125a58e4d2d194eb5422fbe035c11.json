@@ -17,6 +17,11 @@
         "ordinal": 2,
         "name": "created_at",
         "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 3,
+        "name": "context",
+        "type_info": "Text"
       }
     ],
     "parameters": {
@@ -28,7 +33,8 @@
     "nullable": [
       false,
       false,
-      false
+      false,
+      true
     ]
   },
   "hash": "4e529a565e5b1ff8a04d591894f532eb131125a58e4d2d194eb5422fbe035c11"

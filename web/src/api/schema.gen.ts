@@ -905,6 +905,7 @@ export type components = {
         Deployment: {
             deployment_id: string;
             site_id: string;
+            context?: string;
             /** Format: date-time */
             created_at: string;
         };

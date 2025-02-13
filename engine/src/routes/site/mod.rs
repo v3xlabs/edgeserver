@@ -208,7 +208,7 @@ impl SiteApi {
 
         info!("Uploading file: {:?}", payload.data);
 
-        let deployment = Deployment::new(&state.database, site_id)
+        let deployment = Deployment::new(&state.database, site_id, payload.context)
             .await
             .map_err(HttpError::from)?;
 

@@ -13,6 +13,7 @@ use crate::{
 pub struct Deployment {
     pub deployment_id: String,
     pub site_id: String,
+    pub context: Option<String>,
     pub created_at: DateTime<Utc>,
 }
 
@@ -32,14 +33,15 @@ pub struct DeploymentFile {
 }
 
 impl Deployment {
-    pub async fn new(db: &Database, site_id: String) -> Result<Self, sqlx::Error> {
+    pub async fn new(db: &Database, site_id: String, context: Option<String>) -> Result<Self, sqlx::Error> {
         let deployment_id: String = generate_id(IdType::DEPLOYMENT);
 
         query_as!(
             Deployment,
-            "INSERT INTO deployments (deployment_id, site_id) VALUES ($1, $2) RETURNING *",
+            "INSERT INTO deployments (deployment_id, site_id, context) VALUES ($1, $2, $3) RETURNING *",
             deployment_id,
-            site_id
+            site_id,
+            context
         )
         .fetch_one(&db.pool)
         .await
