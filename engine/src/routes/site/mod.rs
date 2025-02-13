@@ -257,6 +257,14 @@ impl SiteApi {
     ) -> Result<Json<Vec<DeploymentFileEntry>>> {
         user.verify_access_to(&SiteId(&site_id.0)).await?;
 
+        let deployment = Deployment::get_by_id(&state.database, &deployment_id.0)
+            .await
+            .map_err(HttpError::from)?;
+
+        if deployment.site_id != site_id.0 {
+            Err(HttpError::Forbidden)?;
+        }
+
         DeploymentFile::get_deployment_files(&state.database, &deployment_id.0)
             .await
             .map_err(HttpError::from)
