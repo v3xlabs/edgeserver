@@ -73,6 +73,7 @@ export const getSiteDeployments = (siteId?: string) =>
 
             return response.data;
         },
+        refetchInterval: 5000,
         enabled: !!siteId,
     });
 
