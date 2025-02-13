@@ -28,10 +28,5 @@ async fn main() {
         }
     };
 
-    // ensure temp directory exists
-    std::fs::create_dir_all("/tmp").ok();
-    // ensure its owned by the user and has 777 permissions
-    std::fs::set_permissions("/tmp", std::fs::Permissions::from_mode(0o777)).ok();
-
     routes::serve(state).await;
 }
