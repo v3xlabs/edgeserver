@@ -1,6 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router';
 
 import { useDeployment } from '@/api';
+import { DeploymentContext } from '@/gui/deployments/context/context';
 import { FileExplorer } from '@/gui/deployments/files/FileExplorer';
 import { SCPage } from '@/layouts';
 
@@ -23,6 +24,9 @@ function RouteComponent() {
                         {JSON.stringify(deployment, undefined, 2)}
                     </pre>
                 </div>
+            )}
+            {deployment?.context && (
+                <DeploymentContext context={deployment.context} />
             )}
             <FileExplorer siteId={siteId} deploymentId={deploymentId} />
         </SCPage>
