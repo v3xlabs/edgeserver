@@ -66,7 +66,7 @@ impl Deployment {
         file_path: impl AsRef<str>,
         file_hash: impl AsRef<str>,
         mime_type: impl AsRef<str>,
-    ) -> Result<(), sqlx::Error> {
+    ) -> Result<NewlyCreatedFile, sqlx::Error> {
         // create a new file in `files` table
         // create a new `deployment_files` row in `deployment_files` table to link the file to the deployment
 
@@ -110,7 +110,7 @@ LIMIT 1;
             mime_type
         ).fetch_one(&db.pool).await?;
 
-        Ok(())
+        Ok(file)
     }
 
     // Go through all `files` where the `deployment_files` links it to a deployment_id from `deployments` table

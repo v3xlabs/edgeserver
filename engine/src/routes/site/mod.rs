@@ -193,7 +193,16 @@ impl SiteApi {
             file_content.read_to_end_checked(&mut buf).await.unwrap();
 
             // hash the file
+            info!("Hashing file: {:?}", path);
             let file_hash = hash_file(&buf);
+
+            info!("Cataloging metadata for file: {:?}", path);
+            let x = deployment
+            .upload_file(&state.database, path, &file_hash, &content_type)
+            .await
+            .unwrap();
+
+            if x.is_new.unwrap_or_default() {
 
             info!("Uploading file: {:?}", path);
 
@@ -205,12 +214,10 @@ impl SiteApi {
                 .await
                 .unwrap();
 
-            info!("Upload complete");
-
-            deployment
-                .upload_file(&state.database, path, &file_hash, &content_type)
-                .await
-                .unwrap();
+                info!("Upload complete");
+            } else {
+                info!("File already exists, skipping upload");
+            }
         }
 
         info!("Deployment complete");
