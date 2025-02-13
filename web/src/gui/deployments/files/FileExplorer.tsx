@@ -1,6 +1,7 @@
 import byteSize from 'byte-size';
 import { FC } from 'react';
-import { FiFile, FiFolder } from 'react-icons/fi';
+import { BsFileEarmarkFont, BsFiletypeHtml, BsFiletypeXml } from 'react-icons/bs';
+import { FiFile, FiFileText, FiFolder, FiImage } from 'react-icons/fi';
 
 import { useDeploymentFiles } from '@/api';
 import { components } from '@/api/schema.gen';
@@ -138,7 +139,7 @@ export const FileEntry: FC<{ file: DeploymentFile; name: string }> = ({
     return (
         <div className="flex items-center justify-between gap-2">
             <div className="flex items-center gap-2">
-                <FiFile />
+                <CustomFileIcon mime_type={file.deployment_file_mime_type} />
                 <span>{name}</span>
             </div>
             <div className="flex items-center gap-2">
@@ -147,4 +148,38 @@ export const FileEntry: FC<{ file: DeploymentFile; name: string }> = ({
             </div>
         </div>
     );
+};
+
+export const CustomFileIcon: FC<{ mime_type: string }> = ({ mime_type }) => {
+    if (mime_type === 'text/html') {
+        return <BsFiletypeHtml />;
+    }
+
+    if (mime_type === 'text/xml') {
+        return <BsFiletypeXml />;
+    }
+
+    if (
+        [
+            'image/png',
+            'image/jpeg',
+            'image/gif',
+            'image/svg+xml',
+            'image/webp',
+        ].includes(mime_type)
+    ) {
+        return <FiImage />;
+    }
+
+    if (
+        [
+            'application/font-woff',
+            'application/font-woff2',
+            'application/font-sfnt',
+        ].includes(mime_type)
+    ) {
+        return <BsFileEarmarkFont />;
+    }
+
+    return <FiFile />;
 };
