@@ -1,3 +1,4 @@
+import { useNavigate } from '@tanstack/react-router';
 import { Command } from 'cmdk';
 import { FC } from 'react';
 import { FiGlobe } from 'react-icons/fi';
@@ -6,6 +7,7 @@ import { useSite, useTeam, useTeams, useTeamSites } from '@/api';
 
 export const SiteEntry: FC<{ site_id: string }> = ({ site_id }) => {
     const { data: site } = useSite(site_id);
+    const navigate = useNavigate();
 
     if (!site) return <></>;
 
@@ -13,6 +15,14 @@ export const SiteEntry: FC<{ site_id: string }> = ({ site_id }) => {
         <Command.Item
             keywords={[site.name, site.site_id]}
             className="flex items-center justify-between"
+            onSelect={() => {
+                navigate({
+                    to: '/site/$siteId',
+                    params: {
+                        siteId: site_id,
+                    },
+                });
+            }}
         >
             <div>{site.name}</div>
             <div className="text-muted flex items-center gap-1">

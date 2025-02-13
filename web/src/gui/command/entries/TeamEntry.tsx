@@ -1,3 +1,4 @@
+import { useNavigate } from '@tanstack/react-router';
 import { Command } from 'cmdk';
 import { FC } from 'react';
 import { FiUsers } from 'react-icons/fi';
@@ -7,8 +8,7 @@ import { Avatar } from '@/components';
 
 export const TeamEntry: FC<{ team_id: string }> = ({ team_id }) => {
     const { data: team } = useTeam(team_id);
-
-    // const search: string = useCommandState((state) => state.search);
+    const navigate = useNavigate();
 
     if (!team) return <></>;
 
@@ -16,6 +16,14 @@ export const TeamEntry: FC<{ team_id: string }> = ({ team_id }) => {
         <Command.Item
             keywords={[team.name, team.team_id]}
             className="flex items-center justify-between"
+            onSelect={() => {
+                navigate({
+                    to: '/team/$teamId',
+                    params: {
+                        teamId: team_id,
+                    },
+                });
+            }}
         >
             <div className="flex w-full items-center gap-2">
                 <div className="size-4">
