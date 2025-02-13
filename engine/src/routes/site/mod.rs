@@ -1,11 +1,8 @@
-use async_zip::base::read::mem::ZipFileReader;
-use chrono::{Duration, Utc};
 use poem::{web::Data, Result};
 use poem_openapi::{
     param::Path, payload::Json, types::multipart::Upload, Multipart, Object, OpenApi,
 };
 use serde::{Deserialize, Serialize};
-use sha2::{Digest, Sha256};
 use tracing::info;
 
 use crate::{
@@ -38,7 +35,7 @@ struct File {
 
 #[derive(Debug, Multipart)]
 pub struct UploadPayload {
-    data: Upload,
+    data: Option<Upload>,
     context: Option<String>,
 }
 
@@ -162,27 +159,6 @@ impl SiteApi {
             .map_err(HttpError::from)
             .map(Json)
             .map_err(poem::Error::from)
-        }
-
-    #[oai(
-        path = "/site/:site_id/deployment/:deployment_id/files",
-        method = "get",
-        tag = "ApiTags::Site"
-    )]
-    pub async fn get_deployment_files(
-        &self,
-        user: UserAuth,
-        state: Data<&State>,
-        site_id: Path<String>,
-        deployment_id: Path<String>,
-    ) -> Result<Json<Vec<DeploymentFileEntry>>> {
-        user.verify_access_to(&SiteId(&site_id.0)).await?;
-
-        DeploymentFile::get_deployment_files(&state.database, &deployment_id.0)
-            .await
-            .map_err(HttpError::from)
-            .map(Json)
-            .map_err(poem::Error::from)
     }
 
     #[oai(
@@ -212,72 +188,79 @@ impl SiteApi {
             .await
             .map_err(HttpError::from)?;
 
-        let content_type = payload.data.content_type().unwrap().to_string();
-        let file_stream = payload.data.into_vec().await.unwrap();
-
-        // TODO: Read file stream, extract zip file (contains multiple files), upload each file to s3 at the correct relevant path relative to deployment.deployment_id + '/'
-
-        let zip = ZipFileReader::new(file_stream).await.unwrap();
-
-        for index in 0..zip.file().entries().len() {
-            let file = zip.file().entries().get(index).unwrap();
-            let path = file.filename().as_str().unwrap();
-            let entry_is_dir = file.dir().unwrap();
-
-            if entry_is_dir {
-                info!("Skipping directory: {:?}", path);
-                continue;
-            }
-
-            let mut file_content = zip.reader_with_entry(index).await.unwrap();
-
-            let mut buf = Vec::new();
-            file_content.read_to_end_checked(&mut buf).await.unwrap();
-
-            // hash the file
-            info!("Hashing file: {:?}", path);
-            let file_hash = hash_file(&buf);
-
-            let content_type = infer::get(&buf).map(|t| t.mime_type().to_string()).unwrap_or_default();
-            let file_size = buf.len() as i64;
-
-            info!("Cataloging metadata for file: {:?}", path);
-            let x = deployment
-                .upload_file(&state.database, path, &file_hash, &content_type, file_size)
-                .await
-                .unwrap();
-
-            if x.is_new.unwrap_or_default() {
-                info!("Uploading file: {:?}", path);
-
-                let s3_path = file_hash.to_string();
-                state
-                    .storage
-                    .bucket
-                    .put_object_with_content_type(&s3_path, &buf, &content_type)
-                    .await
-                    .unwrap();
-
-                info!("Upload complete");
-            } else {
-                info!("File already exists, skipping upload");
-            }
-        }
-
         info!("Deployment complete");
 
-        let cutoff_date = Utc::now() - Duration::days(365);
-        Deployment::cleanup_old_files(&state, cutoff_date)
-            .await
-            .unwrap();
+        if let Some(data) = payload.data {
+            Deployment::upload_files(&deployment, &state, data)
+                .await
+                .unwrap();
+        }
+
+        // let cutoff_date = Utc::now() - Duration::days(365);
+        // Deployment::cleanup_old_files(&state, cutoff_date)
+        //     .await
+        //     .unwrap();
 
         Ok(Json(deployment))
     }
-}
 
-fn hash_file(file: &[u8]) -> String {
-    let mut hasher = Sha256::new();
-    hasher.update(file);
-    let hash = hasher.finalize();
-    format!("{:x}", hash)
+    #[oai(
+        path = "/site/:site_id/deployment/:deployment_id/files",
+        method = "patch",
+        tag = "ApiTags::Site"
+    )]
+    pub async fn upload_files(
+        &self,
+        user: UserAuth,
+        state: Data<&State>,
+        site_id: Path<String>,
+        deployment_id: Path<String>,
+        payload: UploadPayload,
+    ) -> Result<Json<Deployment>> {
+        info!(
+            "Uploading files for deployment: {:?} for site: {:?} for user: {:?}",
+            deployment_id.0, site_id.0, user
+        );
+
+        user.verify_access_to(&SiteId(&site_id.0)).await?;
+
+        let deployment_id = deployment_id.0;
+        
+        info!("Uploading file: {:?}", payload.data);
+
+        let deployment = Deployment::get_by_id(&state.database, &deployment_id)
+            .await
+            .map_err(HttpError::from)?;
+
+        info!("Deployment complete");
+
+        if let Some(data) = payload.data {
+            Deployment::upload_files(&deployment, &state, data)
+                .await
+                .unwrap();
+        }
+
+        Ok(Json(deployment))
+    }
+
+    #[oai(
+        path = "/site/:site_id/deployment/:deployment_id/files",
+        method = "get",
+        tag = "ApiTags::Site"
+    )]
+    pub async fn get_deployment_files(
+        &self,
+        user: UserAuth,
+        state: Data<&State>,
+        site_id: Path<String>,
+        deployment_id: Path<String>,
+    ) -> Result<Json<Vec<DeploymentFileEntry>>> {
+        user.verify_access_to(&SiteId(&site_id.0)).await?;
+
+        DeploymentFile::get_deployment_files(&state.database, &deployment_id.0)
+            .await
+            .map_err(HttpError::from)
+            .map(Json)
+            .map_err(poem::Error::from)
+    }
 }

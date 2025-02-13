@@ -1,7 +1,10 @@
 use chrono::{DateTime, Utc};
-use poem_openapi::Object;
+use poem_openapi::{types::multipart::Upload, Object};
 use serde::{Deserialize, Serialize};
+use sha2::{Digest, Sha256};
 use sqlx::{query, query_as};
+use async_zip::base::read::mem::ZipFileReader;
+use tracing::info;
 
 use crate::{
     database::Database,
@@ -33,7 +36,11 @@ pub struct DeploymentFile {
 }
 
 impl Deployment {
-    pub async fn new(db: &Database, site_id: String, context: Option<String>) -> Result<Self, sqlx::Error> {
+    pub async fn new(
+        db: &Database,
+        site_id: String,
+        context: Option<String>,
+    ) -> Result<Self, sqlx::Error> {
         let deployment_id: String = generate_id(IdType::DEPLOYMENT);
 
         query_as!(
@@ -56,10 +63,6 @@ impl Deployment {
     //         created_at: Utc::now(),
     //     }
     // }
-
-    pub async fn upload_file_full(&self, state: &State) -> Result<(), sqlx::Error> {
-        Ok(())
-    }
 
     pub async fn upload_file(
         &self,
@@ -114,6 +117,64 @@ LIMIT 1;
         ).fetch_one(&db.pool).await?;
 
         Ok(file)
+    }
+
+    pub async fn upload_files(&self, state: &State, file: Upload) -> Result<(), sqlx::Error> {
+        let content_type = file.content_type().unwrap().to_string();
+        let file_stream = file.into_vec().await.unwrap();
+
+        // TODO: Read file stream, extract zip file (contains multiple files), upload each file to s3 at the correct relevant path relative to deployment.deployment_id + '/'
+
+        let zip = ZipFileReader::new(file_stream).await.unwrap();
+
+        for index in 0..zip.file().entries().len() {
+            let file = zip.file().entries().get(index).unwrap();
+            let path = file.filename().as_str().unwrap();
+            let entry_is_dir = file.dir().unwrap();
+
+            if entry_is_dir {
+                info!("Skipping directory: {:?}", path);
+                continue;
+            }
+
+            let mut file_content = zip.reader_with_entry(index).await.unwrap();
+
+            let mut buf = Vec::new();
+            file_content.read_to_end_checked(&mut buf).await.unwrap();
+
+            // hash the file
+            info!("Hashing file: {:?}", path);
+            let file_hash = hash_file(&buf);
+
+            let content_type = infer::get(&buf)
+                .map(|t| t.mime_type().to_string())
+                .unwrap_or_default();
+            let file_size = buf.len() as i64;
+
+            info!("Cataloging metadata for file: {:?}", path);
+            let x = self
+                .upload_file(&state.database, path, &file_hash, &content_type, file_size)
+                .await
+                .unwrap();
+
+            if x.is_new.unwrap_or_default() {
+                info!("Uploading file: {:?}", path);
+
+                let s3_path = file_hash.to_string();
+                state
+                    .storage
+                    .bucket
+                    .put_object_with_content_type(&s3_path, &buf, &content_type)
+                    .await
+                    .unwrap();
+
+                info!("Upload complete");
+            } else {
+                info!("File already exists, skipping upload");
+            }
+        }
+
+        Ok(())
     }
 
     // Go through all `files` where the `deployment_files` links it to a deployment_id from `deployments` table
@@ -213,4 +274,11 @@ pub struct DeploymentFileEntry {
     pub deployment_file_file_path: String,
     pub deployment_file_mime_type: String,
     pub file_size: Option<i64>,
+}
+
+fn hash_file(file: &[u8]) -> String {
+    let mut hasher = Sha256::new();
+    hasher.update(file);
+    let hash = hasher.finalize();
+    format!("{:x}", hash)
 }
