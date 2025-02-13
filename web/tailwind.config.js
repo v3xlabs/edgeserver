@@ -19,6 +19,7 @@ module.exports = {
             },
             textColor: {
                 link: 'var(--link)',
+                muted: 'var(--text-muted)',
                 secondary: 'var(--text-secondary)',
                 default: 'var(--text-primary)',
             },

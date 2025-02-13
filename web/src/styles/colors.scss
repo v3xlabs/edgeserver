@@ -8,6 +8,7 @@
     --bg-hover: #0000001a;
     --text-primary: #000;
     --text-secondary: #fff;
+    --text-muted: #666;
 }
 :root.light {
     color-scheme: light;
@@ -24,6 +25,7 @@ html.dark {
     --bg-muted: #1f1f1f;
     --text-primary: #fff;
     --text-secondary: #fff;
+    --text-muted: #666;
     color-scheme: dark;
 }
 
@@ -39,6 +41,7 @@ html.dark {
         --bg-muted: #1f1f1f;
         --text-primary: #fff;
         --text-secondary: #fff;
+        --text-muted: #666;
         color-scheme: dark;
     }
 }

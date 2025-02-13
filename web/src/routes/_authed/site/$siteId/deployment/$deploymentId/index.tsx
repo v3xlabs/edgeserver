@@ -17,14 +17,6 @@ function RouteComponent() {
 
     return (
         <SCPage title={`Deployment ${deploymentId}`}>
-            <div className="card">This is the deployment page</div>
-            {deployment && (
-                <div className="card text-wrap break-words">
-                    <pre className="w-full whitespace-break-spaces">
-                        {JSON.stringify(deployment, undefined, 2)}
-                    </pre>
-                </div>
-            )}
             {deployment?.context && (
                 <DeploymentContext context={deployment.context} />
             )}

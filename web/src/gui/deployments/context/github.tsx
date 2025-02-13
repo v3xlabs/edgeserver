@@ -35,18 +35,26 @@ export type GithubDeploymentContextType = {
     };
 };
 
-export const GithubDeploymentContext: FC<{
-    context: GithubDeploymentContextType;
-}> = ({ context }) => {
+export const decorateGithubDeploymentContext = (
+    context: GithubDeploymentContextType
+) => {
     // strip `/commit/*` from the url
     const repoUrl = context.data.commit.url.replace(/\/commit\/.*/, '');
     const workflowUrl = `${repoUrl}/actions/runs/${context.data.runId}`;
+
+    return { ...context, workflowUrl, repoUrl };
+};
+
+export const GithubDeploymentContext: FC<{
+    context: GithubDeploymentContextType;
+}> = ({ context }) => {
+    const decoratedContext = decorateGithubDeploymentContext(context);
 
     return (
         <div className="card no-padding flex justify-between gap-2 p-5">
             <div className="h-full grow space-y-1">
                 <Link
-                    to={workflowUrl}
+                    to={decoratedContext.workflowUrl}
                     className="hover:text-link flex items-center gap-2 hover:underline"
                     target="_blank"
                 >
