@@ -2,7 +2,7 @@ import { useForm } from '@tanstack/react-form';
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 
 import { useSiteCreate, useTeams } from '@/api';
-import { Button, Input } from '@/components';
+import { Button, Input, TeamSelect } from '@/components';
 import { SCPage } from '@/layouts/SimpleCenterPage';
 
 export const Route = createFileRoute('/_authed/site/new')({
@@ -63,13 +63,11 @@ function RouteComponent() {
                     {({ handleBlur, handleChange, state }) => (
                         <div>
                             <label htmlFor="team_id">Team</label>
-                            <Input
-                                onBlur={handleBlur}
-                                onChange={(event) =>
-                                    handleChange(event.target.value)
-                                }
+                            <TeamSelect
                                 id="team_id"
+                                onBlur={handleBlur}
                                 value={state.value}
+                                onChange={(value) => handleChange(value)}
                             />
                         </div>
                     )}
