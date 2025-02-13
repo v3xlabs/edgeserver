@@ -1,0 +1,29 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            WITH ins AS (\n  INSERT INTO files (file_hash, file_size)\n  VALUES ($1, $2)\n  ON CONFLICT (file_hash) DO NOTHING\n  RETURNING file_id, true AS is_new\n)\nSELECT file_id, is_new\nFROM ins\nUNION ALL\nSELECT file_id, false AS is_new\nFROM files\nWHERE file_hash = $1\nLIMIT 1;\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "file_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "is_new",
+        "type_info": "Bool"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Text",
+        "Int8"
+      ]
+    },
+    "nullable": [
+      null,
+      null
+    ]
+  },
+  "hash": "181384aaec76c2a8be870975b772820cb2afe3215b33cbfa56d5ca29cca1eb1b"
+}

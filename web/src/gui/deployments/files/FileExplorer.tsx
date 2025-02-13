@@ -3,8 +3,9 @@ import { FiFile, FiFolder } from 'react-icons/fi';
 
 import { useDeploymentFiles } from '@/api';
 import { components } from '@/api/schema.gen';
+import byteSize from 'byte-size';
 
-type DeploymentFile = components['schemas']['DeploymentFile'];
+type DeploymentFile = components['schemas']['DeploymentFileEntry'];
 
 type FolderNode = {
     type: 'directory';
@@ -25,7 +26,9 @@ const reorgFilesIntoTree = (files?: DeploymentFile[]): TreeNode => {
 
     for (const file of files) {
         // Split the path and remove any empty segments (from leading/trailing slashes)
-        const segments = file.file_path.split('/').filter(Boolean);
+        const segments = file.deployment_file_file_path
+            .split('/')
+            .filter(Boolean);
 
         if (segments.length === 0) {
             continue; // Skip if the path is empty
@@ -116,13 +119,18 @@ export const FileEntry: FC<{ file: DeploymentFile; name: string }> = ({
     file,
     name,
 }) => {
+    const file_size = file.file_size ? byteSize(file.file_size) : undefined;
+
     return (
         <div className="flex items-center justify-between gap-2">
             <div className="flex items-center gap-2">
                 <FiFile />
                 <span>{name}</span>
             </div>
-            <span>{file.mime_type}</span>
+            <div className="flex items-center gap-2">
+                <span>{file.deployment_file_mime_type}</span>
+                {file_size && <span>{file_size.toString()}</span>}
+            </div>
         </div>
     );
 };

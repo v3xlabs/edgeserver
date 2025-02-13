@@ -59,6 +59,9 @@ importers:
       '@tanstack/router-plugin':
         specifier: ^1.93.0
         version: 1.93.0(@tanstack/react-router@1.93.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(vite@6.0.6(@types/node@22.10.3)(jiti@1.21.7)(sass@1.83.0)(tsx@4.19.2)(yaml@2.7.0))
+      '@types/byte-size':
+        specifier: ^8.1.2
+        version: 8.1.2
       '@types/jsonwebtoken':
         specifier: ^8.5.8
         version: 8.5.9
@@ -71,6 +74,9 @@ importers:
       buffer:
         specifier: ^6.0.3
         version: 6.0.3
+      byte-size:
+        specifier: ^9.0.1
+        version: 9.0.1
       class-variance-authority:
         specifier: ^0.7.1
         version: 0.7.1
@@ -2007,6 +2013,9 @@ packages:
   '@types/babel__traverse@7.20.6':
     resolution: {integrity: sha512-r1bzfrm0tomOI8g1SzvCaQHo6Lcv6zu0EA+W2kHrt8dyrHQxGzBBL4kdkzIS+jBMV+EYcMAEAqXqYaLJq5rOZg==}
 
+  '@types/byte-size@8.1.2':
+    resolution: {integrity: sha512-jGyVzYu6avI8yuqQCNTZd65tzI8HZrLjKX9sdMqZrGWVlNChu0rf6p368oVEDCYJe5BMx2Ov04tD1wqtgTwGSA==}
+
   '@types/color-hash@1.0.5':
     resolution: {integrity: sha512-miV7Z8zvOnRn0ZjbP/D/qb1VWHrWkKOnfC764SJvnCeIziW4pZy3tPK/542seSgccGAXlPQd/seuNyVAS/p5Ug==}
 
@@ -2337,6 +2346,15 @@ packages:
     engines: {node: ^12.20.0 || ^14.13.1 || >=16.0.0}
     peerDependencies:
       esbuild: '>=0.18'
+
+  byte-size@9.0.1:
+    resolution: {integrity: sha512-YLe9x3rabBrcI0cueCdLS2l5ONUKywcRpTs02B8KP9/Cimhj7o3ZccGrPnRvcbyHMbb7W79/3MUJl7iGgTXKEw==}
+    engines: {node: '>=12.17'}
+    peerDependencies:
+      '@75lb/nature': latest
+    peerDependenciesMeta:
+      '@75lb/nature':
+        optional: true
 
   cac@6.7.14:
     resolution: {integrity: sha512-b6Ilus+c3RrdDk+JhLKUAQfzzgLEPy6wcXqS7f/xe1EETvsDP6GORG7SFuOs6cID5YkqchW/LXZbX5bc8j7ZcQ==}
@@ -6785,6 +6803,8 @@ snapshots:
     dependencies:
       '@babel/types': 7.26.3
 
+  '@types/byte-size@8.1.2': {}
+
   '@types/color-hash@1.0.5': {}
 
   '@types/cookie@0.6.0': {}
@@ -7153,6 +7173,8 @@ snapshots:
     dependencies:
       esbuild: 0.24.2
       load-tsconfig: 0.2.5
+
+  byte-size@9.0.1: {}
 
   cac@6.7.14: {}
 

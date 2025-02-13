@@ -237,7 +237,7 @@ export type paths = {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json; charset=utf-8": components["schemas"]["DeploymentFile"][];
+                        "application/json; charset=utf-8": components["schemas"]["DeploymentFileEntry"][];
                     };
                 };
             };
@@ -908,13 +908,15 @@ export type components = {
             /** Format: date-time */
             created_at: string;
         };
-        /** DeploymentFile */
-        DeploymentFile: {
-            deployment_id: string;
+        /** DeploymentFileEntry */
+        DeploymentFileEntry: {
+            deployment_file_deployment_id: string;
             /** Format: int64 */
-            file_id: number;
-            file_path: string;
-            mime_type: string;
+            deployment_file_file_id: number;
+            deployment_file_file_path: string;
+            deployment_file_mime_type: string;
+            /** Format: int64 */
+            file_size?: number;
         };
         /** LoginRequest */
         LoginRequest: {

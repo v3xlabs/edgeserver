@@ -12,6 +12,11 @@
         "ordinal": 1,
         "name": "file_hash",
         "type_info": "Text"
+      },
+      {
+        "ordinal": 2,
+        "name": "file_size",
+        "type_info": "Int8"
       }
     ],
     "parameters": {
@@ -21,7 +26,8 @@
     },
     "nullable": [
       false,
-      false
+      false,
+      true
     ]
   },
   "hash": "7727a042c9f30a8943521ece22c665a9acaef1438a993403c6019eaa60886fdf"

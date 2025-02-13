@@ -4,7 +4,9 @@ use serde::{Deserialize, Serialize};
 use sqlx::{query, query_as};
 
 use crate::{
-    database::Database, state::State, utils::id::{generate_id, IdType}
+    database::Database,
+    state::State,
+    utils::id::{generate_id, IdType},
 };
 
 #[derive(Debug, Serialize, Deserialize, Object)]
@@ -18,6 +20,7 @@ pub struct Deployment {
 pub struct File {
     pub file_id: i64,
     pub file_hash: String,
+    pub file_size: Option<i64>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Object)]
@@ -52,11 +55,7 @@ impl Deployment {
     //     }
     // }
 
-    pub async fn upload_file_full(
-        &self,
-        state: &State,
-    ) -> Result<(), sqlx::Error> {
-
+    pub async fn upload_file_full(&self, state: &State) -> Result<(), sqlx::Error> {
         Ok(())
     }
 
@@ -66,6 +65,7 @@ impl Deployment {
         file_path: impl AsRef<str>,
         file_hash: impl AsRef<str>,
         mime_type: impl AsRef<str>,
+        file_size: i64,
     ) -> Result<NewlyCreatedFile, sqlx::Error> {
         // create a new file in `files` table
         // create a new `deployment_files` row in `deployment_files` table to link the file to the deployment
@@ -81,8 +81,8 @@ impl Deployment {
             NewlyCreatedFile,
             r#"
             WITH ins AS (
-  INSERT INTO files (file_hash)
-  VALUES ($1)
+  INSERT INTO files (file_hash, file_size)
+  VALUES ($1, $2)
   ON CONFLICT (file_hash) DO NOTHING
   RETURNING file_id, true AS is_new
 )
@@ -94,7 +94,8 @@ FROM files
 WHERE file_hash = $1
 LIMIT 1;
             "#,
-            file_hash
+            file_hash,
+            file_size
         )
         .fetch_one(&db.pool)
         .await?;
@@ -115,7 +116,10 @@ LIMIT 1;
 
     // Go through all `files` where the `deployment_files` links it to a deployment_id from `deployments` table
     // if the file is not used by deployments > cutoff_date then return the file
-    pub async fn cleanup_old_files(state: &State, cutoff_date: DateTime<Utc>) -> Result<Vec<File>, sqlx::Error> {
+    pub async fn cleanup_old_files(
+        state: &State,
+        cutoff_date: DateTime<Utc>,
+    ) -> Result<Vec<File>, sqlx::Error> {
         tracing::info!("Checking for unused files before: {:?}", cutoff_date);
         let files = query_as!(
             File,
@@ -175,13 +179,36 @@ pub struct NewlyCreatedFile {
 }
 
 impl DeploymentFile {
-    pub async fn get_deployment_files(db: &Database, deployment_id: &str) -> Result<Vec<Self>, sqlx::Error> {
+    pub async fn get_deployment_files(
+        db: &Database,
+        deployment_id: &str,
+    ) -> Result<Vec<DeploymentFileEntry>, sqlx::Error> {
         query_as!(
-            DeploymentFile,
-            "SELECT * FROM deployment_files WHERE deployment_id = $1",
+            DeploymentFileEntry,
+            r#"
+            SELECT
+                df.deployment_id as "deployment_file_deployment_id!",
+                df.file_id as "deployment_file_file_id!",
+                df.file_path as "deployment_file_file_path!",
+                df.mime_type as "deployment_file_mime_type!",
+                f.file_size
+            FROM deployment_files df
+            JOIN files f ON df.file_id = f.file_id
+            WHERE df.deployment_id = $1
+            "#,
             deployment_id
         )
         .fetch_all(&db.pool)
         .await
     }
+}
+
+// Add this new struct to represent the joined result
+#[derive(Debug, sqlx::FromRow, Object)]
+pub struct DeploymentFileEntry {
+    pub deployment_file_deployment_id: String,
+    pub deployment_file_file_id: i64,
+    pub deployment_file_file_path: String,
+    pub deployment_file_mime_type: String,
+    pub file_size: Option<i64>,
 }

@@ -11,7 +11,7 @@ use tracing::info;
 use crate::{
     middlewares::auth::UserAuth,
     models::{
-        deployment::{Deployment, DeploymentFile},
+        deployment::{Deployment, DeploymentFile, DeploymentFileEntry},
         site::{Site, SiteId},
         team::Team,
     },
@@ -175,7 +175,7 @@ impl SiteApi {
         state: Data<&State>,
         site_id: Path<String>,
         deployment_id: Path<String>,
-    ) -> Result<Json<Vec<DeploymentFile>>> {
+    ) -> Result<Json<Vec<DeploymentFileEntry>>> {
         user.verify_access_to(&SiteId(&site_id.0)).await?;
 
         DeploymentFile::get_deployment_files(&state.database, &deployment_id.0)
@@ -239,17 +239,18 @@ impl SiteApi {
             let file_hash = hash_file(&buf);
 
             let content_type = infer::get(&buf).map(|t| t.mime_type().to_string()).unwrap_or_default();
+            let file_size = buf.len() as i64;
 
             info!("Cataloging metadata for file: {:?}", path);
             let x = deployment
-                .upload_file(&state.database, path, &file_hash, &content_type)
+                .upload_file(&state.database, path, &file_hash, &content_type, file_size)
                 .await
                 .unwrap();
 
             if x.is_new.unwrap_or_default() {
                 info!("Uploading file: {:?}", path);
 
-                let s3_path = format!("{}", &file_hash);
+                let s3_path = file_hash.to_string();
                 state
                     .storage
                     .bucket
