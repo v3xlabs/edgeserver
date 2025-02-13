@@ -238,6 +238,8 @@ impl SiteApi {
             info!("Hashing file: {:?}", path);
             let file_hash = hash_file(&buf);
 
+            let content_type = infer::get(&buf).map(|t| t.mime_type().to_string()).unwrap_or_default();
+
             info!("Cataloging metadata for file: {:?}", path);
             let x = deployment
                 .upload_file(&state.database, path, &file_hash, &content_type)

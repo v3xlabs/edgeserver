@@ -37,3 +37,13 @@ services:
         echo $0 "$@"
         exec minio $0 "$@"                                                 # start Minio in the foreground
       '
+  engine:
+    image: ghcr.io/v3xlabs/edgeserver:edge
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    network_mode: host
+    environment:
+      - RUST_LOG=debug
+      - RUST_BACKTRACE=1

@@ -117,9 +117,12 @@ export const FileEntry: FC<{ file: DeploymentFile; name: string }> = ({
     name,
 }) => {
     return (
-        <div className="flex items-center gap-2">
-            <FiFile />
-            <span>{name}</span>
+        <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2">
+                <FiFile />
+                <span>{name}</span>
+            </div>
+            <span>{file.mime_type}</span>
         </div>
     );
 };

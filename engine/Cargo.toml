@@ -62,4 +62,5 @@ async_zip = { version = "0.0.17", features = ["bzip2", "lzma", "zstd", "xz", "de
 dashmap = { version = "6.1.0", features = ["serde"] }
 serde_json = "1.0.138"
 moka = { version = "0.12.10", features = ["future"] }
+infer = "0.19.0"
 # tokio = { version = "1.39.0", features = [""], default-features = false}
