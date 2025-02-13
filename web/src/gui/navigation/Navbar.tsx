@@ -46,7 +46,7 @@ export const Navbar = () => {
         <div className="w-full">
             <div className="relative z-30 h-14 w-full">
                 <div className="bg-default z-10 h-14 w-full border-b px-4">
-                    <div className="w-container-dynamic flex h-full items-center justify-between">
+                    <div className="w-container-dynamic flex h-full items-center justify-between px-6">
                         <div className="flex h-full">
                             <div className="relative h-full w-8">
                                 <Link
