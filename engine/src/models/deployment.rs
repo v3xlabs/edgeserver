@@ -52,6 +52,14 @@ impl Deployment {
     //     }
     // }
 
+    pub async fn upload_file_full(
+        &self,
+        state: &State,
+    ) -> Result<(), sqlx::Error> {
+
+        Ok(())
+    }
+
     pub async fn upload_file(
         &self,
         db: &Database,
