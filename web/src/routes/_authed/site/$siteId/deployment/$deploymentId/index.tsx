@@ -1,6 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router';
 
-import { useDeployment, useDeploymentFiles } from '@/api';
+import { useDeployment } from '@/api';
+import { FileExplorer } from '@/gui/deployments/files/FileExplorer';
 import { SCPage } from '@/layouts';
 
 export const Route = createFileRoute(
@@ -12,7 +13,6 @@ export const Route = createFileRoute(
 function RouteComponent() {
     const { siteId, deploymentId } = Route.useParams();
     const { data: deployment } = useDeployment(siteId, deploymentId);
-    const { data: deploymentFiles } = useDeploymentFiles(siteId, deploymentId);
 
     return (
         <SCPage title={`Deployment ${deploymentId}`}>
@@ -24,13 +24,7 @@ function RouteComponent() {
                     </pre>
                 </div>
             )}
-            {deploymentFiles && (
-                <div className="card text-wrap break-words">
-                    <pre className="w-full whitespace-break-spaces">
-                        {JSON.stringify(deploymentFiles, undefined, 2)}
-                    </pre>
-                </div>
-            )}
+            <FileExplorer siteId={siteId} deploymentId={deploymentId} />
         </SCPage>
     );
 }
