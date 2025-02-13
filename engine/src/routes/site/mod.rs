@@ -266,7 +266,7 @@ impl SiteApi {
 
         info!("Deployment complete");
 
-        let cutoff_date = Utc::now() - Duration::seconds(30);
+        let cutoff_date = Utc::now() - Duration::days(365);
         Deployment::cleanup_old_files(&state, cutoff_date)
             .await
             .unwrap();
