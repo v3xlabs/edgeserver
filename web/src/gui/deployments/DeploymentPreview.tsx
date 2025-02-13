@@ -35,7 +35,16 @@ export const DeploymentPreview: FC<{
     if (githubContext) {
         return (
             <div className="card flex justify-between gap-4">
-                <div className="bg-secondary aspect-video h-full max-h-48 min-h-24 rounded-md drop-shadow-sm"></div>
+                <Link
+                    to="/site/$siteId/deployment/$deploymentId"
+                    params={{
+                        deploymentId: deployment?.deployment_id ?? '',
+                        siteId: deployment?.site_id ?? '',
+                    }}
+                    className="cursor-pointer"
+                >
+                    <div className="bg-secondary aspect-video h-full max-h-48 min-h-24 rounded-md drop-shadow-sm"></div>
+                </Link>
                 <div className="grow py-2">
                     <div>
                         <Link
