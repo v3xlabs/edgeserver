@@ -37,7 +37,7 @@ const TeamEntry: FC<{ team_id: string }> = ({ team_id }) => {
 
 const EmptyTeamEntry: FC = () => {
     return (
-        <div className="flex h-full items-center text-black/20">
+        <div className="text-muted flex h-full items-center">
             Select a team or site...
         </div>
     );
