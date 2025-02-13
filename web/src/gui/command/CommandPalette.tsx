@@ -15,6 +15,7 @@ import {
     team_commands,
 } from './command';
 import { TeamEntries } from './entries/TeamEntry';
+import { SiteEntries } from './entries/SiteEntry';
 
 export const CommandPalette = () => {
     const [open, setOpen] = useState(false);
@@ -149,6 +150,7 @@ const CommandPaletteInternal: FC<{ requestClose: () => void }> = ({
                         </Command.Group>
                     ))}
                 <TeamEntries />
+                <SiteEntries />
             </Command.List>
         </Command>
     );
