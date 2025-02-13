@@ -34,6 +34,7 @@ import { Route as AuthedTeamTeamIdSettingsSImport } from './routes/_authed/team/
 import { Route as AuthedSiteSiteIdSettingsSImport } from './routes/_authed/site/$siteId/settings/_s'
 import { Route as AuthedTeamTeamIdSettingsSIndexImport } from './routes/_authed/team/$teamId/settings/_s.index'
 import { Route as AuthedSiteSiteIdSettingsSIndexImport } from './routes/_authed/site/$siteId/settings/_s.index'
+import { Route as AuthedSiteSiteIdDeploymentDeploymentIdIndexImport } from './routes/_authed/site/$siteId/deployment/$deploymentId/index'
 import { Route as AuthedTeamTeamIdSettingsSWebhooksImport } from './routes/_authed/team/$teamId/settings/_s.webhooks'
 import { Route as AuthedTeamTeamIdSettingsSTransferImport } from './routes/_authed/team/$teamId/settings/_s.transfer'
 import { Route as AuthedTeamTeamIdSettingsSMembersImport } from './routes/_authed/team/$teamId/settings/_s.members'
@@ -207,6 +208,13 @@ const AuthedSiteSiteIdSettingsSIndexRoute =
     id: '/',
     path: '/',
     getParentRoute: () => AuthedSiteSiteIdSettingsSRoute,
+  } as any)
+
+const AuthedSiteSiteIdDeploymentDeploymentIdIndexRoute =
+  AuthedSiteSiteIdDeploymentDeploymentIdIndexImport.update({
+    id: '/site/$siteId/deployment/$deploymentId/',
+    path: '/site/$siteId/deployment/$deploymentId/',
+    getParentRoute: () => AuthedRoute,
   } as any)
 
 const AuthedTeamTeamIdSettingsSWebhooksRoute =
@@ -556,6 +564,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthedTeamTeamIdSettingsSWebhooksImport
       parentRoute: typeof AuthedTeamTeamIdSettingsSImport
     }
+    '/_authed/site/$siteId/deployment/$deploymentId/': {
+      id: '/_authed/site/$siteId/deployment/$deploymentId/'
+      path: '/site/$siteId/deployment/$deploymentId'
+      fullPath: '/site/$siteId/deployment/$deploymentId'
+      preLoaderRoute: typeof AuthedSiteSiteIdDeploymentDeploymentIdIndexImport
+      parentRoute: typeof AuthedImport
+    }
     '/_authed/site/$siteId/settings/_s/': {
       id: '/_authed/site/$siteId/settings/_s/'
       path: '/'
@@ -726,6 +741,7 @@ interface AuthedRouteChildren {
   AuthedTeamTeamIdIndexRoute: typeof AuthedTeamTeamIdIndexRoute
   AuthedSiteSiteIdSettingsRoute: typeof AuthedSiteSiteIdSettingsRouteWithChildren
   AuthedTeamTeamIdSettingsRoute: typeof AuthedTeamTeamIdSettingsRouteWithChildren
+  AuthedSiteSiteIdDeploymentDeploymentIdIndexRoute: typeof AuthedSiteSiteIdDeploymentDeploymentIdIndexRoute
 }
 
 const AuthedRouteChildren: AuthedRouteChildren = {
@@ -741,6 +757,8 @@ const AuthedRouteChildren: AuthedRouteChildren = {
   AuthedTeamTeamIdIndexRoute: AuthedTeamTeamIdIndexRoute,
   AuthedSiteSiteIdSettingsRoute: AuthedSiteSiteIdSettingsRouteWithChildren,
   AuthedTeamTeamIdSettingsRoute: AuthedTeamTeamIdSettingsRouteWithChildren,
+  AuthedSiteSiteIdDeploymentDeploymentIdIndexRoute:
+    AuthedSiteSiteIdDeploymentDeploymentIdIndexRoute,
 }
 
 const AuthedRouteWithChildren =
@@ -779,6 +797,7 @@ export interface FileRoutesByFullPath {
   '/team/$teamId/settings/members': typeof AuthedTeamTeamIdSettingsSMembersRoute
   '/team/$teamId/settings/transfer': typeof AuthedTeamTeamIdSettingsSTransferRoute
   '/team/$teamId/settings/webhooks': typeof AuthedTeamTeamIdSettingsSWebhooksRoute
+  '/site/$siteId/deployment/$deploymentId': typeof AuthedSiteSiteIdDeploymentDeploymentIdIndexRoute
   '/site/$siteId/settings/': typeof AuthedSiteSiteIdSettingsSIndexRoute
   '/team/$teamId/settings/': typeof AuthedTeamTeamIdSettingsSIndexRoute
 }
@@ -813,6 +832,7 @@ export interface FileRoutesByTo {
   '/team/$teamId/settings/members': typeof AuthedTeamTeamIdSettingsSMembersRoute
   '/team/$teamId/settings/transfer': typeof AuthedTeamTeamIdSettingsSTransferRoute
   '/team/$teamId/settings/webhooks': typeof AuthedTeamTeamIdSettingsSWebhooksRoute
+  '/site/$siteId/deployment/$deploymentId': typeof AuthedSiteSiteIdDeploymentDeploymentIdIndexRoute
 }
 
 export interface FileRoutesById {
@@ -853,6 +873,7 @@ export interface FileRoutesById {
   '/_authed/team/$teamId/settings/_s/members': typeof AuthedTeamTeamIdSettingsSMembersRoute
   '/_authed/team/$teamId/settings/_s/transfer': typeof AuthedTeamTeamIdSettingsSTransferRoute
   '/_authed/team/$teamId/settings/_s/webhooks': typeof AuthedTeamTeamIdSettingsSWebhooksRoute
+  '/_authed/site/$siteId/deployment/$deploymentId/': typeof AuthedSiteSiteIdDeploymentDeploymentIdIndexRoute
   '/_authed/site/$siteId/settings/_s/': typeof AuthedSiteSiteIdSettingsSIndexRoute
   '/_authed/team/$teamId/settings/_s/': typeof AuthedTeamTeamIdSettingsSIndexRoute
 }
@@ -892,6 +913,7 @@ export interface FileRouteTypes {
     | '/team/$teamId/settings/members'
     | '/team/$teamId/settings/transfer'
     | '/team/$teamId/settings/webhooks'
+    | '/site/$siteId/deployment/$deploymentId'
     | '/site/$siteId/settings/'
     | '/team/$teamId/settings/'
   fileRoutesByTo: FileRoutesByTo
@@ -925,6 +947,7 @@ export interface FileRouteTypes {
     | '/team/$teamId/settings/members'
     | '/team/$teamId/settings/transfer'
     | '/team/$teamId/settings/webhooks'
+    | '/site/$siteId/deployment/$deploymentId'
   id:
     | '__root__'
     | '/_authed'
@@ -963,6 +986,7 @@ export interface FileRouteTypes {
     | '/_authed/team/$teamId/settings/_s/members'
     | '/_authed/team/$teamId/settings/_s/transfer'
     | '/_authed/team/$teamId/settings/_s/webhooks'
+    | '/_authed/site/$siteId/deployment/$deploymentId/'
     | '/_authed/site/$siteId/settings/_s/'
     | '/_authed/team/$teamId/settings/_s/'
   fileRoutesById: FileRoutesById
@@ -1015,7 +1039,8 @@ export const routeTree = rootRoute
         "/_authed/site/$siteId/",
         "/_authed/team/$teamId/",
         "/_authed/site/$siteId/settings",
-        "/_authed/team/$teamId/settings"
+        "/_authed/team/$teamId/settings",
+        "/_authed/site/$siteId/deployment/$deploymentId/"
       ]
     },
     "/bootstrap": {
@@ -1190,6 +1215,10 @@ export const routeTree = rootRoute
     "/_authed/team/$teamId/settings/_s/webhooks": {
       "filePath": "_authed/team/$teamId/settings/_s.webhooks.tsx",
       "parent": "/_authed/team/$teamId/settings/_s"
+    },
+    "/_authed/site/$siteId/deployment/$deploymentId/": {
+      "filePath": "_authed/site/$siteId/deployment/$deploymentId/index.tsx",
+      "parent": "/_authed"
     },
     "/_authed/site/$siteId/settings/_s/": {
       "filePath": "_authed/site/$siteId/settings/_s.index.tsx",

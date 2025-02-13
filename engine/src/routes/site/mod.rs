@@ -11,7 +11,7 @@ use tracing::info;
 use crate::{
     middlewares::auth::UserAuth,
     models::{
-        deployment::Deployment,
+        deployment::{Deployment, DeploymentFile},
         site::{Site, SiteId},
         team::Team,
     },
@@ -144,6 +144,48 @@ impl SiteApi {
     }
 
     #[oai(
+        path = "/site/:site_id/deployment/:deployment_id",
+        method = "get",
+        tag = "ApiTags::Site"
+    )]
+    pub async fn get_deployment(
+        &self,
+        user: UserAuth,
+        state: Data<&State>,
+        site_id: Path<String>,
+        deployment_id: Path<String>,
+    ) -> Result<Json<Deployment>> {
+        user.verify_access_to(&SiteId(&site_id.0)).await?;
+
+        Deployment::get_by_id(&state.database, &deployment_id.0)
+            .await
+            .map_err(HttpError::from)
+            .map(Json)
+            .map_err(poem::Error::from)
+        }
+
+    #[oai(
+        path = "/site/:site_id/deployment/:deployment_id/files",
+        method = "get",
+        tag = "ApiTags::Site"
+    )]
+    pub async fn get_deployment_files(
+        &self,
+        user: UserAuth,
+        state: Data<&State>,
+        site_id: Path<String>,
+        deployment_id: Path<String>,
+    ) -> Result<Json<Vec<DeploymentFile>>> {
+        user.verify_access_to(&SiteId(&site_id.0)).await?;
+
+        DeploymentFile::get_deployment_files(&state.database, &deployment_id.0)
+            .await
+            .map_err(HttpError::from)
+            .map(Json)
+            .map_err(poem::Error::from)
+    }
+
+    #[oai(
         path = "/site/:site_id/deployment",
         method = "post",
         tag = "ApiTags::Site"
@@ -198,21 +240,20 @@ impl SiteApi {
 
             info!("Cataloging metadata for file: {:?}", path);
             let x = deployment
-            .upload_file(&state.database, path, &file_hash, &content_type)
-            .await
-            .unwrap();
-
-            if x.is_new.unwrap_or_default() {
-
-            info!("Uploading file: {:?}", path);
-
-            let s3_path = format!("{}", &file_hash);
-            state
-                .storage
-                .bucket
-                .put_object_with_content_type(&s3_path, &buf, &content_type)
+                .upload_file(&state.database, path, &file_hash, &content_type)
                 .await
                 .unwrap();
+
+            if x.is_new.unwrap_or_default() {
+                info!("Uploading file: {:?}", path);
+
+                let s3_path = format!("{}", &file_hash);
+                state
+                    .storage
+                    .bucket
+                    .put_object_with_content_type(&s3_path, &buf, &content_type)
+                    .await
+                    .unwrap();
 
                 info!("Upload complete");
             } else {

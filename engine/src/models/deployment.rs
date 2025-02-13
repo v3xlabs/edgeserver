@@ -156,10 +156,32 @@ LIMIT 1;
 
         Ok(files)
     }
+
+    pub async fn get_by_id(db: &Database, deployment_id: &str) -> Result<Self, sqlx::Error> {
+        query_as!(
+            Deployment,
+            "SELECT * FROM deployments WHERE deployment_id = $1",
+            deployment_id
+        )
+        .fetch_one(&db.pool)
+        .await
+    }
 }
 
 #[derive(Debug, Serialize, Deserialize, Object)]
 pub struct NewlyCreatedFile {
     pub file_id: Option<i64>,
     pub is_new: Option<bool>,
+}
+
+impl DeploymentFile {
+    pub async fn get_deployment_files(db: &Database, deployment_id: &str) -> Result<Vec<Self>, sqlx::Error> {
+        query_as!(
+            DeploymentFile,
+            "SELECT * FROM deployment_files WHERE deployment_id = $1",
+            deployment_id
+        )
+        .fetch_all(&db.pool)
+        .await
+    }
 }

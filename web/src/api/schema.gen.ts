@@ -176,6 +176,80 @@ export type paths = {
         patch?: never;
         trace?: never;
     };
+    "/site/{site_id}/deployment/{deployment_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    site_id: string;
+                    deployment_id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json; charset=utf-8": components["schemas"]["Deployment"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/site/{site_id}/deployment/{deployment_id}/files": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    site_id: string;
+                    deployment_id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json; charset=utf-8": components["schemas"]["DeploymentFile"][];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/site/{site_id}/deployment": {
         parameters: {
             query?: never;
@@ -199,6 +273,7 @@ export type paths = {
                     "multipart/form-data": {
                         /** Format: binary */
                         data: string;
+                        context?: string;
                     };
                 };
             };
@@ -808,35 +883,49 @@ export type paths = {
 export type webhooks = Record<string, never>;
 export type components = {
     schemas: {
+        /** BootstrapUserRequest */
         BootstrapUserRequest: {
             username: string;
             password: string;
         };
+        /** BootstrapUserResponse */
         BootstrapUserResponse: {
             user: components["schemas"]["User"];
             team: components["schemas"]["Team"];
         };
+        /** CanBootstrapResponse */
         CanBootstrapResponse: {
             can_bootstrap: boolean;
         };
+        /** CreateTeamRequest */
         CreateTeamRequest: {
             name: string;
         };
+        /** Deployment */
         Deployment: {
             deployment_id: string;
             site_id: string;
-            hash: string;
-            storage: string;
             /** Format: date-time */
             created_at: string;
         };
+        /** DeploymentFile */
+        DeploymentFile: {
+            deployment_id: string;
+            /** Format: int64 */
+            file_id: number;
+            file_path: string;
+            mime_type: string;
+        };
+        /** LoginRequest */
         LoginRequest: {
             username: string;
             password: string;
         };
+        /** LoginResponse */
         LoginResponse: {
             token: string;
         };
+        /** Site */
         Site: {
             site_id: string;
             team_id: string;
@@ -844,10 +933,12 @@ export type components = {
             /** Format: date-time */
             created_at: string;
         };
+        /** SiteCreateRequest */
         SiteCreateRequest: {
             name: string;
             team_id: string;
         };
+        /** Team */
         Team: {
             team_id: string;
             owner_id: string;
@@ -855,14 +946,17 @@ export type components = {
             /** Format: date-time */
             created_at: string;
         };
+        /** TeamInviteAcceptNewPayload */
         TeamInviteAcceptNewPayload: {
             username: string;
             password: string;
         };
+        /** TeamInviteData */
         TeamInviteData: {
             invite: components["schemas"]["UserTeamInvite"];
             team: components["schemas"]["Team"];
         };
+        /** User */
         User: {
             user_id: string;
             name: string;
@@ -870,6 +964,7 @@ export type components = {
             created_at: string;
             admin?: boolean;
         };
+        /** UserTeamInvite */
         UserTeamInvite: {
             invite_id: string;
             team_id: string;

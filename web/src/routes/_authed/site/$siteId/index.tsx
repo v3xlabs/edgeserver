@@ -21,7 +21,7 @@ function RouteComponent() {
     return (
         <SCPage title={site?.name ?? 'Site'}>
             <div className="card">This is the site page</div>
-            <DeploymentList siteId={siteId} />
+            <DeploymentList siteId={siteId} max={3} />
         </SCPage>
     );
 }

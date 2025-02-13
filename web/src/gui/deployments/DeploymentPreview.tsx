@@ -1,3 +1,4 @@
+import { Link } from '@tanstack/react-router';
 import { FC } from 'react';
 import TimeAgo from 'react-timeago-i18n';
 
@@ -16,6 +17,15 @@ export const DeploymentPreview: FC<{
             <div>
                 <div>{deployment_id}</div>
                 <div>{deployment?.deployment_id}</div>
+                <Link
+                    to="/site/$siteId/deployment/$deploymentId"
+                    params={{
+                        deploymentId: deployment?.deployment_id ?? '',
+                        siteId: deployment?.site_id ?? '',
+                    }}
+                >
+                    View
+                </Link>
             </div>
             <div>
                 {deployment?.created_at && (

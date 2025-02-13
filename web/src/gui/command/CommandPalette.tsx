@@ -14,6 +14,7 @@ import {
     site_commands,
     team_commands,
 } from './command';
+import { TeamEntries } from './entries/TeamEntry';
 
 export const CommandPalette = () => {
     const [open, setOpen] = useState(false);
@@ -58,12 +59,7 @@ const CommandPaletteInternal: FC<{ requestClose: () => void }> = ({
     const navigate = useNavigate();
 
     return (
-        <Command
-            label="Global Command Palette"
-            // onValueChange={(value) => {
-            //     console.log({ value });
-            // }}
-        >
+        <Command label="Global Command Palette">
             <div className="border-b p-2">
                 <div className="flex items-center gap-2">
                     <FiChevronRight className="size-4" />
@@ -139,7 +135,6 @@ const CommandPaletteInternal: FC<{ requestClose: () => void }> = ({
                                             requestClose();
                                         }
                                     }}
-                                    on
                                     keywords={command.aliases}
                                 >
                                     <span className="flex w-full items-center gap-2">
@@ -153,6 +148,7 @@ const CommandPaletteInternal: FC<{ requestClose: () => void }> = ({
                             ))}
                         </Command.Group>
                     ))}
+                <TeamEntries />
             </Command.List>
         </Command>
     );
