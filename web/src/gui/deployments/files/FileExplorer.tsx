@@ -1,9 +1,9 @@
+import byteSize from 'byte-size';
 import { FC } from 'react';
 import { FiFile, FiFolder } from 'react-icons/fi';
 
 import { useDeploymentFiles } from '@/api';
 import { components } from '@/api/schema.gen';
-import byteSize from 'byte-size';
 
 type DeploymentFile = components['schemas']['DeploymentFileEntry'];
 
@@ -68,17 +68,19 @@ export const FileExplorer: FC<{ siteId: string; deploymentId: string }> = ({
     const tree = reorgFilesIntoTree(deploymentFiles);
 
     return (
-        <div>
+        <div className="space-y-4">
             <div className="card">
-                <TreeEntry node={tree} name="/" />
+                <div className="bg-secondary rounded-md border p-4">
+                    <TreeEntry node={tree} name="/" />
+                </div>
             </div>
-            {deploymentFiles && (
+            {/* {deploymentFiles && (
                 <div className="card text-wrap break-words">
                     <pre className="w-full whitespace-break-spaces">
                         {JSON.stringify(deploymentFiles, undefined, 2)}
                     </pre>
                 </div>
-            )}
+            )} */}
         </div>
     );
 };
@@ -105,11 +107,23 @@ export const FolderEntry: FC<{ node: FolderNode; name: string }> = ({
                 <span>{name}</span>
             </div>
             <ul className="pl-4">
-                {Object.entries(node.files).map(([key, value]) => (
-                    <li key={key}>
-                        <TreeEntry node={value} name={key} />
-                    </li>
-                ))}
+                {Object.entries(node.files)
+                    .sort(([aName, a], [bName, b]) => {
+                        if (a.type === 'directory' && b.type === 'file') {
+                            return -1;
+                        }
+
+                        if (a.type === 'file' && b.type === 'directory') {
+                            return 1;
+                        }
+
+                        return aName.localeCompare(bName);
+                    })
+                    .map(([key, value]) => (
+                        <li key={key}>
+                            <TreeEntry node={value} name={key} />
+                        </li>
+                    ))}
             </ul>
         </div>
     );
