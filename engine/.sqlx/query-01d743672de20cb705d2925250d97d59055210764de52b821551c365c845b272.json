@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "DELETE FROM files WHERE file_id = ANY($1)",
+  "query": "UPDATE files SET file_deleted = TRUE WHERE file_id = ANY($1)",
   "describe": {
     "columns": [],
     "parameters": {
@@ -10,5 +10,5 @@
     },
     "nullable": []
   },
-  "hash": "633148aa2542fcd5642f0f9d2bf99cc7a0bb5967e84e255aaba7720af2ebd196"
+  "hash": "01d743672de20cb705d2925250d97d59055210764de52b821551c365c845b272"
 }

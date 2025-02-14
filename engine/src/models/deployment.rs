@@ -25,6 +25,7 @@ pub struct File {
     pub file_id: i64,
     pub file_hash: String,
     pub file_size: Option<i64>,
+    pub file_deleted: bool,
 }
 
 #[derive(Debug, Serialize, Deserialize, Object)]
@@ -195,7 +196,7 @@ LIMIT 1;
                 JOIN deployments d ON df.deployment_id = d.deployment_id
                 WHERE df.file_id = f.file_id 
                 AND d.created_at > $1
-            )"#,
+            ) AND f.file_deleted = FALSE"#,
             cutoff_date
         )
         .fetch_all(&state.database.pool)
@@ -214,7 +215,7 @@ LIMIT 1;
 
             // delete the files from the `files` table
             query!(
-                "DELETE FROM files WHERE file_id = ANY($1)",
+                "UPDATE files SET file_deleted = TRUE WHERE file_id = ANY($1)",
                 &files.iter().map(|f| f.file_id).collect::<Vec<i64>>()
             )
             .execute(&state.database.pool)
@@ -254,7 +255,8 @@ impl DeploymentFile {
                 df.file_id as "deployment_file_file_id!",
                 df.file_path as "deployment_file_file_path!",
                 df.mime_type as "deployment_file_mime_type!",
-                f.file_size
+                f.file_size,
+                f.file_deleted
             FROM deployment_files df
             JOIN files f ON df.file_id = f.file_id
             WHERE df.deployment_id = $1
@@ -274,6 +276,7 @@ pub struct DeploymentFileEntry {
     pub deployment_file_file_path: String,
     pub deployment_file_mime_type: String,
     pub file_size: Option<i64>,
+    pub file_deleted: bool,
 }
 
 fn hash_file(file: &[u8]) -> String {
