@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            SELECT\n                df.deployment_id as \"deployment_file_deployment_id!\",\n                df.file_id as \"deployment_file_file_id!\",\n                df.file_path as \"deployment_file_file_path!\",\n                df.mime_type as \"deployment_file_mime_type!\",\n                f.file_size\n            FROM deployment_files df\n            JOIN files f ON df.file_id = f.file_id\n            WHERE df.deployment_id = $1\n            ",
+  "query": "\n            SELECT\n                df.deployment_id as \"deployment_file_deployment_id!\",\n                df.file_id as \"deployment_file_file_id!\",\n                df.file_path as \"deployment_file_file_path!\",\n                df.mime_type as \"deployment_file_mime_type!\",\n                f.file_size,\n                f.file_deleted\n            FROM deployment_files df\n            JOIN files f ON df.file_id = f.file_id\n            WHERE df.deployment_id = $1\n            ",
   "describe": {
     "columns": [
       {
@@ -27,6 +27,11 @@
         "ordinal": 4,
         "name": "file_size",
         "type_info": "Int8"
+      },
+      {
+        "ordinal": 5,
+        "name": "file_deleted",
+        "type_info": "Bool"
       }
     ],
     "parameters": {
@@ -39,8 +44,9 @@
       false,
       false,
       false,
-      true
+      true,
+      false
     ]
   },
-  "hash": "1008fa21a7dfc8114e90af7983cf715b0d123a55b07364edc1ad5be045002b93"
+  "hash": "d5214436198da4f23c29dd223e8fdc82018e8c80c6345bd02f1966a7772ad22e"
 }
