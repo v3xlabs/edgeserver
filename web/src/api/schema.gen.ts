@@ -213,6 +213,50 @@ export type paths = {
         patch?: never;
         trace?: never;
     };
+    "/site/{site_id}/deployment": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    site_id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "multipart/form-data": {
+                        /** Format: binary */
+                        data?: string;
+                        context?: string;
+                    };
+                };
+            };
+            responses: {
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json; charset=utf-8": components["schemas"]["Deployment"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/site/{site_id}/deployment/{deployment_id}/files": {
         parameters: {
             query?: never;
@@ -247,24 +291,13 @@ export type paths = {
         delete?: never;
         options?: never;
         head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/site/{site_id}/deployment": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: {
+        patch: {
             parameters: {
                 query?: never;
                 header?: never;
                 path: {
                     site_id: string;
+                    deployment_id: string;
                 };
                 cookie?: never;
             };
@@ -272,7 +305,7 @@ export type paths = {
                 content: {
                     "multipart/form-data": {
                         /** Format: binary */
-                        data: string;
+                        data?: string;
                         context?: string;
                     };
                 };
@@ -288,10 +321,6 @@ export type paths = {
                 };
             };
         };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
         trace?: never;
     };
     "/user": {
@@ -918,6 +947,7 @@ export type components = {
             deployment_file_mime_type: string;
             /** Format: int64 */
             file_size?: number;
+            file_deleted: boolean;
         };
         /** LoginRequest */
         LoginRequest: {
