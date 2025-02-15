@@ -2,39 +2,52 @@ import { Link, useParams } from '@tanstack/react-router';
 import { AnimatePresence } from 'framer-motion';
 
 import { useMe } from '@/api';
-import { authStore, useAuth } from '@/api/auth/store';
-import { Avatar } from '@/components';
+import { authStore } from '@/api/auth/store';
+import { Avatar, Button } from '@/components';
 
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuPortal,
+    DropdownMenuTrigger,
+} from '../Dropdown';
 import { InteractiveNavigator } from './InteractiveNavigator';
 import { Subbar } from './Subbar';
 import { ThemeSwitcher } from './ThemeSwitcher';
 
 const UserProfile = () => {
-    const { token } = useAuth();
     const { data: me } = useMe();
 
     return (
-        <div className="group relative flex h-full items-end">
-            <div className="flex h-full w-fit items-center px-2 group-hover:bg-black/10">
-                <span>{me?.name}</span>
-                {/* <AvatarOrGradient
+        <DropdownMenu>
+            <div className="flex h-full items-end">
+                <div className="flex h-full w-fit items-center px-2 group-hover:bg-black/10">
+                    <DropdownMenuTrigger>
+                        <span>{me?.name}</span>
+                        {/* <AvatarOrGradient
                     src={avatar}
                     hash={user || ''}
                     className="ml-2 size-8 overflow-hidden rounded-full bg-white"
                 /> */}
+                    </DropdownMenuTrigger>
+                </div>
+                <DropdownMenuPortal>
+                    <DropdownMenuContent>
+                        <div className="top-full flex w-fit flex-col gap-y-2 whitespace-nowrap rounded-b-md">
+                            <ThemeSwitcher />
+                            <Button
+                                className="flex items-start px-4 py-2 hover:bg-black/10"
+                                onClick={() => {
+                                    authStore.send({ type: 'clearAuthToken' });
+                                }}
+                            >
+                                Log out
+                            </Button>
+                        </div>
+                    </DropdownMenuContent>
+                </DropdownMenuPortal>
             </div>
-            <div className="bg-default absolute right-0 top-full hidden w-fit flex-col overflow-hidden whitespace-nowrap rounded-b-md group-hover:flex">
-                <ThemeSwitcher />
-                <button
-                    className="flex items-start px-4 py-2 hover:bg-black/10"
-                    onClick={() => {
-                        authStore.send({ type: 'clearAuthToken' });
-                    }}
-                >
-                    Log out
-                </button>
-            </div>
-        </div>
+        </DropdownMenu>
     );
 };
 
