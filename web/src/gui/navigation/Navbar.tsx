@@ -37,16 +37,9 @@ const UserProfile = () => {
                             <ThemeSwitcher />
                             <div className="flex flex-row gap-x-2">
                                 {me?.admin && (
-                                    <Button
-                                        className="flex items-start px-4 py-2 hover:bg-black/10"
-                                        onClick={() => {
-                                            authStore.send({
-                                                type: 'clearAuthToken',
-                                            });
-                                        }}
-                                    >
-                                        Admin
-                                    </Button>
+                                    <Link to="/admin">
+                                        <Button>Admin</Button>
+                                    </Link>
                                 )}
                                 <Button
                                     className="flex items-start px-4 py-2 hover:bg-black/10"
