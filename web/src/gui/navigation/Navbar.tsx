@@ -35,14 +35,30 @@ const UserProfile = () => {
                     <DropdownMenuContent>
                         <div className="top-full flex w-fit flex-col gap-y-2 whitespace-nowrap rounded-b-md">
                             <ThemeSwitcher />
-                            <Button
-                                className="flex items-start px-4 py-2 hover:bg-black/10"
-                                onClick={() => {
-                                    authStore.send({ type: 'clearAuthToken' });
-                                }}
-                            >
-                                Log out
-                            </Button>
+                            <div className="flex flex-row gap-x-2">
+                                {me?.admin && (
+                                    <Button
+                                        className="flex items-start px-4 py-2 hover:bg-black/10"
+                                        onClick={() => {
+                                            authStore.send({
+                                                type: 'clearAuthToken',
+                                            });
+                                        }}
+                                    >
+                                        Admin
+                                    </Button>
+                                )}
+                                <Button
+                                    className="flex items-start px-4 py-2 hover:bg-black/10"
+                                    onClick={() => {
+                                        authStore.send({
+                                            type: 'clearAuthToken',
+                                        });
+                                    }}
+                                >
+                                    Log out
+                                </Button>
+                            </div>
                         </div>
                     </DropdownMenuContent>
                 </DropdownMenuPortal>
