@@ -21,7 +21,7 @@ export const ThemeSwitcher = () => {
     };
 
     return (
-        <div className="flex h-full items-center">
+        <div className="mx-auto flex size-full">
             {(
                 [
                     ['light', <FiSun key="light" />],
@@ -34,7 +34,7 @@ export const ThemeSwitcher = () => {
                     onClick={() => setTheme(theme)}
                     className={cn(
                         currentTheme === theme && 'bg-hover',
-                        'h-full flex items-center px-1'
+                        'h-full flex items-center px-1 aspect-square rounded-full'
                     )}
                 >
                     {icon}
