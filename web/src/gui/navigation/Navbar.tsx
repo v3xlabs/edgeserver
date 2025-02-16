@@ -33,16 +33,18 @@ const UserProfile = () => {
                 </div>
                 <DropdownMenuPortal>
                     <DropdownMenuContent>
-                        <div className="top-full flex w-fit flex-col gap-y-2 whitespace-nowrap rounded-b-md">
+                        <div className="top-full flex w-full flex-col gap-y-2 whitespace-nowrap rounded-b-md">
                             <ThemeSwitcher />
-                            <div className="flex flex-row gap-x-2">
+                            <div className="flex flex-col gap-y-1">
                                 {me?.admin && (
                                     <Link to="/admin">
-                                        <Button>Admin</Button>
+                                        <Button className="w-full">
+                                            Admin
+                                        </Button>
                                     </Link>
                                 )}
                                 <Button
-                                    className="flex items-start px-4 py-2 hover:bg-black/10"
+                                    className="flex w-full items-start px-4 py-2 hover:bg-black/10"
                                     onClick={() => {
                                         authStore.send({
                                             type: 'clearAuthToken',
