@@ -1,5 +1,8 @@
 import { queryOptions, useQuery } from '@tanstack/react-query';
 
+import { parseDeploymentContext } from '@/gui/deployments/context/context';
+import { decorateGithubDeploymentContext } from '@/gui/deployments/context/github';
+
 import { apiRequest } from '../core';
 import { components } from '../schema.gen';
 
@@ -21,6 +24,41 @@ export const getDeployment = (siteId: string, deploymentId: string) =>
             );
 
             return response.data;
+        },
+        refetchInterval(query) {
+            // parse context if it exists
+            // if github context workflow_status is pre or push, return 1000
+            // ensure that created_at is within the last 30 minutes
+            // if not, return undefined
+
+            const deployment = query.state.data;
+
+            if (!deployment) return;
+
+            const deploymentContext = deployment.context
+                ? parseDeploymentContext(deployment.context)
+                : undefined;
+
+            const githubContext =
+                deploymentContext?.contextType === 'github-action'
+                    ? decorateGithubDeploymentContext(deploymentContext)
+                    : undefined;
+
+            if (githubContext) {
+                const workflowStatus = githubContext.data.workflow_status;
+                const createdAt = new Date(deployment.created_at);
+                const now = new Date();
+                const diff = now.getTime() - createdAt.getTime();
+                const diffInMinutes = diff / 60_000;
+
+                if (diffInMinutes > 30) {
+                    return;
+                }
+
+                if (workflowStatus === 'pre' || workflowStatus === 'push') {
+                    return 1000;
+                }
+            }
         },
     });
 

@@ -32,6 +32,11 @@ export type GithubDeploymentContextType = {
             tree_id: string; // 'fea2c25f496451c42e5dc74130b033cc239e2e70';
             url: string; // 'https://github.com/v3xlabs/env-md/commit/f49a26f53118281e734941ef7e8cb374212d6436';
         };
+        // ISO string
+        pre_time: string;
+        push_time: string;
+        post_time: string;
+        workflow_status: string;
     };
 };
 
@@ -42,7 +47,16 @@ export const decorateGithubDeploymentContext = (
     const repoUrl = context.data.commit.url.replace(/\/commit\/.*/, '');
     const workflowUrl = `${repoUrl}/actions/runs/${context.data.runId}`;
 
-    return { ...context, workflowUrl, repoUrl };
+    let duration;
+
+    if (context.data.pre_time && context.data.post_time) {
+        const preTime = new Date(context.data.pre_time);
+        const postTime = new Date(context.data.post_time);
+
+        duration = Math.floor((postTime.getTime() - preTime.getTime()) / 1000);
+    }
+
+    return { ...context, workflowUrl, repoUrl, duration };
 };
 
 export const GithubDeploymentContext: FC<{

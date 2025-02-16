@@ -31,7 +31,7 @@
         {
             "label": "PNPM Dev",
             "type": "shell",
-            "command": "pnpm dev",
+            "command": "pnpm install && pnpm dev",
             "options": {
                 "cwd": "${workspaceFolder}/web"
             },

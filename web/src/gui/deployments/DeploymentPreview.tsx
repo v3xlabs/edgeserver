@@ -1,9 +1,11 @@
 import { Link } from '@tanstack/react-router';
 import { FC } from 'react';
-import { FiFileText, FiGitCommit } from 'react-icons/fi';
+import { FiCheckCircle, FiClock, FiFileText, FiGitCommit, FiUpload, FiXCircle } from 'react-icons/fi';
 import TimeAgo from 'react-timeago-i18n';
+import { match } from 'ts-pattern';
 
 import { Deployment, useDeployment } from '@/api';
+import { secondsToDuration } from '@/util/time';
 
 import { parseDeploymentContext } from './context/context';
 import { decorateGithubDeploymentContext } from './context/github';
@@ -34,19 +36,19 @@ export const DeploymentPreview: FC<{
 
     if (githubContext) {
         return (
-            <div className="card flex justify-between gap-4">
+            <div className="card flex flex-wrap justify-stretch gap-4">
                 <Link
                     to="/site/$siteId/deployment/$deploymentId"
                     params={{
                         deploymentId: deployment?.deployment_id ?? '',
                         siteId: deployment?.site_id ?? '',
                     }}
-                    className="cursor-pointer"
+                    className="block h-fit w-full cursor-pointer md:h-full md:w-fit"
                 >
-                    <div className="bg-secondary aspect-video h-full max-h-48 min-h-24 rounded-md drop-shadow-sm"></div>
+                    <div className="bg-secondary aspect-video h-full min-h-24 rounded-md drop-shadow-sm md:max-h-48"></div>
                 </Link>
-                <div className="grow py-2">
-                    <div>
+                <div className="w-full py-2 md:w-fit md:grow">
+                    <div className="flex w-fit items-center gap-2">
                         <Link
                             to="/site/$siteId/deployment/$deploymentId"
                             params={{
@@ -57,8 +59,20 @@ export const DeploymentPreview: FC<{
                         >
                             {githubContext.data.commit.message}
                         </Link>
+                        {githubContext.data.workflow_status &&
+                            match(githubContext.data.workflow_status)
+                                .with('pre', () => (
+                                    <FiClock className="text-yellow-500" />
+                                ))
+                                .with('push', () => (
+                                    <FiUpload className="text-blue-400" />
+                                ))
+                                .with('post', () => (
+                                    <FiCheckCircle className="text-green-500" />
+                                ))
+                                .otherwise((status) => <div>{status}?</div>)}
                     </div>
-                    <div>
+                    <div className="w-fit">
                         <Link
                             to={githubContext.data.commit.url}
                             className="hover:text-link text-muted flex w-fit items-center gap-1 hover:underline"
@@ -75,9 +89,15 @@ export const DeploymentPreview: FC<{
                             <FiFileText />
                             {githubContext.data.workflow}
                         </Link>
+                        {githubContext.duration && (
+                            <div className="text-muted flex items-center gap-1">
+                                <FiClock />
+                                {secondsToDuration(githubContext.duration)}
+                            </div>
+                        )}
                     </div>
                 </div>
-                <div className="flex flex-col items-end justify-center gap-2">
+                <div className="flex flex-col items-end justify-center gap-2 ">
                     <Link
                         to={githubContext.workflowUrl}
                         className="bg-secondary w-fit rounded-md border px-2 py-0"
