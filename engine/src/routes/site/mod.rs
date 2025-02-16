@@ -240,6 +240,13 @@ impl SiteApi {
                 .unwrap();
         }
 
+        // update context on deployment
+        if let Some(context) = payload.context {
+            Deployment::update_context(&state.database, &deployment_id, &context)
+                .await
+                .unwrap();
+        }
+
         Ok(Json(deployment))
     }
 

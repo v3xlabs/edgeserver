@@ -234,6 +234,18 @@ LIMIT 1;
         .fetch_one(&db.pool)
         .await
     }
+
+    pub async fn update_context(db: &Database, deployment_id: &str, context: &str) -> Result<(), sqlx::Error> {
+        query!(
+            "UPDATE deployments SET context = $1 WHERE deployment_id = $2",
+            context,
+            deployment_id
+        )
+        .execute(&db.pool)
+        .await?;
+
+        Ok(())
+    }
 }
 
 #[derive(Debug, Serialize, Deserialize, Object)]
