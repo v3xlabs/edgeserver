@@ -1,7 +1,11 @@
 import byteSize from 'byte-size';
-import { FC } from 'react';
-import { BsFileEarmarkFont, BsFiletypeHtml, BsFiletypeXml } from 'react-icons/bs';
-import { FiFile, FiFileText, FiFolder, FiImage } from 'react-icons/fi';
+import { FC, useState } from 'react';
+import {
+    BsFileEarmarkFont,
+    BsFiletypeHtml,
+    BsFiletypeXml,
+} from 'react-icons/bs';
+import { FiFile, FiFolderMinus, FiFolderPlus, FiImage } from 'react-icons/fi';
 
 import { useDeploymentFiles } from '@/api';
 import { components } from '@/api/schema.gen';
@@ -101,31 +105,54 @@ export const FolderEntry: FC<{ node: FolderNode; name: string }> = ({
     node,
     name,
 }) => {
+    const [isCollapsed, setIsCollapsed] = useState(false);
+
+    const toggleCollapse = () => {
+        setIsCollapsed(!isCollapsed);
+    };
+
     return (
-        <div>
-            <div className="flex items-center gap-2">
-                <FiFolder />
+        <div
+            // eslint-disable-next-line jsx-a11y/role-has-required-aria-props
+            role="treeitem"
+            aria-expanded={!isCollapsed}
+            aria-label={name}
+        >
+            <div
+                className="flex cursor-pointer items-center gap-2"
+                onClick={toggleCollapse}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(event) => {
+                    if (event.key === 'Enter' || event.key === ' ') {
+                        toggleCollapse();
+                    }
+                }}
+            >
+                {isCollapsed ? <FiFolderPlus /> : <FiFolderMinus />}
                 <span>{name}</span>
             </div>
-            <ul className="pl-4">
-                {Object.entries(node.files)
-                    .sort(([aName, a], [bName, b]) => {
-                        if (a.type === 'directory' && b.type === 'file') {
-                            return -1;
-                        }
+            {!isCollapsed && (
+                <ul className="pl-4" role="group">
+                    {Object.entries(node.files)
+                        .sort(([aName, a], [bName, b]) => {
+                            if (a.type === 'directory' && b.type === 'file') {
+                                return -1;
+                            }
 
-                        if (a.type === 'file' && b.type === 'directory') {
-                            return 1;
-                        }
+                            if (a.type === 'file' && b.type === 'directory') {
+                                return 1;
+                            }
 
-                        return aName.localeCompare(bName);
-                    })
-                    .map(([key, value]) => (
-                        <li key={key}>
-                            <TreeEntry node={value} name={key} />
-                        </li>
-                    ))}
-            </ul>
+                            return aName.localeCompare(bName);
+                        })
+                        .map(([key, value]) => (
+                            <li key={key}>
+                                <TreeEntry node={value} name={key} />
+                            </li>
+                        ))}
+                </ul>
+            )}
         </div>
     );
 };
@@ -137,7 +164,12 @@ export const FileEntry: FC<{ file: DeploymentFile; name: string }> = ({
     const file_size = file.file_size ? byteSize(file.file_size) : undefined;
 
     return (
-        <div className="flex items-center justify-between gap-2">
+        <div
+            className="flex items-center justify-between gap-2"
+            // eslint-disable-next-line jsx-a11y/role-has-required-aria-props
+            role="treeitem"
+            aria-label={name}
+        >
             <div className="flex items-center gap-2">
                 <CustomFileIcon mime_type={file.deployment_file_mime_type} />
                 <span>{name}</span>
