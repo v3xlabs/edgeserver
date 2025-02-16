@@ -2,6 +2,7 @@ import { createFileRoute } from '@tanstack/react-router';
 
 import { useTeam } from '@/api';
 import { Button, Input } from '@/components';
+import TeamUserTransfer from '@/gui/transferDialog/teamUserTransfer';
 
 export const Route = createFileRoute('/_authed/team/$teamId/settings/_s/')({
     component: RouteComponent,
@@ -25,10 +26,7 @@ function RouteComponent() {
             <div>
                 <div>Owner</div>
                 <div className="flex gap-2">
-                    <Input value={team?.owner_id} />
-                    <Button onClick={() => alert('Not implemented')}>
-                        Transfer
-                    </Button>
+                    <TeamUserTransfer prefillId={team?.owner_id} />
                 </div>
             </div>
         </div>
