@@ -1,6 +1,12 @@
 import { Link } from '@tanstack/react-router';
-import { FC } from 'react';
-import { FiCheckCircle, FiClock, FiFileText, FiGitCommit, FiUpload, FiXCircle } from 'react-icons/fi';
+import { FC, useEffect, useState } from 'react';
+import {
+    FiCheckCircle,
+    FiClock,
+    FiFileText,
+    FiGitCommit,
+    FiUpload,
+} from 'react-icons/fi';
 import TimeAgo from 'react-timeago-i18n';
 import { match } from 'ts-pattern';
 
@@ -89,12 +95,23 @@ export const DeploymentPreview: FC<{
                             <FiFileText />
                             {githubContext.data.workflow}
                         </Link>
-                        {githubContext.duration && (
-                            <div className="text-muted flex items-center gap-1">
-                                <FiClock />
-                                {secondsToDuration(githubContext.duration)}
-                            </div>
-                        )}
+                        {githubContext.duration &&
+                            match(githubContext.duration)
+                                .with({ type: 'completed' }, (duration) => (
+                                    <div className="text-muted flex items-center gap-1">
+                                        <FiClock />
+                                        {secondsToDuration(duration.duration)}
+                                    </div>
+                                ))
+                                .with({ type: 'pending' }, (duration) => (
+                                    <div className="text-muted flex animate-pulse items-center gap-1">
+                                        <FiClock />
+                                        <LiveAgo
+                                            date={new Date(duration.startedAt)}
+                                        />
+                                    </div>
+                                ))
+                                .otherwise(() => <></>)}
                     </div>
                 </div>
                 <div className="flex flex-col items-end justify-center gap-2 ">
@@ -120,6 +137,22 @@ export const DeploymentPreview: FC<{
                             alt={githubContext.data.commit.author.name}
                         />
                     </Link>
+                    {githubContext.data.commit.timestamp && (
+                        <div className="text-muted">
+                            <TimeAgo
+                                date={
+                                    new Date(
+                                        githubContext.data.commit.timestamp
+                                    )
+                                }
+                                formatOptions={{
+                                    numeric: 'always',
+                                    style: 'long',
+                                }}
+                            />
+                        </div>
+                    )}
+
                     {/* <div>{githubContext.data.commit.timestamp}</div> */}
                 </div>
             </div>
@@ -148,4 +181,22 @@ export const DeploymentPreview: FC<{
             </div>
         </div>
     );
+};
+
+const LiveAgo: FC<{ date: Date }> = ({ date }) => {
+    const [time, setTime] = useState(date);
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setTime(new Date());
+        }, 1000);
+
+        return () => clearInterval(interval);
+    }, []);
+
+    const ago = secondsToDuration(
+        Math.floor((Date.now() - date.getTime()) / 1000)
+    );
+
+    return <>{ago}</>;
 };

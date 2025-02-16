@@ -40,6 +40,16 @@ export type GithubDeploymentContextType = {
     };
 };
 
+export type GithubRunDuration =
+    | {
+          duration: number;
+          type: 'completed';
+      }
+    | {
+          type: 'pending';
+          startedAt: string;
+      };
+
 export const decorateGithubDeploymentContext = (
     context: GithubDeploymentContextType
 ) => {
@@ -47,13 +57,28 @@ export const decorateGithubDeploymentContext = (
     const repoUrl = context.data.commit.url.replace(/\/commit\/.*/, '');
     const workflowUrl = `${repoUrl}/actions/runs/${context.data.runId}`;
 
-    let duration;
+    let duration: GithubRunDuration | undefined;
 
     if (context.data.pre_time && context.data.post_time) {
         const preTime = new Date(context.data.pre_time);
         const postTime = new Date(context.data.post_time);
 
-        duration = Math.floor((postTime.getTime() - preTime.getTime()) / 1000);
+        duration = {
+            duration: Math.floor(
+                (postTime.getTime() - preTime.getTime()) / 1000
+            ),
+            type: 'completed',
+        };
+    } else if (
+        context.data.pre_time &&
+        ['pre', 'push'].includes(context.data.workflow_status)
+    ) {
+        const preTime = new Date(context.data.pre_time);
+
+        duration = {
+            startedAt: preTime.toISOString(),
+            type: 'pending',
+        };
     }
 
     return { ...context, workflowUrl, repoUrl, duration };
