@@ -38,7 +38,7 @@ ReactDOM.createRoot(document.querySelector('#root')!).render(
     <React.StrictMode>
         <QueryProvider>
             <RouterProvider router={router} />
-            <ReactQueryDevtools initialIsOpen />
+            {import.meta.env.DEV && <ReactQueryDevtools />}
         </QueryProvider>
     </React.StrictMode>
 );
