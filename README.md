@@ -16,6 +16,13 @@
 
 Deployed sites are instantly available over both [http](https://www.rfc-editor.org/rfc/rfc2616) and [ipfs](https://ipfs.tech/) aswell as dynamically change [ENS](https://ens.domains/) content-hash.
 
+## Beta Preview
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="./.github/assets/edgeserver_preview_dark.png#" />
+  <img alt="edgeserver.io bridging web2 to web3" src="./.github/assets/edgeserver_preview_light.png#" width="100%" />
+</picture>
+
 ## Deploy
 
 Publish your site in mere minutes using your favourite [CI/CD Integration](https://github.com/v3xlabs/edgeserver/wiki/CI-CD-Integrations) or using the [CLI](https://github.com/v3xlabs/edgeserver/wiki/CLI).
