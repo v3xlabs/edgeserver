@@ -23,12 +23,6 @@ function RouteComponent() {
                     </Button>
                 </div>
             </div>
-            <div>
-                <div>Owner</div>
-                <div className="flex gap-2">
-                    <TeamUserTransfer prefillId={team?.owner_id} />
-                </div>
-            </div>
         </div>
     );
 }
