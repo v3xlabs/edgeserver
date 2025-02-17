@@ -19,8 +19,8 @@ Deployed sites are instantly available over both [http](https://www.rfc-editor.o
 ## Beta Preview
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="./.github/assets/edgeserver_preview_dark.png#" />
-  <img alt="edgeserver.io bridging web2 to web3" src="./.github/assets/edgeserver_preview_light.png#" width="100%" />
+  <source media="(prefers-color-scheme: dark)" srcset="./.github/assets/edgeserver_preview_dark.png#1" />
+  <img alt="edgeserver.io bridging web2 to web3" src="./.github/assets/edgeserver_preview_light.png#1" width="100%" />
 </picture>
 
 ## Deploy
