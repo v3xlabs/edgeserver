@@ -1,12 +1,6 @@
 import { Link } from '@tanstack/react-router';
 import { FC } from 'react';
-import {
-    FiCheckCircle,
-    FiClock,
-    FiFileText,
-    FiGitCommit,
-    FiUpload,
-} from 'react-icons/fi';
+import { FiClock, FiFileText, FiGitCommit } from 'react-icons/fi';
 import TimeAgo from 'react-timeago-i18n';
 import { match } from 'ts-pattern';
 
@@ -43,16 +37,16 @@ export const DeploymentPreview: FC<{
 
     if (githubContext) {
         return (
-            <div className="card flex flex-wrap justify-stretch gap-4">
+            <div className="card flex flex-wrap items-stretch justify-stretch gap-4">
                 <Link
                     to="/site/$siteId/deployment/$deploymentId"
                     params={{
                         deploymentId: deployment?.deployment_id ?? '',
                         siteId: deployment?.site_id ?? '',
                     }}
-                    className="block h-fit w-full cursor-pointer md:h-full md:w-fit"
+                    className="block h-fit w-full cursor-pointer md:h-screen md:max-h-32 md:w-fit"
                 >
-                    <div className="bg-secondary aspect-video h-full min-h-24 rounded-md drop-shadow-sm md:max-h-48"></div>
+                    <div className="bg-secondary aspect-video h-full min-h-24 rounded-md border drop-shadow-sm md:max-h-48"></div>
                 </Link>
                 <div className="w-full py-2 md:w-fit md:grow">
                     <div className="flex w-fit items-center gap-2">
