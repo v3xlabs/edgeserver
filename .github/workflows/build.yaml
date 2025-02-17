@@ -39,8 +39,10 @@ jobs:
               working-directory: web
               run: pnpm install
 
-            - name: Build web
+            - name: Build web for production
               working-directory: web
+              env:
+                  NODE_ENV: production
               run: pnpm build
 
             - name: Upload web artifacts

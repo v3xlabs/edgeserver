@@ -18,6 +18,7 @@ export default defineConfig({
         //     util: 'util/',
         // }),
     ],
+    base: '/',
     // define: { global: 'globalThis' },
     build: {
         // rollupOptions: {
