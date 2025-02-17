@@ -2,7 +2,10 @@ import byteSize from 'byte-size';
 import { FC, useState } from 'react';
 import {
     BsFileEarmarkFont,
+    BsFiletypeCss,
     BsFiletypeHtml,
+    BsFiletypeJs,
+    BsFiletypeJson,
     BsFiletypeXml,
 } from 'react-icons/bs';
 import { FiFile, FiFolderMinus, FiFolderPlus, FiImage } from 'react-icons/fi';
@@ -215,6 +218,18 @@ export const CustomFileIcon: FC<{ mime_type: string }> = ({ mime_type }) => {
         ].includes(mime_type)
     ) {
         return <BsFileEarmarkFont />;
+    }
+
+    if (mime_type === 'text/css') {
+        return <BsFiletypeCss />;
+    }
+
+    if (mime_type === 'text/javascript') {
+        return <BsFiletypeJs />;
+    }
+
+    if (mime_type === 'application/json') {
+        return <BsFiletypeJson />;
     }
 
     return <FiFile />;
