@@ -24,6 +24,23 @@ pub struct AppConfig {
     pub s3_bucket_name: String,
     pub s3_access_key: String,
     pub s3_secret_key: String,
+    pub github_app: Option<GithubAppConfig>,
+}
+
+/// Github App Config
+/// 
+/// Setup your app with Callback URL
+/// /api/github/oauth
+/// 
+/// Setup URL (optional)
+/// /github/setup
+/// 
+/// Webhook URL (optional)
+/// /api/github/webhook
+#[derive(Deserialize, Debug)]
+pub struct GithubAppConfig {
+    pub client_id: String,
+    pub client_secret: String,
 }
 
 impl AppState {

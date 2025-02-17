@@ -8,6 +8,7 @@ import { bootstrapPreflight } from '@/api';
 export interface MyRouterContext {
     title: string;
     suffix?: ReactNode;
+    subtitle?: string;
 }
 
 export const Route = createRootRouteWithContext<MyRouterContext>()({

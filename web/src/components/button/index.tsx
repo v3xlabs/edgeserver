@@ -43,9 +43,8 @@ const [buttonVariants, buttonVariantsConfig] = cvax(
                     'disabled:bg-yellow-300 disabled:text-yellow-500 disabled:border-transparent disabled:hover:bg-yellow-300 disabled:hover:border-transparent disabled:cursor-not-allowed',
                 ],
                 destructive: [
-                    'text-foreground border',
-                    'bg-red-400 hover:bg-red-400/80 border-transparent',
-                    'disabled:bg-red-300 disabled:text-red-500 disabled:border-transparent disabled:hover:bg-red-300 disabled:hover:border-transparent disabled:cursor-not-allowed',
+                    'bg-default text-red-500 border border-solid hover:bg-red-800 hover:text-white',
+                    'disabled:text-red-300 disabled:opacity-50 disabled:cursor-not-allowed',
                 ],
             },
             size: {

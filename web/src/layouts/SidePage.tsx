@@ -6,6 +6,7 @@ import { getTitle } from '@/util/title';
 
 export type SidePageProperties = PropsWithChildren<{
     title: string;
+    subtitle?: string;
     suffix?: ReactNode;
     className?: ClassValue;
     sidebar?: ReactNode;
@@ -14,6 +15,7 @@ export type SidePageProperties = PropsWithChildren<{
 export const SidePage: FC<SidePageProperties> = ({
     children,
     title,
+    subtitle,
     suffix,
     className,
     sidebar,
@@ -32,7 +34,14 @@ export const SidePage: FC<SidePageProperties> = ({
             {sidebar && <div className="w-full md:max-w-64">{sidebar}</div>}
             <div className="w-full space-y-4">
                 <div className="flex items-end justify-between">
-                    <h1 className="h1 pl-4">{title}</h1>
+                    <div>
+                        <h1 className="h1 pl-4">{title}</h1>
+                        {subtitle && (
+                            <div className="text-muted pl-4 text-sm">
+                                {subtitle}
+                            </div>
+                        )}
+                    </div>
                     {suffix}
                 </div>
                 {children}
