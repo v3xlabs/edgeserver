@@ -5,6 +5,7 @@ import TimeAgo from 'react-timeago-i18n';
 import { match } from 'ts-pattern';
 
 import { Deployment, useDeployment } from '@/api';
+import { startsWithEmoji } from '@/util/emoji';
 import { LiveAgo, secondsToDuration } from '@/util/time';
 
 import { parseDeploymentContext } from './context/context';
@@ -34,6 +35,10 @@ export const DeploymentPreview: FC<{
         deploymentContext?.contextType === 'github-action'
             ? decorateGithubDeploymentContext(deploymentContext)
             : undefined;
+
+    const workflowStartsWithEmoji = startsWithEmoji(
+        githubContext?.data.workflow ?? ''
+    );
 
     if (githubContext) {
         return (
@@ -78,7 +83,7 @@ export const DeploymentPreview: FC<{
                             className="hover:text-link text-muted flex w-fit items-center gap-1 hover:underline"
                             target="_blank"
                         >
-                            <FiFileText />
+                            {!workflowStartsWithEmoji && <FiFileText />}
                             {githubContext.data.workflow}
                         </Link>
                         {githubContext.duration &&

@@ -4,6 +4,7 @@ import { FiClock, FiFileText, FiGitCommit } from 'react-icons/fi';
 import TimeAgo from 'react-timeago-i18n';
 import { match } from 'ts-pattern';
 
+import { startsWithEmoji } from '@/util/emoji';
 import { LiveAgo, secondsToDuration } from '@/util/time';
 
 import { WorkflowStatusIndicator } from '../WorkflowStatusIndicator';
@@ -94,6 +95,10 @@ export const GithubDeploymentContext: FC<{
     context: GithubDeploymentContextType;
 }> = ({ context }) => {
     const decoratedContext = decorateGithubDeploymentContext(context);
+
+    const workflowStartsWithEmoji = startsWithEmoji(
+        decoratedContext.data.workflow
+    );
 
     return (
         <div className="card no-padding space-y-4 p-5">
@@ -192,6 +197,19 @@ export const GithubDeploymentContext: FC<{
                             .otherwise(() => (
                                 <></>
                             ))}
+                    </div>
+                )}
+                {decoratedContext.data.workflow && (
+                    <div>
+                        <div className="text-muted">Workflow</div>
+                        <Link
+                            to={decoratedContext.workflowUrl}
+                            className="flex items-center gap-1.5 hover:underline"
+                            target="_blank"
+                        >
+                            {!workflowStartsWithEmoji && <FiFileText />}
+                            <span>{decoratedContext.data.workflow}</span>
+                        </Link>
                     </div>
                 )}
             </div>

@@ -72,6 +72,10 @@ export const FileExplorer: FC<{ siteId: string; deploymentId: string }> = ({
     const { data: deploymentFiles } = useDeploymentFiles(siteId, deploymentId);
     const tree = reorgFilesIntoTree(deploymentFiles);
 
+    if (!deploymentFiles) {
+        return;
+    }
+
     return (
         <div className="space-y-4">
             <div className="card">
