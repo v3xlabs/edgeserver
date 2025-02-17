@@ -21,7 +21,7 @@ export const ThemeSwitcher = () => {
     };
 
     return (
-        <div className="mx-auto flex size-full">
+        <div className="bg-muted mx-auto flex size-full gap-1 rounded-xl">
             {(
                 [
                     ['light', <FiSun key="light" />],
@@ -31,7 +31,11 @@ export const ThemeSwitcher = () => {
             ).map(([theme, icon]) => (
                 <button
                     key={theme}
-                    onClick={() => setTheme(theme)}
+                    onClick={(event) => {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        setTheme(theme);
+                    }}
                     className={cn(
                         currentTheme === theme && 'bg-hover',
                         'h-full flex items-center px-1 aspect-square rounded-full'

@@ -1,5 +1,6 @@
 import { Link, useParams } from '@tanstack/react-router';
 import { AnimatePresence } from 'framer-motion';
+import { FiServer } from 'react-icons/fi';
 
 import { useMe } from '@/api';
 import { authStore } from '@/api/auth/store';
@@ -8,7 +9,9 @@ import { Avatar, Button } from '@/components';
 import {
     DropdownMenu,
     DropdownMenuContent,
+    DropdownMenuItem,
     DropdownMenuPortal,
+    DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '../Dropdown';
 import { InteractiveNavigator } from './InteractiveNavigator';
@@ -33,28 +36,38 @@ const UserProfile = () => {
                 </div>
                 <DropdownMenuPortal>
                     <DropdownMenuContent>
-                        <div className="top-full flex w-full flex-col gap-y-2 whitespace-nowrap rounded-b-md">
+                        <DropdownMenuItem className="flex items-center justify-between gap-6">
+                            <div>Theme</div>
                             <ThemeSwitcher />
-                            <div className="flex flex-col gap-y-1">
-                                {me?.admin && (
-                                    <Link to="/admin">
-                                        <Button className="w-full">
-                                            Admin
-                                        </Button>
-                                    </Link>
-                                )}
+                        </DropdownMenuItem>
+                        {me?.admin && (
+                            <DropdownMenuItem asChild>
                                 <Button
-                                    className="flex w-full items-start px-4 py-2 hover:bg-black/10"
-                                    onClick={() => {
-                                        authStore.send({
-                                            type: 'clearAuthToken',
-                                        });
-                                    }}
+                                    className="w-full justify-start"
+                                    variant="ghost"
+                                    asChild
                                 >
-                                    Log out
+                                    <Link to="/admin">
+                                        <FiServer />
+                                        Administration
+                                    </Link>
                                 </Button>
-                            </div>
-                        </div>
+                            </DropdownMenuItem>
+                        )}
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem asChild>
+                            <Button
+                                className="flex w-full cursor-pointer items-start px-4 py-2"
+                                onClick={() => {
+                                    authStore.send({
+                                        type: 'clearAuthToken',
+                                    });
+                                }}
+                                variant="ghost"
+                            >
+                                Log out
+                            </Button>
+                        </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenuPortal>
             </div>

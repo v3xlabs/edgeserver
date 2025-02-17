@@ -1,3 +1,5 @@
+import { FC, useEffect, useState } from 'react';
+
 export const secondsToDuration = (seconds: number) => {
     if (seconds < 60) {
         return `${seconds}s`;
@@ -27,4 +29,22 @@ export const secondsToDuration = (seconds: number) => {
     }
 
     return parts.join(' ');
+};
+
+export const LiveAgo: FC<{ date: Date }> = ({ date }) => {
+    const [time, setTime] = useState(date);
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setTime(new Date());
+        }, 1000);
+
+        return () => clearInterval(interval);
+    }, []);
+
+    const ago = secondsToDuration(
+        Math.floor((Date.now() - date.getTime()) / 1000)
+    );
+
+    return <>{ago}</>;
 };

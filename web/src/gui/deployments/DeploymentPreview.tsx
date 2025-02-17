@@ -1,5 +1,5 @@
 import { Link } from '@tanstack/react-router';
-import { FC, useEffect, useState } from 'react';
+import { FC } from 'react';
 import {
     FiCheckCircle,
     FiClock,
@@ -11,10 +11,11 @@ import TimeAgo from 'react-timeago-i18n';
 import { match } from 'ts-pattern';
 
 import { Deployment, useDeployment } from '@/api';
-import { secondsToDuration } from '@/util/time';
+import { LiveAgo, secondsToDuration } from '@/util/time';
 
 import { parseDeploymentContext } from './context/context';
 import { decorateGithubDeploymentContext } from './context/github';
+import { WorkflowStatusIndicator } from './WorkflowStatusIndicator';
 
 export const DeploymentPreview: FC<{
     deployment?: Deployment;
@@ -65,18 +66,9 @@ export const DeploymentPreview: FC<{
                         >
                             {githubContext.data.commit.message}
                         </Link>
-                        {githubContext.data.workflow_status &&
-                            match(githubContext.data.workflow_status)
-                                .with('pre', () => (
-                                    <FiClock className="text-yellow-500" />
-                                ))
-                                .with('push', () => (
-                                    <FiUpload className="text-blue-400" />
-                                ))
-                                .with('post', () => (
-                                    <FiCheckCircle className="text-green-500" />
-                                ))
-                                .otherwise((status) => <div>{status}?</div>)}
+                        <WorkflowStatusIndicator
+                            status={githubContext.data.workflow_status}
+                        />
                     </div>
                     <div className="w-fit">
                         <Link
@@ -181,22 +173,4 @@ export const DeploymentPreview: FC<{
             </div>
         </div>
     );
-};
-
-const LiveAgo: FC<{ date: Date }> = ({ date }) => {
-    const [time, setTime] = useState(date);
-
-    useEffect(() => {
-        const interval = setInterval(() => {
-            setTime(new Date());
-        }, 1000);
-
-        return () => clearInterval(interval);
-    }, []);
-
-    const ago = secondsToDuration(
-        Math.floor((Date.now() - date.getTime()) / 1000)
-    );
-
-    return <>{ago}</>;
 };

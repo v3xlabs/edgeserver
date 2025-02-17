@@ -30,7 +30,7 @@ const [buttonVariants, buttonVariantsConfig] = cvax(
                     'disabled:bg-neutral-100 disabled:text-neutral-400 disabled:border-neutral-200 disabled:hover:bg-neutral-100 disabled:cursor-not-allowed',
                 ],
                 ghost: [
-                    'hover:bg-neutral-100 text-neutral-700 border-transparent',
+                    'hover:bg-muted text-default border-transparent',
                     'disabled:bg-neutral-100 disabled:text-neutral-400 disabled:border-transparent disabled:hover:bg-neutral-100 disabled:cursor-not-allowed',
                 ],
                 link: 'text-blue-500 hover:underline border-transparent bg-transparent',
