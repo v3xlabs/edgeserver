@@ -301,10 +301,16 @@ fn hash_file(file: &[u8]) -> String {
 
 fn content_type_from_file_name(file_name: &str) -> String {
     let extension = file_name.split('.').last().unwrap_or_default();
+
+    info!("Content type from file name: {:?}", extension);
+
     match extension {
-        "js" => "text/javascript",
-        "css" => "text/css",
-        "json" => "application/json",
-        _ => "application/octet-stream",
-    }.to_string()
+        "js" => "text/javascript".to_string(),
+        "css" => "text/css".to_string(),
+        "json" => "application/json".to_string(),
+        _ => {
+            info!("Unknown file extension: {:?}", extension);
+            "application/octet-stream".to_string()
+        },
+    }
 }
