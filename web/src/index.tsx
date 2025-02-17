@@ -1,6 +1,3 @@
-import './styles/colors.scss';
-import './styles/index.scss';
-
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { createRouter, RouterProvider } from '@tanstack/react-router';
 import React from 'react';
