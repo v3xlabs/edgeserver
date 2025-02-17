@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 
+import { useSiteTransfer } from '@/api';
 import { Button, TeamSelect } from '@/components';
 import {
     AlertAction,
@@ -10,8 +11,10 @@ import {
 
 const SiteTeamTransfer: React.FC<{
     prefillId?: string;
-}> = ({ prefillId }) => {
+    siteId: string;
+}> = ({ prefillId, siteId }) => {
     const [teamId, setTeamId] = useState(prefillId);
+    const { mutate: transferSite } = useSiteTransfer();
 
     return (
         <div className="flex gap-2">
@@ -33,7 +36,18 @@ const SiteTeamTransfer: React.FC<{
                         <span className="font-bold">{teamId}</span>?
                     </p>
                     <AlertAction asChild>
-                        <Button>Yes</Button>
+                        <Button
+                            onClick={() => {
+                                if (!teamId || !siteId) return;
+
+                                transferSite({
+                                    siteId,
+                                    teamId,
+                                });
+                            }}
+                        >
+                            Yes
+                        </Button>
                     </AlertAction>
                 </AlertContent>
             </AlertRoot>

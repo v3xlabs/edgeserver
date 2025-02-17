@@ -1,7 +1,7 @@
 use chrono::{DateTime, Utc};
 use poem_openapi::Object;
 use serde::{Deserialize, Serialize};
-use sqlx::{query_as, query_scalar};
+use sqlx::{query, query_as, query_scalar};
 
 use crate::{
     database::Database,
@@ -87,6 +87,17 @@ impl Site {
         )
         .fetch_all(&db.pool)
         .await
+    }
+
+    pub async fn update_team(db: &Database, site_id: impl AsRef<str>, team_id: impl AsRef<str>) -> Result<(), sqlx::Error> {
+        query!(
+            "UPDATE sites SET team_id = $1 WHERE site_id = $2",
+            team_id.as_ref(),
+            site_id.as_ref()
+        )
+        .execute(&db.pool)
+        .await
+        .map(|_| ())
     }
 }
 

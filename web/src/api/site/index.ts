@@ -97,3 +97,33 @@ export const useSiteCreate = () =>
             return response.data;
         },
     });
+
+export const useSiteTransfer = () =>
+    useMutation({
+        mutationFn: async ({
+            siteId,
+            teamId,
+        }: {
+            siteId: string;
+            teamId: string;
+        }) => {
+            const response = await apiRequest(
+                '/site/{site_id}/transfer',
+                'post',
+                {
+                    data: { team_id: teamId },
+                    path: { site_id: siteId },
+                    contentType: 'application/json; charset=utf-8',
+                }
+            );
+
+            queryClient.invalidateQueries({
+                queryKey: ['auth', 'site', '{siteId}', siteId],
+            });
+            queryClient.invalidateQueries({
+                queryKey: ['auth', 'team', '{teamId}', teamId, 'sites'],
+            });
+
+            return response.data;
+        },
+    });

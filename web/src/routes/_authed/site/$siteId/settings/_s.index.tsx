@@ -25,7 +25,7 @@ function RouteComponent() {
             </div>
             <div>
                 <div>Team</div>
-                <SiteTeamTransfer prefillId={site?.team_id} />
+                <SiteTeamTransfer prefillId={site?.team_id} siteId={siteId} />
             </div>
         </div>
     );

@@ -323,6 +323,50 @@ export type paths = {
         };
         trace?: never;
     };
+    "/site/{site_id}/transfer": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * /site/:site_id/transfer
+         * @description Transfer a site to a different team
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    site_id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json; charset=utf-8": components["schemas"]["TransferSiteRequest"];
+                };
+            };
+            responses: {
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json; charset=utf-8": components["schemas"]["Site"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/user": {
         parameters: {
             query?: never;
@@ -988,6 +1032,10 @@ export type components = {
         TeamInviteData: {
             invite: components["schemas"]["UserTeamInvite"];
             team: components["schemas"]["Team"];
+        };
+        /** TransferSiteRequest */
+        TransferSiteRequest: {
+            team_id: string;
         };
         /** User */
         User: {

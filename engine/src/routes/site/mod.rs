@@ -278,4 +278,40 @@ impl SiteApi {
             .map(Json)
             .map_err(poem::Error::from)
     }
+
+    /// /site/:site_id/transfer
+    /// 
+    /// Transfer a site to a different team
+    #[oai(path = "/site/:site_id/transfer", method = "post", tag = "ApiTags::Site")]
+    pub async fn transfer_site(&self, user: UserAuth, state: Data<&State>, site_id: Path<String>, payload: Json<TransferSiteRequest>) -> Result<Json<Site>> {
+        user.verify_access_to(&SiteId(&site_id.0)).await?;
+
+        let user_ = user.required()?;
+
+        let site = Site::get_by_id(&state.database, &site_id.0)
+            .await
+            .map_err(HttpError::from)?;
+
+        if !Team::is_owner(&state.database, &site.team_id, &user_.user_id)
+            .await
+            .map_err(HttpError::from)?
+        {
+            Err(HttpError::Forbidden)?;
+        }
+
+        Site::update_team(&state.database, &site_id.0, &payload.team_id)
+            .await
+            .map_err(HttpError::from)?;
+
+        let site = Site::get_by_id(&state.database, &site_id.0)
+            .await
+            .map_err(HttpError::from)?;
+
+        Ok(Json(site))
+    }
+}
+
+#[derive(Debug, Deserialize, Serialize, Object)]
+pub struct TransferSiteRequest {
+    pub team_id: String,
 }
