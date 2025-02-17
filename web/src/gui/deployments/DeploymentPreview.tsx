@@ -105,7 +105,7 @@ export const DeploymentPreview: FC<{
                                 ))
                                 .with({ type: 'pending' }, (duration) => (
                                     <div className="text-muted flex animate-pulse items-center gap-1">
-                                        <FiClock />
+                                        <FiClock className="animate-spin" />
                                         <LiveAgo
                                             date={new Date(duration.startedAt)}
                                         />
