@@ -148,8 +148,9 @@ LIMIT 1;
             let file_hash = hash_file(&buf);
 
             let content_type = infer::get(&buf)
-                .map(|t| t.mime_type().to_string())
-                .unwrap_or_default();
+                .map(|t| t.mime_type().to_string()).unwrap_or_else(|| {
+                    content_type_from_file_name(path)
+                });
             let file_size = buf.len() as i64;
 
             info!("Cataloging metadata for file: {:?}", path);
@@ -296,4 +297,14 @@ fn hash_file(file: &[u8]) -> String {
     hasher.update(file);
     let hash = hasher.finalize();
     format!("{:x}", hash)
+}
+
+fn content_type_from_file_name(file_name: &str) -> String {
+    let extension = file_name.split('.').last().unwrap_or_default();
+    match extension {
+        "js" => "text/javascript",
+        "css" => "text/css",
+        "json" => "application/json",
+        _ => "application/octet-stream",
+    }.to_string()
 }
