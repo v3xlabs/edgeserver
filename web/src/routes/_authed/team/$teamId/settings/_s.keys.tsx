@@ -29,7 +29,7 @@ function RouteComponent() {
                             <FiKey />
                         </div>
                         <div>
-                            <div>
+                            <div className="font-mono">
                                 <span>*****</span>
                                 <span>8a9faa19</span>
                             </div>

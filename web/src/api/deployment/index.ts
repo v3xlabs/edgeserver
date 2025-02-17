@@ -31,9 +31,10 @@ export const getDeployment = (siteId: string, deploymentId: string) =>
             // ensure that created_at is within the last 30 minutes
             // if not, return undefined
 
+            const site = query.state.data?.site_id;
             const deployment = query.state.data;
 
-            if (!deployment) return;
+            if (!deployment || !site) return;
 
             const deploymentContext = deployment.context
                 ? parseDeploymentContext(deployment.context)

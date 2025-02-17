@@ -14,6 +14,8 @@ export const DeploymentList: FC<{ siteId?: string; max?: number }> = ({
 
     const maxEntries = max ?? deployments?.length ?? 10;
 
+    if (!siteId) return;
+
     return (
         <div className="space-y-2">
             <div className="flex items-center justify-between">
@@ -32,7 +34,11 @@ export const DeploymentList: FC<{ siteId?: string; max?: number }> = ({
                 <ul className="space-y-2">
                     {deployments.slice(0, maxEntries).map((deployment) => (
                         <li key={deployment.deployment_id}>
-                            <DeploymentPreview deployment={deployment} />
+                            <DeploymentPreview
+                                deployment={deployment}
+                                deployment_id={deployment.deployment_id}
+                                site_id={deployment.site_id}
+                            />
                         </li>
                     ))}
                 </ul>
