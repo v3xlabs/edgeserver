@@ -401,6 +401,40 @@ export type paths = {
         patch?: never;
         trace?: never;
     };
+    "/user/all": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json; charset=utf-8": components["schemas"]["UserMinimal"][];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/user/{user_id}": {
         parameters: {
             query?: never;
@@ -1020,6 +1054,7 @@ export type components = {
             team_id: string;
             owner_id: string;
             name: string;
+            avatar_url?: string;
             /** Format: date-time */
             created_at: string;
         };
@@ -1041,8 +1076,16 @@ export type components = {
         User: {
             user_id: string;
             name: string;
+            avatar_url?: string;
             /** Format: date-time */
             created_at: string;
+            admin?: boolean;
+        };
+        /** UserMinimal */
+        UserMinimal: {
+            user_id: string;
+            name: string;
+            avatar_url?: string;
             admin?: boolean;
         };
         /** UserTeamInvite */

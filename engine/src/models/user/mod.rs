@@ -14,9 +14,18 @@ use super::team::Team;
 pub struct User {
     pub user_id: String,
     pub name: String,
+    pub avatar_url: Option<String>,
     #[oai(skip)]
     pub password: String,
     pub created_at: DateTime<Utc>,
+    pub admin: Option<bool>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Object, Clone)]
+pub struct UserMinimal {
+    pub user_id: String,
+    pub name: String,
+    pub avatar_url: Option<String>,
     pub admin: Option<bool>,
 }
 
@@ -92,6 +101,12 @@ impl User {
         )
         .fetch_one(&db.pool)
         .await
+    }
+
+    pub async fn get_all_minimal(db: &Database) -> Result<Vec<UserMinimal>, sqlx::Error> {
+        query_as!(UserMinimal, "SELECT user_id, name, avatar_url, admin FROM users")
+            .fetch_all(&db.pool)
+            .await
     }
 
     pub async fn can_bootstrap(db: &Database) -> Result<bool, sqlx::Error> {

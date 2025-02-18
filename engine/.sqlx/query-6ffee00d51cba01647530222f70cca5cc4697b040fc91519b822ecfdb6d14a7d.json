@@ -22,6 +22,11 @@
         "ordinal": 3,
         "name": "created_at",
         "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 4,
+        "name": "avatar_url",
+        "type_info": "Text"
       }
     ],
     "parameters": {
@@ -35,7 +40,8 @@
       false,
       false,
       false,
-      false
+      false,
+      true
     ]
   },
   "hash": "6ffee00d51cba01647530222f70cca5cc4697b040fc91519b822ecfdb6d14a7d"

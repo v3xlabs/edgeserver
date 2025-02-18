@@ -4,7 +4,7 @@ use tracing::info;
 
 use crate::{
     middlewares::auth::UserAuth,
-    models::user::User,
+    models::user::{User, UserMinimal},
     routes::{error::HttpError, ApiTags},
     state::State,
 };
@@ -24,6 +24,21 @@ impl UserApi {
             .map_err(HttpError::from)?;
 
         Ok(Json(user))
+    }
+
+    #[oai(path = "/user/all", method = "get", tag = "ApiTags::User")]
+    pub async fn get_all_users(
+        &self,
+        state: Data<&State>,
+        auth: UserAuth,
+    ) -> Result<Json<Vec<UserMinimal>>> {
+        auth.required()?;
+
+        let users = User::get_all_minimal(&state.database)
+            .await
+            .map_err(HttpError::from)?;
+
+        Ok(Json(users))
     }
 
     #[oai(path = "/user/:user_id", method = "get", tag = "ApiTags::User")]
