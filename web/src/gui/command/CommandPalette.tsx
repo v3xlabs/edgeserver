@@ -14,8 +14,8 @@ import {
     site_commands,
     team_commands,
 } from './command';
-import { TeamEntries } from './entries/TeamEntry';
 import { SiteEntries } from './entries/SiteEntry';
+import { TeamEntries } from './entries/TeamEntry';
 
 export const CommandPalette = () => {
     const [open, setOpen] = useState(false);

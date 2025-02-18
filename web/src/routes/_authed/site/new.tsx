@@ -60,14 +60,18 @@ function RouteComponent() {
                 }}
             >
                 <Field name="team_id">
-                    {({ handleBlur, handleChange, state }) => (
-                        <div>
+                    {({ handleChange, state }) => (
+                        <div className="w-[calc(236px+2rem)]">
+                            {/* 230 (default <input> width, plus 6px for border and 2 rem for padding of the adjacent <input> box) */}
                             <label htmlFor="team_id">Team</label>
                             <TeamSelect
-                                id="team_id"
-                                onBlur={handleBlur}
                                 value={state.value}
-                                onChange={(value) => handleChange(value)}
+                                popoverWidth="100%"
+                                onChange={(value) => {
+                                    handleChange(value);
+
+                                    return true;
+                                }}
                             />
                         </div>
                     )}
