@@ -1,13 +1,13 @@
 import { FC } from 'react';
 
-import { useTeams } from '@/api';
+import { useUsers } from '@/api';
 
 import {
     FieldSelect,
     FieldSelectProperties as FieldSelectProperties,
 } from '../select/FieldSelect';
 
-export const TeamSelect: FC<
+export const UserSelect: FC<
     {
         value: string;
         name?: string;
@@ -15,12 +15,12 @@ export const TeamSelect: FC<
         onChange: (_value: string) => void;
     } & Partial<FieldSelectProperties>
 > = ({ value, name, forceCategory, onChange, ...properties }) => {
-    const { data: teams } = useTeams();
+    const { data: users } = useUsers();
 
-    const options = teams!.map((team) => {
+    const options = users!.map((user) => {
         return {
-            label: team.name,
-            value: team.team_id,
+            label: user.name,
+            value: user.user_id,
         };
     });
 
@@ -30,6 +30,7 @@ export const TeamSelect: FC<
             label={name}
             options={options}
             value={value ?? ''}
+            popoverWidth="420"
             justifyBetween
             onChange={(value) => {
                 onChange(value);
