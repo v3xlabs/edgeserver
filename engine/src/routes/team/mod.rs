@@ -1,17 +1,14 @@
 use poem::{web::Data, Result};
-use poem_openapi::{param::Path, payload::Json, Object, OpenApi};
+use poem_openapi::{param::Path, payload::Json, types::multipart::Upload, Multipart, Object, OpenApi};
 use serde::{Deserialize, Serialize};
 use tracing::info;
 
 use crate::{
-    middlewares::auth::UserAuth,
-    models::{
+    assets::AssetFile, middlewares::auth::UserAuth, models::{
         site::Site,
         team::{invite::UserTeamInvite, Team, TeamId},
         user::User,
-    },
-    routes::{error::HttpError, ApiTags},
-    state::State,
+    }, routes::{error::HttpError, ApiTags}, state::State
 };
 
 #[derive(Debug, Serialize, Deserialize, Object)]
@@ -259,4 +256,41 @@ impl TeamApi {
 
         Ok(())
     }
+
+    #[oai(path = "/team/:team_id/avatar", method = "post", tag = "ApiTags::Team")]
+    pub async fn upload_team_avatar(
+        &self,
+        user: UserAuth,
+        state: Data<&State>,
+        team_id: Path<String>,
+        body: UploadTeamAvatarRequest,
+    ) -> Result<Json<Team>> {
+        user.verify_access_to(&TeamId(&team_id.0)).await?;
+
+        let user = user.required()?;
+
+        if !Team::is_owner(&state.0.database, &team_id.0, &user.user_id)
+            .await
+            .map_err(HttpError::from)?
+        {
+            Err(HttpError::Forbidden)?;
+        }
+
+        let x = body.avatar;
+
+        let file_name = x.file_name().unwrap().to_string();
+        // Load into memory
+        let file = x.into_vec().await.unwrap();
+
+        let (file, _, file_hash, _, _) = AssetFile::from_buffer(&state, &file, file_name).await.unwrap();
+
+        let team = Team::update_avatar(&state.0.database, &team_id.0, &file_hash).await.unwrap();
+
+        Ok(Json(team))
+    }
+}
+
+#[derive(Debug, Multipart)]
+pub struct UploadTeamAvatarRequest {
+    pub avatar: Upload,
 }

@@ -4,8 +4,7 @@ use serde::{Deserialize, Serialize};
 use sqlx::{query_as, query_scalar};
 
 use crate::{
-    database::Database,
-    utils::id::{generate_id, IdType},
+    database::Database, utils::id::{generate_id, IdType}
 };
 
 use super::team::Team;

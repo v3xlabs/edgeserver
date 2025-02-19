@@ -7,6 +7,7 @@ use tracing::{error, info};
 use opentelemetry_sdk::Resource;
 use opentelemetry::KeyValue;
 
+pub mod assets;
 pub mod cache;
 pub mod database;
 pub mod middlewares;

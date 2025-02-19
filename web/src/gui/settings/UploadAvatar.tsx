@@ -20,7 +20,7 @@ export const TeamAvatarUpload: FC<{ team: Team }> = ({ team }) => {
 
     const { getRootProps, getInputProps, isDragActive } = useDropzone({
         onDrop,
-        accept: 'image/*',
+        accept: { 'image/*': [] },
     });
 
     const handleSubmit = async () => {

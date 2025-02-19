@@ -152,12 +152,23 @@ impl Team {
         Ok(())
     }
 
-    pub async fn update_details(db: &Database, team_id: impl AsRef<str>, name: impl AsRef<str>, avatar_url: impl AsRef<str>) -> Result<(), sqlx::Error> {
-        query!("UPDATE teams SET name = $2, avatar_url = $3 WHERE team_id = $1", team_id.as_ref(), name.as_ref(), avatar_url.as_ref())
+    pub async fn update_name(db: &Database, team_id: impl AsRef<str>, name: impl AsRef<str>) -> Result<(), sqlx::Error> {
+        query!("UPDATE teams SET name = $2 WHERE team_id = $1", team_id.as_ref(), name.as_ref())
             .execute(&db.pool)
             .await?;
 
         Ok(())
+    }
+
+    pub async fn update_avatar(db: &Database, team_id: impl AsRef<str>, avatar_url: impl AsRef<str>) -> Result<Team, sqlx::Error> {
+        query_as!(
+            Team,
+            "UPDATE teams SET avatar_url = $2 WHERE team_id = $1 RETURNING *",
+            team_id.as_ref(),
+            avatar_url.as_ref()
+        )
+        .fetch_one(&db.pool)
+        .await
     }
 }
 
