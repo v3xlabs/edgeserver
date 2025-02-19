@@ -51,3 +51,23 @@ export const getUser = (user_id?: string) =>
     });
 
 export const useUser = (user_id?: string) => useQuery(getUser(user_id));
+
+export const getUsers = (
+    filter?: (user: Omit<User, 'created_at'>) => boolean
+) =>
+    queryOptions({
+        queryKey: ['auth', 'userlist'],
+        queryFn: async () => {
+            const response = await apiRequest('/user/all', 'get', {});
+
+            const users = response.data;
+
+            return filter ? users.filter(filter) : users;
+        },
+        enabled: true,
+        initialData: undefined,
+    });
+
+export const useUsers = (
+    filter?: (user: Omit<User, 'created_at'>) => boolean
+) => useQuery(getUsers(filter));
