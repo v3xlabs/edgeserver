@@ -1,0 +1,16 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE teams SET name = $2, avatar_url = $3 WHERE team_id = $1",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Text",
+        "Text",
+        "Text"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "6fbcea6f1c56d4c83d72b4077fab381ab854201a66c0cfa28ce8d5a967fd5067"
+}

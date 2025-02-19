@@ -30,6 +30,7 @@ impl<'a> ApiExtractor<'a> for UserAuth {
     type ParamType = ();
     type ParamRawType = ();
 
+    #[tracing::instrument(skip(req, body, _param_opts))]
     async fn from_request(
         req: &'a Request,
         body: &mut RequestBody,
