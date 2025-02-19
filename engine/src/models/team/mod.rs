@@ -107,20 +107,6 @@ impl Team {
         let is_member: bool = serde_json::from_value(is_member).unwrap_or(false);
 
         Ok(is_member)
-
-        // if let Some(x) = state.cache.has(&cache_key).await {
-        //     return Ok(x.as_bool().unwrap_or(false));
-        // }
-
-
-        // state.cache.raw.insert(
-        //     cache_key,
-        //     async move {
-        //         CachedValue::new_with_ttl(serde_json::Value::from(x), Duration::seconds(30))
-        //      }.boxed().shared(),
-        // );
-
-        // Ok(x)
     }
 
     async fn _is_member(
@@ -156,6 +142,25 @@ impl Team {
             .await?;
 
         Ok(())
+    }
+
+    pub async fn update_name(db: &Database, team_id: impl AsRef<str>, name: impl AsRef<str>) -> Result<(), sqlx::Error> {
+        query!("UPDATE teams SET name = $2 WHERE team_id = $1", team_id.as_ref(), name.as_ref())
+            .execute(&db.pool)
+            .await?;
+
+        Ok(())
+    }
+
+    pub async fn update_avatar(db: &Database, team_id: impl AsRef<str>, avatar_url: impl AsRef<str>) -> Result<Team, sqlx::Error> {
+        query_as!(
+            Team,
+            "UPDATE teams SET avatar_url = $2 WHERE team_id = $1 RETURNING *",
+            team_id.as_ref(),
+            avatar_url.as_ref()
+        )
+        .fetch_one(&db.pool)
+        .await
     }
 }
 

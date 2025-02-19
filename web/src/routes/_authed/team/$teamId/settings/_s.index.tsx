@@ -2,7 +2,7 @@ import { createFileRoute } from '@tanstack/react-router';
 
 import { useTeam } from '@/api';
 import { Button, Input } from '@/components';
-import TeamUserTransfer from '@/gui/transferDialog/teamUserTransfer';
+import { TeamAvatarUpload } from '@/gui/settings/UploadAvatar';
 
 export const Route = createFileRoute('/_authed/team/$teamId/settings/_s/')({
     component: RouteComponent,
@@ -23,6 +23,7 @@ function RouteComponent() {
                     </Button>
                 </div>
             </div>
+            {team && <TeamAvatarUpload team={team} />}
         </div>
     );
 }

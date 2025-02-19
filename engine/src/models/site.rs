@@ -4,12 +4,7 @@ use serde::{Deserialize, Serialize};
 use sqlx::{query, query_as, query_scalar};
 
 use crate::{
-    database::Database,
-    middlewares::auth::AccessibleResource,
-    models::deployment::Deployment,
-    routes::error::HttpError,
-    state::State,
-    utils::id::{generate_id, IdType},
+    database::Database, middlewares::auth::AccessibleResource, models::deployment::Deployment, routes::error::HttpError, state::State, utils::id::{generate_id, IdType}
 };
 
 #[derive(Debug, Serialize, Deserialize, Object)]
