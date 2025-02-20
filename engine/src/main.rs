@@ -57,7 +57,10 @@ async fn main() {
 
         let tracer = trace_provider.tracer("edgeserver");
 
-        let telemetry_layer = tracing_opentelemetry::layer().with_tracer(tracer.clone());
+        let telemetry_layer = tracing_opentelemetry::layer()
+            .with_tracer(tracer.clone())
+            .with_error_fields_to_exceptions(true)
+            .with_tracked_inactivity(true);
 
         let fmt_layer = tracing_subscriber::fmt::layer().with_filter(EnvFilter::from_default_env());
         tracing_subscriber::registry()

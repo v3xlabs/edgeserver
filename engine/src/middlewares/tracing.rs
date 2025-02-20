@@ -17,6 +17,7 @@ use poem::{
     },
     Endpoint, FromRequest, IntoResponse, PathPattern, Request, Response, Result,
 };
+use tracing_opentelemetry;
 
 /// Middleware that injects the OpenTelemetry trace ID into the response headers.
 #[derive(Default)]
@@ -61,27 +62,6 @@ where
     type Output = Response;
 
     async fn call(&self, req: Request) -> Result<Self::Output> {
-        // // Execute the inner endpoint.
-        // let response = self.inner.call(req).await?;
-
-        // // Extract the trace ID from the current tracing context.
-        // let trace_id = Span::current()
-        //     .context()
-        //     .span()
-        //     .span_context()
-        //     .trace_id()
-        //     .to_string();
-
-        // // Add the trace ID to the response headers (under X-Trace-Id).
-        // let mut response = response.into_response();
-        // response.headers_mut().insert(
-        //     "X-Trace-Id",
-        //     HeaderValue::from_str(&trace_id)
-        //         .unwrap_or_else(|_| HeaderValue::from_static("unknown")),
-        // );
-
-        // Ok(response)
-
         let tracer = self.tracer.clone();
 
         let remote_addr = RealIp::from_request_without_body(&req)
@@ -133,6 +113,11 @@ where
             let cx = Context::current();
             let span = cx.span();
 
+            let guard = tracing_opentelemetry::OpenTelemetrySpanExt::set_parent(
+                &tracing::span::Span::current(),
+                cx.clone()
+            );
+            
             match res {
                 Ok(resp) => {
                     let mut resp = resp.into_response();
