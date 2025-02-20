@@ -47,7 +47,7 @@ export const Subbar: FC<{ type: 'site' | 'team'; entry_id: string }> = ({
     }, [reference]);
 
     return (
-        <div className="w-full" ref={reference}>
+        <div className="z-20 w-full" ref={reference}>
             <motion.div
                 initial={{ y: '0%', opacity: 0 }}
                 animate={{ y: '0', opacity: 1 }}
