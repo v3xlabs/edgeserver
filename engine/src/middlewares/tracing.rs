@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use color_eyre::SectionExt;
 use opentelemetry::{
     global,
@@ -7,34 +9,58 @@ use opentelemetry::{
 use opentelemetry_http::HeaderExtractor;
 use opentelemetry_semantic_conventions::{attribute, resource};
 use poem::{
-    http::HeaderValue, middleware::Middleware, web::{
+    http::HeaderValue,
+    middleware::Middleware,
+    web::{
         headers::{self, HeaderMapExt},
         RealIp,
-    }, Endpoint, FromRequest, IntoResponse, PathPattern, Request, Response, Result
+    },
+    Endpoint, FromRequest, IntoResponse, PathPattern, Request, Response, Result,
 };
 
 /// Middleware that injects the OpenTelemetry trace ID into the response headers.
 #[derive(Default)]
-pub struct TraceId;
+pub struct TraceId<T> {
+    tracer: Arc<T>,
+}
 
-impl<E: Endpoint> Middleware<E> for TraceId {
-    type Output = TraceIdEndpoint<E>;
+impl<T> TraceId<T> {
+    pub fn new(tracer: Arc<T>) -> Self {
+        Self { tracer }
+    }
+}
+
+impl<T, E> Middleware<E> for TraceId<T>
+where
+    E: Endpoint,
+    T: Tracer + Send + Sync,
+    T::Span: Send + Sync + 'static,
+{
+    type Output = TraceIdEndpoint<T, E>;
 
     fn transform(&self, ep: E) -> Self::Output {
-        TraceIdEndpoint { inner: ep }
+        TraceIdEndpoint {
+            inner: ep,
+            tracer: self.tracer.clone(),
+        }
     }
 }
 
 /// The endpoint wrapper produced by the TraceId middleware.
-pub struct TraceIdEndpoint<E> {
+pub struct TraceIdEndpoint<T, E> {
     inner: E,
+    tracer: Arc<T>,
 }
 
-impl<E: Endpoint> Endpoint for TraceIdEndpoint<E> {
+impl<T, E> Endpoint for TraceIdEndpoint<T, E>
+where
+    E: Endpoint,
+    T: Tracer + Send + Sync,
+    T::Span: Send + Sync + 'static,
+{
     type Output = Response;
 
     async fn call(&self, req: Request) -> Result<Self::Output> {
-        let tracer = global::tracer("edgeserver");
         // // Execute the inner endpoint.
         // let response = self.inner.call(req).await?;
 
@@ -55,6 +81,8 @@ impl<E: Endpoint> Endpoint for TraceIdEndpoint<E> {
         // );
 
         // Ok(response)
+
+        let tracer = self.tracer.clone();
 
         let remote_addr = RealIp::from_request_without_body(&req)
             .await
@@ -96,7 +124,7 @@ impl<E: Endpoint> Endpoint for TraceIdEndpoint<E> {
             .span_builder(format!("{} {}", method, req.uri()))
             .with_kind(SpanKind::Server)
             .with_attributes(attributes)
-            .start_with_context(&tracer, &parent_cx);
+            .start_with_context(&*tracer, &parent_cx);
 
         span.add_event("request.started".to_string(), vec![]);
 

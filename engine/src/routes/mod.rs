@@ -3,6 +3,7 @@ use std::sync::Arc;
 use async_std::path::Path;
 use auth::AuthApi;
 use invite::InviteApi;
+use opentelemetry::global;
 use poem::{
     endpoint::StaticFilesEndpoint, get, handler, listener::TcpListener, middleware::{Cors, OpenTelemetryTracing},
     web::Html, EndpointExt, Route, Server,
@@ -62,7 +63,7 @@ pub async fn serve(state: AppState) {
         .at("/docs", get(get_openapi_docs))
         .nest("/", file_endpoint)
         .with(Cors::new())
-        .with(TraceId)
+        .with(TraceId::new(Arc::new(global::tracer("edgeserver"))))
         .data(state);
 
     let listener = TcpListener::bind("0.0.0.0:3000");
