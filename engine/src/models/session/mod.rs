@@ -47,19 +47,21 @@ impl Session {
         Ok((token, session))
     }
 
-    pub async fn get_by_id(db: &Database, id: &str) -> Result<Option<Self>, sqlx::Error> {
-        let session = query_as!(Session, "SELECT * FROM sessions WHERE session_id = $1", id)
+    #[tracing::instrument(name = "get_session_by_id", skip(db))]
+    pub async fn get_by_id(db: &Database, session_id: &str) -> Result<Option<Self>, sqlx::Error> {
+        let session = query_as!(Session, "SELECT * FROM sessions WHERE session_id = $1", session_id)
             .fetch_optional(&db.pool)
             .await?;
 
         Ok(session)
     }
 
-    pub async fn try_access(db: &Database, id: &str) -> Result<Option<Self>, sqlx::Error> {
+    #[tracing::instrument(name = "try_access", skip(db))]
+    pub async fn try_access(db: &Database, session_id: &str) -> Result<Option<Self>, sqlx::Error> {
         let session = query_as!(
             Session,
             "UPDATE sessions SET updated_at = NOW() WHERE session_id = $1 AND valid = TRUE RETURNING *",
-            id
+            session_id
         )
         .fetch_optional(&db.pool)
         .await?;

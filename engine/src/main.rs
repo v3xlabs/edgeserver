@@ -16,7 +16,7 @@ pub mod state;
 pub mod storage;
 pub mod utils;
 
-use tracing_subscriber::prelude::*;
+use tracing_subscriber::{prelude::*, EnvFilter};
 
 #[async_std::main]
 async fn main() {
@@ -61,7 +61,7 @@ async fn main() {
     let telemetry_layer = tracing_opentelemetry::layer().with_tracer(tracer.clone());
 
     // tracing_subscriber::fmt::init();
-    let fmt_layer = tracing_subscriber::fmt::layer();
+    let fmt_layer = tracing_subscriber::fmt::layer().with_filter(EnvFilter::from_default_env());
     tracing_subscriber::registry()
         .with(fmt_layer)
         .with(telemetry_layer)
