@@ -55,16 +55,16 @@ async fn main() {
 
         global::set_tracer_provider(trace_provider.clone());
 
-        // let tracer = trace_provider.tracer("edgeserver");
+        let tracer = trace_provider.tracer("edgeserver");
 
-        // let telemetry_layer = tracing_opentelemetry::layer().with_tracer(tracer.clone());
+        let telemetry_layer = tracing_opentelemetry::layer().with_tracer(tracer.clone());
 
-        // let fmt_layer = tracing_subscriber::fmt::layer().with_filter(EnvFilter::from_default_env());
-        // tracing_subscriber::registry()
-        //     .with(fmt_layer)
-        //     .with(telemetry_layer)
-        //     .init();
-        tracing_subscriber::fmt::init();
+        let fmt_layer = tracing_subscriber::fmt::layer().with_filter(EnvFilter::from_default_env());
+        tracing_subscriber::registry()
+            .with(fmt_layer)
+            .with(telemetry_layer)
+            .init();
+        // tracing_subscriber::fmt::init();
 
     } else {
         info!("Starting Edgerouter without OTLP tracing, provide OTLP_ENDPOINT to enable tracing");
