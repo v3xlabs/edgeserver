@@ -35,7 +35,7 @@ impl Storage {
         name: &str,
         kind: &str,
         file: Vec<u8>,
-    ) -> Result<String, anyhow::Error> {
+    ) -> Result<String, color_eyre::eyre::Error> {
         self.bucket.put_object(&name, &file).await?;
 
         Ok(name.to_string())

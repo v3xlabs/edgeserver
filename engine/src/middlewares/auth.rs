@@ -30,7 +30,7 @@ impl<'a> ApiExtractor<'a> for UserAuth {
     type ParamType = ();
     type ParamRawType = ();
 
-    #[tracing::instrument(skip(req, body, _param_opts))]
+    #[tracing::instrument(skip(req, body, _param_opts), name = "auth")]
     async fn from_request(
         req: &'a Request,
         body: &mut RequestBody,
@@ -151,7 +151,8 @@ impl UserAuth {
         }
     }
 
-    pub async fn required_member_of(&self, team_id: impl AsRef<str>) -> Result<(), HttpError> {
+    #[tracing::instrument(name = "required_member_of")]
+    pub async fn required_member_of(&self, team_id: impl AsRef<str> + Debug) -> Result<(), HttpError> {
         match self {
             UserAuth::User(session, state) => {
                 if !Team::is_member(&state, &team_id, &session.user_id)
@@ -167,6 +168,7 @@ impl UserAuth {
         }
     }
 
+    #[tracing::instrument(name = "verify_access_to")]
     pub async fn verify_access_to(
         &self,
         resource: &impl AccessibleResource,
@@ -186,6 +188,6 @@ impl UserAuth {
     }
 }
 
-pub trait AccessibleResource {
+pub trait AccessibleResource: Debug {
     async fn has_access_to(&self, state: &State, user_id: &str) -> Result<bool, HttpError>;
 }

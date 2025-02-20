@@ -9,10 +9,12 @@ use crate::{
     state::State,
 };
 
+#[derive(Debug)]
 pub struct UserApi;
 
 #[OpenApi]
 impl UserApi {
+    #[tracing::instrument(skip(user, state))]
     #[oai(path = "/user", method = "get", tag = "ApiTags::User")]
     pub async fn get_user(&self, user: UserAuth, state: Data<&State>) -> Result<Json<User>> {
         info!("Getting user: {:?}", user);

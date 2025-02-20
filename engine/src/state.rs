@@ -1,5 +1,6 @@
 use std::sync::Arc;
 
+use color_eyre::eyre::Result;
 use config::{Config, Environment};
 use serde::Deserialize;
 
@@ -44,7 +45,7 @@ pub struct GithubAppConfig {
 }
 
 impl AppState {
-    pub async fn new() -> Result<Self, anyhow::Error> {
+    pub async fn new() -> Result<Self> {
         let config = Config::builder()
             .add_source(Environment::default())
             .build()?;

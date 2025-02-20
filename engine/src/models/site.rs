@@ -101,9 +101,11 @@ impl Site {
     }
 }
 
+#[derive(Debug)]
 pub struct SiteId<'a>(pub &'a str);
 
 impl<'a> AccessibleResource for SiteId<'a> {
+    #[tracing::instrument(name = "has_access_to", skip(state))]
     async fn has_access_to(&self, state: &State, user_id: &str) -> Result<bool, HttpError> {
         let cache_key = format!("site:{}", self.0);
 

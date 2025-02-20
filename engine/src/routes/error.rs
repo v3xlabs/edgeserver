@@ -6,7 +6,7 @@ use tracing::error;
 #[derive(Debug, thiserror::Error)]
 pub enum HttpError {
     #[error("Anyhow error: {0}")]
-    AnyhowError(#[from] anyhow::Error),
+    AnyhowError(#[from] color_eyre::eyre::Error),
 
     #[error("Database error: {0}")]
     DatabaseError(#[from] sqlx::Error),

@@ -1,10 +1,11 @@
 use std::env;
 
-use opentelemetry::trace::TracerProvider;
+use opentelemetry::{global, trace::TracerProvider};
 use opentelemetry_otlp::WithExportConfig;
-use opentelemetry_sdk::trace::TracerProviderBuilder;
 use state::AppState;
 use tracing::{error, info};
+use opentelemetry_sdk::Resource;
+use opentelemetry::KeyValue;
 
 pub mod cache;
 pub mod database;
@@ -37,13 +38,27 @@ async fn main() {
         // .install_batch(opentelemetry_sdk::runtime::AsyncStd)
         .expect("Couldn't create OTLP tracer");
 
+    // Optionally get hostname via environment variable or using another method.
+    let hostname = std::env::var("HOSTNAME")
+        .unwrap_or_else(|_| "unknown".to_string());
+
+    // Create a resource with the desired attributes.
+    let resource = Resource::builder()
+        .with_service_name("edgeserver")
+        .with_attributes(vec![KeyValue::new("host.name", hostname)])
+        .build();
+
     let trace_provider = opentelemetry_sdk::trace::SdkTracerProvider::builder()
+        // Attach the resource here.
+        .with_resource(resource)
         .with_batch_exporter(exporter)
         .build();
 
+    global::set_tracer_provider(trace_provider.clone());
+
     let tracer = trace_provider.tracer("edgeserver");
 
-    let telemetry_layer = tracing_opentelemetry::layer().with_tracer(tracer);
+    let telemetry_layer = tracing_opentelemetry::layer().with_tracer(tracer.clone());
 
     // tracing_subscriber::fmt::init();
     let fmt_layer = tracing_subscriber::fmt::layer();
@@ -63,5 +78,5 @@ async fn main() {
         }
     };
 
-    routes::serve(state).await;
+    routes::serve(state, tracer).await;
 }

@@ -1,3 +1,5 @@
+use std::fmt::Debug;
+
 use chrono::{DateTime, Utc};
 use poem_openapi::Object;
 use serde::{Deserialize, Serialize};
@@ -42,7 +44,8 @@ impl Team {
         .await
     }
 
-    pub async fn get_by_id(db: &Database, team_id: impl AsRef<str>) -> Result<Self, sqlx::Error> {
+    #[tracing::instrument(name = "get_by_id", skip(db))]
+    pub async fn get_by_id(db: &Database, team_id: impl AsRef<str> + Debug) -> Result<Self, sqlx::Error> {
         query_as!(
             Team,
             "SELECT * FROM teams WHERE team_id = $1",
@@ -52,9 +55,10 @@ impl Team {
         .await
     }
 
+    #[tracing::instrument(name = "get_by_user_id", skip(db))]
     pub async fn get_by_user_id(
         db: &Database,
-        user_id: impl AsRef<str>,
+        user_id: impl AsRef<str> + Debug,
     ) -> Result<Vec<Self>, sqlx::Error> {
         // query for teams where the user_id is the team owner_id,
         // also include teams where the user_id is in the user_teams table
@@ -75,10 +79,11 @@ impl Team {
         Ok(())
     }
 
+    #[tracing::instrument(name = "is_owner", skip(db))]
     pub async fn is_owner(
         db: &Database,
-        team_id: impl AsRef<str>,
-        user_id: impl AsRef<str>,
+        team_id: impl AsRef<str> + Debug,
+        user_id: impl AsRef<str> + Debug,
     ) -> Result<bool, sqlx::Error> {
         Ok(query_as!(
             Team,
@@ -91,10 +96,11 @@ impl Team {
         .is_some())
     }
 
+    #[tracing::instrument(name = "is_member", skip(state))]
     pub async fn is_member(
         state: &State,
-        team_id: impl AsRef<str>,
-        user_id: impl AsRef<str>,
+        team_id: impl AsRef<str> + Debug,
+        user_id: impl AsRef<str> + Debug,
     ) -> Result<bool, sqlx::Error> {
         let cache_key = format!("team:{}:member:{}", team_id.as_ref(), user_id.as_ref());
 
@@ -109,10 +115,11 @@ impl Team {
         Ok(is_member)
     }
 
+    #[tracing::instrument(name = "_is_member", skip(state))]
     async fn _is_member(
         state: State,
-        team_id: impl AsRef<str>,
-        user_id: impl AsRef<str>,
+        team_id: impl AsRef<str> + Debug,
+        user_id: impl AsRef<str> + Debug,
     ) -> Result<bool, sqlx::Error> {
         query_scalar!(
             "SELECT EXISTS (SELECT 1 FROM user_teams WHERE team_id = $1 AND user_id = $2) OR EXISTS (SELECT 1 FROM teams WHERE team_id = $1 AND owner_id = $2)",
@@ -123,9 +130,10 @@ impl Team {
         .await.map(|x| x.unwrap_or(false))
     }
 
+    #[tracing::instrument(name = "get_members", skip(db))]
     pub async fn get_members(
         db: &Database,
-        team_id: impl AsRef<str>,
+        team_id: impl AsRef<str> + Debug,
     ) -> Result<Vec<User>, sqlx::Error> {
         query_as!(
             User,
@@ -153,6 +161,7 @@ impl Team {
     }
 }
 
+#[derive(Debug)]
 pub struct TeamId<'a>(pub &'a str);
 
 impl<'a> AccessibleResource for TeamId<'a> {

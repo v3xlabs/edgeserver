@@ -14,7 +14,8 @@ sqlx = { version = "0", features = [
     "ipnetwork",
 ] }
 tracing = "0.1.41"
-anyhow = "1.0.95"
+# anyhow = "1.0.95"
+color-eyre = "0.6.1"
 async-std = { version = "1", features = ["attributes", "tokio1"] }
 config = "0.15.4"
 dotenvy = "0.15.7"
@@ -22,7 +23,9 @@ futures = "0.3.31"
 poem = { version = "3.1.6", git = "https://github.com/poem-web/poem", branch = "master", features = [
     "rustls",
     "sse",
-    "tempfile"
+    "tempfile",
+    "opentelemetry",
+    "requestid"
 ] }
 poem-openapi = { version = "5.1.5", git = "https://github.com/poem-web/poem", branch = "master", features = [
     "chrono",
