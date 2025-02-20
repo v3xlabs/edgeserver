@@ -1,3 +1,5 @@
+use std::fmt::Debug;
+
 use poem_openapi::Object;
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
@@ -18,7 +20,8 @@ impl From<String> for AssetFile {
 }
 
 impl AssetFile {
-    pub async fn from_buffer(state: &State, buffer: &[u8], path: impl AsRef<str>) -> Result<(Self, NewlyCreatedFile, String, String, i64), sqlx::Error> {
+    #[tracing::instrument(name = "from_buffer", skip(state, buffer))]
+    pub async fn from_buffer(state: &State, buffer: &[u8], path: impl AsRef<str> + Debug) -> Result<(Self, NewlyCreatedFile, String, String, i64), sqlx::Error> {
         let file_hash = hash_file(&buffer);
         let content_type = infer::get(&buffer)
             .map(|t| t.mime_type().to_string()).unwrap_or_else(|| {
@@ -60,6 +63,7 @@ impl AssetFile {
     }
 }
 
+#[tracing::instrument(name = "hash_file", skip(file))]
 fn hash_file(file: &[u8]) -> String {
     let mut hasher = Sha256::new();
     hasher.update(file);

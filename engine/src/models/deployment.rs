@@ -63,6 +63,7 @@ impl Deployment {
     //     }
     // }
 
+    #[tracing::instrument(name = "upload_files", skip(self, state, file))]
     pub async fn upload_files(&self, state: &State, file: Upload) -> Result<(), sqlx::Error> {
         let file_stream = file.into_vec().await.unwrap();
 
@@ -90,6 +91,9 @@ impl Deployment {
 
             info!("Cataloging metadata for file: {:?}", path);
             
+            let s = tracing::span!(tracing::Level::INFO, "cataloging_metadata", file_path = path);
+            let _enter = s.enter();
+
             let deployment_file = query_as!(
                  DeploymentFile,
                 "INSERT INTO deployment_files (deployment_id, file_id, file_path, mime_type) VALUES ($1, $2, $3, $4) RETURNING *",
@@ -99,8 +103,12 @@ impl Deployment {
                 content_type
             ).fetch_one(&state.database.pool).await?;
 
+            drop(_enter);
+
             if newly_created_file.is_new.unwrap_or_default() {
                 info!("Uploading file: {:?}", path);
+                let s = tracing::span!(tracing::Level::INFO, "uploading_file", file_path = path);
+                let _enter = s.enter();
 
                 let s3_path = file_hash.to_string();
                 state
@@ -109,6 +117,8 @@ impl Deployment {
                     .put_object_with_content_type(&s3_path, &buf, &content_type)
                     .await
                     .unwrap();
+
+                drop(_enter);
 
                 info!("Upload complete");
             } else {
