@@ -4,7 +4,7 @@ use async_std::path::Path;
 use auth::AuthApi;
 use invite::InviteApi;
 use poem::{
-    endpoint::StaticFilesEndpoint, get, handler, listener::TcpListener, middleware::{Cors, Tracing},
+    endpoint::StaticFilesEndpoint, get, handler, listener::TcpListener, middleware::{Cors, OpenTelemetryTracing},
     web::Html, EndpointExt, Route, Server,
 };
 use tracing::info;
@@ -63,7 +63,6 @@ pub async fn serve(state: AppState) {
         .nest("/", file_endpoint)
         .with(Cors::new())
         .with(TraceId)
-        .with(Tracing)
         .data(state);
 
     let listener = TcpListener::bind("0.0.0.0:3000");

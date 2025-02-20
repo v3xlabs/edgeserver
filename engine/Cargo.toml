@@ -72,3 +72,5 @@ opentelemetry-otlp = { version = "0.28.0", features = ["trace", "metrics", "grpc
 opentelemetry_sdk = {version = "0.28.0", features = ["trace", "rt-async-std"]}
 opentelemetry = { version = "0.28.0", features = ["trace"]}
 opentelemetry-stdout = "0.28.0"
+opentelemetry-http = "0.28.0"
+opentelemetry-semantic-conventions = "0.28.0"
