@@ -139,6 +139,11 @@ where
                         attribute::HTTP_RESPONSE_STATUS_CODE,
                         resp.status().as_u16() as i64,
                     ));
+                    // Grafana specific override
+                    span.set_attribute(KeyValue::new(
+                        "http.status_code",
+                        resp.status().as_u16() as i64,
+                    ));
                     if let Some(content_length) =
                         resp.headers().typed_get::<headers::ContentLength>()
                     {
