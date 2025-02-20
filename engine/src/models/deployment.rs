@@ -7,9 +7,7 @@ use async_zip::base::read::mem::ZipFileReader;
 use tracing::info;
 
 use crate::{
-    database::Database,
-    state::State,
-    utils::id::{generate_id, IdType},
+    assets::AssetFile, database::Database, state::State, utils::id::{generate_id, IdType}
 };
 
 #[derive(Debug, Serialize, Deserialize, Object)]
@@ -65,63 +63,8 @@ impl Deployment {
     //     }
     // }
 
-    pub async fn upload_file(
-        &self,
-        db: &Database,
-        file_path: impl AsRef<str>,
-        file_hash: impl AsRef<str>,
-        mime_type: impl AsRef<str>,
-        file_size: i64,
-    ) -> Result<NewlyCreatedFile, sqlx::Error> {
-        // create a new file in `files` table
-        // create a new `deployment_files` row in `deployment_files` table to link the file to the deployment
-
-        let file_path = file_path.as_ref();
-        let file_hash = file_hash.as_ref();
-        let mime_type = mime_type.as_ref();
-
-        tracing::info!("File path: {:?}", file_path);
-
-        // insert into the `files` table by file_hash if it doesn't exist otherwise get the file_id
-        let file = query_as!(
-            NewlyCreatedFile,
-            r#"
-            WITH ins AS (
-  INSERT INTO files (file_hash, file_size)
-  VALUES ($1, $2)
-  ON CONFLICT (file_hash) DO NOTHING
-  RETURNING file_id, true AS is_new
-)
-SELECT file_id, is_new
-FROM ins
-UNION ALL
-SELECT file_id, false AS is_new
-FROM files
-WHERE file_hash = $1
-LIMIT 1;
-            "#,
-            file_hash,
-            file_size
-        )
-        .fetch_one(&db.pool)
-        .await?;
-
-        tracing::info!("File: {:?}", file);
-
-        let deployment_file = query_as!(
-            DeploymentFile,
-            "INSERT INTO deployment_files (deployment_id, file_id, file_path, mime_type) VALUES ($1, $2, $3, $4) RETURNING *",
-            self.deployment_id,
-            file.file_id,
-            file_path,
-            mime_type
-        ).fetch_one(&db.pool).await?;
-
-        Ok(file)
-    }
-
+    #[tracing::instrument(name = "upload_files", skip(self, state, file))]
     pub async fn upload_files(&self, state: &State, file: Upload) -> Result<(), sqlx::Error> {
-        let content_type = file.content_type().unwrap().to_string();
         let file_stream = file.into_vec().await.unwrap();
 
         // TODO: Read file stream, extract zip file (contains multiple files), upload each file to s3 at the correct relevant path relative to deployment.deployment_id + '/'
@@ -144,23 +87,28 @@ LIMIT 1;
             file_content.read_to_end_checked(&mut buf).await.unwrap();
 
             // hash the file
-            info!("Hashing file: {:?}", path);
-            let file_hash = hash_file(&buf);
-
-            let content_type = infer::get(&buf)
-                .map(|t| t.mime_type().to_string()).unwrap_or_else(|| {
-                    content_type_from_file_name(path)
-                });
-            let file_size = buf.len() as i64;
+            let (file, newly_created_file, file_hash, content_type, file_size) = AssetFile::from_buffer(state, &buf, path).await?;
 
             info!("Cataloging metadata for file: {:?}", path);
-            let x = self
-                .upload_file(&state.database, path, &file_hash, &content_type, file_size)
-                .await
-                .unwrap();
+            
+            let s = tracing::span!(tracing::Level::INFO, "cataloging_metadata", file_path = path);
+            let _enter = s.enter();
 
-            if x.is_new.unwrap_or_default() {
+            let deployment_file = query_as!(
+                 DeploymentFile,
+                "INSERT INTO deployment_files (deployment_id, file_id, file_path, mime_type) VALUES ($1, $2, $3, $4) RETURNING *",
+                self.deployment_id,
+                newly_created_file.file_id,
+                path,
+                content_type
+            ).fetch_one(&state.database.pool).await?;
+
+            drop(_enter);
+
+            if newly_created_file.is_new.unwrap_or_default() {
                 info!("Uploading file: {:?}", path);
+                let s = tracing::span!(tracing::Level::INFO, "uploading_file", file_path = path);
+                let _enter = s.enter();
 
                 let s3_path = file_hash.to_string();
                 state
@@ -169,6 +117,8 @@ LIMIT 1;
                     .put_object_with_content_type(&s3_path, &buf, &content_type)
                     .await
                     .unwrap();
+
+                drop(_enter);
 
                 info!("Upload complete");
             } else {
