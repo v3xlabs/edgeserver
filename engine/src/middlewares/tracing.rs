@@ -16,7 +16,7 @@ use poem::{
     },
     Endpoint, FromRequest, IntoResponse, PathPattern, Request, Response, Result,
 };
-use tracing::{info_span, Instrument};
+use tracing::{info_span, Instrument, Metadata};
 use tracing_opentelemetry::{self, OpenTelemetrySpanExt};
 
 /// Middleware that injects the OpenTelemetry trace ID into the response headers.
@@ -108,8 +108,12 @@ where
 
         span.add_event("request.started".to_string(), vec![]);
 
-        let tracing_span = info_span!("request.started");
+        // let tracing_span = info_span!("request.started");
         let parent_context = Context::current_with_span(span);
+        // tracing_span.set_parent(parent_context.clone());
+
+        // set the tracing_opentelemetry span default for new spans to the parent_context
+        let tracing_span = info_span!("tracing-request-started");
         tracing_span.set_parent(parent_context.clone());
 
         async move {
@@ -185,6 +189,7 @@ where
         }
         .with_context(parent_context)
         .instrument(tracing_span)
+        // .instrument(tracing_span)
         .await
     }
 }

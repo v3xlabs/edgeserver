@@ -5,13 +5,13 @@ use auth::AuthApi;
 use invite::InviteApi;
 use opentelemetry::global;
 use poem::{
-    endpoint::StaticFilesEndpoint, get, handler, listener::TcpListener, middleware::{Cors, OpenTelemetryTracing},
+    endpoint::StaticFilesEndpoint, get, handler, listener::TcpListener, middleware::Cors,
     web::Html, EndpointExt, Route, Server,
 };
-use tracing::info;
 use poem_openapi::{OpenApi, OpenApiService, Tags};
 use site::SiteApi;
 use team::TeamApi;
+use tracing::info;
 use user::UserApi;
 
 use crate::middlewares::tracing::TraceId;
