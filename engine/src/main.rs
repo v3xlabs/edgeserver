@@ -16,7 +16,7 @@ pub mod state;
 pub mod storage;
 pub mod utils;
 
-use tracing_subscriber::{prelude::*, EnvFilter};
+use tracing_subscriber::prelude::*;
 
 #[async_std::main]
 async fn main() {
@@ -45,7 +45,7 @@ async fn main() {
     // Create a resource with the desired attributes.
     let resource = Resource::builder()
         .with_service_name("edgeserver")
-        .with_attributes(vec![KeyValue::new("host.name", hostname)])
+        .with_attribute(KeyValue::new("host.name", hostname))
         .build();
 
     let trace_provider = opentelemetry_sdk::trace::SdkTracerProvider::builder()
