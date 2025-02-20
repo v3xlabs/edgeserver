@@ -10,6 +10,7 @@ module.exports = {
                 secondary: 'var(--bg-secondary)',
                 muted: 'var(--bg-muted)',
                 hover: 'var(--bg-hover)',
+                selected: 'var(--bg-selected)',
             },
             borderColor: {
                 DEFAULT: 'var(--border)',

@@ -164,7 +164,9 @@ export const FieldSelect: FC<FieldSelectProperties> = ({
                                                 className={clsx(
                                                     'm-2',
                                                     justifyBetween &&
-                                                        'flex items-center justify-between'
+                                                        'flex items-center justify-between',
+                                                    value === option.value &&
+                                                        'bg-selected'
                                                 )}
                                             >
                                                 {option.label}
