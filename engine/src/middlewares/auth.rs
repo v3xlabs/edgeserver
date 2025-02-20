@@ -5,7 +5,7 @@ use poem_openapi::{
     registry::{MetaSecurityScheme, Registry},
     ApiExtractor, ApiExtractorType, ExtractParamOptions,
 };
-use tracing::info;
+use tracing::{info, span, Level};
 
 use crate::{
     models::{session::Session, team::Team},
@@ -36,7 +36,10 @@ impl<'a> ApiExtractor<'a> for UserAuth {
         body: &mut RequestBody,
         _param_opts: ExtractParamOptions<Self::ParamType>,
     ) -> Result<Self> {
+        let s = span!(Level::INFO, "get_state");
+        let _enter = s.enter();
         let state = <Data<&State> as FromRequest>::from_request(req, body).await?;
+        drop(_enter);
 
         let state = state.0;
 
@@ -59,6 +62,9 @@ impl<'a> ApiExtractor<'a> for UserAuth {
 
         let cache_key = format!("session:{}", token);
 
+        let s = span!(Level::INFO, "get_session_from_cache_optional");
+        let _enter = s.enter();
+
         let is_user = state.cache.raw.get_with(cache_key, async {
             info!("Cache miss for session: {}", token);
             // Hash the token
@@ -73,6 +79,8 @@ impl<'a> ApiExtractor<'a> for UserAuth {
             serde_json::to_value(session).unwrap()
             // Ok(UserAuth::User(session, state.clone())) as Result<UserAuth>
         }).await;
+
+        drop(_enter);
 
         let session: Option<Session> = serde_json::from_value(is_user).ok();
 
