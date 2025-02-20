@@ -146,7 +146,7 @@ export const FieldSelect: FC<FieldSelectProperties> = ({
                                     className="max-h-[200px] w-full overflow-y-auto"
                                 >
                                     <div className="w-full">
-                                        {filteredOptions.map((option) => (
+                                        {filteredOptions?.map((option) => (
                                             <Command.Item
                                                 key={option.value}
                                                 value={option.value}
