@@ -109,18 +109,18 @@ export const FieldSelect: FC<FieldSelectProperties> = ({
                             type="button"
                             role="combobox"
                             aria-expanded={open}
-                            className="w-full justify-between rounded-md border border-gray-300 shadow-sm"
+                            className="border-default w-full justify-between rounded-md border shadow-sm"
                         >
                             {value
                                 ? options.find(
                                       (option) => option.value === value
                                   )?.label
-                                : 'Select an option...'}
+                                : placeholder || 'Select an option...'}
                             <FaArrowsUpDown className="opacity-50" />
                         </Button>
                     </PopoverTrigger>
                     <PopoverContent
-                        className="bg-default rounded-md border border-gray-300 p-0 shadow-lg"
+                        className="bg-default border-default rounded-md border p-0 shadow-lg"
                         style={{ width: popoverWidth }}
                         onWheel={(event) => {
                             event.stopPropagation();

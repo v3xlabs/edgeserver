@@ -1,6 +1,8 @@
 import { createFileRoute } from '@tanstack/react-router';
 
+import { Button } from '@/components';
 import { InviteList } from '@/gui/invite/InviteList';
+import { TeamInviteCreateModal } from '@/gui/invite/TeamInviteCreateModal';
 import { MemberList } from '@/gui/user/MemberList';
 
 export const Route = createFileRoute(
@@ -10,6 +12,11 @@ export const Route = createFileRoute(
     context(context) {
         return {
             title: 'Members',
+            suffix: (
+                <TeamInviteCreateModal team_id={context.params.teamId}>
+                    <Button>Invite Member</Button>
+                </TeamInviteCreateModal>
+            ),
         };
     },
 });
