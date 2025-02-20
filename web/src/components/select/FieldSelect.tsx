@@ -143,7 +143,7 @@ export const FieldSelect: FC<FieldSelectProperties> = ({
                                 )}
                                 <div
                                     ref={parentReference}
-                                    className="max-h-[200px] w-full overflow-y-auto"
+                                    className="w-full overflow-y-auto"
                                 >
                                     <div className="w-full">
                                         {filteredOptions?.map((option) => (
@@ -164,9 +164,7 @@ export const FieldSelect: FC<FieldSelectProperties> = ({
                                                 className={clsx(
                                                     'm-2',
                                                     justifyBetween &&
-                                                        'flex items-center justify-between',
-                                                    value === option.value &&
-                                                        'bg-gray-200'
+                                                        'flex items-center justify-between'
                                                 )}
                                             >
                                                 {option.label}
