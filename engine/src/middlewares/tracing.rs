@@ -1,6 +1,5 @@
 use std::sync::Arc;
 
-use color_eyre::SectionExt;
 use opentelemetry::{
     global,
     trace::{FutureExt, Span, SpanKind, TraceContextExt, Tracer},
@@ -17,7 +16,8 @@ use poem::{
     },
     Endpoint, FromRequest, IntoResponse, PathPattern, Request, Response, Result,
 };
-use tracing_opentelemetry;
+use tracing::{info_span, Instrument};
+use tracing_opentelemetry::{self, OpenTelemetrySpanExt};
 
 /// Middleware that injects the OpenTelemetry trace ID into the response headers.
 #[derive(Default)]
@@ -108,16 +108,15 @@ where
 
         span.add_event("request.started".to_string(), vec![]);
 
+        let tracing_span = info_span!("request.started");
+        let parent_context = Context::current_with_span(span);
+        tracing_span.set_parent(parent_context.clone());
+
         async move {
             let res = self.inner.call(req).await;
             let cx = Context::current();
             let span = cx.span();
 
-            let guard = tracing_opentelemetry::OpenTelemetrySpanExt::set_parent(
-                &tracing::span::Span::current(),
-                cx.clone()
-            );
-            
             match res {
                 Ok(resp) => {
                     let mut resp = resp.into_response();
@@ -184,7 +183,8 @@ where
                 }
             }
         }
-        .with_context(Context::current_with_span(span))
+        .with_context(parent_context)
+        .instrument(tracing_span)
         .await
     }
 }
