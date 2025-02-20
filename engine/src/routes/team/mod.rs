@@ -19,6 +19,11 @@ pub struct CreateTeamRequest {
     pub name: String,
 }
 
+#[derive(Debug, Serialize, Deserialize, Object)]
+pub struct InviteUserToTeamRequest {
+    pub user_id: Option<String>,
+}
+
 pub struct TeamApi;
 
 #[OpenApi]
@@ -99,10 +104,11 @@ impl TeamApi {
         user: UserAuth,
         state: Data<&State>,
         team_id: Path<String>,
+        body: Json<InviteUserToTeamRequest>,
     ) -> Result<Json<UserTeamInvite>> {
         info!(
             "Inviting user to team: {:?} for user: {:?}",
-            team_id.0, user
+            team_id.0, body.user_id
         );
 
         user.verify_access_to(&TeamId(&team_id.0)).await?;
@@ -116,8 +122,18 @@ impl TeamApi {
             Err(HttpError::Forbidden)?;
         }
 
+        let user_to = body.user_id.clone();
+
+        if let Some(user_to) = user_to.as_ref() {
+            let user_to_obj = User::get_by_id(&state.0.database, &user_to)
+                .await
+                .map_err(HttpError::from)?;
+
+            info!("User to invite directly to: {:?}", user_to_obj);
+        }
+
         // Create "anonymous" invite (for now), replace None with user_id when we have a way to create invites for specific users
-        UserTeamInvite::new(&state.0.database, &team_id.0, None::<String>, &user.user_id)
+        UserTeamInvite::new(&state.0.database, &team_id.0, user_to, &user.user_id)
             .await
             .map_err(HttpError::from)
             .map(Json)
