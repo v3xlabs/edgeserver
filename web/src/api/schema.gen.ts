@@ -737,7 +737,11 @@ export type paths = {
                 };
                 cookie?: never;
             };
-            requestBody?: never;
+            requestBody: {
+                content: {
+                    "application/json; charset=utf-8": components["schemas"]["InviteUserToTeamRequest"];
+                };
+            };
             responses: {
                 200: {
                     headers: {
@@ -1026,6 +1030,10 @@ export type components = {
             /** Format: int64 */
             file_size?: number;
             file_deleted: boolean;
+        };
+        /** InviteUserToTeamRequest */
+        InviteUserToTeamRequest: {
+            user_id?: string;
         };
         /** LoginRequest */
         LoginRequest: {
