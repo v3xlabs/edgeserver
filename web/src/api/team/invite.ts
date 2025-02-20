@@ -25,21 +25,15 @@ export const useTeamInvites = (teamId: string) => {
     return useQuery(getTeamInvites(teamId));
 };
 
-export const useTeamInviteCreate = ({
-    teamId,
-    userId,
-}: {
-    teamId: string;
-    userId?: string;
-}) => {
+export const useTeamInviteCreate = ({ teamId }: { teamId: string }) => {
     return useMutation({
-        mutationFn: async (data) => {
+        mutationFn: async (data: { userId?: string }) => {
             const response = await apiRequest(
                 '/team/{team_id}/invites',
                 'post',
                 {
                     path: { team_id: teamId },
-                    data: { user_id: userId },
+                    data: { user_id: data.userId },
                     contentType: 'application/json; charset=utf-8',
                 }
             );

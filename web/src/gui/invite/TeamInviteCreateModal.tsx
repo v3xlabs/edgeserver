@@ -15,9 +15,11 @@ import { UserSelect } from '@/components/select/UserSelect';
 export const TeamInviteCreateModal: FC<
     PropsWithChildren<{ team_id: string }>
 > = ({ team_id, children }) => {
-    const { mutate: createInvite } = useTeamInviteCreate({ teamId: team_id });
-    const [user, setUser] = useState('');
-    const isDisabled = !user;
+    const [userId, setUserId] = useState('');
+    const { mutate: createInvite } = useTeamInviteCreate({
+        teamId: team_id,
+    });
+    const isDisabled = !userId;
 
     return (
         <>
@@ -32,9 +34,9 @@ export const TeamInviteCreateModal: FC<
                     </ModalDescription>
                     <UserSelect
                         placeholder="Choose an individual"
-                        value={user}
+                        value={userId}
                         onChange={(user) => {
-                            setUser(user);
+                            setUserId(user);
 
                             return true;
                         }}
@@ -43,7 +45,7 @@ export const TeamInviteCreateModal: FC<
                     <div className="flex flex-row gap-2">
                         <Button
                             className="w-full"
-                            onClick={() => createInvite()}
+                            onClick={() => createInvite({})}
                         >
                             <FiLink /> Copy link
                         </Button>
@@ -51,6 +53,11 @@ export const TeamInviteCreateModal: FC<
                             className="w-full"
                             variant="primary"
                             disabled={isDisabled}
+                            onClick={() => {
+                                if (isDisabled) return;
+
+                                createInvite({ userId });
+                            }}
                         >
                             <FiUserPlus />
                             Send
