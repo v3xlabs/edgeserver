@@ -59,35 +59,40 @@ function RouteComponent() {
                     handleSubmit();
                 }}
             >
-                <Field name="team_id">
-                    {({ handleBlur, handleChange, state }) => (
-                        <div>
-                            <label htmlFor="team_id">Team</label>
-                            <TeamSelect
-                                id="team_id"
-                                onBlur={handleBlur}
-                                value={state.value}
-                                onChange={(value) => handleChange(value)}
-                            />
-                        </div>
-                    )}
-                </Field>
-                <Field name="name">
-                    {({ handleBlur, handleChange, state }) => (
-                        <div>
-                            <label htmlFor="name">Name</label>
-                            <Input
-                                onBlur={handleBlur}
-                                onChange={(event) =>
-                                    handleChange(event.target.value)
-                                }
-                                id="name"
-                                placeholder="My Cool Site"
-                                value={state.value}
-                            />
-                        </div>
-                    )}
-                </Field>
+                <div className="w-fit space-y-4">
+                    <Field name="team_id">
+                        {({ handleChange, state }) => (
+                            <div className="w-full">
+                                <label htmlFor="team_id">Team</label>
+                                <TeamSelect
+                                    value={state.value}
+                                    popoverWidth="100%"
+                                    onChange={(value) => {
+                                        handleChange(value);
+
+                                        return true;
+                                    }}
+                                />
+                            </div>
+                        )}
+                    </Field>
+                    <Field name="name">
+                        {({ handleBlur, handleChange, state }) => (
+                            <div>
+                                <label htmlFor="name">Name</label>
+                                <Input
+                                    onBlur={handleBlur}
+                                    onChange={(event) =>
+                                        handleChange(event.target.value)
+                                    }
+                                    id="name"
+                                    placeholder="My Cool Site"
+                                    value={state.value}
+                                />
+                            </div>
+                        )}
+                    </Field>
+                </div>
                 <div className="flex justify-end">
                     <Subscribe>
                         {({ canSubmit }) => (
