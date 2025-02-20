@@ -62,10 +62,11 @@ async fn main() {
             .with_error_fields_to_exceptions(true)
             .with_tracked_inactivity(true);
 
-        let fmt_layer = tracing_subscriber::fmt::layer().with_filter(EnvFilter::from_default_env());
+        let fmt_layer = tracing_subscriber::fmt::layer();
         tracing_subscriber::registry()
             .with(fmt_layer)
             .with(telemetry_layer)
+            .with(EnvFilter::from_default_env())
             .init();
         // tracing_subscriber::fmt::init();
 
