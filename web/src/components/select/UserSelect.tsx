@@ -17,7 +17,7 @@ export const UserSelect: FC<
 > = ({ value, name, forceCategory, onChange, ...properties }) => {
     const { data: users } = useUsers();
 
-    const options = users!.map((user) => {
+    const options = (users || []).map((user) => {
         return {
             label: user.name,
             value: user.user_id,
