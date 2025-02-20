@@ -3,17 +3,17 @@ use std::sync::Arc;
 use async_std::path::Path;
 use auth::AuthApi;
 use invite::InviteApi;
-use opentelemetry_sdk::trace::Tracer;
 use poem::{
     endpoint::StaticFilesEndpoint, get, handler, listener::TcpListener, middleware::{Cors, Tracing},
     web::Html, EndpointExt, Route, Server,
 };
+use tracing::info;
 use poem_openapi::{OpenApi, OpenApiService, Tags};
 use site::SiteApi;
 use team::TeamApi;
-use tracing::info;
 use user::UserApi;
 
+use crate::middlewares::tracing::TraceId;
 use crate::state::AppState;
 
 pub mod auth;
@@ -22,8 +22,6 @@ pub mod invite;
 pub mod site;
 pub mod team;
 pub mod user;
-use tracing_subscriber::{prelude::*, EnvFilter};
-use crate::middlewares::tracing::TraceId;
 
 fn get_api() -> impl OpenApi {
     (SiteApi, UserApi, AuthApi, TeamApi, InviteApi)
@@ -44,7 +42,7 @@ pub enum ApiTags {
     Auth,
 }
 
-pub async fn serve(state: AppState, tracer: Tracer) {
+pub async fn serve(state: AppState) {
     info!("Serving HTTP");
 
     let state = Arc::new(state);
