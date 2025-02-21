@@ -1,3 +1,4 @@
+import * as Collapsible from '@radix-ui/react-collapsible';
 import byteSize from 'byte-size';
 import { FC, useState } from 'react';
 import {
@@ -112,55 +113,56 @@ export const FolderEntry: FC<{ node: FolderNode; name: string }> = ({
     node,
     name,
 }) => {
-    const [isCollapsed, setIsCollapsed] = useState(false);
-
-    const toggleCollapse = () => {
-        setIsCollapsed(!isCollapsed);
-    };
+    const [isOpen, setIsOpen] = useState(true);
 
     return (
-        <div
-            // eslint-disable-next-line jsx-a11y/role-has-required-aria-props
-            role="treeitem"
-            aria-expanded={!isCollapsed}
-            aria-label={name}
-        >
+        <Collapsible.Root open={isOpen} onOpenChange={setIsOpen} asChild>
             <div
-                className="flex cursor-pointer items-center gap-2"
-                onClick={toggleCollapse}
-                role="button"
-                tabIndex={0}
-                onKeyDown={(event) => {
-                    if (event.key === 'Enter' || event.key === ' ') {
-                        toggleCollapse();
-                    }
-                }}
+                role="treeitem"
+                aria-expanded={isOpen}
+                aria-label={name}
+                aria-selected={false}
             >
-                {isCollapsed ? <FiFolderPlus /> : <FiFolderMinus />}
-                <span>{name}</span>
+                <Collapsible.Trigger asChild>
+                    <div
+                        className="flex cursor-pointer items-center gap-2"
+                        role="button"
+                        tabIndex={0}
+                    >
+                        {isOpen ? <FiFolderMinus /> : <FiFolderPlus />}
+                        <span>{name}</span>
+                    </div>
+                </Collapsible.Trigger>
+
+                <Collapsible.Content>
+                    <ul className="pl-4" role="group">
+                        {Object.entries(node.files)
+                            .sort(([aName, a], [bName, b]) => {
+                                if (
+                                    a.type === 'directory' &&
+                                    b.type === 'file'
+                                ) {
+                                    return -1;
+                                }
+
+                                if (
+                                    a.type === 'file' &&
+                                    b.type === 'directory'
+                                ) {
+                                    return 1;
+                                }
+
+                                return aName.localeCompare(bName);
+                            })
+                            .map(([key, value]) => (
+                                <li key={key}>
+                                    <TreeEntry node={value} name={key} />
+                                </li>
+                            ))}
+                    </ul>
+                </Collapsible.Content>
             </div>
-            {!isCollapsed && (
-                <ul className="pl-4" role="group">
-                    {Object.entries(node.files)
-                        .sort(([aName, a], [bName, b]) => {
-                            if (a.type === 'directory' && b.type === 'file') {
-                                return -1;
-                            }
-
-                            if (a.type === 'file' && b.type === 'directory') {
-                                return 1;
-                            }
-
-                            return aName.localeCompare(bName);
-                        })
-                        .map(([key, value]) => (
-                            <li key={key}>
-                                <TreeEntry node={value} name={key} />
-                            </li>
-                        ))}
-                </ul>
-            )}
-        </div>
+        </Collapsible.Root>
     );
 };
 
