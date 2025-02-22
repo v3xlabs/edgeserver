@@ -37,7 +37,7 @@
         "@spruceid/siwe-parser": "^2.0.2",
         "@tanstack/query-sync-storage-persister": "^5.62.9",
         "@tanstack/react-form": "^0.41.0",
-        "@tanstack/react-query": "^5.62.11",
+        "@tanstack/react-query": "^5.66.9",
         "@tanstack/react-query-devtools": "^5.62.11",
         "@tanstack/react-query-persist-client": "^5.62.11",
         "@tanstack/react-router": "^1.93.0",
