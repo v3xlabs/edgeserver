@@ -113,7 +113,7 @@ where
         // tracing_span.set_parent(parent_context.clone());
 
         // set the tracing_opentelemetry span default for new spans to the parent_context
-        let tracing_span = info_span!("tracing-request-started");
+        let tracing_span = tracing::span!(tracing::Level::INFO, "tracing-request-started");
         tracing_span.set_parent(parent_context.clone());
 
         async move {
