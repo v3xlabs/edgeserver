@@ -4,13 +4,16 @@ use async_std::path::Path;
 use auth::AuthApi;
 use invite::InviteApi;
 use opentelemetry::global;
+use opentelemetry_prometheus::PrometheusExporter;
 use poem::middleware::OpenTelemetryMetrics;
+use poem::web::Data;
 use poem::{
     endpoint::StaticFilesEndpoint, get, handler, listener::TcpListener, middleware::Cors,
     web::Html, EndpointExt, Route, Server,
 };
 use poem_openapi::payload::PlainText;
 use poem_openapi::{OpenApi, OpenApiService, Tags};
+use prometheus::Encoder;
 use site::SiteApi;
 use team::TeamApi;
 use tracing::info;
@@ -83,4 +86,17 @@ async fn get_openapi_docs() -> Html<&'static str> {
 async fn not_found() -> Html<&'static str> {
     // inline 404 template
     Html(include_str!("./404.html"))
+}
+
+#[handler]
+async fn metrics_handler(exporter: Data<&PrometheusExporter>) -> String {
+    // // Gather and format the metrics for Prometheus.
+    // let metric_families = exporter.0.;
+    // let mut buffer = Vec::new();
+    // prometheus::TextEncoder::new()
+    //     .encode(&metric_families, &mut buffer)
+    //     .unwrap();
+    // String::from_utf8(buffer).unwrap()
+
+    todo!()
 }

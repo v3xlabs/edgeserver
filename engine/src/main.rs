@@ -33,8 +33,6 @@ async fn main() {
     let otlp_endpoint = env::var("OTLP_ENDPOINT").ok();
 
     if let Some(endpoint) = otlp_endpoint {
-        info!("Starting Edgerouter with OTLP tracing");
-
         let exporter = opentelemetry_otlp::SpanExporter::builder()
             .with_tonic()
             .with_endpoint(endpoint)
@@ -70,9 +68,10 @@ async fn main() {
             .init();
         // tracing_subscriber::fmt::init();
 
+        info!("Starting Edgerouter with OTLP tracing");
     } else {
-        info!("Starting Edgerouter without OTLP tracing, provide OTLP_ENDPOINT to enable tracing");
         tracing_subscriber::fmt::init();
+        info!("Starting Edgerouter without OTLP tracing, provide OTLP_ENDPOINT to enable tracing");
     }
 
     let state = match AppState::new().await {
