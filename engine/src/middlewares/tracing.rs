@@ -112,10 +112,11 @@ where
 
         async move {
             let cx = Context::current();
-            let tracing_span = tracing::span!(tracing::Level::INFO, "test");
-            tracing_span.set_parent(cx);
+            cx.attach();
+            // let tracing_span = tracing::span!(tracing::Level::INFO, "test");
+            // tracing_span.set_parent(cx);
 
-            let res = async move { self.inner.call(req).await }.instrument(tracing_span).await;
+            let res = self.inner.call(req).await;
             let cx = Context::current();
             let span = cx.span();
 
