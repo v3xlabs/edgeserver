@@ -1,10 +1,13 @@
 use chrono::{DateTime, Utc};
+use opentelemetry::{global::ObjectSafeSpan, trace::{SpanKind, Tracer}, KeyValue};
 use poem_openapi::Object;
 use serde::{Deserialize, Serialize};
-use sqlx::{query_as, query_scalar};
+use sqlx::{query_as, query_scalar, Acquire, Connection, ConnectOptions};
+use tracing::info_span;
 
 use crate::{
-    database::Database, utils::id::{generate_id, IdType}
+    database::Database,
+    utils::id::{generate_id, IdType},
 };
 
 use super::team::Team;
@@ -41,14 +44,11 @@ impl User {
         let password = password.as_ref();
 
         // check if no user with this name already exists
-        let exists = query_scalar!(
-            "SELECT COUNT(*) FROM users WHERE name = $1",
-            name
-        )
-        .fetch_one(&db.pool)
-        .await?
-        .unwrap_or(0)
-        > 0;
+        let exists = query_scalar!("SELECT COUNT(*) FROM users WHERE name = $1", name)
+            .fetch_one(&db.pool)
+            .await?
+            .unwrap_or(0)
+            > 0;
 
         if exists {
             // TODO: nicer `Username taken` error
@@ -77,7 +77,49 @@ impl User {
         }
     }
 
+    #[opentelemetry_auto_span::auto_span]
     pub async fn get_by_id(db: &Database, user_id: impl AsRef<str>) -> Result<Self, sqlx::Error> {
+        let query = "SELECT * FROM users WHERE user_id = $1";
+
+        let tracer = opentelemetry::global::tracer("sqlx");
+        let attributes: Vec<KeyValue> = vec![
+            KeyValue::new("db.system", "postgresql"),
+            KeyValue::new("db.query.text", query),
+            KeyValue::new("db.statement", query),
+            KeyValue::new("db.system.name", "postgresql"),
+            KeyValue::new("otel.kind", "client"),
+            KeyValue::new("db.name", "edgeserver"),
+            KeyValue::new("db.collection", "users"),
+            KeyValue::new("db.operation", "SELECT"),
+            //
+            KeyValue::new("peer.service", "postgresql"),
+            KeyValue::new("server.address", "localhost:5432"),
+            // KeyValue::new("net.peer.name", "localhost"),
+            // KeyValue::new("net.peer.port", 5432),
+        ];
+        let span = tracer.span_builder("SELECT * FROM users ...").with_kind(SpanKind::Client).with_attributes(attributes);
+        let span = tracer.build(span);
+
+        let span = info_span!(
+            "SELECT * FROM users ...",
+            otel.kind = "client",
+            db.system = "postgresql",
+            db.system.name = "postgresql",
+            db.name = "edgeserver",
+            db.collection.name = "users",
+            db.collection = "users",
+            db.operation.name = "SELECT",
+            db.operation = "SELECT",
+            db.query.text = %query,
+            db.statement = %query,
+            peer.service = "postgresql",
+            server.address = "localhost:5432",
+            net.peer.name = "localhost", // Database host
+            net.peer.port = 5432, // Database port
+            service.name = "postgres",
+            otel.service.name = "postgres",
+        );        
+
         query_as!(
             User,
             "SELECT * FROM users WHERE user_id = $1",
@@ -103,9 +145,12 @@ impl User {
     }
 
     pub async fn get_all_minimal(db: &Database) -> Result<Vec<UserMinimal>, sqlx::Error> {
-        query_as!(UserMinimal, "SELECT user_id, name, avatar_url, admin FROM users")
-            .fetch_all(&db.pool)
-            .await
+        query_as!(
+            UserMinimal,
+            "SELECT user_id, name, avatar_url, admin FROM users"
+        )
+        .fetch_all(&db.pool)
+        .await
     }
 
     pub async fn can_bootstrap(db: &Database) -> Result<bool, sqlx::Error> {

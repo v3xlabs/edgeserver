@@ -1656,6 +1656,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "delegate"
+version = "0.13.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "297806318ef30ad066b15792a8372858020ae3ca2e414ee6c2133b1eb9e9e945"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 2.0.94",
+]
+
+[[package]]
 name = "der"
 version = "0.6.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1791,6 +1802,7 @@ dependencies = [
  "color-eyre",
  "config 0.15.4",
  "dashmap 6.1.0",
+ "delegate",
  "dotenvy",
  "futures",
  "hex",
@@ -1798,6 +1810,7 @@ dependencies = [
  "ipnetwork",
  "moka",
  "opentelemetry 0.28.0",
+ "opentelemetry-auto-span",
  "opentelemetry-http 0.28.0",
  "opentelemetry-otlp",
  "opentelemetry-prometheus",
@@ -1817,6 +1830,8 @@ dependencies = [
  "sqlx",
  "thiserror 2.0.9",
  "tracing",
+ "tracing-futures",
+ "tracing-log",
  "tracing-opentelemetry",
  "tracing-subscriber",
  "url",
@@ -3350,6 +3365,20 @@ checksum = "ff011a302c396a5197692431fc1948019154afc178baf7d8e37367442a4601cf"
 
 [[package]]
 name = "opentelemetry"
+version = "0.26.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "570074cc999d1a58184080966e5bd3bf3a9a4af650c3b05047c2621e7405cd17"
+dependencies = [
+ "futures-core",
+ "futures-sink",
+ "js-sys",
+ "once_cell",
+ "pin-project-lite",
+ "thiserror 1.0.69",
+]
+
+[[package]]
+name = "opentelemetry"
 version = "0.27.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ab70038c28ed37b97d8ed414b6429d343a8bbf44c9f79ec854f3a643029ba6d7"
@@ -3374,6 +3403,20 @@ dependencies = [
  "pin-project-lite",
  "thiserror 2.0.9",
  "tracing",
+]
+
+[[package]]
+name = "opentelemetry-auto-span"
+version = "0.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "829e46e3ae41aa8cf45f958abf33d591b7a3fa9e4f835cca0ed5821b98fd2a83"
+dependencies = [
+ "darling",
+ "opentelemetry 0.26.0",
+ "proc-macro2",
+ "quote",
+ "regex",
+ "syn 2.0.94",
 ]
 
 [[package]]
@@ -5723,6 +5766,16 @@ checksum = "8b1581020d7a273442f5b45074a6a57d5757ad0a47dac0e9f0bd57b81936f3db"
 dependencies = [
  "tracing",
  "tracing-subscriber",
+]
+
+[[package]]
+name = "tracing-futures"
+version = "0.2.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "97d095ae15e245a057c8e8451bab9b3ee1e1f68e9ba2b4fbc18d0ac5237835f2"
+dependencies = [
+ "pin-project",
+ "tracing",
 ]
 
 [[package]]
