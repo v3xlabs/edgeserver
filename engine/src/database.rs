@@ -22,10 +22,6 @@ impl Database {
                 Ok(true)
             }))
             .after_connect(|conn, _meta| Box::pin(async move {
-                // When directly invoking `Executor` methods,
-                // it is possible to execute multiple statements with one call.
-                // conn.execute("SET application_name = 'your_app'; SET search_path = 'my_schema';")
-                //     .await?;
                 info!("After Connect");
                 
                 Ok(())

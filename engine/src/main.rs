@@ -23,7 +23,7 @@ use tracing_subscriber::{prelude::*, EnvFilter};
 #[async_std::main]
 async fn main() {
     // Initialize the log bridge early so that all log records are captured.
-    tracing_log::LogTracer::init().expect("Failed to set logger");
+    // tracing_log::LogTracer::init().expect("Failed to set logger");
 
     dotenvy::dotenv().ok();
 
