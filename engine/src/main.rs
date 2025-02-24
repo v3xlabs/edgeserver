@@ -3,9 +3,10 @@ use std::env;
 use opentelemetry::KeyValue;
 use opentelemetry::{global, trace::TracerProvider};
 use opentelemetry_otlp::WithExportConfig;
+use opentelemetry_sdk::trace::SdkTracerProvider;
 use opentelemetry_sdk::Resource;
 use state::AppState;
-use tracing::{error, info, Subscriber};
+use tracing::{error, info, warn, Subscriber};
 
 pub mod assets;
 pub mod cache;
@@ -32,15 +33,17 @@ async fn main() {
     let env_filter = tracing_subscriber::EnvFilter::from_default_env();
 
     // Create a subscriber based on whether OTLP is configured.
-    let subscriber: Box<dyn Subscriber + Send + Sync> = if let Some(endpoint) = otlp_endpoint {
+    let (subscriber, tracer_provider): (
+        Box<dyn Subscriber + Send + Sync>,
+        Option<SdkTracerProvider>,
+    ) = if let Some(endpoint) = otlp_endpoint {
         let exporter = opentelemetry_otlp::SpanExporter::builder()
             .with_tonic()
             .with_endpoint(endpoint)
             .build()
             .expect("Couldn't create OTLP tracer");
 
-        let hostname =
-            std::env::var("HOSTNAME").unwrap_or_else(|_| "unknown".to_string());
+        let hostname = std::env::var("HOSTNAME").unwrap_or_else(|_| "unknown".to_string());
         let resource = opentelemetry_sdk::Resource::builder()
             .with_service_name("edgeserver")
             .with_attribute(opentelemetry::KeyValue::new("host.name", hostname))
@@ -65,17 +68,23 @@ async fn main() {
             .with_error_fields_to_exceptions(true)
             .with_tracked_inactivity(true);
 
-        Box::new(
-            tracing_subscriber::registry()
-                .with(fmt_layer)
-                .with(env_filter)
-                .with(telemetry_layer)
+        (
+            Box::new(
+                tracing_subscriber::registry()
+                    .with(fmt_layer)
+                    .with(env_filter)
+                    .with(telemetry_layer),
+            ),
+            Some(tracer_provider),
         )
     } else {
-        Box::new(
-            tracing_subscriber::registry()
-                .with(fmt_layer)
-                .with(env_filter)
+        (
+            Box::new(
+                tracing_subscriber::registry()
+                    .with(fmt_layer)
+                    .with(env_filter),
+            ),
+            None,
         )
     };
 
@@ -95,4 +104,10 @@ async fn main() {
     };
 
     routes::serve(state).await;
+
+    if let Some(tracer_provider) = tracer_provider {
+        warn!("Shutting down tracer provider");
+        tracer_provider.force_flush();
+        tracer_provider.shutdown();
+    }
 }

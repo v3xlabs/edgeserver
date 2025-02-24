@@ -108,16 +108,14 @@ where
 
         span.add_event("request.started".to_string(), vec![]);
 
-        // let tracing_span = info_span!("request.started");
         let parent_context = Context::current_with_span(span);
-        // tracing_span.set_parent(parent_context.clone());
-
-        // set the tracing_opentelemetry span default for new spans to the parent_context
-        let tracing_span = tracing::span!(tracing::Level::INFO, "trs");
-        tracing_span.set_parent(parent_context.clone());
 
         async move {
-            let res = self.inner.call(req).await;
+            let cx = Context::current();
+            let tracing_span = tracing::span!(tracing::Level::INFO, "test");
+            tracing_span.set_parent(cx);
+
+            let res = async move { self.inner.call(req).await }.instrument(tracing_span).await;
             let cx = Context::current();
             let span = cx.span();
 
@@ -204,7 +202,6 @@ where
             }
         }
         .with_context(parent_context)
-        .instrument(tracing_span)
         .await
     }
 }

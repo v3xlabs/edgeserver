@@ -3,7 +3,7 @@ use opentelemetry::{global::ObjectSafeSpan, trace::{SpanKind, Tracer}, KeyValue}
 use poem_openapi::Object;
 use serde::{Deserialize, Serialize};
 use sqlx::{query_as, query_scalar, Acquire, Connection, ConnectOptions};
-use tracing::info_span;
+use tracing::{info_span, instrument};
 
 use crate::{
     database::Database,
@@ -153,8 +153,9 @@ impl User {
         .await
     }
 
+    #[instrument(skip(db))]
     pub async fn can_bootstrap(db: &Database) -> Result<bool, sqlx::Error> {
-        Ok(query_scalar!("SELECT COUNT(*) FROM users")
+        Ok(query_scalar!("SELECT COUNT(*) FROM users LIMIT 1")
             .fetch_one(&db.pool)
             .await?
             .unwrap_or(0)
