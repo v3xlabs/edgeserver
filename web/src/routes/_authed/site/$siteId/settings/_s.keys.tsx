@@ -4,7 +4,7 @@ import { useMe, useTokenCreate } from '@/api';
 import { Button } from '@/components/button';
 import { KeyTable } from '@/gui/keys';
 
-const MyButton = ({ siteId }: { siteId?: string }) => {
+const GenerateButton = ({ siteId }: { siteId?: string }) => {
     const { data: me } = useMe();
     const { mutate } = useTokenCreate();
 
@@ -28,7 +28,7 @@ export const Route = createFileRoute('/_authed/site/$siteId/settings/_s/keys')({
     context: (context) => {
         return {
             title: 'Site keys',
-            suffix: <MyButton siteId={context.params.siteId} />,
+            suffix: <GenerateButton siteId={context.params.siteId} />,
         };
     },
     component: RouteComponent,
