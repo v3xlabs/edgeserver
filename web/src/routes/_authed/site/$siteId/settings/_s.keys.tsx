@@ -1,11 +1,34 @@
 import { createFileRoute } from '@tanstack/react-router';
 
+import { useMe, useTokenCreate } from '@/api';
+import { Button } from '@/components/button';
 import { KeyTable } from '@/gui/keys';
 
+const MyButton = ({ siteId }: { siteId?: string }) => {
+    const { data: me } = useMe();
+    const { mutate } = useTokenCreate();
+
+    return (
+        <>
+            <Button
+                onClick={() => {
+                    mutate({
+                        name: me?.name || 'Me',
+                        siteId,
+                    });
+                }}
+            >
+                Generate new key
+            </Button>
+        </>
+    );
+};
+
 export const Route = createFileRoute('/_authed/site/$siteId/settings/_s/keys')({
-    context: () => {
+    context: (context) => {
         return {
             title: 'Site keys',
+            suffix: <MyButton siteId={context.params.siteId} />,
         };
     },
     component: RouteComponent,

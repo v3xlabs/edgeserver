@@ -13,16 +13,6 @@ export const KeyTable = ({ siteId }: { siteId?: string }) => {
     return (
         <>
             <ul className="card no-padding divide-y">
-                <Button
-                    onClick={() => {
-                        mutate({
-                            name: me?.name || 'Me',
-                            siteId,
-                        });
-                    }}
-                >
-                    Generate new key
-                </Button>
                 {tokens?.map((token) => (
                     <li key={token.token} className="flex gap-4 p-4">
                         <div className="py-1.5">
