@@ -1,12 +1,12 @@
 import { createFileRoute } from '@tanstack/react-router';
 
-import { useMe, useTokenCreate } from '@/api';
+import { useKeyCreate, useMe } from '@/api';
 import { Button } from '@/components/button';
 import { KeyTable } from '@/gui/keys';
 
 const GenerateButton = ({ siteId }: { siteId?: string }) => {
     const { data: me } = useMe();
-    const { mutate } = useTokenCreate();
+    const { mutate } = useKeyCreate();
 
     return (
         <>

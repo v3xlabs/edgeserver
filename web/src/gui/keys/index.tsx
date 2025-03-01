@@ -1,39 +1,52 @@
+import { motion } from 'framer-motion';
+import { BsCopy } from 'react-icons/bs';
 import { FiKey } from 'react-icons/fi';
 import { GiHouseKeys } from 'react-icons/gi';
 import TimeAgo from 'react-timeago-i18n';
 
-import { useMe, useTokenCreate, useTokens } from '@/api';
+import { useKeys } from '@/api';
 import { Button } from '@/components';
 
 export const KeyTable = ({ siteId }: { siteId?: string }) => {
-    const { data: tokens } = useTokens({});
-    const { data: me } = useMe();
-    const { mutate } = useTokenCreate();
+    const { data: keys } = useKeys({});
 
     return (
         <>
             <ul className="card no-padding divide-y">
-                {tokens?.map((token) => (
-                    <li key={token.token} className="flex gap-4 p-4">
+                {keys?.map((key) => (
+                    <li key={key.token} className="flex gap-4 p-4">
                         <div className="py-1.5">
-                            {token.siteId ? <FiKey /> : <GiHouseKeys />}
+                            {key.siteId ? <FiKey /> : <GiHouseKeys />}
                         </div>
                         <div>
                             <div className="font-mono">
-                                <span>{token.token}</span>
+                                <span>{key.token}</span>
+                                {!key.token.includes('*') && (
+                                    <motion.button
+                                        className="hover:bg-hover ml-1 rounded-md p-1.5 text-sm"
+                                        whileTap={{ scale: 0.9 }}
+                                        onClick={() =>
+                                            navigator.clipboard.writeText(
+                                                key.token
+                                            )
+                                        }
+                                    >
+                                        <BsCopy />
+                                    </motion.button>
+                                )}
                             </div>
                             <div>
                                 Created by{' '}
                                 <span className="font-bold">
-                                    {token.createdBy}
+                                    {key.createdBy}
                                 </span>
                             </div>
                             <div>
-                                {token.lastUsed ? (
+                                {key.lastUsed ? (
                                     <>
                                         Last used{' '}
                                         <span>
-                                            <TimeAgo date={token.lastUsed} />
+                                            <TimeAgo date={key.lastUsed} />
                                         </span>
                                     </>
                                 ) : (

@@ -2,7 +2,7 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 
 import { queryClient } from '@/util/query';
 
-export const useTokens = ({ siteId }: { siteId?: string }) => {
+export const useKeys = ({ siteId }: { siteId?: string }) => {
     return useQuery({
         queryKey: ['tokens', siteId || 'global'],
         queryFn: async () => {
@@ -16,7 +16,7 @@ export const useTokens = ({ siteId }: { siteId?: string }) => {
     });
 };
 
-export const useTokenCreate = () =>
+export const useKeyCreate = () =>
     useMutation({
         mutationKey: ['tokensUpdate', 'global'],
         mutationFn: async ({
@@ -39,7 +39,10 @@ export const useTokenCreate = () =>
                         | undefined
                 ) => [
                     {
-                        token: Math.random().toString(16).slice(2, 20),
+                        token: Math.random()
+                            .toString(16)
+                            .slice(2, 20)
+                            .padEnd(13, '0'),
                         createdBy: name,
                         lastUsed: undefined,
                         siteId,
