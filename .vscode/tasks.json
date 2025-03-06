@@ -31,7 +31,7 @@
         {
             "label": "PNPM Dev",
             "type": "shell",
-            "command": "pnpm install && pnpm dev",
+            "command": "nix-shell --run 'pnpm install && pnpm dev'",
             "options": {
                 "cwd": "${workspaceFolder}/web"
             },
@@ -45,7 +45,7 @@
         {
             "label": "Cargo Run",
             "type": "shell",
-            "command": "cargo run",
+            "command": "nix-shell --run 'cargo run'",
             "options": {
                 "cwd": "${workspaceFolder}/engine"
             },
@@ -59,7 +59,7 @@
         {
             "label": "Bacon",
             "type": "shell",
-            "command": "bacon",
+            "command": "nix-shell --run 'bacon'",
             "options": {
                 "cwd": "${workspaceFolder}/engine"
             },
