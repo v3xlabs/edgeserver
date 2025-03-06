@@ -1,4 +1,7 @@
-use sqlx::{postgres::PgPoolOptions, PgPool};
+use sqlx::{
+    postgres::{PgConnectOptions, PgPoolOptions},
+    ConnectOptions, PgPool,
+};
 use tracing::info;
 
 #[derive(Debug)]
@@ -8,7 +11,23 @@ pub struct Database {
 
 impl Database {
     pub async fn new(url: &str) -> Result<Self, sqlx::Error> {
-        let pool = PgPoolOptions::new().max_connections(5).connect(url).await?;
+        let mut options: PgConnectOptions = url.parse().unwrap();
+
+        options = options.log_statements(tracing_log::log::LevelFilter::Trace);
+
+        let pool = PgPoolOptions::new()
+            .max_connections(5)
+            .before_acquire(|conn, _meta| Box::pin(async move {
+                info!("Before Acquire");
+                Ok(true)
+            }))
+            .after_connect(|conn, _meta| Box::pin(async move {
+                info!("After Connect");
+                
+                Ok(())
+            }))
+            .connect_with(options)
+            .await?;
 
         // Initialization code here
         let s = Self { pool };

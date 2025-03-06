@@ -2,7 +2,7 @@ use std::sync::Arc;
 
 use opentelemetry::{
     global,
-    trace::{FutureExt, Span, SpanKind, TraceContextExt, Tracer},
+    trace::{self, FutureExt, Span, SpanKind, TraceContextExt, Tracer},
     Context, Key, KeyValue,
 };
 use opentelemetry_http::HeaderExtractor;
@@ -108,15 +108,14 @@ where
 
         span.add_event("request.started".to_string(), vec![]);
 
-        // let tracing_span = info_span!("request.started");
         let parent_context = Context::current_with_span(span);
-        // tracing_span.set_parent(parent_context.clone());
-
-        // set the tracing_opentelemetry span default for new spans to the parent_context
-        let tracing_span = tracing::span!(tracing::Level::INFO, "tracing-request-started");
-        tracing_span.set_parent(parent_context.clone());
 
         async move {
+            let cx = Context::current();
+            cx.attach();
+            // let tracing_span = tracing::span!(tracing::Level::INFO, "test");
+            // tracing_span.set_parent(cx);
+
             let res = self.inner.call(req).await;
             let cx = Context::current();
             let span = cx.span();
@@ -135,15 +134,26 @@ where
                     }
 
                     span.add_event("request.completed".to_string(), vec![]);
+                    
+                    // Set the http.response.status_code otlp attribute
                     span.set_attribute(KeyValue::new(
                         attribute::HTTP_RESPONSE_STATUS_CODE,
                         resp.status().as_u16() as i64,
                     ));
-                    // Grafana specific override
+                    // Grafana specific override (http.status_code)
                     span.set_attribute(KeyValue::new(
                         "http.status_code",
                         resp.status().as_u16() as i64,
                     ));
+                
+                    // Span status update
+                    if resp.status().is_success() {
+                        span.set_status(trace::Status::Ok);
+                    } else {
+                        let status_string = resp.status().to_string();
+                        span.set_status(trace::Status::Error { description: status_string.into() });
+                    }
+
                     if let Some(content_length) =
                         resp.headers().typed_get::<headers::ContentLength>()
                     {
@@ -193,8 +203,6 @@ where
             }
         }
         .with_context(parent_context)
-        .instrument(tracing_span)
-        // .instrument(tracing_span)
         .await
     }
 }
