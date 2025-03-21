@@ -8,9 +8,11 @@ import tsconfigPaths from 'vite-tsconfig-paths';
 // https://vitejs.dev/config/
 export default defineConfig({
     server: {
+        host: '127.0.0.1',
         proxy: {
             '/api': {
-                target: 'http://localhost:3000',
+                target: 'http://0.0.0.0:3000',
+                changeOrigin: true,
             },
         },
     },
