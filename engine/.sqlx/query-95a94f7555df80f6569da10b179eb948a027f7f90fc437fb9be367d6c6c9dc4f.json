@@ -1,0 +1,34 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "DELETE FROM domains WHERE domain = $1 RETURNING *",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "site_id",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 1,
+        "name": "domain",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 2,
+        "name": "created_at",
+        "type_info": "Timestamptz"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Text"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "95a94f7555df80f6569da10b179eb948a027f7f90fc437fb9be367d6c6c9dc4f"
+}

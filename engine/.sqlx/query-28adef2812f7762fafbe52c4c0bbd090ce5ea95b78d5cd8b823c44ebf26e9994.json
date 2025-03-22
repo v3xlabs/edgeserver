@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE domains_pending SET status = 'pending' WHERE site_id = $1 AND domain = $2",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Text",
+        "Text"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "28adef2812f7762fafbe52c4c0bbd090ce5ea95b78d5cd8b823c44ebf26e9994"
+}
