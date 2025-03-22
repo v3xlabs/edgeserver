@@ -8,6 +8,7 @@ module.exports = {
             backgroundColor: {
                 default: 'var(--bg-primary)',
                 secondary: 'var(--bg-secondary)',
+                accent: 'var(--link)',
                 muted: 'var(--bg-muted)',
                 hover: 'var(--bg-hover)',
             },
@@ -16,6 +17,7 @@ module.exports = {
             },
             outlineColor: {
                 DEFAULT: 'var(--border)',
+                default: 'var(--border)',
             },
             textColor: {
                 link: 'var(--link)',

@@ -62,7 +62,7 @@ impl<'a> ApiExtractor<'a> for UserAuth {
 
         let cache_key = format!("session:{}", token);
 
-        let s = span!(Level::INFO, "get_session_from_cache_optional");
+        let s = span!(Level::INFO, "session_cache");
         let _enter = s.enter();
 
         let is_user = state.cache.raw.get_with(cache_key, async {
@@ -81,6 +81,7 @@ impl<'a> ApiExtractor<'a> for UserAuth {
         }).await;
 
         drop(_enter);
+        drop(s);
 
         let session: Option<Session> = serde_json::from_value(is_user).ok();
 

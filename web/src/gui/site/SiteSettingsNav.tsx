@@ -1,7 +1,8 @@
 import * as Accordion from '@radix-ui/react-accordion';
+import { useQuery } from '@tanstack/react-query';
 import { Link, useParams, useRouterState } from '@tanstack/react-router';
 import clsx from 'clsx';
-import { ReactNode, useState } from 'react';
+import { FC, ReactNode, useState } from 'react';
 import { FiChevronDown } from 'react-icons/fi';
 import {
     LuCode,
@@ -13,6 +14,9 @@ import {
     LuSettings,
     LuWebhook,
 } from 'react-icons/lu';
+
+import { getSiteDomains } from '@/api';
+import { queryClient } from '@/util/query';
 
 export function isTruthy<T>(value?: T | undefined | null | false): value is T {
     return !!value;
@@ -104,56 +108,91 @@ export const SiteSettingsNav = () => {
                     [
                         '',
                         [
-                            [
-                                '/settings',
-                                'General',
-                                <LuSettings key="general" />,
-                            ],
+                            {
+                                path: '/settings',
+                                label: 'General',
+                                icon: <LuSettings key="general" />,
+                            },
                         ],
                     ],
                     [
                         'Internet Exposure',
                         [
-                            [
-                                '/settings/domains',
-                                'Domains',
-                                <LuGlobe key="domains" />,
-                            ],
-                            [
-                                '/settings/rules',
-                                'Routing Rules',
-                                <LuFilter key="rules" />,
-                            ],
+                            {
+                                path: '/settings/domains',
+                                label: 'Domains',
+                                icon: <LuGlobe key="domains" />,
+                                getHasNotification: async () => {
+                                    const data =
+                                        await queryClient.ensureQueryData(
+                                            getSiteDomains(siteId)
+                                        );
+
+                                    if (!data) {
+                                        console.error('No data');
+
+                                        return;
+                                    }
+
+                                    console.log(data);
+
+                                    if (
+                                        data.some(
+                                            (domain) =>
+                                                'status' in domain &&
+                                                domain.status === 'pending'
+                                        )
+                                    ) {
+                                        return {
+                                            type: 'pending',
+                                            message: 'Pending DNS Updates',
+                                        };
+                                    }
+                                },
+                            },
+                            {
+                                path: '/settings/rules',
+                                label: 'Routing Rules',
+                                icon: <LuFilter key="rules" />,
+                            },
                         ],
                     ],
                     [
                         'Deployment',
                         [
-                            ['/settings/ci', 'CI/CD', <LuCode key="ci" />],
-                            [
-                                '/settings/webhooks',
-                                'Webhooks',
-                                <LuWebhook key="webhooks" />,
-                            ],
-                            ['/settings/keys', 'Keys', <LuKey key="keys" />],
+                            {
+                                path: '/settings/ci',
+                                label: 'CI/CD',
+                                icon: <LuCode key="ci" />,
+                            },
+                            {
+                                path: '/settings/webhooks',
+                                label: 'Webhooks',
+                                icon: <LuWebhook key="webhooks" />,
+                            },
+                            {
+                                path: '/settings/keys',
+                                label: 'Keys',
+                                icon: <LuKey key="keys" />,
+                            },
                         ],
                     ],
                     [
                         'Administrative',
                         [
-                            [
-                                '/settings/transfer',
-                                'Transfer',
-                                <LuForward key="transfer" />,
-                            ],
-                            [
-                                '/settings/actions',
-                                'Actions',
-                                <LuFileWarning key="delete" />,
-                            ],
+                            {
+                                path: '/settings/transfer',
+                                label: 'Transfer',
+                                icon: <LuForward key="transfer" />,
+                            },
+                            {
+                                path: '/settings/actions',
+                                label: 'Actions',
+                                icon: <LuFileWarning key="delete" />,
+                            },
                         ],
                     ],
-                ] as const
+                ] as [string, SideEntryType[]][]
             ).map(([group, items]) => (
                 <div key={group}>
                     {group != '' && (
@@ -162,41 +201,91 @@ export const SiteSettingsNav = () => {
                         </h3>
                     )}
                     <ul className="flex flex-col pb-4 pl-2">
-                        {items.filter(isTruthy).map(([path, label, icon]) => (
-                            <li
-                                key={path as string}
-                                className={clsx(
-                                    'flex w-full items-center gap-1'
-                                )}
-                            >
-                                {Array.isArray(path) ? (
-                                    <ExpandableItem
-                                        path={path}
-                                        label={label}
-                                        icon={icon}
-                                    />
-                                ) : (
-                                    <Link
-                                        to={(prefix + path) as string}
-                                        params={{ siteId }}
-                                        activeOptions={{ exact: true }}
-                                        className={clsx(
-                                            'text-default hover:bg-default relative flex w-full cursor-pointer items-center gap-2 rounded-md px-2 py-1',
-                                            '[&.active]:text-default [&.active]:bg-default',
-                                            // eslint-disable-next-line quotes
-                                            "[&.active]:before:content-['']",
-                                            '[&.active]:before:absolute [&.active]:before:inset-y-[12%] [&.active]:before:-left-3 [&.active]:before:w-1 [&.active]:before:rounded-md [&.active]:before:bg-blue-500'
-                                        )}
-                                    >
-                                        {icon}
-                                        {label}
-                                    </Link>
-                                )}
-                            </li>
+                        {items.filter(isTruthy).map((entry) => (
+                            <SideEntry
+                                key={entry.path as string}
+                                entry={entry}
+                                prefix={prefix}
+                                siteId={siteId}
+                            />
                         ))}
                     </ul>
                 </div>
             ))}
         </ul>
+    );
+};
+
+export type SideEntryType = {
+    path: string;
+    label: string;
+    icon: ReactNode;
+    getHasNotification?: () => Promise<
+        { type: 'pending' | 'success' | 'error'; message: string } | undefined
+    >;
+};
+
+export const SideEntry: FC<{
+    entry: SideEntryType;
+    prefix: string;
+    siteId: string | undefined;
+}> = ({ entry, prefix, siteId }) => {
+    const [state, setState] = useState(false);
+    const { data: notification } = useQuery({
+        queryKey: [
+            'side-entry',
+            'notification',
+            '{entry_prefix}',
+            entry.path,
+            siteId,
+        ],
+        queryFn: () => entry.getHasNotification?.(),
+        enabled: !!entry.getHasNotification,
+        staleTime: 0,
+        refetchInterval: 3000,
+    });
+
+    const { icon, label, path } = entry;
+
+    return (
+        <li
+            key={path as string}
+            className={clsx('flex w-full items-center gap-1')}
+        >
+            {Array.isArray(path) ? (
+                <ExpandableItem path={path} label={label} icon={icon} />
+            ) : (
+                <Link
+                    to={(prefix + path) as string}
+                    params={{ siteId }}
+                    activeOptions={{ exact: true }}
+                    className={clsx(
+                        'text-default hover:bg-default relative flex w-full cursor-pointer items-center gap-2 rounded-md px-2 py-1',
+                        '[&.active]:text-default [&.active]:bg-default',
+                        // eslint-disable-next-line quotes
+                        "[&.active]:before:content-['']",
+                        '[&.active]:before:absolute [&.active]:before:inset-y-[12%] [&.active]:before:-left-3 [&.active]:before:w-1 [&.active]:before:rounded-md [&.active]:before:bg-blue-500'
+                    )}
+                >
+                    {icon}
+                    <span className="relative">
+                        {label}
+                        {notification && (
+                            <div
+                                className={clsx(
+                                    'absolute -right-3 top-1/2 size-1.5 -translate-y-1/2 animate-pulse rounded-full',
+                                    notification.type === 'pending' &&
+                                        'bg-accent',
+                                    notification.type === 'success' &&
+                                        'bg-green-500',
+                                    notification.type === 'error' &&
+                                        'bg-red-500'
+                                )}
+                            />
+                        )}
+                    </span>
+                </Link>
+            )}
+        </li>
     );
 };

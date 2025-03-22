@@ -74,3 +74,4 @@ opentelemetry = { version = "0.28.0", features = ["trace"]}
 opentelemetry-stdout = "0.28.0"
 opentelemetry-http = "0.28.0"
 opentelemetry-semantic-conventions = "0.28.0"
+regex = "1.11.1"

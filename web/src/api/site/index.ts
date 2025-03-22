@@ -1,3 +1,4 @@
+/* eslint-disable sonarjs/no-duplicate-string */
 import { queryOptions, useMutation, useQuery } from '@tanstack/react-query';
 
 import { queryClient } from '@/util/query';
@@ -80,6 +81,58 @@ export const getSiteDeployments = (siteId?: string) =>
 export const useSiteDeployments = (siteId?: string) => {
     return useQuery(getSiteDeployments(siteId));
 };
+
+export type DomainSubmission = components['schemas']['DomainSubmission'];
+
+export const getSiteDomains = (siteId?: string) =>
+    queryOptions({
+        queryKey: ['auth', 'site', '{siteId}', siteId, 'domains'],
+        queryFn: async () => {
+            if (!siteId) return;
+
+            const response = await apiRequest(
+                '/site/{site_id}/domains',
+                'get',
+                {
+                    path: { site_id: siteId },
+                }
+            );
+
+            return response.data;
+        },
+        enabled: !!siteId,
+    });
+
+export const useSiteDomains = (siteId?: string) => {
+    return useQuery(getSiteDomains(siteId));
+};
+
+export const useSiteDomainCreate = () =>
+    useMutation({
+        mutationFn: async (domain: { site_id: string; domain: string }) => {
+            const response = await apiRequest(
+                '/site/{site_id}/domains',
+                'post',
+                {
+                    data: { domain: domain.domain },
+                    contentType: 'application/json; charset=utf-8',
+                    path: { site_id: domain.site_id },
+                }
+            );
+
+            queryClient.invalidateQueries({
+                queryKey: [
+                    'auth',
+                    'site',
+                    '{siteId}',
+                    domain.site_id,
+                    'domains',
+                ],
+            });
+
+            return response.data;
+        },
+    });
 
 export const useSiteCreate = () =>
     useMutation({

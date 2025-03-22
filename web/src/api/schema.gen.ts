@@ -323,6 +323,74 @@ export type paths = {
         };
         trace?: never;
     };
+    "/site/{site_id}/domains": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * /site/:site_id/domains
+         * @description Get all domains for a site
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    site_id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json; charset=utf-8": components["schemas"]["DomainSubmission"][];
+                    };
+                };
+            };
+        };
+        put?: never;
+        /**
+         * /site/:site_id/domains
+         * @description Create a new domain for a site
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    site_id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json; charset=utf-8": components["schemas"]["CreateSiteDomainRequest"];
+                };
+            };
+            responses: {
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json; charset=utf-8": components["schemas"]["DomainSubmission"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/site/{site_id}/transfer": {
         parameters: {
             query?: never;
@@ -866,6 +934,49 @@ export type paths = {
         patch?: never;
         trace?: never;
     };
+    "/team/{team_id}/avatar": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    team_id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "multipart/form-data": {
+                        /** Format: binary */
+                        avatar: string;
+                    };
+                };
+            };
+            responses: {
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json; charset=utf-8": components["schemas"]["Team"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/invite/{invite_id}": {
         parameters: {
             query?: never;
@@ -1008,6 +1119,10 @@ export type components = {
         CanBootstrapResponse: {
             can_bootstrap: boolean;
         };
+        /** CreateSiteDomainRequest */
+        CreateSiteDomainRequest: {
+            domain: string;
+        };
         /** CreateTeamRequest */
         CreateTeamRequest: {
             name: string;
@@ -1031,6 +1146,25 @@ export type components = {
             file_size?: number;
             file_deleted: boolean;
         };
+        /** Domain */
+        Domain: {
+            site_id: string;
+            domain: string;
+            /** Format: date-time */
+            created_at: string;
+        };
+        /** DomainPending */
+        DomainPending: {
+            site_id: string;
+            domain: string;
+            challenge: string;
+            status: string;
+            /** Format: date-time */
+            created_at: string;
+            /** Format: date-time */
+            updated_at: string;
+        };
+        DomainSubmission: components["schemas"]["DomainPending"] | components["schemas"]["Domain"];
         /** InviteUserToTeamRequest */
         InviteUserToTeamRequest: {
             user_id?: string;
