@@ -1,4 +1,4 @@
-import { createFileRoute } from '@tanstack/react-router';
+import { createFileRoute, Link } from '@tanstack/react-router';
 import { format, parseISO } from 'date-fns';
 import { FC, PropsWithChildren, useEffect, useState } from 'react';
 import {
@@ -97,7 +97,10 @@ export const DomainPreview: FC<{
 
     return (
         <Collapsible open={isOpen} onOpenChange={setIsOpen} className="w-full">
-            <div className="card no-padding w-full space-y-1 p-2">
+            <div
+                className="card no-padding w-full space-y-1 p-2"
+                id={`${domain.domain}`}
+            >
                 <CollapsibleTrigger asChild>
                     <div className="hover:bg-muted flex cursor-pointer items-center justify-between gap-2 rounded-md p-2">
                         <div className="flex items-center gap-2">
@@ -245,6 +248,7 @@ export const SiteDomainCreateModal: FC<
                                             <li key={domain.domain}>
                                                 <MiniDomainPreview
                                                     domain={domain}
+                                                    showSiteId={true}
                                                 />
                                             </li>
                                         ))}
@@ -266,6 +270,7 @@ export const SiteDomainCreateModal: FC<
                                             <li key={domain.domain}>
                                                 <MiniDomainPreview
                                                     domain={domain}
+                                                    showSiteId={true}
                                                 />
                                             </li>
                                         ))}
@@ -301,14 +306,20 @@ export const SiteDomainCreateModal: FC<
 
 export const MiniDomainPreview: FC<{
     domain: Domain;
-}> = ({ domain }) => {
+    showSiteId?: boolean;
+}> = ({ domain, showSiteId = false }) => {
     return (
-        <div className="card no-padding flex items-center justify-between gap-2 p-2">
+        <Link
+            to="/site/$siteId/settings/domains"
+            params={{ siteId: domain.site_id }}
+            hash={`#${domain.domain}`}
+            className="card no-padding flex items-center justify-between gap-2 p-2"
+        >
             <div className="flex items-center gap-2">
                 <LuGlobe />
                 <div className="truncate">{domain.domain}</div>
             </div>
-            <div className="text-muted">{domain.site_id}</div>
-        </div>
+            {showSiteId && <div className="text-muted">{domain.site_id}</div>}
+        </Link>
     );
 };
