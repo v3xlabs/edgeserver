@@ -1,21 +1,22 @@
 use std::sync::Arc;
 
-use async_std::fs::File;
-use async_std::io::WriteExt;
 use async_std::path::Path;
 use auth::AuthApi;
 use invite::InviteApi;
 use opentelemetry::global;
 use poem::middleware::OpenTelemetryMetrics;
+use poem::web::Data;
+use poem::Response;
 use poem::{
     endpoint::StaticFilesEndpoint, get, handler, listener::TcpListener, middleware::Cors,
     web::Html, EndpointExt, Route, Server,
 };
+use poem_openapi::payload::Json;
 use poem_openapi::{OpenApi, OpenApiService, Tags};
+use serde_json::{self, Value};
 use team::TeamApi;
 use tracing::info;
 use user::UserApi;
-use serde_json::{self, Value};
 
 use crate::middlewares::tracing::TraceId;
 use crate::state::AppState;
@@ -48,6 +49,11 @@ pub enum ApiTags {
     Auth,
 }
 
+#[derive(Debug, Clone)]
+pub struct OpenApiSpec {
+    pub spec: String,
+}
+
 /// Reorders the tags in the OpenAPI spec according to the specified order without
 /// parsing the entire JSON. Only the tags array is modified.
 /// Tags not in the order list will be placed at the end.
@@ -61,13 +67,13 @@ fn reorder_openapi_tags(json: &str, tag_order: &[&str]) -> String {
     // The key and opening bracket
     let key_length = r#""tags": "#.len();
     let content_start = tags_start + key_length;
-    
+
     // Now we need to find where the array ends
     // We'll count brackets to handle nested structures
     let mut bracket_count = 1; // We start after the opening '['
     let mut content_end = content_start + 1;
-    
-    for (idx, ch) in json[content_start+1..].char_indices() {
+
+    for (idx, ch) in json[content_start + 1..].char_indices() {
         if ch == '[' {
             bracket_count += 1;
         } else if ch == ']' {
@@ -78,23 +84,23 @@ fn reorder_openapi_tags(json: &str, tag_order: &[&str]) -> String {
             }
         }
     }
-    
+
     if bracket_count != 0 {
         return json.to_string(); // Malformed JSON
     }
-    
+
     // Extract the array content including brackets
     let tags_array = &json[content_start..content_end];
-    
+
     // Parse just the tags array
     let tags_result: Result<Vec<Value>, _> = serde_json::from_str(tags_array);
-    
+
     match tags_result {
         Ok(mut tags) => {
             // Reorder the tags array
             let mut ordered_tags = Vec::new();
             let mut remaining_tags = Vec::new();
-            
+
             // First, collect tags in the specified order
             for &tag_name in tag_order {
                 let position = tags.iter().position(|tag| {
@@ -104,16 +110,16 @@ fn reorder_openapi_tags(json: &str, tag_order: &[&str]) -> String {
                         false
                     }
                 });
-                
+
                 if let Some(idx) = position {
                     ordered_tags.push(tags.remove(idx));
                 }
             }
-            
+
             // Append any remaining tags
             remaining_tags.append(&mut tags);
             ordered_tags.append(&mut remaining_tags);
-            
+
             // Serialize just the tags array back to a string
             if let Ok(new_tags_json) = serde_json::to_string(&ordered_tags) {
                 // Reconstruct the JSON string with the reordered tags
@@ -126,7 +132,7 @@ fn reorder_openapi_tags(json: &str, tag_order: &[&str]) -> String {
             } else {
                 json.to_string()
             }
-        },
+        }
         Err(_) => json.to_string(),
     }
 }
@@ -147,16 +153,30 @@ pub async fn serve(state: AppState) {
 
     // write spec_json to file in www/openapi.json
     let spec_json = api_service.spec();
-    
+
     // Define the desired tag order
-    let tag_order = &["Authentication", "Site", "Deployment", "User", "Team", "Invite"];
-    
+    let tag_order = &[
+        "Authentication",
+        "Site",
+        "Deployment",
+        "User",
+        "Team",
+        "Invite",
+    ];
+
     // Reorder tags according to the specified order
     let spec_json = reorder_openapi_tags(&spec_json, tag_order);
-    
-    let mut file = File::create("www/openapi.json").await.unwrap();
-    file.write_all(spec_json.as_bytes()).await.unwrap();
-    file.flush().await.unwrap();
+
+    // Prepare spec_json for use in the route
+    let spec_json_str = spec_json.clone();
+
+    let openapi_spec = OpenApiSpec {
+        spec: spec_json_str,
+    };
+
+    let openapi_route = Route::new()
+        .at("", get(get_openapi_spec))
+        .data(Arc::new(openapi_spec));
 
     let frontend_dir = Path::new("www");
     let file_endpoint = StaticFilesEndpoint::new(frontend_dir)
@@ -165,7 +185,7 @@ pub async fn serve(state: AppState) {
 
     let app = Route::new()
         .nest("/api", api_service)
-        // .nest("/openapi.json", spec)
+        .nest("/openapi.json", openapi_route)
         .at("/docs", get(get_openapi_docs))
         .nest("/", file_endpoint)
         .with(Cors::new())
@@ -187,4 +207,12 @@ async fn get_openapi_docs() -> Html<&'static str> {
 async fn not_found() -> Html<&'static str> {
     // inline 404 template
     Html(include_str!("./404.html"))
+}
+
+#[handler]
+async fn get_openapi_spec(payload: Data<&Arc<OpenApiSpec>>) -> Response {
+    let spec = payload.spec.clone();
+    Response::builder()
+        .header("Content-Type", "application/json")
+        .body(spec)
 }
