@@ -164,6 +164,30 @@ export const useSiteDomainCreate = () =>
                     'domains',
                 ],
             });
+            queryClient.refetchQueries({
+                queryKey: [
+                    'auth',
+                    'site',
+                    '{siteId}',
+                    domain.site_id,
+                    'domains',
+                    'notifications',
+                ],
+            });
+
+            // TODO: figure out why this is needed
+            setTimeout(() => {
+                queryClient.resetQueries({
+                    queryKey: [
+                        'auth',
+                        'site',
+                        '{siteId}',
+                        domain.site_id,
+                        'domains',
+                        'notifications',
+                    ],
+                });
+            }, 100);
 
             return response.data;
         },
@@ -189,6 +213,29 @@ export const useSiteDomainDelete = () =>
                     'domains',
                 ],
             });
+            queryClient.resetQueries({
+                queryKey: [
+                    'auth',
+                    'site',
+                    '{siteId}',
+                    domain.site_id,
+                    'domains',
+                    'notifications',
+                ],
+            });
+
+            setTimeout(() => {
+                queryClient.resetQueries({
+                    queryKey: [
+                        'auth',
+                        'site',
+                        '{siteId}',
+                        domain.site_id,
+                        'domains',
+                        'notifications',
+                    ],
+                });
+            }, 100);
 
             toast.success(`Domain '${domain.domain}' deleted`);
 

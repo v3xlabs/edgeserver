@@ -1,5 +1,5 @@
 import * as Accordion from '@radix-ui/react-accordion';
-import { useQuery } from '@tanstack/react-query';
+import { QueryKey, useQuery } from '@tanstack/react-query';
 import { Link, useParams, useRouterState } from '@tanstack/react-router';
 import clsx from 'clsx';
 import { FC, ReactNode, useState } from 'react';
@@ -122,6 +122,14 @@ export const SiteSettingsNav = () => {
                                 path: '/settings/domains',
                                 label: 'Domains',
                                 icon: <LuGlobe key="domains" />,
+                                hasNotificationKey: [
+                                    'auth',
+                                    'site',
+                                    '{siteId}',
+                                    siteId,
+                                    'domains',
+                                    'notifications',
+                                ],
                                 getHasNotification: async () => {
                                     const data =
                                         await queryClient.ensureQueryData(
@@ -131,10 +139,11 @@ export const SiteSettingsNav = () => {
                                     if (!data) {
                                         console.error('No data');
 
-                                        return;
+                                        return {
+                                            type: 'error',
+                                            message: 'No data',
+                                        };
                                     }
-
-                                    console.log(data);
 
                                     if (
                                         data.some(
@@ -148,6 +157,11 @@ export const SiteSettingsNav = () => {
                                             message: 'Pending DNS Updates',
                                         };
                                     }
+
+                                    return {
+                                        type: 'none',
+                                        message: '',
+                                    };
                                 },
                             },
                             {
@@ -223,6 +237,7 @@ export type SideEntryType = {
     getHasNotification?: () => Promise<
         { type: 'pending' | 'success' | 'error'; message: string } | undefined
     >;
+    hasNotificationKey?: QueryKey;
 };
 
 export const SideEntry: FC<{
@@ -232,7 +247,7 @@ export const SideEntry: FC<{
 }> = ({ entry, prefix, siteId }) => {
     const [state, setState] = useState(false);
     const { data: notification } = useQuery({
-        queryKey: [
+        queryKey: entry.hasNotificationKey ?? [
             'side-entry',
             'notification',
             '{entry_prefix}',
@@ -242,7 +257,8 @@ export const SideEntry: FC<{
         queryFn: () => entry.getHasNotification?.(),
         enabled: !!entry.getHasNotification,
         staleTime: 0,
-        refetchInterval: 3000,
+        retry: false,
+        // refetchInterval: 3000,
     });
 
     const { icon, label, path } = entry;
