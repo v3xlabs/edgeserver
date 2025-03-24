@@ -84,6 +84,7 @@ export const useSiteDeployments = (siteId?: string) => {
 };
 
 export type DomainSubmission = components['schemas']['DomainSubmission'];
+export type Domain = components['schemas']['Domain'];
 
 export const getSiteDomains = (siteId?: string) =>
     queryOptions({
@@ -106,6 +107,39 @@ export const getSiteDomains = (siteId?: string) =>
 
 export const useSiteDomains = (siteId?: string) => {
     return useQuery(getSiteDomains(siteId));
+};
+
+export const getSiteDomainPreflight = (siteId?: string, domain?: string) =>
+    queryOptions({
+        queryKey: [
+            'auth',
+            'site',
+            '{siteId}',
+            siteId,
+            'domains',
+            '{domain}',
+            domain,
+            'preflight',
+        ],
+        queryFn: async () => {
+            if (!siteId || !domain) return { error: 'No siteId or domain' };
+
+            const response = await apiRequest(
+                '/site/{site_id}/domains/{domain}/preflight',
+                'get',
+                {
+                    path: { site_id: siteId, domain: domain },
+                }
+            );
+
+            return response.data;
+        },
+        retry: false,
+        staleTime: 0,
+    });
+
+export const useSiteDomainPreflight = (siteId?: string, domain?: string) => {
+    return useQuery(getSiteDomainPreflight(siteId, domain));
 };
 
 export const useSiteDomainCreate = () =>

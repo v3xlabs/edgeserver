@@ -1,14 +1,46 @@
 use poem::{web::Data, Result};
-use poem_openapi::{param::Path, payload::Json, OpenApi};
+use poem_openapi::{param::Path, payload::Json, ApiResponse, Object, OpenApi};
+use serde::Deserialize;
 use serde_json::json;
 
 use crate::{
-    middlewares::auth::UserAuth, models::{domain::{Domain, DomainPending, DomainSubmission}, site::SiteId}, routes::{error::HttpError, ApiTags}, state::State
+    middlewares::auth::UserAuth,
+    models::{
+        domain::{Domain, DomainPending, DomainSubmission},
+        site::SiteId,
+    },
+    routes::{error::HttpError, ApiTags},
+    state::State,
 };
 
 use super::CreateSiteDomainRequest;
 
 pub struct SiteDomainsApi;
+
+#[derive(ApiResponse)]
+enum DomainPreflightResponse {
+    #[oai(status = 200)]
+    Result(Json<DomainPreflightResponseData>),
+
+    #[oai(status = 400)]
+    MalformattedInput(Json<MalformattedInputResponse>),
+}
+
+#[derive(Deserialize, Object)]
+struct MalformattedInputResponse {
+    message: String,
+}
+
+#[derive(Deserialize, Object)]
+struct DomainPreflightResponseConflicts {
+    conflicts: Vec<DomainSubmission>,
+}
+
+#[derive(Deserialize, Object)]
+struct DomainPreflightResponseData {
+    overrides: Vec<Domain>,
+    invalidates: Vec<Domain>,
+}
 
 #[OpenApi]
 impl SiteDomainsApi {
@@ -21,7 +53,7 @@ impl SiteDomainsApi {
         #[oai(name = "site_id", style = "simple")] site_id: Path<String>,
         state: Data<&State>,
     ) -> Result<Json<Vec<DomainSubmission>>> {
-        let domains = Domain::get_by_site_id(site_id.0, &state)
+        let domains = Domain::get_by_site_id(&site_id, &state)
             .await
             .map_err(HttpError::from)
             .map_err(poem::Error::from)?;
@@ -57,7 +89,7 @@ impl SiteDomainsApi {
 
         let corrected_domain = payload.domain.trim();
 
-        let domain = Domain::create_for_site(site_id.0, corrected_domain.to_string(), &state)
+        let domain = Domain::create_for_site(&site_id, &corrected_domain, &state)
             .await
             .map_err(HttpError::from)
             .map(Json)
@@ -113,5 +145,48 @@ impl SiteDomainsApi {
         }
 
         Err(HttpError::NotFound.into())
+    }
+
+    /// /site/:site_id/domains/:domain/preflight
+    ///
+    /// Checks wether or not the domain will require validation
+    /// It does so by checking overlap
+    #[oai(
+        path = "/site/:site_id/domains/:domain/preflight",
+        method = "get",
+        tag = "ApiTags::Site"
+    )]
+    pub async fn preflight_site_domain(
+        &self,
+        state: Data<&State>,
+        site_id: Path<String>,
+        domain: Path<String>,
+    ) -> Result<DomainPreflightResponse> {
+        // validate domain is atleast 3 characters and has a dot seperator, no spaces, trim, etc
+        // use regex to validate
+        let domain_regex = regex::Regex::new(r"^(\*\.)?([a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?\.)+[a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?$").unwrap();
+        if !domain_regex.is_match(&domain) {
+            // invalid domain
+            return Ok(DomainPreflightResponse::MalformattedInput(Json(MalformattedInputResponse {
+                message: "Invalid domain".to_string(),
+            })));
+        }
+
+        let domain = domain.trim();
+
+        let invalidates = Domain::get_soft_overlap(&domain, &state)
+            .await
+            .map_err(HttpError::from)?;
+
+        let overrides = Domain::get_hard_overlap(&domain, &state)
+            .await
+            .map_err(HttpError::from)?;
+
+        Ok(DomainPreflightResponse::Result(Json(
+            DomainPreflightResponseData {
+                overrides,
+                invalidates,
+            },
+        )))
     }
 }

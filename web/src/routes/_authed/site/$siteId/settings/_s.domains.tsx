@@ -4,6 +4,7 @@ import { FC, PropsWithChildren, useEffect, useState } from 'react';
 import {
     LuAsterisk,
     LuCalendar,
+    LuCheckCircle,
     LuChevronDown,
     LuChevronUp,
     LuGlobe,
@@ -11,9 +12,11 @@ import {
 } from 'react-icons/lu';
 
 import {
+    Domain,
     DomainSubmission,
     useSiteDomainCreate,
     useSiteDomainDelete,
+    useSiteDomainPreflight,
     useSiteDomains,
 } from '@/api';
 import { Input } from '@/components';
@@ -191,6 +194,7 @@ export const SiteDomainCreateModal: FC<
     const [domain, setDomain] = useState('');
     const [open, setOpen] = useState(false);
     const { mutate: createDomain, isSuccess, reset } = useSiteDomainCreate();
+    const { data: preflight, error } = useSiteDomainPreflight(site_id, domain);
 
     useEffect(() => {
         if (isSuccess) {
@@ -203,6 +207,13 @@ export const SiteDomainCreateModal: FC<
     const handleSubmit = () => {
         createDomain({ site_id, domain });
     };
+
+    const hasInput = domain.length > 0;
+
+    const hasOverlap =
+        preflight &&
+        (('overrides' in preflight && preflight.overrides.length > 0) ||
+            ('invalidates' in preflight && preflight.invalidates.length > 0));
 
     return (
         <ModalRoot open={open} onOpenChange={setOpen}>
@@ -219,8 +230,85 @@ export const SiteDomainCreateModal: FC<
                     value={domain}
                     onChange={(event_) => setDomain(event_.target.value)}
                 />
-                <Button onClick={() => handleSubmit()}>Add Domain</Button>
+                {preflight && (
+                    <>
+                        {'overrides' in preflight &&
+                            preflight.overrides.length > 0 && (
+                                <div className="space-y-3">
+                                    <p>
+                                        This domain requires verification
+                                        because it falls within/overlaps the
+                                        jurisdiction of the following:
+                                    </p>
+                                    <ul className="space-y-1">
+                                        {preflight.overrides.map((domain) => (
+                                            <li key={domain.domain}>
+                                                <MiniDomainPreview
+                                                    domain={domain}
+                                                />
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            )}
+                        {'invalidates' in preflight &&
+                            preflight.invalidates.length > 0 && (
+                                <div className="space-y-1">
+                                    <p>
+                                        The following domain
+                                        {preflight.invalidates.length > 1
+                                            ? 's'
+                                            : ''}{' '}
+                                        will <b>out-prioritize</b> your domain:
+                                    </p>
+                                    <ul className="space-y-1">
+                                        {preflight.invalidates.map((domain) => (
+                                            <li key={domain.domain}>
+                                                <MiniDomainPreview
+                                                    domain={domain}
+                                                />
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            )}
+                        {hasOverlap ? (
+                            <div className="text-muted">
+                                Due to the overlap you will need to verify this
+                                domain. You can still add it but DNS level
+                                verification will be required.
+                            </div>
+                        ) : (
+                            <></>
+                        )}
+                        {hasInput && !error && !hasOverlap && (
+                            <div className="flex items-center justify-end gap-2 text-end text-green-400">
+                                <LuCheckCircle />
+                                You are good to go!
+                            </div>
+                        )}
+                    </>
+                )}
+                {error && <div className="text-muted">{error.message}</div>}
+                <Button onClick={() => handleSubmit()}>
+                    Add Domain
+                    {hasOverlap ? <> Anyway</> : <></>}
+                </Button>
             </ModalContent>
         </ModalRoot>
+    );
+};
+
+export const MiniDomainPreview: FC<{
+    domain: Domain;
+}> = ({ domain }) => {
+    return (
+        <div className="card no-padding flex items-center justify-between gap-2 p-2">
+            <div className="flex items-center gap-2">
+                <LuGlobe />
+                <div className="truncate">{domain.domain}</div>
+            </div>
+            <div className="text-muted">{domain.site_id}</div>
+        </div>
     );
 };

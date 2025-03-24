@@ -16,8 +16,32 @@ pub struct Domain {
 }
 
 impl Domain {
+    pub async fn get_soft_overlap(
+        domain: &str,
+        state: &State,
+    ) -> Result<Vec<Domain>, Error> {
+        let overlap = if domain.starts_with("*.") {
+            Domain::existing_wildcard_overlap_by_name(domain, state).await?
+        } else {
+            Domain::existing_domain_by_name(domain, state)
+                .await?
+                .map(|x| vec![x])
+                .unwrap_or_default()
+        };
+
+        Ok(overlap)
+    }
+
+    pub async fn get_hard_overlap(
+        domain: &str,
+        state: &State,
+    ) -> Result<Vec<Domain>, Error> {
+        let overlap = Domain::overlap_upwards_wildcard(domain.clone(), state).await?;
+        Ok(overlap)
+    }
+
     pub async fn get_by_site_id(
-        site_id: String,
+        site_id: &str,
         state: &State,
     ) -> Result<Vec<DomainSubmission>, Error> {
         let mut domains: Vec<Domain> =
@@ -78,19 +102,12 @@ impl Domain {
     }
 
     pub async fn create_for_site(
-        site_id: String,
-        domain: String,
+        site_id: &str,
+        domain: &str,
         state: &State,
     ) -> Result<DomainSubmission, Error> {
         // check if domain exist by name, the domains from initial overlap are to be overwritten if this gets validated
-        let mut overlap = if domain.starts_with("*.") {
-            Domain::existing_wildcard_overlap_by_name(domain.clone(), state).await?
-        } else {
-            Domain::existing_domain_by_name(domain.clone(), state)
-                .await?
-                .map(|x| vec![x])
-                .unwrap_or_default()
-        };
+        let mut overlap = Domain::get_soft_overlap(domain, state).await?;
 
         // reverse overlap (any domains that might overlap with this domain)
         // these domains wont get overwritten if this gets validated, however will be out-prioritized
@@ -141,8 +158,8 @@ impl Domain {
     }
 
     pub async fn create_for_site_superceded(
-        site_id: String,
-        domain: String,
+        site_id: &str,
+        domain: &str,
         state: &State,
     ) -> Result<Domain, Error> {
         let domain = sqlx::query_as!(Domain, "INSERT INTO domains (site_id, domain) VALUES ($1, $2) RETURNING *", site_id, domain)
@@ -153,7 +170,7 @@ impl Domain {
     }
 
     pub async fn existing_domain_by_name(
-        domain: String,
+        domain: &str,
         state: &State,
     ) -> Result<Option<Domain>, Error> {
         let domain = sqlx::query_as!(Domain, "SELECT * FROM domains WHERE domain = $1", domain)
@@ -167,7 +184,7 @@ impl Domain {
     ///
     /// Given `*.luc.computer` it will return `['hello.world.luc.computer', '*.dev.luc.computer', '*.computer']`
     pub async fn existing_wildcard_overlap_by_name(
-        domain: String,
+        domain: &str,
         state: &State,
     ) -> Result<Vec<Domain>, Error> {
         // require that the domain starts with `*.`
@@ -194,7 +211,7 @@ impl Domain {
     ///
     /// This function takes both `luc.computer` and `*.luc.computer` as input
     pub async fn overlap_upwards_wildcard(
-        domain: String,
+        domain: &str,
         state: &State,
     ) -> Result<Vec<Domain>, Error> {
         let domain = domain[2..].to_string();
@@ -225,8 +242,8 @@ pub struct DomainPending {
 
 impl DomainPending {
     pub async fn create(
-        site_id: String,
-        domain: String,
+        site_id: &str,
+        domain: &str,
         state: &State,
     ) -> Result<DomainPending, Error> {
         let challenge = uuid::Uuid::new_v4().to_string();
@@ -282,7 +299,7 @@ impl DomainPending {
         // get the dns txt record `_edgeserver-challenge` and if its equal to the challenge, update the status to verified
 
         // if a site exists for this domain delete it and generate a challenge in its place
-        let existing_domain = Domain::existing_domain_by_name(self.domain.clone(), state).await;
+        let existing_domain = Domain::existing_domain_by_name(&self.domain, state).await;
 
         if existing_domain.is_ok() {
             let domain = sqlx::query_as!(
@@ -293,7 +310,7 @@ impl DomainPending {
             .fetch_one(&state.database.pool)
             .await?;
 
-            DomainPending::create(domain.site_id, domain.domain, state).await?;
+            DomainPending::create(&domain.site_id, &domain.domain, state).await?;
 
             info!("Updated the superseded domain and created a new challenge for it");
         }
@@ -308,7 +325,7 @@ impl DomainPending {
 
         // mark this domainpending as verified and create a new domain in its place
         let _domain =
-            Domain::create_for_site(self.site_id.clone(), self.domain.clone(), state).await?;
+            Domain::create_for_site(&self.site_id, &self.domain, state).await?;
 
         Ok(())
     }

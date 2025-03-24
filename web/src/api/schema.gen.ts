@@ -12,7 +12,7 @@ export type paths = {
             cookie?: never;
         };
         /**
-         * Get all sites
+         * Get all sites personal
          * @description Gets a list of all the sites you have access to
          */
         get: {
@@ -35,6 +35,10 @@ export type paths = {
             };
         };
         put?: never;
+        /**
+         * Create a new site
+         * @description Creates a new site given a create request
+         */
         post: {
             parameters: {
                 query?: never;
@@ -71,6 +75,7 @@ export type paths = {
             path?: never;
             cookie?: never;
         };
+        /** Get a site by id */
         get: {
             parameters: {
                 query?: never;
@@ -92,6 +97,7 @@ export type paths = {
                 };
             };
         };
+        /** Update a site */
         put: {
             parameters: {
                 query?: never;
@@ -114,6 +120,7 @@ export type paths = {
             };
         };
         post?: never;
+        /** Delete a site */
         delete: {
             parameters: {
                 query?: never;
@@ -140,6 +147,47 @@ export type paths = {
         patch?: never;
         trace?: never;
     };
+    "/site/{site_id}/transfer": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Transfer a site */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    site_id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json; charset=utf-8": components["schemas"]["TransferSiteRequest"];
+                };
+            };
+            responses: {
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json; charset=utf-8": components["schemas"]["Site"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/site/{site_id}/deployments": {
         parameters: {
             query?: never;
@@ -147,6 +195,7 @@ export type paths = {
             path?: never;
             cookie?: never;
         };
+        /** Get all deployments */
         get: {
             parameters: {
                 query?: never;
@@ -183,6 +232,7 @@ export type paths = {
             path?: never;
             cookie?: never;
         };
+        /** Get a deployment by id */
         get: {
             parameters: {
                 query?: never;
@@ -222,6 +272,7 @@ export type paths = {
         };
         get?: never;
         put?: never;
+        /** Create a new deployment */
         post: {
             parameters: {
                 query?: never;
@@ -264,6 +315,7 @@ export type paths = {
             path?: never;
             cookie?: never;
         };
+        /** Get all files for a deployment */
         get: {
             parameters: {
                 query?: never;
@@ -291,6 +343,7 @@ export type paths = {
         delete?: never;
         options?: never;
         head?: never;
+        /** Upload files to a deployment */
         patch: {
             parameters: {
                 query?: never;
@@ -432,44 +485,50 @@ export type paths = {
         patch?: never;
         trace?: never;
     };
-    "/site/{site_id}/transfer": {
+    "/site/{site_id}/domains/{domain}/preflight": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        get?: never;
-        put?: never;
         /**
-         * /site/:site_id/transfer
-         * @description Transfer a site to a different team
+         * /site/:site_id/domains/:domain/preflight
+         * @description Checks wether or not the domain will require validation
+         *     It does so by checking overlap
          */
-        post: {
+        get: {
             parameters: {
                 query?: never;
                 header?: never;
                 path: {
                     site_id: string;
+                    domain: string;
                 };
                 cookie?: never;
             };
-            requestBody: {
-                content: {
-                    "application/json; charset=utf-8": components["schemas"]["TransferSiteRequest"];
-                };
-            };
+            requestBody?: never;
             responses: {
                 200: {
                     headers: {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json; charset=utf-8": components["schemas"]["Site"];
+                        "application/json; charset=utf-8": components["schemas"]["DomainPreflightResponseData"];
+                    };
+                };
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json; charset=utf-8": components["schemas"]["DomainPreflightResponseConflicts"];
                     };
                 };
             };
         };
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -1069,7 +1128,8 @@ export type paths = {
         put?: never;
         /**
          * Accept an invite
-         * @description Accepts an invite by its ID
+         * @description Accepts an invite by its ID, this endpoint requires you to be authenticated
+         *     The invite will be accepted as the user you are authenticated as
          */
         post: {
             parameters: {
@@ -1109,7 +1169,8 @@ export type paths = {
         put?: never;
         /**
          * Accept an invite and create a user
-         * @description Accepts an invite by its ID and creates a user
+         * @description Accepts an invite by its ID and onboards as a new user
+         *     This endpoint does not require authentication
          */
         post: {
             parameters: {
@@ -1168,8 +1229,17 @@ export type components = {
         CreateTeamRequest: {
             name: string;
         };
-        /** Deployment */
+        /**
+         * Deployment
+         * @example {
+         *       "context": "test",
+         *       "created_at": "2025-03-24T19:45:57.396480136+00:00",
+         *       "deployment_id": "d_1234567890",
+         *       "site_id": "s_1234567890"
+         *     }
+         */
         Deployment: {
+            /** @description The Deployment ID */
             deployment_id: string;
             site_id: string;
             context?: string;
@@ -1205,17 +1275,37 @@ export type components = {
             /** Format: date-time */
             updated_at: string;
         };
+        /** DomainPreflightResponseConflicts */
+        DomainPreflightResponseConflicts: {
+            conflicts: components["schemas"]["DomainSubmission"][];
+        };
+        /** DomainPreflightResponseData */
+        DomainPreflightResponseData: {
+            overrides: components["schemas"]["Domain"][];
+            invalidates: components["schemas"]["Domain"][];
+        };
         DomainSubmission: components["schemas"]["DomainPending"] | components["schemas"]["Domain"];
         /** InviteUserToTeamRequest */
         InviteUserToTeamRequest: {
             user_id?: string;
         };
-        /** LoginRequest */
+        /**
+         * LoginRequest
+         * @example {
+         *       "password": "password123",
+         *       "username": "john"
+         *     }
+         */
         LoginRequest: {
             username: string;
             password: string;
         };
-        /** LoginResponse */
+        /**
+         * LoginResponse
+         * @example {
+         *       "token": "se_0123456789abcdef0123456789abcdef"
+         *     }
+         */
         LoginResponse: {
             token: string;
         };
@@ -1241,7 +1331,13 @@ export type components = {
             /** Format: date-time */
             created_at: string;
         };
-        /** TeamInviteAcceptNewPayload */
+        /**
+         * TeamInviteAcceptNewPayload
+         * @example {
+         *       "password": "password123",
+         *       "username": "john"
+         *     }
+         */
         TeamInviteAcceptNewPayload: {
             username: string;
             password: string;
