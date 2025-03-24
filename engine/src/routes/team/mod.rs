@@ -62,6 +62,7 @@ impl TeamApi {
         &self,
         user: UserAuth,
         state: Data<&State>,
+        #[oai(name = "team_id", style = "simple")]
         team_id: Path<String>,
     ) -> Result<Json<Team>> {
         info!("Getting team: {:?} for user: {:?}", team_id.0, user);
@@ -79,6 +80,7 @@ impl TeamApi {
         &self,
         user: UserAuth,
         state: Data<&State>,
+        #[oai(name = "team_id", style = "simple")]
         team_id: Path<String>,
     ) -> Result<Json<Vec<UserTeamInvite>>> {
         info!(
@@ -100,6 +102,7 @@ impl TeamApi {
         &self,
         user: UserAuth,
         state: Data<&State>,
+        #[oai(name = "team_id", style = "simple")]
         team_id: Path<String>,
         body: Json<InviteUserToTeamRequest>,
     ) -> Result<Json<UserTeamInvite>> {
@@ -146,7 +149,9 @@ impl TeamApi {
         &self,
         user: UserAuth,
         state: Data<&State>,
+        #[oai(name = "team_id", style = "simple")]
         team_id: Path<String>,
+        #[oai(name = "invite_id", style = "simple")]
         invite_id: Path<String>,
     ) -> Result<()> {
         info!(
@@ -177,6 +182,7 @@ impl TeamApi {
         &self,
         user: UserAuth,
         state: Data<&State>,
+        #[oai(name = "team_id", style = "simple")]
         team_id: Path<String>,
     ) -> Result<Json<Vec<Site>>> {
         info!(
@@ -198,6 +204,7 @@ impl TeamApi {
         &self,
         user: UserAuth,
         state: Data<&State>,
+        #[oai(name = "team_id", style = "simple")]
         team_id: Path<String>,
     ) -> Result<Json<Vec<User>>> {
         user.verify_access_to(&TeamId(&team_id.0)).await?;
@@ -214,6 +221,7 @@ impl TeamApi {
         &self,
         user: UserAuth,
         state: Data<&State>,
+        #[oai(name = "team_id", style = "simple")]
         team_id: Path<String>,
     ) -> Result<Json<Team>> {
         info!("Updating team: {:?} for user: {:?}", team_id.0, user);
@@ -237,6 +245,7 @@ impl TeamApi {
         &self,
         user: UserAuth,
         state: Data<&State>,
+        #[oai(name = "team_id", style = "simple")]
         team_id: Path<String>,
     ) -> Result<()> {
         info!("Deleting team: {:?} for user: {:?}", team_id.0, user);
@@ -262,6 +271,7 @@ impl TeamApi {
         &self,
         user: UserAuth,
         state: Data<&State>,
+        #[oai(name = "team_id", style = "simple")]
         team_id: Path<String>,
         body: UploadTeamAvatarRequest,
     ) -> Result<Json<Team>> {
@@ -282,7 +292,7 @@ impl TeamApi {
         // Load into memory
         let file = x.into_vec().await.unwrap();
 
-        let (file, _, file_hash, _, _) = AssetFile::from_buffer(&state, &file, file_name).await.unwrap();
+        let (_file, _, file_hash, _, _) = AssetFile::from_buffer(&state, &file, file_name).await.unwrap();
 
         let team = Team::update_avatar(&state.0.database, &team_id.0, &file_hash).await.unwrap();
 

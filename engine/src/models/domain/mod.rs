@@ -20,18 +20,22 @@ impl Domain {
         site_id: String,
         state: &State,
     ) -> Result<Vec<DomainSubmission>, Error> {
-        let domains: Vec<Domain> =
+        let mut domains: Vec<Domain> =
             sqlx::query_as!(Domain, "SELECT * FROM domains WHERE site_id = $1", site_id)
                 .fetch_all(&state.database.pool)
                 .await?;
 
-        let pending_domains: Vec<DomainPending> = sqlx::query_as!(
+        domains.sort_by(|a, b| sort_domains_by_reversed_parts(&a.domain, &b.domain));
+
+        let mut pending_domains: Vec<DomainPending> = sqlx::query_as!(
             DomainPending,
             "SELECT * FROM domains_pending WHERE site_id = $1",
             site_id
         )
         .fetch_all(&state.database.pool)
         .await?;
+
+        pending_domains.sort_by(|a, b| sort_domains_by_reversed_parts(&a.domain, &b.domain));
 
         Ok(domains
             .into_iter()
@@ -40,21 +44,61 @@ impl Domain {
             .collect())
     }
 
+    pub async fn get_by_site_id_and_domain(
+        site_id: &str,
+        domain: &str,
+        state: &State,
+    ) -> Result<Option<Domain>, Error> {
+        let domain = sqlx::query_as!(
+            Domain,
+            "SELECT * FROM domains WHERE site_id = $1 AND domain = $2",
+            site_id,
+            domain
+        )
+        .fetch_optional(&state.database.pool)
+        .await?;
+
+        Ok(domain)
+    }
+
+    pub async fn delete_by_site_id_and_domain(
+        site_id: &str,
+        domain: &str,
+        state: &State,
+    ) -> Result<(), Error> {
+        sqlx::query!(
+            "DELETE FROM domains WHERE site_id = $1 AND domain = $2",
+            site_id,
+            domain
+        )
+        .execute(&state.database.pool)
+        .await?;
+
+        Ok(())
+    }
+
     pub async fn create_for_site(
         site_id: String,
         domain: String,
         state: &State,
     ) -> Result<DomainSubmission, Error> {
-        // check if domain exist by name
-        let overlap = if domain.starts_with("*.") {
-            Domain::existing_wildcard_overlap_by_name(domain.clone(), state).await
+        // check if domain exist by name, the domains from initial overlap are to be overwritten if this gets validated
+        let mut overlap = if domain.starts_with("*.") {
+            Domain::existing_wildcard_overlap_by_name(domain.clone(), state).await?
         } else {
             Domain::existing_domain_by_name(domain.clone(), state)
-                .await
+                .await?
                 .map(|x| vec![x])
-        }
-        .ok()
-        .unwrap_or_default();
+                .unwrap_or_default()
+        };
+
+        // reverse overlap (any domains that might overlap with this domain)
+        // these domains wont get overwritten if this gets validated, however will be out-prioritized
+        overlap.extend(Domain::overlap_upwards_wildcard(domain.clone(), state).await?);
+
+        // remove duplicates
+        overlap.sort_by_key(|x| x.domain.clone());
+        overlap.dedup_by_key(|x| x.domain.clone());
 
         if !overlap.is_empty() {
             for existing_domain in overlap {
@@ -69,13 +113,13 @@ impl Domain {
                 }
 
                 let domain_pending_exists = DomainPending::get_by_site_id_and_domain(
-                    existing_domain.site_id.clone(),
-                    existing_domain.domain.clone(),
+                    &existing_domain.site_id,
+                    &existing_domain.domain,
                     state,
                 )
-                .await;
+                .await?;
 
-                if let Ok(domain_pending) = domain_pending_exists {
+                if let Some(domain_pending) = domain_pending_exists {
                     // already exists as pending on this site
                     return Ok(domain_pending.into());
                 }
@@ -96,16 +140,31 @@ impl Domain {
         Ok(domain.into())
     }
 
-    pub async fn existing_domain_by_name(domain: String, state: &State) -> Result<Domain, Error> {
-        let domain = sqlx::query_as!(Domain, "SELECT * FROM domains WHERE domain = $1", domain)
+    pub async fn create_for_site_superceded(
+        site_id: String,
+        domain: String,
+        state: &State,
+    ) -> Result<Domain, Error> {
+        let domain = sqlx::query_as!(Domain, "INSERT INTO domains (site_id, domain) VALUES ($1, $2) RETURNING *", site_id, domain)
             .fetch_one(&state.database.pool)
             .await?;
 
         Ok(domain)
     }
 
+    pub async fn existing_domain_by_name(
+        domain: String,
+        state: &State,
+    ) -> Result<Option<Domain>, Error> {
+        let domain = sqlx::query_as!(Domain, "SELECT * FROM domains WHERE domain = $1", domain)
+            .fetch_optional(&state.database.pool)
+            .await?;
+
+        Ok(domain)
+    }
+
     /// Given a wildcard domain `*.luc.computer` it will return all downwards overlapping domains
-    /// 
+    ///
     /// Given `*.luc.computer` it will return `['hello.world.luc.computer', '*.dev.luc.computer', '*.computer']`
     pub async fn existing_wildcard_overlap_by_name(
         domain: String,
@@ -130,11 +189,14 @@ impl Domain {
     }
 
     /// Checks what wildcard domains overlap with this entry (aka would need be replaced by this domain) (upwards)
-    /// 
+    ///
     /// Given `hello.world.luc.computer` it will spot domains like `['*.world.luc.computer', '*.luc.computer', '*.computer']`
-    /// 
+    ///
     /// This function takes both `luc.computer` and `*.luc.computer` as input
-    pub async fn overlap_upwards_wildcard(domain: String, state: &State) -> Result<Vec<Domain>, Error> {
+    pub async fn overlap_upwards_wildcard(
+        domain: String,
+        state: &State,
+    ) -> Result<Vec<Domain>, Error> {
         let domain = domain[2..].to_string();
 
         let domains = sqlx::query_as!(
@@ -185,22 +247,37 @@ impl DomainPending {
     }
 
     pub async fn get_by_site_id_and_domain(
-        site_id: String,
-        domain: String,
+        site_id: &str,
+        domain: &str,
         state: &State,
-    ) -> Result<DomainPending, Error> {
+    ) -> Result<Option<DomainPending>, Error> {
         let domain_pending = sqlx::query_as!(
             DomainPending,
             "SELECT * FROM domains_pending WHERE site_id = $1 AND domain = $2",
             site_id,
             domain
         )
-        .fetch_one(&state.database.pool)
+        .fetch_optional(&state.database.pool)
         .await?;
 
         Ok(domain_pending)
     }
 
+    pub async fn delete_by_site_id_and_domain(
+        site_id: &str,
+        domain: &str,
+        state: &State,
+    ) -> Result<(), Error> {
+        sqlx::query!(
+            "DELETE FROM domains_pending WHERE site_id = $1 AND domain = $2",
+            site_id,
+            domain
+        )
+        .execute(&state.database.pool)
+        .await?;
+
+        Ok(())
+    }
     pub async fn do_challenge(&self, state: &State) -> Result<(), Error> {
         // get the dns txt record `_edgeserver-challenge` and if its equal to the challenge, update the status to verified
 
@@ -230,7 +307,7 @@ impl DomainPending {
         .await?;
 
         // mark this domainpending as verified and create a new domain in its place
-        let domain =
+        let _domain =
             Domain::create_for_site(self.site_id.clone(), self.domain.clone(), state).await?;
 
         Ok(())
@@ -253,4 +330,33 @@ impl From<Domain> for DomainSubmission {
     fn from(domain: Domain) -> Self {
         DomainSubmission::Verified(domain)
     }
+}
+
+/// Sorts domains in reverse order (TLD first), with "*" treated as coming last
+fn sort_domains_by_reversed_parts(a: &str, b: &str) -> std::cmp::Ordering {
+    // Split domains by dots and reverse the parts
+    let a_parts: Vec<&str> = a.split('.').collect::<Vec<&str>>().into_iter().rev().collect();
+    let b_parts: Vec<&str> = b.split('.').collect::<Vec<&str>>().into_iter().rev().collect();
+    
+    // Compare parts one by one
+    for i in 0..std::cmp::min(a_parts.len(), b_parts.len()) {
+        let a_part = a_parts[i];
+        let b_part = b_parts[i];
+        
+        // Special handling for "*"
+        if a_part == "*" && b_part != "*" {
+            return std::cmp::Ordering::Greater;
+        } else if a_part != "*" && b_part == "*" {
+            return std::cmp::Ordering::Less;
+        }
+        
+        // Normal string comparison if neither is "*"
+        let part_cmp = a_part.cmp(b_part);
+        if part_cmp != std::cmp::Ordering::Equal {
+            return part_cmp;
+        }
+    }
+    
+    // If all compared parts are equal, the shorter domain comes first
+    a_parts.len().cmp(&b_parts.len())
 }

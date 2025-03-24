@@ -1,9 +1,8 @@
 import { createRootRouteWithContext, Outlet } from '@tanstack/react-router';
 import { ReactNode } from 'react';
+import { Toaster } from 'sonner';
 
 import { bootstrapPreflight } from '@/api';
-
-// import { Toaster } from '@/gui/ui/Toaster';
 
 export interface MyRouterContext {
     title: string;
@@ -14,7 +13,7 @@ export interface MyRouterContext {
 export const Route = createRootRouteWithContext<MyRouterContext>()({
     component: () => (
         <>
-            {/* <Toaster /> */}
+            <Toaster />
             <Outlet />
         </>
     ),

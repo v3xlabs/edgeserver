@@ -1,5 +1,6 @@
 /* eslint-disable sonarjs/no-duplicate-string */
 import { queryOptions, useMutation, useQuery } from '@tanstack/react-query';
+import { toast } from 'sonner';
 
 import { queryClient } from '@/util/query';
 
@@ -129,6 +130,33 @@ export const useSiteDomainCreate = () =>
                     'domains',
                 ],
             });
+
+            return response.data;
+        },
+    });
+
+export const useSiteDomainDelete = () =>
+    useMutation({
+        mutationFn: async (domain: { site_id: string; domain: string }) => {
+            const response = await apiRequest(
+                '/site/{site_id}/domains/{domain}',
+                'delete',
+                {
+                    path: { site_id: domain.site_id, domain: domain.domain },
+                }
+            );
+
+            queryClient.invalidateQueries({
+                queryKey: [
+                    'auth',
+                    'site',
+                    '{siteId}',
+                    domain.site_id,
+                    'domains',
+                ],
+            });
+
+            toast.success(`Domain '${domain.domain}' deleted`);
 
             return response.data;
         },

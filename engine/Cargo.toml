@@ -1,6 +1,6 @@
 [package]
 name = "edgeserver"
-version = "0.1.0"
+version = "0.0.1"
 edition = "2021"
 
 [dependencies]
@@ -27,7 +27,7 @@ poem = { version = "3.1.6", git = "https://github.com/poem-web/poem", branch = "
     "opentelemetry",
     "requestid"
 ] }
-poem-openapi = { version = "5.1.5", git = "https://github.com/poem-web/poem", branch = "master", features = [
+poem-openapi = { version = "5.1.8", git = "https://github.com/poem-web/poem", branch = "master", features = [
     "chrono",
     "uuid",
     "sqlx",

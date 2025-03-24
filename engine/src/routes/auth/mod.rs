@@ -3,7 +3,7 @@ use poem::{
     web::{Data, RealIp},
     Result,
 };
-use poem_openapi::{payload::Json, Object, OpenApi};
+use poem_openapi::{payload::Json, types::Example, Object, OpenApi};
 use serde::{Deserialize, Serialize};
 use tracing::info;
 
@@ -19,14 +19,32 @@ use super::error::HttpError;
 pub struct AuthApi;
 
 #[derive(Deserialize, Debug, Object)]
+#[oai(example)]
 pub struct LoginRequest {
     username: String,
     password: String,
 }
 
+impl Example for LoginRequest {
+    fn example() -> Self {
+        Self {
+            username: "john".to_string(),
+            password: "password123".to_string(),
+        }
+    }
+}
 #[derive(Serialize, Debug, Object)]
+#[oai(example)]
 pub struct LoginResponse {
     token: String,
+}
+
+impl Example for LoginResponse {
+    fn example() -> Self {
+        Self {
+            token: "se_0123456789abcdef0123456789abcdef".to_string(),
+        }
+    }
 }
 
 #[derive(Serialize, Debug, Object)]

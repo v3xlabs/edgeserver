@@ -2,7 +2,7 @@ use std::sync::Arc;
 
 use opentelemetry::{
     global,
-    trace::{self, FutureExt, Span, SpanKind, TraceContextExt, Tracer},
+    trace::{self, Span, SpanKind, TraceContextExt, Tracer},
     Context, Key, KeyValue,
 };
 use opentelemetry_http::HeaderExtractor;
@@ -16,8 +16,6 @@ use poem::{
     },
     Endpoint, FromRequest, IntoResponse, PathPattern, Request, Response, Result,
 };
-use tracing::{info_span, Instrument, Metadata};
-use tracing_opentelemetry::{self, OpenTelemetrySpanExt};
 
 /// Middleware that injects the OpenTelemetry trace ID into the response headers.
 #[derive(Default)]
@@ -42,7 +40,7 @@ where
     fn transform(&self, ep: E) -> Self::Output {
         TraceIdEndpoint {
             inner: ep,
-            tracer: self.tracer.clone(),
+            _tracer: self.tracer.clone(),
         }
     }
 }
@@ -50,7 +48,7 @@ where
 /// The endpoint wrapper produced by the TraceId middleware.
 pub struct TraceIdEndpoint<T, E> {
     inner: E,
-    tracer: Arc<T>,
+    _tracer: Arc<T>,
 }
 
 impl<T, E> Endpoint for TraceIdEndpoint<T, E>

@@ -1,8 +1,6 @@
 use poem::{web::Data, Result};
 use poem_openapi::{
-    param::Path,
-    payload::{Json, PlainText},
-    Object, OpenApi,
+    param::Path, payload::{Json, PlainText}, types::Example, Object, OpenApi
 };
 use serde::{Deserialize, Serialize};
 use tracing::info;
@@ -35,9 +33,19 @@ pub struct TeamInviteData {
 }
 
 #[derive(Deserialize, Debug, Object)]
+#[oai(example)]
 pub struct TeamInviteAcceptNewPayload {
     username: String,
     password: String,
+}
+
+impl Example for TeamInviteAcceptNewPayload {
+    fn example() -> Self {
+        Self {
+            username: "john".to_string(),
+            password: "password123".to_string(),
+        }
+    }
 }
 
 #[OpenApi]
@@ -50,6 +58,7 @@ impl InviteApi {
         &self,
         // user: UserAuth,
         state: Data<&State>,
+        #[oai(name = "invite_id", style = "simple")]
         invite_id: Path<String>,
     ) -> Result<Json<TeamInviteData>> {
         info!("Getting invite: {:?}", invite_id.0);
@@ -69,7 +78,8 @@ impl InviteApi {
 
     /// Accept an invite
     ///
-    /// Accepts an invite by its ID
+    /// Accepts an invite by its ID, this endpoint requires you to be authenticated
+    /// The invite will be accepted as the user you are authenticated as
     #[oai(
         path = "/invite/:invite_id/accept",
         method = "post",
@@ -79,6 +89,7 @@ impl InviteApi {
         &self,
         user: UserAuth,
         state: Data<&State>,
+        #[oai(name = "invite_id", style = "simple")]
         invite_id: Path<String>,
     ) -> Result<PlainText<String>> {
         info!("Accepting invite: {:?}", invite_id.0);
@@ -102,7 +113,8 @@ impl InviteApi {
 
     /// Accept an invite and create a user
     ///
-    /// Accepts an invite by its ID and creates a user
+    /// Accepts an invite by its ID and onboards as a new user
+    /// This endpoint does not require authentication
     #[oai(
         path = "/invite/:invite_id/accept/new",
         method = "post",
@@ -111,6 +123,7 @@ impl InviteApi {
     async fn bootstrap_user(
         &self,
         state: Data<&State>,
+        #[oai(name = "invite_id", style = "simple")]
         invite_id: Path<String>,
         request: Json<TeamInviteAcceptNewPayload>,
     ) -> Result<Json<BootstrapUserResponse>> {

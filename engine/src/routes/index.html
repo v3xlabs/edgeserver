@@ -6,6 +6,11 @@
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/docs/favicon.png" />
         <meta property="og:image" content="/docs/opengraph.png" />
+        <style>
+            :root {
+                --scalar-sidebar-width: 360px;
+            }
+        </style>
     </head>
     <body>
         <script
@@ -15,6 +20,12 @@
         <script>
             var configuration = {
                 theme: "blue",
+                defaultHttpClient: {
+                    targetKey: "js",
+                    clientKey: "fetch"
+                },
+                hiddenClients: [],
+                /* TODO: setup more cool properties here */
             };
 
             var apiReference = document.getElementById("api-reference");

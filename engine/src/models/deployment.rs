@@ -1,7 +1,6 @@
 use chrono::{DateTime, Utc};
-use poem_openapi::{types::multipart::Upload, Object};
+use poem_openapi::{types::{multipart::Upload, Example}, Object};
 use serde::{Deserialize, Serialize};
-use sha2::{Digest, Sha256};
 use sqlx::{query, query_as};
 use async_zip::base::read::mem::ZipFileReader;
 use tracing::info;
@@ -11,11 +10,24 @@ use crate::{
 };
 
 #[derive(Debug, Serialize, Deserialize, Object)]
+#[oai(example)]
 pub struct Deployment {
+    /// The Deployment ID
     pub deployment_id: String,
     pub site_id: String,
     pub context: Option<String>,
     pub created_at: DateTime<Utc>,
+}
+
+impl Example for Deployment {
+    fn example() -> Self {
+        Self {
+            deployment_id: "d_1234567890".to_string(),
+            site_id: "s_1234567890".to_string(),
+            context: Some("test".to_string()),
+            created_at: Utc::now(),
+        }
+    }
 }
 
 #[derive(Debug, Serialize, Deserialize, Object)]
@@ -87,14 +99,14 @@ impl Deployment {
             file_content.read_to_end_checked(&mut buf).await.unwrap();
 
             // hash the file
-            let (file, newly_created_file, file_hash, content_type, file_size) = AssetFile::from_buffer(state, &buf, path).await?;
+            let (_file, newly_created_file, file_hash, content_type, _file_size) = AssetFile::from_buffer(state, &buf, path).await?;
 
             info!("Cataloging metadata for file: {:?}", path);
             
             let s = tracing::span!(tracing::Level::INFO, "cataloging_metadata", file_path = path);
             let _enter = s.enter();
 
-            let deployment_file = query_as!(
+            let _deployment_file = query_as!(
                  DeploymentFile,
                 "INSERT INTO deployment_files (deployment_id, file_id, file_path, mime_type) VALUES ($1, $2, $3, $4) RETURNING *",
                 self.deployment_id,
@@ -240,27 +252,4 @@ pub struct DeploymentFileEntry {
     pub deployment_file_mime_type: String,
     pub file_size: Option<i64>,
     pub file_deleted: bool,
-}
-
-fn hash_file(file: &[u8]) -> String {
-    let mut hasher = Sha256::new();
-    hasher.update(file);
-    let hash = hasher.finalize();
-    format!("{:x}", hash)
-}
-
-fn content_type_from_file_name(file_name: &str) -> String {
-    let extension = file_name.split('.').last().unwrap_or_default();
-
-    info!("Content type from file name: {:?}", extension);
-
-    match extension {
-        "js" => "text/javascript".to_string(),
-        "css" => "text/css".to_string(),
-        "json" => "application/json".to_string(),
-        _ => {
-            info!("Unknown file extension: {:?}", extension);
-            "application/octet-stream".to_string()
-        },
-    }
 }

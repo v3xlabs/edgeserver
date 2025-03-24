@@ -33,7 +33,7 @@ impl Storage {
     pub async fn upload(
         &self,
         name: &str,
-        kind: &str,
+        _kind: &str,
         file: Vec<u8>,
     ) -> Result<String, color_eyre::eyre::Error> {
         self.bucket.put_object(&name, &file).await?;

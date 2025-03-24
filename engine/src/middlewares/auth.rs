@@ -198,5 +198,5 @@ impl UserAuth {
 }
 
 pub trait AccessibleResource: Debug {
-    async fn has_access_to(&self, state: &State, user_id: &str) -> Result<bool, HttpError>;
+    fn has_access_to(&self, state: &State, user_id: &str) -> impl std::future::Future<Output = Result<bool, HttpError>> + Send;
 }

@@ -31,9 +31,9 @@ export const SidePage: FC<SidePageProperties> = ({
                 className
             )}
         >
-            {sidebar && <div className="w-full md:max-w-64">{sidebar}</div>}
+            {sidebar && <div className="w-full md:w-96">{sidebar}</div>}
             <div className="w-full space-y-4">
-                <div className="flex items-end justify-between">
+                <div className="flex w-full items-end justify-between">
                     <div>
                         <h1 className="h1 pl-4">{title}</h1>
                         {subtitle && (
