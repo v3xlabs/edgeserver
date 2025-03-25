@@ -11,8 +11,6 @@ pub fn hash_password(password: impl AsRef<str>) -> String {
     hex::encode(hash)
 }
 
-// Instead of creating a new span every time, we'll just hash without instrumentation
-// since this is called very frequently and is a simple function
 pub fn hash_session(session: impl AsRef<str>) -> String {
     let session = session.as_ref();
     let salt = b"edgeserver";
