@@ -1,11 +1,13 @@
 use std::fmt::Debug;
 
+use opentelemetry::Context;
 use poem::{web::Data, FromRequest, Request, RequestBody, Result};
 use poem_openapi::{
     registry::{MetaSecurityScheme, Registry},
     ApiExtractor, ApiExtractorType, ExtractParamOptions,
 };
 use tracing::{info, info_span, Level};
+use tracing_opentelemetry::OpenTelemetrySpanExt;
 
 use crate::{
     models::{session::Session, team::Team},
@@ -36,6 +38,7 @@ impl<'a> ApiExtractor<'a> for UserAuth {
         _param_opts: ExtractParamOptions<Self::ParamType>,
     ) -> Result<Self> {
         let span = info_span!("auth");
+        span.set_parent(Context::current());
         let _guard = span.enter();
 
         let state = <Data<&State> as FromRequest>::from_request(req, body).await?;
@@ -60,9 +63,6 @@ impl<'a> ApiExtractor<'a> for UserAuth {
 
         let cache_key = format!("session:{}", token);
 
-        let s = info_span!("session_cache");
-        let _enter = s.enter();
-
         let is_user = state
             .cache
             .raw
@@ -82,9 +82,6 @@ impl<'a> ApiExtractor<'a> for UserAuth {
                 // Ok(UserAuth::User(session, state.clone())) as Result<UserAuth>
             })
             .await;
-
-        drop(_enter);
-        drop(s);
 
         let session: Option<Session> = serde_json::from_value(is_user).ok();
 
