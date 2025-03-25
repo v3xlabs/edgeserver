@@ -36,8 +36,8 @@ impl DeploymentPreview {
         for row in rows.iter_mut() {
             info!("Presigning URL for: {:?}", row.file_path);
             let form = state.storage.previews_bucket.as_ref().unwrap().presign_get(
-                row.file_path.clone(), 
-                60*60, 
+                format!("!{}", row.file_path.clone()), 
+                60*60,
                 None
             ).await.unwrap();
             row.file_path = form;
