@@ -93,3 +93,31 @@ export const getDeploymentFiles = (siteId: string, deploymentId: string) =>
 
 export const useDeploymentFiles = (siteId: string, deploymentId: string) =>
     useQuery(getDeploymentFiles(siteId, deploymentId));
+
+export const getDeploymentPreviews = (siteId: string, deploymentId: string) =>
+    queryOptions({
+        queryKey: [
+            'auth',
+            'deployment',
+            '{deployment_id}',
+            deploymentId,
+            'previews',
+        ],
+        queryFn: async () => {
+            const response = await apiRequest(
+                '/site/{site_id}/deployment/{deployment_id}/previews',
+                'get',
+                {
+                    path: {
+                        site_id: siteId,
+                        deployment_id: deploymentId,
+                    },
+                }
+            );
+
+            return response.data;
+        },
+    });
+
+export const useDeploymentPreviews = (siteId: string, deploymentId: string) =>
+    useQuery(getDeploymentPreviews(siteId, deploymentId));

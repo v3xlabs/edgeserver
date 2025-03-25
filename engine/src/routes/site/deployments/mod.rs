@@ -5,7 +5,7 @@ use tracing::info;
 use crate::{
     middlewares::auth::UserAuth,
     models::{
-        deployment::{Deployment, DeploymentFile, DeploymentFileEntry},
+        deployment::{preview::DeploymentPreview, Deployment, DeploymentFile, DeploymentFileEntry},
         site::{Site, SiteId},
     },
     routes::{error::HttpError, ApiTags},
@@ -55,6 +55,28 @@ impl SiteDeploymentsApi {
         user.verify_access_to(&SiteId(&site_id.0)).await?;
 
         Deployment::get_by_id(&state.database, &deployment_id.0)
+            .await
+            .map_err(HttpError::from)
+            .map(Json)
+            .map_err(poem::Error::from)
+    }
+
+    /// Get a deployment preview by id
+    #[oai(
+        path = "/site/:site_id/deployment/:deployment_id/previews",
+        method = "get",
+        tag = "ApiTags::Deployment"
+    )]
+    pub async fn get_deployment_preview(
+        &self,
+        user: UserAuth,
+        state: Data<&State>,
+        site_id: Path<String>,
+        deployment_id: Path<String>,
+    ) -> Result<Json<Vec<DeploymentPreview>>> {
+        user.verify_access_to(&SiteId(&site_id.0)).await?;
+
+        DeploymentPreview::get_by_deployment_id_public(&state, &site_id.0, &deployment_id.0)
             .await
             .map_err(HttpError::from)
             .map(Json)

@@ -5,14 +5,11 @@ use poem_openapi::{
     param::Path, payload::Json, types::multipart::Upload, Multipart, Object, OpenApi,
 };
 use serde::{Deserialize, Serialize};
-use serde_json::json;
 use tracing::info;
 
 use crate::{
     middlewares::auth::UserAuth,
     models::{
-        deployment::{Deployment, DeploymentFile, DeploymentFileEntry},
-        domain::{Domain, DomainPending, DomainSubmission},
         site::{Site, SiteId},
         team::Team,
     },

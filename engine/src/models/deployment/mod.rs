@@ -9,6 +9,8 @@ use crate::{
     assets::AssetFile, database::Database, state::State, utils::id::{generate_id, IdType}
 };
 
+pub mod preview;
+
 #[derive(Debug, Serialize, Deserialize, Object)]
 #[oai(example)]
 pub struct Deployment {

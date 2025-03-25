@@ -12,18 +12,18 @@ pub struct Storage {
 impl Storage {
     pub fn from_config(config: &AppConfig) -> Self {
         let credentials = Credentials::new(
-            Some(&config.s3_access_key),
-            Some(&config.s3_secret_key),
+            Some(&config.s3.access_key),
+            Some(&config.s3.secret_key),
             None,
             None,
             None,
         )
         .unwrap();
         let region = Region::Custom {
-            region: config.s3_region.clone(),
-            endpoint: config.s3_endpoint_url.clone(),
+            region: config.s3.region.clone(),
+            endpoint: config.s3.endpoint_url.clone(),
         };
-        let bucket = Bucket::new(&config.s3_bucket_name, region, credentials)
+        let bucket = Bucket::new(&config.s3.bucket_name, region, credentials)
             .unwrap()
             .with_path_style();
 

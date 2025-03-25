@@ -1,0 +1,29 @@
+# Environment variables
+.env
+
+# Dependencies
+node_modules
+bun.lockb
+
+# Build output
+dist
+build
+
+# Logs
+*.log
+npm-debug.log*
+
+# Editor directories and files
+.vscode
+.idea
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Temporary files
+tmp
+temp
+screenshots 

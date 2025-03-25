@@ -263,6 +263,44 @@ export type paths = {
         patch?: never;
         trace?: never;
     };
+    "/site/{site_id}/deployment/{deployment_id}/previews": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get a deployment preview by id */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    site_id: string;
+                    deployment_id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json; charset=utf-8": components["schemas"]["DeploymentPreview"][];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/site/{site_id}/deployment": {
         parameters: {
             query?: never;
@@ -517,12 +555,12 @@ export type paths = {
                         "application/json; charset=utf-8": components["schemas"]["DomainPreflightResponseData"];
                     };
                 };
-                409: {
+                400: {
                     headers: {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json; charset=utf-8": components["schemas"]["DomainPreflightResponseConflicts"];
+                        "application/json; charset=utf-8": components["schemas"]["MalformattedInputResponse"];
                     };
                 };
             };
@@ -1233,7 +1271,7 @@ export type components = {
          * Deployment
          * @example {
          *       "context": "test",
-         *       "created_at": "2025-03-24T19:45:57.396480136+00:00",
+         *       "created_at": "2025-03-24T22:30:54.621930627+00:00",
          *       "deployment_id": "d_1234567890",
          *       "site_id": "s_1234567890"
          *     }
@@ -1257,6 +1295,15 @@ export type components = {
             file_size?: number;
             file_deleted: boolean;
         };
+        /** DeploymentPreview */
+        DeploymentPreview: {
+            site_id: string;
+            deployment_id: string;
+            file_path: string;
+            mime_type: string;
+            /** Format: date-time */
+            created_at: string;
+        };
         /** Domain */
         Domain: {
             site_id: string;
@@ -1274,10 +1321,6 @@ export type components = {
             created_at: string;
             /** Format: date-time */
             updated_at: string;
-        };
-        /** DomainPreflightResponseConflicts */
-        DomainPreflightResponseConflicts: {
-            conflicts: components["schemas"]["DomainSubmission"][];
         };
         /** DomainPreflightResponseData */
         DomainPreflightResponseData: {
@@ -1308,6 +1351,10 @@ export type components = {
          */
         LoginResponse: {
             token: string;
+        };
+        /** MalformattedInputResponse */
+        MalformattedInputResponse: {
+            message: string;
         };
         /** Site */
         Site: {

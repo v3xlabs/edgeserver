@@ -1,7 +1,7 @@
 use std::sync::Arc;
 
 use color_eyre::eyre::Result;
-use config::{Config, Environment};
+use figment::{Figment, providers::{Env, Format}};
 use serde::Deserialize;
 
 use crate::{cache::Cache, database::Database, storage::Storage};
@@ -20,12 +20,27 @@ pub struct AppState {
 pub struct AppConfig {
     /// Information
     pub database_url: String,
-    pub s3_endpoint_url: String,
-    pub s3_region: String,
-    pub s3_bucket_name: String,
-    pub s3_access_key: String,
-    pub s3_secret_key: String,
+    pub s3: S3Config,
+    pub s3_previews: Option<S3PreviewsConfig>,
     pub github_app: Option<GithubAppConfig>,
+}
+
+#[derive(Deserialize, Debug)]
+pub struct S3Config {
+    pub endpoint_url: String,
+    pub region: String,
+    pub bucket_name: String,
+    pub access_key: String,
+    pub secret_key: String,
+}
+
+#[derive(Deserialize, Debug)]
+pub struct S3PreviewsConfig {
+    pub endpoint_url: String,
+    pub region: String,
+    pub bucket_name: String,
+    pub access_key: String,
+    pub secret_key: String,
 }
 
 /// Github App Config
@@ -46,12 +61,23 @@ pub struct GithubAppConfig {
 
 impl AppState {
     pub async fn new() -> Result<Self> {
-        let config = Config::builder()
-            .add_source(Environment::default())
-            .build()?;
+        // let config = Config::builder()
+        //     .add_source(Environment::default())
+        //     .build()?;
 
         // Deserialize into the AppConfig struct
-        let config: AppConfig = config.try_deserialize()?;
+        // let config: AppConfig = config.try_deserialize()?;
+
+        let config = Figment::new()
+            .merge(Env::prefixed("DATABASE_").map(|key| format!("database_{}", key.as_str().to_lowercase()).into()))
+            .merge(Env::prefixed("S3_")
+                .map(|key| format!("s3.{}", key.as_str().to_lowercase()).into()))
+            .merge(Env::prefixed("S3_PREVIEWS_")
+                .map(|key| format!("s3_previews.{}", key.as_str().to_lowercase()).into()))
+            .merge(Env::prefixed("GITHUB_APP_")
+                .map(|key| format!("github_app.{}", key.as_str().to_lowercase()).into()))
+            .extract::<AppConfig>()
+            .expect("Failed to load AppConfig configuration");
 
         let database = Database::new(&config.database_url).await?;
 

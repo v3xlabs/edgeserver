@@ -31,9 +31,19 @@ services:
         while ! isAlive; do sleep 0.1; done                                # wait until Minio is alive
         mc alias set minio http://127.0.0.1:9000 minioadmin minioadmin     # setup Minio client
         mc mb minio/edgeserver || true                                    # create a test bucket
+        mc mb minio/screenshots || true                                    # create a test bucket
         mc anonymous set public minio/edgeserver                          # make the test bucket public
+        mc anonymous set public minio/screenshots                          # make the test bucket public
         kill -s INT $(cat /tmp/minio.pid) && rm /tmp/minio.pid             # stop Minio
         while isAlive; do sleep 0.1; done                                  # wait until Minio is stopped
         echo $0 "$@"
         exec minio $0 "$@"                                                 # start Minio in the foreground
       '
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      - RABBITMQ_DEFAULT_USER=user
+      - RABBITMQ_DEFAULT_PASS=password

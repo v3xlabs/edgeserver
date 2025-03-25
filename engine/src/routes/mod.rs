@@ -11,7 +11,6 @@ use poem::{
     endpoint::StaticFilesEndpoint, get, handler, listener::TcpListener, middleware::Cors,
     web::Html, EndpointExt, Route, Server,
 };
-use poem_openapi::payload::Json;
 use poem_openapi::{OpenApi, OpenApiService, Tags};
 use serde_json::{self, Value};
 use team::TeamApi;

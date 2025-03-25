@@ -1,0 +1,26 @@
+{
+  "name": "bunshot",
+  "version": "1.0.0",
+  "description": "A Bun service that takes screenshots of websites using Puppeteer and uploads them to S3",
+  "main": "src/index.ts",
+  "type": "module",
+  "scripts": {
+    "start": "bun run src/index.ts",
+    "dev": "bun --watch run src/index.ts",
+    "build": "bun build src/index.ts --outdir ./dist"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.414.0",
+    "@aws-sdk/lib-storage": "^3.414.0",
+    "@types/node": "^22.13.13",
+    "@types/pg": "^8.11.11",
+    "amqplib": "^0.10.3",
+    "dotenv": "^16.3.1",
+    "pg": "^8.14.1",
+    "puppeteer": "^21.3.8"
+  },
+  "devDependencies": {
+    "bun-types": "latest",
+    "@types/amqplib": "^0.10.1"
+  }
+}
