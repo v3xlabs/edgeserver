@@ -1,4 +1,5 @@
 use chrono::{DateTime, Utc};
+use color_eyre::owo_colors::OwoColorize;
 use serde::{Deserialize, Serialize};
 use poem_openapi::Object;
 use sqlx::FromRow;
@@ -42,6 +43,8 @@ impl DeploymentPreview {
             ).await.unwrap();
             row.file_path = form;
         }
+
+        rows.sort_by_key(|row| std::cmp::Reverse(row.created_at));
 
         Ok(rows)
     }
