@@ -1,4 +1,4 @@
-import { queryOptions, useQuery } from '@tanstack/react-query';
+import { queryOptions, useMutation, useQuery } from '@tanstack/react-query';
 
 import { parseDeploymentContext } from '@/gui/deployments/context/context';
 import { decorateGithubDeploymentContext } from '@/gui/deployments/context/github';
@@ -105,7 +105,7 @@ export const getDeploymentPreviews = (siteId: string, deploymentId: string) =>
         ],
         queryFn: async () => {
             const response = await apiRequest(
-                '/site/{site_id}/deployment/{deployment_id}/previews',
+                '/site/{site_id}/deployment/{deployment_id}/preview',
                 'get',
                 {
                     path: {
@@ -121,3 +121,24 @@ export const getDeploymentPreviews = (siteId: string, deploymentId: string) =>
 
 export const useDeploymentPreviews = (siteId: string, deploymentId: string) =>
     useQuery(getDeploymentPreviews(siteId, deploymentId));
+
+export const useDeploymentPreviewRefetch = (
+    siteId: string,
+    deploymentId: string
+) =>
+    useMutation({
+        mutationFn: async () => {
+            const response = await apiRequest(
+                '/site/{site_id}/deployment/{deployment_id}/preview',
+                'post',
+                {
+                    path: {
+                        site_id: siteId,
+                        deployment_id: deploymentId,
+                    },
+                }
+            );
+
+            return response.data;
+        },
+    });

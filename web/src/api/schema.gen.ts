@@ -263,7 +263,7 @@ export type paths = {
         patch?: never;
         trace?: never;
     };
-    "/site/{site_id}/deployment/{deployment_id}/previews": {
+    "/site/{site_id}/deployment/{deployment_id}/preview": {
         parameters: {
             query?: never;
             header?: never;
@@ -294,7 +294,29 @@ export type paths = {
             };
         };
         put?: never;
-        post?: never;
+        /** /site/:site_id/deployment/:deployment_id/preview */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    site_id: string;
+                    deployment_id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json; charset=utf-8": unknown;
+                    };
+                };
+            };
+        };
         delete?: never;
         options?: never;
         head?: never;
@@ -1271,7 +1293,7 @@ export type components = {
          * Deployment
          * @example {
          *       "context": "test",
-         *       "created_at": "2025-03-24T22:30:54.621930627+00:00",
+         *       "created_at": "2025-03-25T04:13:37.540882594+00:00",
          *       "deployment_id": "d_1234567890",
          *       "site_id": "s_1234567890"
          *     }

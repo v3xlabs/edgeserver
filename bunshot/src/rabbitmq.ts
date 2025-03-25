@@ -203,7 +203,7 @@ async function processScreenshotRequest(
         request.site_id,
         request.deployment_id,
         s3Path,
-        'image/jpeg'
+        'image/webp'
       );
       console.log("Database record created for deployment preview");
     } catch (dbError) {

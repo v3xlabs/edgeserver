@@ -27,7 +27,7 @@ export async function insertDeploymentPreview(
   siteId: string,
   deploymentId: string,
   filePath: string,
-  mimeType: string = 'image/jpeg'
+  mimeType: string = 'image/webp'
 ): Promise<DeploymentPreview> {
   try {
     const client = await pool.connect();

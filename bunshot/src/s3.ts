@@ -30,7 +30,7 @@ export async function uploadToS3(
     // Generate a clean filename
     const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
     const cleanDomain = domain.replace(/[^a-zA-Z0-9]/g, "-");
-    const key = `${siteId}/${deploymentId}/${cleanDomain}_${timestamp}.jpg`;
+    const key = `${siteId}/${deploymentId}/${cleanDomain}_${timestamp}.webp`;
 
     // Log detailed info for debugging
     console.log(`S3 Upload Info - Bucket: ${config.aws.bucket}, Region: ${config.aws.region}`);
@@ -43,7 +43,7 @@ export async function uploadToS3(
       Bucket: config.aws.bucket,
       Key: key,
       Body: buffer,
-      ContentType: "image/jpeg",
+      ContentType: "image/webp",
     };
 
     // Upload to S3

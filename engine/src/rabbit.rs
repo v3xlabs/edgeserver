@@ -11,6 +11,8 @@ use tracing::info;
 pub struct TaskRabbit {
     connection: Connection,
     channel: Channel,
+
+    previews_queue_key: String,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -30,11 +32,31 @@ impl TaskRabbit {
 
         let bunshot_channel = connection.create_channel().await.unwrap();
 
+        let previews_queue_key = config
+            .previews_queue
+            .as_deref()
+            .unwrap_or("previews")
+            .to_string();
+
+        // Declare the screenshots queue
+        bunshot_channel
+            .queue_declare(
+                &previews_queue_key,
+                QueueDeclareOptions {
+                    durable: true,
+                    ..QueueDeclareOptions::default()
+                },
+                FieldTable::default(),
+            )
+            .await
+            .unwrap();
+
         info!("Bunshot queue declared");
 
         TaskRabbit {
             connection,
             channel: bunshot_channel,
+            previews_queue_key,
         }
     }
 
@@ -43,14 +65,28 @@ impl TaskRabbit {
             site_id: site_id.to_string(),
             deployment_id: deployment_id.to_string(),
             domain: domain.to_string(),
-        }).unwrap();
+        })
+        .unwrap();
 
-        self.channel.basic_publish(
-            "bunshot",
-            "bunshot",
-            BasicPublishOptions::default(),
-            payload.as_bytes(),
-            BasicProperties::default(),
-        ).await.unwrap();
+        // Publish to the screenshots queue
+        let confirm = self
+            .channel
+            .basic_publish(
+                "",
+                &self.previews_queue_key,
+                BasicPublishOptions::default(),
+                payload.as_bytes(),
+                BasicProperties::default().with_delivery_mode(2), // Persistent delivery mode
+            )
+            .await
+            .unwrap()
+            .await
+            .unwrap();
+
+        if confirm == Confirmation::NotRequested || confirm == Confirmation::Ack(None) {
+            info!("Message successfully published to screenshots queue");
+        } else {
+            info!("Failed to publish message to screenshots queue");
+        }
     }
 }

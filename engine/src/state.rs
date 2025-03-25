@@ -48,6 +48,7 @@ pub struct S3PreviewsConfig {
 #[derive(Deserialize, Debug)]
 pub struct AMQPConfig {
     pub addr: String,
+    pub previews_queue: Option<String>,
 }
 
 /// Github App Config

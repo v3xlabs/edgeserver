@@ -17,6 +17,8 @@ RUN apt-get update \
     libgbm1 \
     libasound2 \
     libatspi2.0-0 \
+    libwebp6 \
+    webp \
     && rm -rf /var/lib/apt/lists/*
 
 # Set up the working directory

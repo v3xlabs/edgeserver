@@ -41,7 +41,7 @@ export async function takeScreenshot(url: string): Promise<ScreenshotResult> {
 
     // Take a screenshot
     const buffer = await page.screenshot({
-      type: "jpeg",
+      type: "webp",
       quality: config.screenshot.quality,
       fullPage: true,
     });

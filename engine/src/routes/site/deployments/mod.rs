@@ -62,7 +62,7 @@ impl SiteDeploymentsApi {
 
     /// Get a deployment preview by id
     #[oai(
-        path = "/site/:site_id/deployment/:deployment_id/previews",
+        path = "/site/:site_id/deployment/:deployment_id/preview",
         method = "get",
         tag = "ApiTags::Deployment"
     )]
@@ -219,5 +219,41 @@ impl SiteDeploymentsApi {
             .map_err(HttpError::from)
             .map(Json)
             .map_err(poem::Error::from)
+    }
+
+    /// /site/:site_id/deployment/:deployment_id/preview
+    #[oai(
+        path = "/site/:site_id/deployment/:deployment_id/preview",
+        method = "post",
+        tag = "ApiTags::Deployment"
+    )]
+    pub async fn create_deployment_preview(
+        &self,
+        user: UserAuth,
+        state: Data<&State>,
+        site_id: Path<String>,
+        deployment_id: Path<String>,
+    ) -> Result<Json<serde_json::Value>> {
+        user.verify_access_to(&SiteId(&site_id.0)).await?;
+
+        if let Some(rabbit) = &state.rabbit {
+            info!("Queueing bunshot for deployment: {:?}", deployment_id.0);
+
+            let domain = Domain::get_by_site_id(&site_id.0, &state)
+                .await
+                .ok()
+                .and_then(|domains| domains.first().cloned());
+
+            if let Some(domain) = domain {
+                info!("Queueing bunshot for domain: {:?}", domain.domain());
+                rabbit.queue_bunshot(&site_id.0, &deployment_id.0, &domain.domain()).await;
+            } else {
+                info!("No domain was found for this site");
+            }
+        } else {
+            info!("No rabbit was found");
+        }
+
+        Ok(Json(serde_json::Value::Null))
     }
 }
