@@ -1,4 +1,5 @@
 use chrono::{DateTime, Utc};
+use opentelemetry::{global, trace::Tracer};
 use poem_openapi::Object;
 use serde::{Deserialize, Serialize};
 use sqlx::{query, query_as, query_scalar};
@@ -77,6 +78,8 @@ impl Site {
         db: &Database,
         site_id: impl AsRef<str>,
     ) -> Result<Vec<Deployment>, sqlx::Error> {
+        let span = global::tracer("edgeserver").start("get_deployments");
+
         query_as!(
             Deployment,
             "SELECT * FROM deployments WHERE site_id = $1 ORDER BY created_at DESC",

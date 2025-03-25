@@ -70,6 +70,7 @@ async fn main() {
             .with(fmt_layer)
             .with(telemetry_layer)
             .with(EnvFilter::from_default_env())
+            // .with(EnvFilter::new("sqlx=trace"))
             .init();
         // tracing_subscriber::fmt::init();
 

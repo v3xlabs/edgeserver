@@ -1,6 +1,6 @@
 use std::fmt::Debug;
 
-use opentelemetry::Context;
+use opentelemetry::{global, trace::Tracer, Context};
 use poem::{web::Data, FromRequest, Request, RequestBody, Result};
 use poem_openapi::{
     registry::{MetaSecurityScheme, Registry},
@@ -37,9 +37,9 @@ impl<'a> ApiExtractor<'a> for UserAuth {
         body: &mut RequestBody,
         _param_opts: ExtractParamOptions<Self::ParamType>,
     ) -> Result<Self> {
-        let span = info_span!("auth");
-        span.set_parent(Context::current());
-        let _guard = span.enter();
+        let span = global::tracer("edgeserver").start("auth");
+        // let span = info_span!("auth");
+        // span.set_parent(Context::current());
 
         let state = <Data<&State> as FromRequest>::from_request(req, body).await?;
         let state = state.0;
