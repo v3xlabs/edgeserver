@@ -2,6 +2,7 @@ use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use poem_openapi::Object;
 use sqlx::FromRow;
+use tracing::info;
 
 use crate::{database::Database, state::State};
 #[derive(Debug, Serialize, Deserialize, Object, FromRow)]
@@ -30,10 +31,16 @@ impl DeploymentPreview {
     pub async fn get_by_deployment_id_public(state: &State, site_id: &str, deployment_id: &str) -> Result<Vec<Self>, sqlx::Error> {
         let mut rows = DeploymentPreview::get_by_deployment_id(&state.database, site_id, deployment_id).await?;
 
-        let s3_prefix_url = format!("{}/{}", state.config.s3_previews.as_ref().unwrap().endpoint_url, state.config.s3_previews.as_ref().unwrap().bucket_name);
+        // let s3_prefix_url = format!("{}/{}", state.config.s3_previews.as_ref().unwrap().endpoint_url, state.config.s3_previews.as_ref().unwrap().bucket_name);
 
         for row in rows.iter_mut() {
-            row.file_path = format!("{}/{}", s3_prefix_url, row.file_path);
+            info!("Presigning URL for: {:?}", row.file_path);
+            let form = state.storage.previews_bucket.as_ref().unwrap().presign_get(
+                row.file_path.clone(), 
+                60*60, 
+                None
+            ).await.unwrap();
+            row.file_path = form;
         }
 
         Ok(rows)

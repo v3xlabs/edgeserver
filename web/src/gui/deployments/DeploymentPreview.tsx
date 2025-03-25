@@ -56,7 +56,14 @@ export const DeploymentPreview: FC<{
                     }}
                     className="block h-fit w-full cursor-pointer md:h-screen md:max-h-32 md:w-fit"
                 >
-                    <div className="bg-secondary aspect-video h-full min-h-24 rounded-md border drop-shadow-sm md:max-h-48"></div>
+                    <div className="bg-secondary aspect-video h-full min-h-24 rounded-md border drop-shadow-sm md:max-h-48">
+                        {previews && previews.length > 0 && (
+                            <img
+                                src={previews[0].file_path}
+                                className="size-full object-cover"
+                            />
+                        )}
+                    </div>
                 </Link>
                 <div className="w-full py-2 md:w-fit md:grow">
                     <div className="flex w-fit items-center gap-2">
