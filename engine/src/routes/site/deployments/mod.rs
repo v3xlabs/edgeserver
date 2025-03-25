@@ -5,8 +5,7 @@ use tracing::info;
 use crate::{
     middlewares::auth::UserAuth,
     models::{
-        deployment::{preview::DeploymentPreview, Deployment, DeploymentFile, DeploymentFileEntry},
-        site::{Site, SiteId},
+        deployment::{preview::DeploymentPreview, Deployment, DeploymentFile, DeploymentFileEntry}, domain::Domain, site::{Site, SiteId}
     },
     routes::{error::HttpError, ApiTags},
     state::State,
@@ -169,6 +168,20 @@ impl SiteDeploymentsApi {
             Deployment::update_context(&state.database, &deployment_id, &context)
                 .await
                 .unwrap();
+        }
+
+        // TODO: improve trigger based on routing implementation
+        // get first domain if exists for site
+        let domain = Domain::get_by_site_id(&site_id.0, &state)
+            .await
+            .ok()
+            .and_then(|domains| domains.first().cloned());
+
+        if let Some(domain) = domain {
+            if let Some(rabbit) = &state.rabbit {
+                let domain = domain.domain();
+                rabbit.queue_bunshot(&site_id.0, &deployment_id, &domain).await;
+            }
         }
 
         Ok(Json(deployment))

@@ -4,7 +4,7 @@ use color_eyre::eyre::Result;
 use figment::{Figment, providers::{Env, Format}};
 use serde::Deserialize;
 
-use crate::{cache::Cache, database::Database, storage::Storage};
+use crate::{cache::Cache, database::Database, rabbit::TaskRabbit, storage::Storage};
 
 pub type State = Arc<AppState>;
 
@@ -14,6 +14,7 @@ pub struct AppState {
     pub database: Database,
     pub storage: Storage,
     pub cache: Cache,
+    pub rabbit: Option<TaskRabbit>,
 }
 
 #[derive(Deserialize, Debug)]
@@ -23,6 +24,7 @@ pub struct AppConfig {
     pub s3: S3Config,
     pub s3_previews: Option<S3PreviewsConfig>,
     pub github_app: Option<GithubAppConfig>,
+    pub amqp: Option<AMQPConfig>,
 }
 
 #[derive(Deserialize, Debug)]
@@ -41,6 +43,11 @@ pub struct S3PreviewsConfig {
     pub bucket_name: String,
     pub access_key: String,
     pub secret_key: String,
+}
+
+#[derive(Deserialize, Debug)]
+pub struct AMQPConfig {
+    pub addr: String,
 }
 
 /// Github App Config
@@ -76,6 +83,8 @@ impl AppState {
                 .map(|key| format!("s3_previews.{}", key.as_str().to_lowercase()).into()))
             .merge(Env::prefixed("GITHUB_APP_")
                 .map(|key| format!("github_app.{}", key.as_str().to_lowercase()).into()))
+            .merge(Env::prefixed("AMQP_")
+                .map(|key| format!("amqp.{}", key.as_str().to_lowercase()).into()))
             .extract::<AppConfig>()
             .expect("Failed to load AppConfig configuration");
 
@@ -85,11 +94,18 @@ impl AppState {
 
         let cache = Cache::default();
 
+        let rabbit = if let Some(amqp) = &config.amqp {
+            Some(TaskRabbit::init(amqp).await)
+        } else {
+            None
+        };
+
         Ok(Self {
             config,
             database,
             storage,
             cache,
+            rabbit,
         })
     }
 }

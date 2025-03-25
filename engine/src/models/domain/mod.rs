@@ -349,6 +349,14 @@ impl From<Domain> for DomainSubmission {
     }
 }
 
+impl DomainSubmission {
+    pub fn domain(&self) -> String {
+        match self {
+            DomainSubmission::Pending(pending) => pending.domain.clone(),
+            DomainSubmission::Verified(domain) => domain.domain.clone(),
+        }
+    }
+}
 /// Sorts domains in reverse order (TLD first), with "*" treated as coming last
 fn sort_domains_by_reversed_parts(a: &str, b: &str) -> std::cmp::Ordering {
     // Split domains by dots and reverse the parts
