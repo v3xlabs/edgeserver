@@ -178,10 +178,14 @@ impl SiteDeploymentsApi {
             .and_then(|domains| domains.first().cloned());
 
         if let Some(domain) = domain {
+            info!("A domain was found for this site");
             if let Some(rabbit) = &state.rabbit {
+                info!("Queueing bunshot for domain: {:?}", domain);
                 let domain = domain.domain();
                 rabbit.queue_bunshot(&site_id.0, &deployment_id, &domain).await;
             }
+        } else {
+            info!("No domain was found for this site");
         }
 
         Ok(Json(deployment))
