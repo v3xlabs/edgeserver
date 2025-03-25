@@ -47,3 +47,12 @@ services:
     environment:
       - RABBITMQ_DEFAULT_USER=user
       - RABBITMQ_DEFAULT_PASS=password
+
+  jaeger:
+    image: jaegertracing/jaeger:2.4.0
+    ports:
+      - "16686:16686"
+      - "4317:4317"
+      - "4318:4318"
+      - "5778:5778"
+      - "9411:9411"

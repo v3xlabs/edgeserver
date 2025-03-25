@@ -7,6 +7,8 @@ use crate::{
     database::Database, middlewares::auth::AccessibleResource, models::deployment::Deployment, routes::error::HttpError, state::State, utils::id::{generate_id, IdType}
 };
 
+use tracing;
+
 #[derive(Debug, Serialize, Deserialize, Object)]
 pub struct Site {
     pub site_id: String,
@@ -100,26 +102,34 @@ impl Site {
 pub struct SiteId<'a>(pub &'a str);
 
 impl<'a> AccessibleResource for SiteId<'a> {
-    #[tracing::instrument(name = "has_access_to", skip(state))]
     async fn has_access_to(&self, state: &State, user_id: &str) -> Result<bool, HttpError> {
         let cache_key = format!("site:{}", self.0);
+        let site_id = self.0.to_string(); // Capture for the span
+        
+        let access_check = async move {
+            let part_of_site = state.cache.raw.get_with(cache_key, async {
+                // Verify that the user is a member of the team that owns the site
+                let part_of_site = query_scalar!(
+                    "SELECT EXISTS (SELECT 1 FROM sites WHERE site_id = $1 AND team_id IN (SELECT team_id FROM user_teams WHERE user_id = $2) OR team_id IN (SELECT team_id FROM teams WHERE owner_id = $2))",
+                    self.0,
+                    user_id
+                )
+                .fetch_one(&state.database.pool)
+                .await;
 
-        let part_of_site = state.cache.raw.get_with(cache_key, async {
-            // Verify that the user is a member of the team that owns the site
-            let part_of_site = query_scalar!(
-                "SELECT EXISTS (SELECT 1 FROM sites WHERE site_id = $1 AND team_id IN (SELECT team_id FROM user_teams WHERE user_id = $2) OR team_id IN (SELECT team_id FROM teams WHERE owner_id = $2))",
-                self.0,
-                user_id
-            )
-            .fetch_one(&state.database.pool)
-            .await;
+                let part_of_site = part_of_site.ok().flatten().unwrap_or(false);
+                serde_json::to_value(part_of_site).unwrap()
+            }).await;
 
-            let part_of_site = part_of_site.ok().flatten().unwrap_or(false);
-            serde_json::to_value(part_of_site).unwrap()
-        }).await;
+            let part_of_site: bool = serde_json::from_value(part_of_site).unwrap_or_default();
 
-        let part_of_site: bool = serde_json::from_value(part_of_site).unwrap_or_default();
+            Ok(part_of_site)
+        };
 
-        Ok(part_of_site)
+        // Use the Instrument trait properly
+        tracing::Instrument::instrument(
+            access_check,
+            tracing::info_span!("site_access_check", site_id = %site_id)
+        ).await
     }
 }

@@ -4,6 +4,7 @@ use chrono::{DateTime, Utc};
 use poem_openapi::Object;
 use serde::{Deserialize, Serialize};
 use sqlx::query_as;
+use tracing::Instrument;
 
 use crate::{
     database::Database,
@@ -47,26 +48,44 @@ impl Session {
         Ok((token, session))
     }
 
-    #[tracing::instrument(name = "get_session_by_id", skip(db))]
     pub async fn get_by_id(db: &Database, session_id: &str) -> Result<Option<Self>, sqlx::Error> {
-        let session = query_as!(Session, "SELECT * FROM sessions WHERE session_id = $1", session_id)
+        let session_id = session_id.to_string();
+        let db = db.clone();
+        
+        let get_session = async move {
+            let session = query_as!(Session, "SELECT * FROM sessions WHERE session_id = $1", session_id)
+                .fetch_optional(&db.pool)
+                .await?;
+
+            Ok(session)
+        };
+        
+        tracing::Instrument::instrument(
+            get_session,
+            tracing::info_span!("get_session_by_id")
+        ).await
+    }
+
+    pub async fn try_access(db: &Database, session_id: &str) -> Result<Option<Self>, sqlx::Error> {
+        let session_id = session_id.to_string();
+        let db = db.clone();
+        
+        let try_access = async move {
+            let session = query_as!(
+                Session,
+                "UPDATE sessions SET updated_at = NOW() WHERE session_id = $1 AND valid = TRUE RETURNING *",
+                session_id
+            )
             .fetch_optional(&db.pool)
             .await?;
 
-        Ok(session)
-    }
-
-    #[tracing::instrument(name = "try_access", skip(db))]
-    pub async fn try_access(db: &Database, session_id: &str) -> Result<Option<Self>, sqlx::Error> {
-        let session = query_as!(
-            Session,
-            "UPDATE sessions SET updated_at = NOW() WHERE session_id = $1 AND valid = TRUE RETURNING *",
-            session_id
-        )
-        .fetch_optional(&db.pool)
-        .await?;
-
-        Ok(session)
+            Ok(session)
+        };
+        
+        tracing::Instrument::instrument(
+            try_access,
+            tracing::info_span!("try_access")
+        ).await
     }
 
     /// Get all sessions for a user that are valid
@@ -139,10 +158,20 @@ impl Session {
         state: &State,
         resource: &impl AccessibleResource,
     ) -> Result<(), HttpError> {
-        resource
-            .has_access_to(state, &self.user_id)
-            .await
-            .map_err(HttpError::from)?;
-        Ok(())
+        let state = state.clone();
+        let user_id = self.user_id.clone();
+        
+        let verify_access = async move {
+            resource
+                .has_access_to(&state, &user_id)
+                .await
+                .map_err(HttpError::from)?;
+            Ok(())
+        };
+        
+        tracing::Instrument::instrument(
+            verify_access,
+            tracing::info_span!("session_verify_access")
+        ).await
     }
 }

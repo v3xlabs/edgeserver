@@ -2,7 +2,7 @@ use std::sync::Arc;
 
 use opentelemetry::{
     global,
-    trace::{self, Span, SpanKind, TraceContextExt, Tracer},
+    trace::{FutureExt, Span, SpanKind, Status, Tracer, TraceContextExt},
     Context, Key, KeyValue,
 };
 use opentelemetry_http::HeaderExtractor;
@@ -31,7 +31,7 @@ impl<T> TraceId<T> {
 
 impl<T, E> Middleware<E> for TraceId<T>
 where
-    E: Endpoint,
+    E: Endpoint<Output = Response>,
     T: Tracer + Send + Sync,
     T::Span: Send + Sync + 'static,
 {
@@ -40,7 +40,7 @@ where
     fn transform(&self, ep: E) -> Self::Output {
         TraceIdEndpoint {
             inner: ep,
-            _tracer: self.tracer.clone(),
+            tracer: self.tracer.clone(),
         }
     }
 }
@@ -48,19 +48,22 @@ where
 /// The endpoint wrapper produced by the TraceId middleware.
 pub struct TraceIdEndpoint<T, E> {
     inner: E,
-    _tracer: Arc<T>,
+    tracer: Arc<T>,
 }
 
 impl<T, E> Endpoint for TraceIdEndpoint<T, E>
 where
-    E: Endpoint,
+    E: Endpoint<Output = Response>,
     T: Tracer + Send + Sync,
     T::Span: Send + Sync + 'static,
 {
     type Output = Response;
 
     async fn call(&self, req: Request) -> Result<Self::Output> {
-        let tracer = global::tracer("code-fishing");
+        // Extract parent context from request headers if present
+        let parent_cx = global::get_text_map_propagator(|propagator| {
+            propagator.extract(&HeaderExtractor(req.headers()))
+        });
 
         let remote_addr = RealIp::from_request_without_body(&req)
             .await
@@ -69,10 +72,10 @@ where
             .map(|addr| addr.to_string())
             .unwrap_or_else(|| req.remote_addr().to_string());
 
-        let parent_cx = global::get_text_map_propagator(|propagator| {
-            propagator.extract(&HeaderExtractor(req.headers()))
-        });
+        let method = req.method().to_string();
+        let uri = req.uri().to_string();
 
+        // Create span attributes
         let mut attributes = Vec::new();
         attributes.push(KeyValue::new(
             resource::TELEMETRY_SDK_NAME,
@@ -85,7 +88,7 @@ where
         attributes.push(KeyValue::new(resource::TELEMETRY_SDK_LANGUAGE, "rust"));
         attributes.push(KeyValue::new(
             attribute::HTTP_REQUEST_METHOD,
-            req.method().to_string(),
+            method.clone(),
         ));
         attributes.push(KeyValue::new(
             attribute::URL_FULL,
@@ -97,106 +100,85 @@ where
             format!("{:?}", req.version()),
         ));
 
-        let method = req.method().to_string();
-        let mut span = tracer
-            .span_builder(format!("{} {}", method, req.uri()))
+        // Create a span with proper parent context
+        let span_name = format!("{} {}", method, uri);
+        
+        // Create a span with the parent context
+        let mut span = self.tracer
+            .span_builder(span_name)
             .with_kind(SpanKind::Server)
             .with_attributes(attributes)
-            .start_with_context(&tracer, &parent_cx);
-
+            .start_with_context(&*self.tracer, &parent_cx);
+        
         span.add_event("request.started".to_string(), vec![]);
-
-        // Create our isolated context for OpenTelemetry
-        let otel_ctx = Context::current_with_span(span);
         
-        // Run the inner endpoint handler with a clean context
-        let res = self.inner.call(req).await;
+        // Save the trace ID for later
+        let trace_id = span.span_context().trace_id().to_string();
         
-        // Now use the OpenTelemetry context to access our span
-        let span = otel_ctx.span();
+        // Using FutureExt to properly manage the span context
+        async move {
+            let res = self.inner.call(req).await;
+            let cx = Context::current();
+            let span = cx.span();
+            
+            let mut response = match res {
+                Ok(resp) => resp.into_response(),
+                Err(err) => err.into_response(),
+            };
 
-        match res {
-            Ok(resp) => {
-                let mut resp = resp.into_response();
+            // Update span with path pattern if available
+            if let Some(path_pattern) = response.data::<PathPattern>() {
+                const HTTP_PATH_PATTERN: Key = Key::from_static_str("http.path_pattern");
+                span.update_name(format!("{} {}", method, path_pattern.0));
+                span.set_attribute(KeyValue::new(
+                    HTTP_PATH_PATTERN,
+                    path_pattern.0.to_string(),
+                ));
+            }
+            
+            let status_code = response.status().as_u16();
 
-                if let Some(path_pattern) = resp.data::<PathPattern>() {
-                    const HTTP_PATH_PATTERN: Key = Key::from_static_str("http.path_pattern");
-                    span.update_name(format!("{} {}", method, path_pattern.0));
-                    span.set_attribute(KeyValue::new(
-                        HTTP_PATH_PATTERN,
-                        path_pattern.0.to_string(),
-                    ));
-                }
-
+            // Add response status info to span
+            span.set_attribute(KeyValue::new(
+                attribute::HTTP_RESPONSE_STATUS_CODE,
+                status_code as i64,
+            ));
+            
+            // Grafana specific attribute
+            span.set_attribute(KeyValue::new(
+                "http.status_code", 
+                status_code as i64,
+            ));
+            
+            // Set span status based on HTTP status code
+            if response.status().is_success() {
                 span.add_event("request.completed".to_string(), vec![]);
-
-                // Set the http.response.status_code otlp attribute
-                span.set_attribute(KeyValue::new(
-                    attribute::HTTP_RESPONSE_STATUS_CODE,
-                    resp.status().as_u16() as i64,
-                ));
-                // Grafana specific override (http.status_code)
-                span.set_attribute(KeyValue::new(
-                    "http.status_code",
-                    resp.status().as_u16() as i64,
-                ));
-
-                // Span status update
-                if resp.status().is_success() {
-                    span.set_status(trace::Status::Ok);
-                } else {
-                    let status_string = resp.status().to_string();
-                    span.set_status(trace::Status::Error {
-                        description: status_string.into(),
-                    });
-                }
-
-                if let Some(content_length) =
-                    resp.headers().typed_get::<headers::ContentLength>()
-                {
-                    span.set_attribute(KeyValue::new(
-                        // attribute::HTTP_RESPONSE_BODY_SIZE,
-                        "http.response_body_size",
-                        content_length.0 as i64,
-                    ));
-                }
-
-                resp.headers_mut().insert(
-                    "X-Trace-Id",
-                    HeaderValue::from_str(&span.span_context().trace_id().to_string())
-                        .unwrap_or_else(|_| HeaderValue::from_static("unknown")),
-                );
-
-                Ok(resp)
+                span.set_status(Status::Ok);
+            } else {
+                span.add_event("request.error".to_string(), vec![
+                    KeyValue::new(attribute::EXCEPTION_MESSAGE, response.status().to_string()),
+                ]);
+                span.set_status(Status::error(response.status().to_string()));
             }
-            Err(err) => {
-                if let Some(path_pattern) = err.data::<PathPattern>() {
-                    const HTTP_PATH_PATTERN: Key = Key::from_static_str("http.path_pattern");
-                    span.update_name(format!("{} {}", method, path_pattern.0));
-                    span.set_attribute(KeyValue::new(
-                        HTTP_PATH_PATTERN,
-                        path_pattern.0.to_string(),
-                    ));
-                }
-
+            
+            // Track content length if available
+            if let Some(content_length) = response.headers().typed_get::<headers::ContentLength>() {
                 span.set_attribute(KeyValue::new(
-                    attribute::HTTP_RESPONSE_STATUS_CODE,
-                    err.status().as_u16() as i64,
+                    attribute::HTTP_RESPONSE_BODY_SIZE,
+                    content_length.0 as i64,
                 ));
-                span.add_event(
-                    "request.error".to_string(),
-                    vec![KeyValue::new(attribute::EXCEPTION_MESSAGE, err.to_string())],
-                );
-
-                let mut err = err.into_response();
-                err.headers_mut().insert(
-                    "X-Trace-Id",
-                    HeaderValue::from_str(&span.span_context().trace_id().to_string())
-                        .unwrap_or_else(|_| HeaderValue::from_static("unknown")),
-                );
-
-                Ok(err)
             }
+            
+            // Add trace ID to response headers
+            response.headers_mut().insert(
+                "X-Trace-Id",
+                HeaderValue::from_str(&trace_id)
+                    .unwrap_or_else(|_| HeaderValue::from_static("unknown")),
+            );
+            
+            Ok(response)
         }
+        .with_context(Context::current_with_span(span))
+        .await
     }
 }

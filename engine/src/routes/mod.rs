@@ -4,7 +4,7 @@ use async_std::path::Path;
 use auth::AuthApi;
 use invite::InviteApi;
 use opentelemetry::global;
-use poem::middleware::OpenTelemetryMetrics;
+use poem::middleware::{OpenTelemetryMetrics, OpenTelemetryTracing};
 use poem::web::Data;
 use poem::Response;
 use poem::{
@@ -189,6 +189,7 @@ pub async fn serve(state: AppState) {
         .nest("/", file_endpoint)
         .with(Cors::new())
         .with(TraceId::new(Arc::new(global::tracer("edgeserver"))))
+        // .with(OpenTelemetryTracing::new(global::tracer("edgeserver")))
         .with(OpenTelemetryMetrics::new())
         .data(state);
 

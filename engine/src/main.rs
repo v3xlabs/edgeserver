@@ -3,6 +3,7 @@ use std::env;
 use opentelemetry::KeyValue;
 use opentelemetry::{global, trace::TracerProvider};
 use opentelemetry_otlp::WithExportConfig;
+use opentelemetry_sdk::propagation::TraceContextPropagator;
 use opentelemetry_sdk::Resource;
 use state::AppState;
 use tracing::{error, info};
@@ -35,6 +36,7 @@ async fn main() {
 
     if let Some(endpoint) = otlp_endpoint {
         info!("Starting Edgerouter with OTLP tracing");
+        opentelemetry::global::set_text_map_propagator(TraceContextPropagator::new());
 
         let exporter = opentelemetry_otlp::SpanExporter::builder()
             .with_tonic()
