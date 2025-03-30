@@ -79,8 +79,8 @@ impl Site {
         site_id: impl AsRef<str>,
     ) -> Result<Vec<Deployment>, sqlx::Error> {
         // let span = global::tracer("edgeserver").start("get_deployments");
-        let span = info_span!("get_deployments");
-        let _guard = span.enter();
+        // let span = info_span!("get_deployments");
+        // let _guard = span.enter();
 
         query_as!(
             Deployment,

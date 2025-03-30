@@ -125,8 +125,9 @@ where
             let res = self.inner.call(req).await;
             let cx = Context::current();
             let current_tracing = tracing::Span::current();
+            // let span = cx.span();
             let span = cx.span();
-            // current_tracing.set_parent(span.span_context());
+            // current_tracing.set_parent(cx);
             
             let mut response = match res {
                 Ok(resp) => resp.into_response(),
