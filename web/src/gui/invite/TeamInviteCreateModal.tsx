@@ -1,5 +1,6 @@
 import { FC, PropsWithChildren, useState } from 'react';
 import { FiLink, FiUserPlus } from 'react-icons/fi';
+import { toast } from 'sonner';
 
 import { useTeamInviteCreate } from '@/api/team';
 import { Button } from '@/components/button';
@@ -21,6 +22,26 @@ export const TeamInviteCreateModal: FC<
         teamId: team_id,
     });
     const isDisabled = !userId;
+
+    const handleCreateInvite = (userId?: string) => {
+        createInvite(
+            { userId },
+            {
+                onSuccess: () =>
+                    toast.success(
+                        userId
+                            ? 'Invite sent successfully'
+                            : 'Invite link copied to clipboard'
+                    ),
+                onError: () =>
+                    toast.error(
+                        userId
+                            ? 'Failed to send invite'
+                            : 'Failed to create invite link'
+                    ),
+            }
+        );
+    };
 
     return (
         <>
@@ -47,7 +68,7 @@ export const TeamInviteCreateModal: FC<
                         <ModalClose asChild>
                             <Button
                                 className="w-full"
-                                onClick={() => createInvite({})}
+                                onClick={() => handleCreateInvite()}
                             >
                                 <FiLink /> Copy link
                             </Button>
@@ -58,9 +79,7 @@ export const TeamInviteCreateModal: FC<
                                 variant="primary"
                                 disabled={isDisabled}
                                 onClick={() => {
-                                    if (isDisabled) return;
-
-                                    createInvite({ userId });
+                                    handleCreateInvite(userId);
                                 }}
                             >
                                 <FiUserPlus />
