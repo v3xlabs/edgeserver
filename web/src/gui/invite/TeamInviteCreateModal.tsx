@@ -4,6 +4,7 @@ import { FiLink, FiUserPlus } from 'react-icons/fi';
 import { useTeamInviteCreate } from '@/api/team';
 import { Button } from '@/components/button';
 import {
+    ModalClose,
     ModalContent,
     ModalDescription,
     ModalRoot,
@@ -43,25 +44,29 @@ export const TeamInviteCreateModal: FC<
                     />
 
                     <div className="flex flex-row gap-2">
-                        <Button
-                            className="w-full"
-                            onClick={() => createInvite({})}
-                        >
-                            <FiLink /> Copy link
-                        </Button>
-                        <Button
-                            className="w-full"
-                            variant="primary"
-                            disabled={isDisabled}
-                            onClick={() => {
-                                if (isDisabled) return;
+                        <ModalClose asChild>
+                            <Button
+                                className="w-full"
+                                onClick={() => createInvite({})}
+                            >
+                                <FiLink /> Copy link
+                            </Button>
+                        </ModalClose>
+                        <ModalClose asChild>
+                            <Button
+                                className="w-full"
+                                variant="primary"
+                                disabled={isDisabled}
+                                onClick={() => {
+                                    if (isDisabled) return;
 
-                                createInvite({ userId });
-                            }}
-                        >
-                            <FiUserPlus />
-                            Send
-                        </Button>
+                                    createInvite({ userId });
+                                }}
+                            >
+                                <FiUserPlus />
+                                Send
+                            </Button>
+                        </ModalClose>
                     </div>
                 </ModalContent>
             </ModalRoot>
