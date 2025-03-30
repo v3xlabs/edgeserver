@@ -119,12 +119,14 @@ where
         // Using FutureExt to properly manage the span context
         async move {
             // Set the OpenTelemetry context in the tracing subscriber
-            let current_span = tracing::Span::current();
-            current_span.set_parent(parent_cx);
+            // let current_span = tracing::Span::current();
+            // current_span.set_parent(parent_cx);
             
             let res = self.inner.call(req).await;
             let cx = Context::current();
+            let current_tracing = tracing::Span::current();
             let span = cx.span();
+            // current_tracing.set_parent(span.span_context());
             
             let mut response = match res {
                 Ok(resp) => resp.into_response(),

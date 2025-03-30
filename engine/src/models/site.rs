@@ -8,7 +8,7 @@ use crate::{
     database::Database, middlewares::auth::AccessibleResource, models::deployment::Deployment, routes::error::HttpError, state::State, utils::id::{generate_id, IdType}
 };
 
-use tracing;
+use tracing::{self, info_span, span};
 
 #[derive(Debug, Serialize, Deserialize, Object)]
 pub struct Site {
@@ -78,7 +78,9 @@ impl Site {
         db: &Database,
         site_id: impl AsRef<str>,
     ) -> Result<Vec<Deployment>, sqlx::Error> {
-        let span = global::tracer("edgeserver").start("get_deployments");
+        // let span = global::tracer("edgeserver").start("get_deployments");
+        let span = info_span!("get_deployments");
+        let _guard = span.enter();
 
         query_as!(
             Deployment,

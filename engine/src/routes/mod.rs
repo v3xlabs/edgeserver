@@ -188,8 +188,8 @@ pub async fn serve(state: AppState) {
         .at("/docs", get(get_openapi_docs))
         .nest("/", file_endpoint)
         .with(Cors::new())
-        // .with(TraceId::new(Arc::new(global::tracer("edgeserver"))))
-        .with(OpenTelemetryTracing::new(global::tracer("edgeserver")))
+        .with(TraceId::new(Arc::new(global::tracer("edgeserver"))))
+        // .with(OpenTelemetryTracing::new(global::tracer("edgeserver")))
         .with(OpenTelemetryMetrics::new())
         .data(state);
 
