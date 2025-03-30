@@ -27,12 +27,14 @@ export const TeamInviteCreateModal: FC<
         createInvite(
             { userId },
             {
-                onSuccess: () =>
+                onSuccess: () => {
                     toast.success(
                         userId
                             ? 'Invite sent successfully'
                             : 'Invite link copied to clipboard'
-                    ),
+                    );
+                    setUserId('');
+                },
                 onError: () =>
                     toast.error(
                         userId
