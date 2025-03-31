@@ -1293,7 +1293,7 @@ export type components = {
          * Deployment
          * @example {
          *       "context": "test",
-         *       "created_at": "2025-03-31T18:21:19.380531433+00:00",
+         *       "created_at": "2025-03-31T19:18:27.284224766+00:00",
          *       "deployment_id": "d_1234567890",
          *       "site_id": "s_1234567890"
          *     }
@@ -1323,6 +1323,7 @@ export type components = {
             deployment_id: string;
             preview_path: string;
             full_preview_path?: string;
+            favicon_path?: string;
             mime_type: string;
             /** Format: date-time */
             created_at: string;

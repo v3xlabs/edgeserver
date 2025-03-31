@@ -13,6 +13,7 @@ pub struct DeploymentPreview {
     pub deployment_id: String,
     pub preview_path: String,
     pub full_preview_path: Option<String>,
+    pub favicon_path: Option<String>,
     pub mime_type: String,
     pub created_at: DateTime<Utc>,
 }
@@ -60,6 +61,15 @@ impl DeploymentPreview {
                     None
                 ).await.unwrap();
                 row.full_preview_path = Some(form);
+            }
+            info!("Presigning URL for: {:?}", row.favicon_path);
+            if let Some(favicon_path) = row.favicon_path.clone() {
+                let form = state.storage.previews_bucket.as_ref().unwrap().presign_get(
+                    format!("/{}", favicon_path), 
+                    60*60,
+                    None
+                ).await.unwrap();   
+                row.favicon_path = Some(form);
             }
         }
 

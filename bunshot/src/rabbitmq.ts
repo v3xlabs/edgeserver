@@ -195,8 +195,17 @@ async function processScreenshotRequest(
       screenshotResult.full_screenshot,
       request.site_id,
       request.deployment_id,
-      request.domain
+      request.domain,
+      'full'
     );
+
+    const favicon_s3Path = screenshotResult.favicon ? await uploadToS3(
+      screenshotResult.favicon,
+      request.site_id,
+      request.deployment_id,
+      request.domain,
+      'favicon'
+    ) : null;
 
     // Update response
     response.success = true;
@@ -211,6 +220,7 @@ async function processScreenshotRequest(
         request.deployment_id,
         s3Path,
         full_s3Path,
+        favicon_s3Path,
         'image/webp'
       );
       console.log("Database record created for deployment preview");

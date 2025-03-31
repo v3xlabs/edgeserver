@@ -60,10 +60,36 @@ export async function takeScreenshot(url: string): Promise<ScreenshotResult> {
       fullPage: true,
     });
 
+    // get the favicon of the page as a buffer
+    // get it from the browser not from the html meta tags
+    const favicon = await page.evaluate(() => {
+      const favicon = document.querySelector('link[rel="icon"]');
+      if (favicon) {
+        return favicon.getAttribute('href');
+      }
+      return null;
+    });
+
+    console.log("Favicon", favicon);
+
+    const faviconUrl = favicon ? favicon.startsWith('/') ? new URL(favicon, url).toString() : favicon : null;
+
+    console.log("Favicon URL", faviconUrl);
+
+    // fetch favicon to buffer plz
+    const faviconBuffer = faviconUrl ? await fetch(faviconUrl).then(res => res.arrayBuffer()).catch(e => {
+      console.error("Error fetching favicon", e);
+      return null;
+    }).then(buffer => buffer) : null;
+    const faviconBufferRaw: Buffer | null = faviconBuffer ? Buffer.from(faviconBuffer) : null;
+
+    console.log("Favicon Buffer", faviconBufferRaw?.length);
+
     return {
       success: true,
       buffer,
       full_screenshot,
+      favicon: faviconBufferRaw as any,
     };
   } catch (error) {
     console.error(`Error taking screenshot of ${url}:`, error);

@@ -49,7 +49,19 @@ export const SitePreview: FC<{
             )}
             <div className="flex items-center justify-between gap-2">
                 <div className="flex items-center gap-1.5">
-                    {favicon}
+                    {previews &&
+                    previews.length > 0 &&
+                    previews[0].favicon_path ? (
+                        <div className="size-6 overflow-hidden rounded-full">
+                            <img
+                                alt="Deployment Preview"
+                                src={previews[0].favicon_path}
+                                className="size-full object-cover"
+                            />
+                        </div>
+                    ) : (
+                        favicon
+                    )}
                     {site?.name}
                 </div>
                 <FiArrowRight />

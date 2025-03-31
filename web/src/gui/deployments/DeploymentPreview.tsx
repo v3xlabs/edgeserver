@@ -185,6 +185,16 @@ export const DeploymentPreview: FC<{
             </Link>
             <div className="w-full py-2 md:w-fit md:grow">
                 <div className="flex w-fit items-center gap-2">
+                    {previews && previews.length > 0 && (
+                        <div className="size-6 overflow-hidden rounded-full">
+                            <img
+                                alt="Deployment Preview"
+                                src={previews[0].favicon_path}
+                                className="size-full object-cover"
+                            />
+                        </div>
+                    )}
+
                     <div>{deployment_id}</div>
                     {/* <Link
                         to="/site/$siteId/deployment/$deploymentId"

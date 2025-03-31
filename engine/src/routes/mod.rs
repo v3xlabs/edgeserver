@@ -4,7 +4,7 @@ use async_std::path::Path;
 use auth::AuthApi;
 use invite::InviteApi;
 use opentelemetry::global;
-use poem::middleware::{OpenTelemetryMetrics, OpenTelemetryTracing, Tracing};
+use poem::middleware::OpenTelemetryMetrics;
 use poem::web::Data;
 use poem::Response;
 use poem::{

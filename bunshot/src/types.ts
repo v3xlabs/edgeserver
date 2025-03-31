@@ -23,6 +23,7 @@ export interface ScreenshotResult {
   buffer?: Buffer;
   full_screenshot?: Buffer;
   error?: string;
+  favicon?: Buffer;
 }
 
 // Configuration interface

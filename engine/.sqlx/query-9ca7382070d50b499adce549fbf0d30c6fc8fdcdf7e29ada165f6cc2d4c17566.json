@@ -32,6 +32,11 @@
         "ordinal": 5,
         "name": "full_preview_path",
         "type_info": "Text"
+      },
+      {
+        "ordinal": 6,
+        "name": "favicon_path",
+        "type_info": "Text"
       }
     ],
     "parameters": {
@@ -46,6 +51,7 @@
       false,
       false,
       false,
+      true,
       true
     ]
   },
