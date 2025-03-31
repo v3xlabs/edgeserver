@@ -1,6 +1,7 @@
 use chrono::{DateTime, Utc};
 use poem_openapi::Object;
 use serde::{Deserialize, Serialize};
+use tracing::info_span;
 
 use crate::{
     database::Database,
@@ -25,6 +26,9 @@ impl UserTeamInvite {
         user_id: Option<impl AsRef<str>>,
         sender_id: impl AsRef<str>,
     ) -> Result<Self, sqlx::Error> {
+        let span = info_span!("UserTeamInvite::new");
+        let _guard = span.enter();
+
         let invite_id = generate_id(IdType::TEAM_INVITE);
 
         sqlx::query_as!(
@@ -43,6 +47,9 @@ impl UserTeamInvite {
         db: &Database,
         invite_id: impl AsRef<str>,
     ) -> Result<Self, sqlx::Error> {
+        let span = info_span!("UserTeamInvite::get_by_invite_id");
+        let _guard = span.enter();
+
         sqlx::query_as!(
             UserTeamInvite,
             "SELECT * FROM user_team_invites WHERE invite_id = $1",
@@ -56,6 +63,9 @@ impl UserTeamInvite {
         db: &Database,
         team_id: impl AsRef<str>,
     ) -> Result<Vec<Self>, sqlx::Error> {
+        let span = info_span!("UserTeamInvite::get_by_team_id");
+        let _guard = span.enter();
+
         sqlx::query_as!(
             UserTeamInvite,
             "SELECT * FROM user_team_invites WHERE team_id = $1",
@@ -70,6 +80,9 @@ impl UserTeamInvite {
         team_id: impl AsRef<str>,
         user_id: impl AsRef<str>,
     ) -> Result<Self, sqlx::Error> {
+        let span = info_span!("UserTeamInvite::get_by_team_and_user");
+        let _guard = span.enter();
+
         sqlx::query_as!(
             UserTeamInvite,
             "SELECT * FROM user_team_invites WHERE team_id = $1 AND user_id = $2",
@@ -84,6 +97,9 @@ impl UserTeamInvite {
         db: &Database,
         invite_id: impl AsRef<str>,
     ) -> Result<(), sqlx::Error> {
+        let span = info_span!("UserTeamInvite::delete_by_id");
+        let _guard = span.enter();
+
         sqlx::query!(
             "DELETE FROM user_team_invites WHERE invite_id = $1",
             invite_id.as_ref()
@@ -99,6 +115,9 @@ impl UserTeamInvite {
         invite_id: impl AsRef<str>,
         user_id: impl AsRef<str>,
     ) -> Result<(), sqlx::Error> {
+        let span = info_span!("UserTeamInvite::accept_invite");
+        let _guard = span.enter();
+
         // Mark invite as accepted and mark user as a member of the team
         sqlx::query!(
             "UPDATE user_team_invites SET status = 'accepted', user_id = $2, accepted_at = NOW() WHERE invite_id = $1",

@@ -72,7 +72,7 @@ async fn main() {
             .add_directive("sqlx=trace".parse().unwrap());
         tracing_subscriber::registry()
             .with(fmt_layer)
-            .with(sqlxshim::SqlxEventToSpanLayer)
+            // .with(sqlxshim::SqlxEventToSpanLayer)
             .with(telemetry_layer)
             .with(filter)
             .init();

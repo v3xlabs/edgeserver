@@ -2,7 +2,7 @@ use chrono::{DateTime, Utc};
 use poem_openapi::{Object, Union};
 use serde::{Deserialize, Serialize};
 use sqlx::{Error, FromRow};
-use tracing::info;
+use tracing::{info, info_span};
 
 use crate::state::State;
 
@@ -20,6 +20,9 @@ impl Domain {
         domain: &str,
         state: &State,
     ) -> Result<Vec<Domain>, Error> {
+        let span = info_span!("Domain::get_soft_overlap");
+        let _guard = span.enter();
+
         let overlap = if domain.starts_with("*.") {
             Domain::existing_wildcard_overlap_by_name(domain, state).await?
         } else {
@@ -44,6 +47,9 @@ impl Domain {
         site_id: &str,
         state: &State,
     ) -> Result<Vec<DomainSubmission>, Error> {
+        let span = info_span!("Domain::get_by_site_id");
+        let _guard = span.enter();
+
         let mut domains: Vec<Domain> =
             sqlx::query_as!(Domain, "SELECT * FROM domains WHERE site_id = $1", site_id)
                 .fetch_all(&state.database.pool)
@@ -73,6 +79,9 @@ impl Domain {
         domain: &str,
         state: &State,
     ) -> Result<Option<Domain>, Error> {
+        let span = info_span!("Domain::get_by_site_id_and_domain");
+        let _guard = span.enter();
+
         let domain = sqlx::query_as!(
             Domain,
             "SELECT * FROM domains WHERE site_id = $1 AND domain = $2",
@@ -90,6 +99,9 @@ impl Domain {
         domain: &str,
         state: &State,
     ) -> Result<(), Error> {
+        let span = info_span!("Domain::delete_by_site_id_and_domain");
+        let _guard = span.enter();
+
         sqlx::query!(
             "DELETE FROM domains WHERE site_id = $1 AND domain = $2",
             site_id,
@@ -106,6 +118,9 @@ impl Domain {
         domain: &str,
         state: &State,
     ) -> Result<DomainSubmission, Error> {
+        let span = info_span!("Domain::create_for_site");
+        let _guard = span.enter();
+
         // check if domain exist by name, the domains from initial overlap are to be overwritten if this gets validated
         let mut overlap = Domain::get_soft_overlap(domain, state).await?;
 
@@ -162,6 +177,9 @@ impl Domain {
         domain: &str,
         state: &State,
     ) -> Result<Domain, Error> {
+        let span = info_span!("Domain::create_for_site_superceded");
+        let _guard = span.enter();
+
         let domain = sqlx::query_as!(Domain, "INSERT INTO domains (site_id, domain) VALUES ($1, $2) RETURNING *", site_id, domain)
             .fetch_one(&state.database.pool)
             .await?;
@@ -173,6 +191,9 @@ impl Domain {
         domain: &str,
         state: &State,
     ) -> Result<Option<Domain>, Error> {
+        let span = info_span!("Domain::existing_domain_by_name");
+        let _guard = span.enter();
+
         let domain = sqlx::query_as!(Domain, "SELECT * FROM domains WHERE domain = $1", domain)
             .fetch_optional(&state.database.pool)
             .await?;
@@ -187,6 +208,9 @@ impl Domain {
         domain: &str,
         state: &State,
     ) -> Result<Vec<Domain>, Error> {
+        let span = info_span!("Domain::existing_wildcard_overlap_by_name");
+        let _guard = span.enter();
+
         // require that the domain starts with `*.`
         if !domain.starts_with("*.") {
             return Err(Error::RowNotFound);
@@ -214,6 +238,9 @@ impl Domain {
         domain: &str,
         state: &State,
     ) -> Result<Vec<Domain>, Error> {
+        let span = info_span!("Domain::overlap_upwards_wildcard");
+        let _guard = span.enter();
+
         let domain = domain[2..].to_string();
 
         let domains = sqlx::query_as!(
@@ -246,6 +273,9 @@ impl DomainPending {
         domain: &str,
         state: &State,
     ) -> Result<DomainPending, Error> {
+        let span = info_span!("DomainPending::create");
+        let _guard = span.enter();
+
         let challenge = uuid::Uuid::new_v4().to_string();
         let status = "pending".to_string();
 
@@ -268,6 +298,9 @@ impl DomainPending {
         domain: &str,
         state: &State,
     ) -> Result<Option<DomainPending>, Error> {
+        let span = info_span!("DomainPending::get_by_site_id_and_domain");
+        let _guard = span.enter();
+
         let domain_pending = sqlx::query_as!(
             DomainPending,
             "SELECT * FROM domains_pending WHERE site_id = $1 AND domain = $2",
@@ -285,6 +318,9 @@ impl DomainPending {
         domain: &str,
         state: &State,
     ) -> Result<(), Error> {
+        let span = info_span!("DomainPending::delete_by_site_id_and_domain");
+        let _guard = span.enter();
+
         sqlx::query!(
             "DELETE FROM domains_pending WHERE site_id = $1 AND domain = $2",
             site_id,
@@ -296,6 +332,9 @@ impl DomainPending {
         Ok(())
     }
     pub async fn do_challenge(&self, state: &State) -> Result<(), Error> {
+        let span = info_span!("DomainPending::do_challenge");
+        let _guard = span.enter();
+
         // get the dns txt record `_edgeserver-challenge` and if its equal to the challenge, update the status to verified
 
         // if a site exists for this domain delete it and generate a challenge in its place

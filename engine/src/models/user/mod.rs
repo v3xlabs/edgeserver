@@ -2,6 +2,7 @@ use chrono::{DateTime, Utc};
 use poem_openapi::Object;
 use serde::{Deserialize, Serialize};
 use sqlx::{query_as, query_scalar};
+use tracing::info_span;
 
 use crate::{
     database::Database, utils::id::{generate_id, IdType}
@@ -36,6 +37,9 @@ impl User {
         admin: Option<bool>,
         default_team: Option<String>,
     ) -> Result<(Self, Team), sqlx::Error> {
+        let span = info_span!("User::new");
+        let _guard = span.enter();
+
         let user_id = generate_id(IdType::USER);
         let name = name.as_ref();
         let password = password.as_ref();
@@ -78,6 +82,9 @@ impl User {
     }
 
     pub async fn get_by_id(db: &Database, user_id: impl AsRef<str>) -> Result<Self, sqlx::Error> {
+        let span = info_span!("User::get_by_id");
+        let _guard = span.enter();
+
         query_as!(
             User,
             "SELECT * FROM users WHERE user_id = $1",
@@ -92,6 +99,9 @@ impl User {
         name: impl AsRef<str>,
         password: impl AsRef<str>,
     ) -> Result<Self, sqlx::Error> {
+        let span = info_span!("User::get_by_name_and_password");
+        let _guard = span.enter();
+
         query_as!(
             User,
             "SELECT * FROM users WHERE name = $1 AND password = $2",
@@ -103,12 +113,18 @@ impl User {
     }
 
     pub async fn get_all_minimal(db: &Database) -> Result<Vec<UserMinimal>, sqlx::Error> {
+        let span = info_span!("User::get_all_minimal");
+        let _guard = span.enter();
+
         query_as!(UserMinimal, "SELECT user_id, name, avatar_url, admin FROM users")
             .fetch_all(&db.pool)
             .await
     }
 
     pub async fn can_bootstrap(db: &Database) -> Result<bool, sqlx::Error> {
+        let span = info_span!("User::can_bootstrap");
+        let _guard = span.enter();
+
         Ok(query_scalar!("SELECT COUNT(*) FROM users")
             .fetch_one(&db.pool)
             .await?

@@ -3,7 +3,7 @@ use poem_openapi::{types::{multipart::Upload, Example}, Object};
 use serde::{Deserialize, Serialize};
 use sqlx::{query, query_as};
 use async_zip::base::read::mem::ZipFileReader;
-use tracing::info;
+use tracing::{info, info_span};
 
 use crate::{
     assets::AssetFile, database::Database, state::State, utils::id::{generate_id, IdType}
@@ -54,6 +54,9 @@ impl Deployment {
         site_id: String,
         context: Option<String>,
     ) -> Result<Self, sqlx::Error> {
+        let span = info_span!("Deployment::new");
+        let _guard = span.enter();
+
         let deployment_id: String = generate_id(IdType::DEPLOYMENT);
 
         query_as!(
@@ -79,6 +82,9 @@ impl Deployment {
 
     #[tracing::instrument(name = "upload_files", skip(self, state, file))]
     pub async fn upload_files(&self, state: &State, file: Upload) -> Result<(), sqlx::Error> {
+        let span = info_span!("Deployment::upload_files");
+        let _guard = span.enter();
+
         let file_stream = file.into_vec().await.unwrap();
 
         // TODO: Read file stream, extract zip file (contains multiple files), upload each file to s3 at the correct relevant path relative to deployment.deployment_id + '/'
@@ -149,6 +155,9 @@ impl Deployment {
         state: &State,
         cutoff_date: DateTime<Utc>,
     ) -> Result<Vec<File>, sqlx::Error> {
+        let span = info_span!("Deployment::cleanup_old_files");
+        let _guard = span.enter();
+
         tracing::info!("Checking for unused files before: {:?}", cutoff_date);
         let files = query_as!(
             File,
@@ -191,6 +200,9 @@ impl Deployment {
     }
 
     pub async fn get_by_id(db: &Database, deployment_id: &str) -> Result<Self, sqlx::Error> {
+        let span = info_span!("Deployment::get_by_id");
+        let _guard = span.enter();
+
         query_as!(
             Deployment,
             "SELECT * FROM deployments WHERE deployment_id = $1",
@@ -201,6 +213,9 @@ impl Deployment {
     }
 
     pub async fn update_context(db: &Database, deployment_id: &str, context: &str) -> Result<(), sqlx::Error> {
+        let span = info_span!("Deployment::update_context");
+        let _guard = span.enter();
+
         query!(
             "UPDATE deployments SET context = $1 WHERE deployment_id = $2",
             context,
@@ -224,6 +239,9 @@ impl DeploymentFile {
         db: &Database,
         deployment_id: &str,
     ) -> Result<Vec<DeploymentFileEntry>, sqlx::Error> {
+        let span = info_span!("DeploymentFile::get_deployment_files");
+        let _guard = span.enter();
+
         query_as!(
             DeploymentFileEntry,
             r#"

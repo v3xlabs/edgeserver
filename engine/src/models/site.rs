@@ -1,14 +1,18 @@
 use chrono::{DateTime, Utc};
-use opentelemetry::{global, trace::Tracer};
 use poem_openapi::Object;
 use serde::{Deserialize, Serialize};
 use sqlx::{query, query_as, query_scalar};
 
 use crate::{
-    database::Database, middlewares::auth::AccessibleResource, models::deployment::Deployment, routes::error::HttpError, state::State, utils::id::{generate_id, IdType}
+    database::Database,
+    middlewares::auth::AccessibleResource,
+    models::deployment::Deployment,
+    routes::error::HttpError,
+    state::State,
+    utils::id::{generate_id, IdType},
 };
 
-use tracing::{self, info_span, span};
+use tracing::info_span;
 
 #[derive(Debug, Serialize, Deserialize, Object)]
 pub struct Site {
@@ -24,6 +28,9 @@ impl Site {
         name: impl AsRef<str>,
         team_id: impl AsRef<str>,
     ) -> Result<Self, sqlx::Error> {
+        let span = info_span!("Site::new");
+        let _guard = span.enter();
+
         let site_id = generate_id(IdType::SITE);
 
         query_as!(
@@ -38,6 +45,9 @@ impl Site {
     }
 
     pub async fn get_by_id(db: &Database, site_id: impl AsRef<str>) -> Result<Self, sqlx::Error> {
+        let span = info_span!("Site::get_by_id");
+        let _guard = span.enter();
+
         query_as!(
             Site,
             "SELECT * FROM sites WHERE site_id = $1",
@@ -51,6 +61,9 @@ impl Site {
         db: &Database,
         team_id: impl AsRef<str>,
     ) -> Result<Vec<Self>, sqlx::Error> {
+        let span = info_span!("Site::get_by_team_id");
+        let _guard = span.enter();
+
         query_as!(
             Site,
             "SELECT * FROM sites WHERE team_id = $1",
@@ -65,6 +78,9 @@ impl Site {
         db: &Database,
         user_id: impl AsRef<str>,
     ) -> Result<Vec<Self>, sqlx::Error> {
+        let span = info_span!("Site::get_by_user_id");
+        let _guard = span.enter();
+
         query_as!(
             Site,
             "SELECT * FROM sites WHERE team_id IN (SELECT team_id FROM user_teams WHERE user_id = $1) OR team_id IN (SELECT team_id FROM teams WHERE owner_id = $1)",
@@ -78,9 +94,8 @@ impl Site {
         db: &Database,
         site_id: impl AsRef<str>,
     ) -> Result<Vec<Deployment>, sqlx::Error> {
-        // let span = global::tracer("edgeserver").start("get_deployments");
-        // let span = info_span!("get_deployments");
-        // let _guard = span.enter();
+        let span = info_span!("Site::get_deployments");
+        let _guard = span.enter();
 
         query_as!(
             Deployment,
@@ -91,7 +106,14 @@ impl Site {
         .await
     }
 
-    pub async fn update_team(db: &Database, site_id: impl AsRef<str>, team_id: impl AsRef<str>) -> Result<(), sqlx::Error> {
+    pub async fn update_team(
+        db: &Database,
+        site_id: impl AsRef<str>,
+        team_id: impl AsRef<str>,
+    ) -> Result<(), sqlx::Error> {
+        let span = info_span!("Site::update_team");
+        let _guard = span.enter();
+
         query!(
             "UPDATE sites SET team_id = $1 WHERE site_id = $2",
             team_id.as_ref(),
