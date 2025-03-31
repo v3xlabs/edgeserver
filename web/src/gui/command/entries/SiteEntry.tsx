@@ -3,10 +3,22 @@ import { Command } from 'cmdk';
 import { FC } from 'react';
 import { FiGlobe } from 'react-icons/fi';
 
-import { useSite, useTeam, useTeams, useTeamSites } from '@/api';
+import {
+    useDeploymentPreviews,
+    useSite,
+    useSiteDeployments,
+    useTeam,
+    useTeams,
+    useTeamSites,
+} from '@/api';
 
 export const SiteEntry: FC<{ site_id: string }> = ({ site_id }) => {
     const { data: site } = useSite(site_id);
+    const { data: deployments } = useSiteDeployments(site_id);
+    const { data: previews } = useDeploymentPreviews(
+        site_id,
+        deployments?.[0]?.deployment_id ?? ''
+    );
     const navigate = useNavigate();
 
     if (!site) return <></>;
@@ -24,7 +36,18 @@ export const SiteEntry: FC<{ site_id: string }> = ({ site_id }) => {
                 });
             }}
         >
-            <div>{site.name}</div>
+            <div className="flex items-center gap-2">
+                {previews && previews.length > 0 && previews[0].favicon_path ? (
+                    <img
+                        src={previews[0].favicon_path}
+                        alt="Favicon"
+                        className="size-4 rounded-sm"
+                    />
+                ) : (
+                    <FiGlobe className="text-sm" />
+                )}
+                <div>{site.name}</div>
+            </div>
             <div className="text-muted flex items-center gap-1">
                 <FiGlobe className="text-sm" />
                 <span>site</span>
