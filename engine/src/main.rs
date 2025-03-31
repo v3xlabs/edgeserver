@@ -18,12 +18,14 @@ pub mod state;
 pub mod storage;
 pub mod utils;
 pub mod rabbit;
+pub mod sqlxshim;
 
 use tracing_subscriber::{prelude::*, EnvFilter};
 
 #[async_std::main]
 async fn main() {
     dotenvy::dotenv().ok();
+    // tracing_log::LogTracer::init().expect("Failed to initialize logger");
 
     // let exporter = opentelemetry_otlp::SpanExporter::builder()
     //     .with_http()
@@ -66,11 +68,13 @@ async fn main() {
             .with_tracked_inactivity(true);
 
         let fmt_layer = tracing_subscriber::fmt::layer();
+        let filter = tracing_subscriber::EnvFilter::from_default_env()
+            .add_directive("sqlx=trace".parse().unwrap());
         tracing_subscriber::registry()
             .with(fmt_layer)
+            .with(sqlxshim::SqlxEventToSpanLayer)
             .with(telemetry_layer)
-            .with(EnvFilter::from_default_env())
-            // .with(EnvFilter::new("sqlx=trace"))
+            .with(filter)
             .init();
         // tracing_subscriber::fmt::init();
 

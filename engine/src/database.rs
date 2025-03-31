@@ -14,6 +14,7 @@ impl Database {
     pub async fn new(url: &str) -> Result<Self, sqlx::Error> {
         let mut opts: PgConnectOptions = url.parse()?;
         let mut opts = opts.log_statements(log::LevelFilter::Trace);
+        // let mut opts = opts.log_statements(tracing::LevelFilter::TRACE);
         let pool = PgPoolOptions::new()
             .max_connections(5)
             .connect_with(opts)

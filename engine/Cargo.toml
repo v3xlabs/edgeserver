@@ -4,7 +4,7 @@ version = "0.0.1"
 edition = "2021"
 
 [dependencies]
-sqlx = { version = "0", features = [
+sqlx = { git = "https://github.com/launchbadge/sqlx.git", features = [
     "runtime-async-std",
     "tls-rustls",
     "postgres",
@@ -78,3 +78,4 @@ regex = "1.11.1"
 figment = { version = "0.10.19", features = ["env", "json"] }
 lapin = "2.5.1"
 log = "0.4.27"
+tracing-log = "0.2.0"
