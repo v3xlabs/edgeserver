@@ -55,7 +55,7 @@ const InviteListItem: FC<{ invite: Invite }> = ({ invite }) => {
                 {invite.user_id ? (
                     <UserPreview variant="inline" user_id={invite.user_id} />
                 ) : (
-                    <span className="text-muted-foreground">
+                    <span className="pl-2 text-muted-foreground">
                         Anonymous Invite Link
                     </span>
                 )}
