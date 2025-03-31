@@ -137,7 +137,7 @@ export const DeploymentPreview: FC<{
                         <span>{githubContext.data.commit.author.name}</span>
                         <img
                             src={`https://github.com/${githubContext.data.commit.author.username}.png`}
-                            className="size-6 rounded-full"
+                            className="size-6 rounded-sm"
                             alt={githubContext.data.commit.author.name}
                         />
                     </Link>
@@ -186,11 +186,11 @@ export const DeploymentPreview: FC<{
             <div className="w-full py-2 md:w-fit md:grow">
                 <div className="flex w-fit items-center gap-2">
                     {previews && previews.length > 0 && (
-                        <div className="size-6 overflow-hidden rounded-full">
+                        <div className="flex size-6 items-center justify-center overflow-hidden">
                             <img
                                 alt="Deployment Preview"
                                 src={previews[0].favicon_path}
-                                className="size-full object-cover"
+                                className="object-fit size-full"
                             />
                         </div>
                     )}

@@ -52,11 +52,11 @@ export const SitePreview: FC<{
                     {previews &&
                     previews.length > 0 &&
                     previews[0].favicon_path ? (
-                        <div className="size-6 overflow-hidden rounded-full">
+                        <div className="flex size-6 items-center justify-center overflow-hidden">
                             <img
                                 alt="Deployment Preview"
                                 src={previews[0].favicon_path}
-                                className="size-full object-cover"
+                                className="object-fit size-full"
                             />
                         </div>
                     ) : (

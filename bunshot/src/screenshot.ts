@@ -72,9 +72,11 @@ export async function takeScreenshot(url: string): Promise<ScreenshotResult> {
 
     console.log("Favicon", favicon);
 
-    const faviconUrl = favicon ? favicon.startsWith('/') ? new URL(favicon, url).toString() : favicon : null;
+    const faviconUrl = favicon ? new URL(favicon, url).toString() : null;
 
     console.log("Favicon URL", faviconUrl);
+
+    const faviconFileExtension = faviconUrl ? faviconUrl.split('.').pop() : null;
 
     // fetch favicon to buffer plz
     const faviconBuffer = faviconUrl ? await fetch(faviconUrl).then(res => res.arrayBuffer()).catch(e => {
@@ -90,6 +92,7 @@ export async function takeScreenshot(url: string): Promise<ScreenshotResult> {
       buffer,
       full_screenshot,
       favicon: faviconBufferRaw as any,
+      faviconType: faviconFileExtension ?? undefined,
     };
   } catch (error) {
     console.error(`Error taking screenshot of ${url}:`, error);

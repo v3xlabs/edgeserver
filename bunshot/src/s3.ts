@@ -20,18 +20,34 @@ const s3Client = new S3Client({
   maxAttempts: 3
 });
 
+const mimeFromExtension = (extension: string) => {
+  switch (extension) {
+    case 'png':
+      return 'image/png';
+    case 'webp':
+      return 'image/webp';
+    case 'svg':
+      return 'image/svg+xml';
+    case 'ico':
+      return 'image/x-icon';
+    default:
+      return 'image/webp';
+  }
+}
+
 export async function uploadToS3(
   buffer: Buffer,
   siteId: string,
   deploymentId: string,
   domain: string,
-  suffix?: string
+  suffix?: string,
+  mimeType?: string
 ): Promise<string> {
   try {
     // Generate a clean filename
     const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
     const cleanDomain = domain.replace(/[^a-zA-Z0-9]/g, "-");
-    const key = `${siteId}/${deploymentId}/${cleanDomain}_${timestamp}${suffix ? `_${suffix}` : ''}.webp`;
+    const key = `${siteId}/${deploymentId}/${cleanDomain}_${timestamp}${suffix ? `_${suffix}` : ''}.${mimeType ? mimeType : 'webp'}`;
 
     // Log detailed info for debugging
     console.log(`S3 Upload Info - Bucket: ${config.aws.bucket}, Region: ${config.aws.region}`);
@@ -44,7 +60,7 @@ export async function uploadToS3(
       Bucket: config.aws.bucket,
       Key: key,
       Body: buffer,
-      ContentType: "image/webp",
+      ContentType: mimeType ? mimeFromExtension(mimeType) : "image/webp",
     };
 
     // Upload to S3

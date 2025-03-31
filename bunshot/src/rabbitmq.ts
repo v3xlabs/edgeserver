@@ -204,7 +204,8 @@ async function processScreenshotRequest(
       request.site_id,
       request.deployment_id,
       request.domain,
-      'favicon'
+      'favicon',
+      screenshotResult.faviconType
     ) : null;
 
     // Update response
