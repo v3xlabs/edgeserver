@@ -2,7 +2,9 @@ import { FC, PropsWithChildren, useState } from 'react';
 import { FiLink, FiUserPlus } from 'react-icons/fi';
 import { toast } from 'sonner';
 
+import { useUsers } from '@/api';
 import { useTeamInviteCreate } from '@/api/team';
+import { useTeamMembers } from '@/api/team';
 import { Button } from '@/components/button';
 import {
     ModalClose,
@@ -12,7 +14,7 @@ import {
     ModalTitle,
     ModalTrigger,
 } from '@/components/modal';
-import { UserSelect } from '@/components/select/UserSelect';
+import { FieldSelect } from '@/components/select/FieldSelect';
 
 export const TeamInviteCreateModal: FC<
     PropsWithChildren<{ team_id: string }>
@@ -59,6 +61,7 @@ export const TeamInviteCreateModal: FC<
                     <UserSelect
                         placeholder="Choose an individual"
                         value={userId}
+                        teamId={team_id}
                         onChange={(user) => {
                             setUserId(user);
 
@@ -92,5 +95,39 @@ export const TeamInviteCreateModal: FC<
                 </ModalContent>
             </ModalRoot>
         </>
+    );
+};
+
+const UserSelect: FC<{
+    value: string;
+    teamId: string;
+    placeholder?: string;
+    onChange: (value: string) => boolean;
+}> = ({ value, teamId, placeholder, onChange }) => {
+    const { data: users } = useUsers();
+    const { data: teamMembers } = useTeamMembers(teamId);
+
+    const options = (users || [])
+        .filter((user) => {
+            if (!teamMembers) return true;
+
+            return !teamMembers.some(
+                (member) => member.user_id === user.user_id
+            );
+        })
+        .map((user) => ({
+            label: user.name,
+            value: user.user_id,
+        }));
+
+    return (
+        <FieldSelect
+            options={options}
+            value={value}
+            placeholder={placeholder}
+            onChange={onChange}
+            popoverWidth="420"
+            justifyBetween
+        />
     );
 };
