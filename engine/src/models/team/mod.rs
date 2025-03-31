@@ -1,10 +1,12 @@
 use std::fmt::Debug;
 
 use chrono::{DateTime, Utc};
+use opentelemetry::Context;
 use poem_openapi::Object;
 use serde::{Deserialize, Serialize};
 use sqlx::{query, query_as, query_scalar};
 use tracing::info_span;
+use tracing_opentelemetry::OpenTelemetrySpanExt;
 
 use crate::{
     database::Database,
@@ -33,6 +35,7 @@ impl Team {
         owner_id: impl AsRef<str>,
     ) -> Result<Self, sqlx::Error> {
         let span = info_span!("Team::new");
+        span.set_parent(Context::current());
         let _guard = span.enter();
 
         let team_id = generate_id(IdType::TEAM);
@@ -51,6 +54,7 @@ impl Team {
     #[tracing::instrument(name = "get_by_id", skip(db))]
     pub async fn get_by_id(db: &Database, team_id: impl AsRef<str> + Debug) -> Result<Self, sqlx::Error> {
         let span = info_span!("Team::get_by_id");
+        span.set_parent(Context::current());
         let _guard = span.enter();
 
         query_as!(
@@ -68,6 +72,7 @@ impl Team {
         user_id: impl AsRef<str> + Debug,
     ) -> Result<Vec<Self>, sqlx::Error> {
         let span = info_span!("Team::get_by_user_id");
+        span.set_parent(Context::current());
         let _guard = span.enter();
 
         // query for teams where the user_id is the team owner_id,
@@ -83,6 +88,7 @@ impl Team {
 
     pub async fn delete_by_id(db: &Database, team_id: impl AsRef<str>) -> Result<(), sqlx::Error> {
         let span = info_span!("Team::delete_by_id");
+        span.set_parent(Context::current());
         let _guard = span.enter();
 
         query!("DELETE FROM teams WHERE team_id = $1", team_id.as_ref())
@@ -99,6 +105,7 @@ impl Team {
         user_id: impl AsRef<str> + Debug,
     ) -> Result<bool, sqlx::Error> {
         let span = info_span!("Team::is_owner");
+        span.set_parent(Context::current());
         let _guard = span.enter();
 
         Ok(query_as!(
@@ -138,6 +145,7 @@ impl Team {
         user_id: impl AsRef<str> + Debug,
     ) -> Result<bool, sqlx::Error> {
         let span = info_span!("Team::_is_member");
+        span.set_parent(Context::current());
         let _guard = span.enter();
 
         query_scalar!(
@@ -155,6 +163,7 @@ impl Team {
         team_id: impl AsRef<str> + Debug,
     ) -> Result<Vec<User>, sqlx::Error> {
         let span = info_span!("Team::get_members");
+        span.set_parent(Context::current());
         let _guard = span.enter();
 
         query_as!(
@@ -168,6 +177,7 @@ impl Team {
 
     pub async fn add_member(db: &Database, team_id: impl AsRef<str>, user_id: impl AsRef<str>) -> Result<(), sqlx::Error> {
         let span = info_span!("Team::add_member");
+        span.set_parent(Context::current());
         let _guard = span.enter();
 
         query!("INSERT INTO user_teams (team_id, user_id) VALUES ($1, $2)", team_id.as_ref(), user_id.as_ref())
@@ -179,6 +189,7 @@ impl Team {
 
     pub async fn update_name(db: &Database, team_id: impl AsRef<str>, name: impl AsRef<str>) -> Result<(), sqlx::Error> {
         let span = info_span!("Team::update_name");
+        span.set_parent(Context::current());
         let _guard = span.enter();
 
         query!("UPDATE teams SET name = $2 WHERE team_id = $1", team_id.as_ref(), name.as_ref())
@@ -190,6 +201,7 @@ impl Team {
 
     pub async fn update_avatar(db: &Database, team_id: impl AsRef<str>, avatar_url: impl AsRef<str>) -> Result<Team, sqlx::Error> {
         let span = info_span!("Team::update_avatar");
+        span.set_parent(Context::current());
         let _guard = span.enter();
 
         query_as!(

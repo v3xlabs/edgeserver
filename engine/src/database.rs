@@ -1,9 +1,8 @@
 use sqlx::{
     postgres::{PgConnectOptions, PgPoolOptions},
-    ConnectOptions,
-    PgPool,
+    ConnectOptions, PgPool,
 };
-use tracing::{info, level_filters::LevelFilter};
+use tracing::info;
 
 #[derive(Debug)]
 pub struct Database {

@@ -178,14 +178,21 @@ async function processScreenshotRequest(
     // Take screenshot
     const screenshotResult = await takeScreenshot(request.domain);
 
-    if (!screenshotResult.success || !screenshotResult.buffer) {
-      response.error = screenshotResult.error || "Failed to take screenshot";
+    if (!screenshotResult.success || !screenshotResult.buffer || !screenshotResult.full_screenshot) {
+      response.error = screenshotResult.error || "Failed to take screenshots";
       return response;
     }
 
     // Upload to S3
     const s3Path = await uploadToS3(
       screenshotResult.buffer,
+      request.site_id,
+      request.deployment_id,
+      request.domain
+    );
+
+    const full_s3Path = await uploadToS3(
+      screenshotResult.full_screenshot,
       request.site_id,
       request.deployment_id,
       request.domain
@@ -203,6 +210,7 @@ async function processScreenshotRequest(
         request.site_id,
         request.deployment_id,
         s3Path,
+        full_s3Path,
         'image/webp'
       );
       console.log("Database record created for deployment preview");
@@ -210,7 +218,7 @@ async function processScreenshotRequest(
       console.error("Failed to save to database, but screenshot was successful:", dbError);
       // We still consider the operation a success since the screenshot and upload worked
     }
-    
+
     return response;
   } catch (error) {
     console.error("Error processing screenshot request:", error);

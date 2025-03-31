@@ -1,9 +1,11 @@
 use chrono::{DateTime, Utc};
+use opentelemetry::Context;
 use poem_openapi::{types::{multipart::Upload, Example}, Object};
 use serde::{Deserialize, Serialize};
 use sqlx::{query, query_as};
 use async_zip::base::read::mem::ZipFileReader;
 use tracing::{info, info_span};
+use tracing_opentelemetry::OpenTelemetrySpanExt;
 
 use crate::{
     assets::AssetFile, database::Database, state::State, utils::id::{generate_id, IdType}
@@ -55,6 +57,7 @@ impl Deployment {
         context: Option<String>,
     ) -> Result<Self, sqlx::Error> {
         let span = info_span!("Deployment::new");
+        span.set_parent(Context::current());
         let _guard = span.enter();
 
         let deployment_id: String = generate_id(IdType::DEPLOYMENT);
@@ -83,6 +86,7 @@ impl Deployment {
     #[tracing::instrument(name = "upload_files", skip(self, state, file))]
     pub async fn upload_files(&self, state: &State, file: Upload) -> Result<(), sqlx::Error> {
         let span = info_span!("Deployment::upload_files");
+        span.set_parent(Context::current());
         let _guard = span.enter();
 
         let file_stream = file.into_vec().await.unwrap();
@@ -156,6 +160,7 @@ impl Deployment {
         cutoff_date: DateTime<Utc>,
     ) -> Result<Vec<File>, sqlx::Error> {
         let span = info_span!("Deployment::cleanup_old_files");
+        span.set_parent(Context::current());
         let _guard = span.enter();
 
         tracing::info!("Checking for unused files before: {:?}", cutoff_date);
@@ -201,6 +206,7 @@ impl Deployment {
 
     pub async fn get_by_id(db: &Database, deployment_id: &str) -> Result<Self, sqlx::Error> {
         let span = info_span!("Deployment::get_by_id");
+        span.set_parent(Context::current());
         let _guard = span.enter();
 
         query_as!(
@@ -240,6 +246,7 @@ impl DeploymentFile {
         deployment_id: &str,
     ) -> Result<Vec<DeploymentFileEntry>, sqlx::Error> {
         let span = info_span!("DeploymentFile::get_deployment_files");
+        span.set_parent(Context::current());
         let _guard = span.enter();
 
         query_as!(

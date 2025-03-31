@@ -55,16 +55,27 @@ function RouteComponent() {
                 </DropdownMenu>
             }
         >
-            <div className="card">
-                <div className="aspect-video w-full max-w-sm overflow-hidden rounded-md bg-gray-100">
+            <div className="card flex gap-4">
+                <div className="aspect-video h-fit w-full max-w-sm overflow-hidden rounded-md bg-gray-100">
                     {previews && previews.length > 0 && (
                         <img
-                            src={previews[0].file_path}
                             alt="Deployment Preview"
+                            src={previews[0].preview_path}
                             className="size-full object-cover"
                         />
                     )}
                 </div>
+                {previews &&
+                    previews.length > 0 &&
+                    previews[0].full_preview_path && (
+                        <div className="w-full max-w-sm overflow-hidden rounded-md bg-gray-100">
+                            <img
+                                alt="Deployment Preview"
+                                src={previews[0].full_preview_path}
+                                className="size-full object-cover"
+                            />
+                        </div>
+                    )}
             </div>
             {deployment?.context && (
                 <DeploymentContext context={deployment.context} />

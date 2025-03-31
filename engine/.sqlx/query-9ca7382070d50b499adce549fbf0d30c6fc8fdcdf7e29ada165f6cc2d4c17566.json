@@ -15,7 +15,7 @@
       },
       {
         "ordinal": 2,
-        "name": "file_path",
+        "name": "preview_path",
         "type_info": "Text"
       },
       {
@@ -27,6 +27,11 @@
         "ordinal": 4,
         "name": "created_at",
         "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 5,
+        "name": "full_preview_path",
+        "type_info": "Text"
       }
     ],
     "parameters": {
@@ -40,7 +45,8 @@
       false,
       false,
       false,
-      false
+      false,
+      true
     ]
   },
   "hash": "9ca7382070d50b499adce549fbf0d30c6fc8fdcdf7e29ada165f6cc2d4c17566"

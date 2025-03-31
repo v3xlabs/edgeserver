@@ -67,16 +67,17 @@ async fn main() {
             .with_error_fields_to_exceptions(true)
             .with_tracked_inactivity(true);
 
-        let fmt_layer = tracing_subscriber::fmt::layer();
+        let fmt_layer = tracing_subscriber::fmt::layer().with_span_events(tracing_subscriber::fmt::format::FmtSpan::CLOSE);
+        
         let filter = tracing_subscriber::EnvFilter::from_default_env()
-            .add_directive("sqlx=trace".parse().unwrap());
+            .add_directive("poem=info".parse().unwrap())
+            .add_directive("edgeserver=debug".parse().unwrap());
+            
         tracing_subscriber::registry()
-            .with(fmt_layer)
-            // .with(sqlxshim::SqlxEventToSpanLayer)
-            .with(telemetry_layer)
             .with(filter)
+            .with(fmt_layer)
+            .with(telemetry_layer)
             .init();
-        // tracing_subscriber::fmt::init();
 
     } else {
         info!("Starting Edgerouter without OTLP tracing, provide OTLP_ENDPOINT to enable tracing");

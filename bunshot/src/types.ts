@@ -21,6 +21,7 @@ export interface ScreenshotResponse {
 export interface ScreenshotResult {
   success: boolean;
   buffer?: Buffer;
+  full_screenshot?: Buffer;
   error?: string;
 }
 

@@ -1,13 +1,14 @@
 use std::fmt::Debug;
 
-use opentelemetry::{global, trace::Tracer, Context};
+use opentelemetry::{global, trace::{Tracer, FutureExt}, Context};
 use poem::{web::Data, FromRequest, Request, RequestBody, Result};
 use poem_openapi::{
     registry::{MetaSecurityScheme, Registry},
     ApiExtractor, ApiExtractorType, ExtractParamOptions,
 };
-use tracing::{info, info_span, Level};
+use tracing::{info, info_span, Level, Instrument};
 use tracing_opentelemetry::OpenTelemetrySpanExt;
+use uuid;
 
 use crate::{
     models::{session::Session, team::Team},
@@ -37,85 +38,70 @@ impl<'a> ApiExtractor<'a> for UserAuth {
         body: &mut RequestBody,
         _param_opts: ExtractParamOptions<Self::ParamType>,
     ) -> Result<Self> {
-        // let span = global::tracer("edgeserver").start("auth");
-        let span = info_span!("auth");
-        // span.set_parent(Context::current());
+        // Get current OpenTelemetry context to propagate
+        let parent_cx = Context::current();
+        
+        // Create auth span with proper parent context
+        let auth_span = info_span!("auth");
+        auth_span.set_parent(parent_cx);
+        
+        // Run the authentication logic within the auth span
+        let auth_result = async move {
+            let state = <Data<&State> as FromRequest>::from_request(req, body).await?;
+            let state = state.0;
 
-        let state = <Data<&State> as FromRequest>::from_request(req, body).await?;
-        let state = state.0;
+            // extract cookies from request
+            let _cookies = req.headers().get("Cookie").and_then(|x| x.to_str().ok());
 
-        // extract cookies from request
-        let _cookies = req.headers().get("Cookie").and_then(|x| x.to_str().ok());
+            // Extract token from header
+            let token = req
+                .headers()
+                .get("Authorization")
+                .and_then(|x| x.to_str().ok())
+                .map(|x| x.replace("Bearer ", ""));
 
-        // Extract token from header
-        let token = req
-            .headers()
-            .get("Authorization")
-            .and_then(|x| x.to_str().ok())
-            .map(|x| x.replace("Bearer ", ""));
+            // Token could either be a session token or a pat token
+            if token.is_none() {
+                return Ok(UserAuth::None(state.clone()));
+            }
 
-        // Token could either be a session token or a pat token
-        if token.is_none() {
-            return Ok(UserAuth::None(state.clone()));
+            let token = token.unwrap();
+
+            let cache_key = format!("session:{}", token);
+
+            let is_user = state
+                .cache
+                .raw
+                .get_with(cache_key, async {
+                    // Use tracing events instead of spans to avoid Send issues
+                    info!("Cache miss for session: {}", token);
+                    
+                    // Hash the token
+                    let hash = hash_session(&token);
+
+                    // Check if active session exists with token
+                    let session = Session::try_access(&state.database, &hash)
+                        .await
+                        .unwrap()
+                        .ok_or(HttpError::Unauthorized)
+                        .unwrap();
+
+                    serde_json::to_value(session).unwrap()
+                })
+                .await;
+
+            let session: Option<Session> = serde_json::from_value(is_user).ok();
+
+            if let Some(session) = session {
+                return Ok(UserAuth::User(session, state.clone()));
+            }
+
+            Err(HttpError::Unauthorized.into())
         }
+        .instrument(auth_span)
+        .await;
 
-        let token = token.unwrap();
-
-        let cache_key = format!("session:{}", token);
-
-        let is_user = state
-            .cache
-            .raw
-            .get_with(cache_key, async {
-                info!("Cache miss for session: {}", token);
-                // Hash the token
-                let hash = hash_session(&token);
-
-                // Check if active session exists with token
-                let session = Session::try_access(&state.database, &hash)
-                    .await
-                    .unwrap()
-                    .ok_or(HttpError::Unauthorized)
-                    .unwrap();
-
-                serde_json::to_value(session).unwrap()
-                // Ok(UserAuth::User(session, state.clone())) as Result<UserAuth>
-            })
-            .await;
-
-        let session: Option<Session> = serde_json::from_value(is_user).ok();
-
-        if let Some(session) = session {
-            return Ok(UserAuth::User(session, state.clone()));
-        }
-
-        // let is_pat = async {
-        //     let pat = UserApiKey::get_by_token(&state.database, &token)
-        //         .await
-        //         .unwrap();
-
-        //     if pat.is_none() {
-        //         return Ok(AuthUser::None(state.clone())) as Result<AuthUser>;
-        //     }
-
-        //     Ok(AuthUser::Pat(pat.unwrap(), state.clone())) as Result<AuthUser>
-        // };
-
-        // let (user, pat) = futures::join! { is_user, is_pat };
-
-        // if let Ok(zuser) = user {
-        //     if zuser.user_id().is_some() {
-        //         return Ok(zuser);
-        //     }
-        // }
-
-        // if let Ok(zpat) = pat {
-        //     if zpat.user_id().is_some() {
-        //         return Ok(zpat);
-        //     }
-        // }
-
-        Err(HttpError::Unauthorized.into())
+        auth_result
     }
 
     fn register(registry: &mut Registry) {
@@ -160,43 +146,64 @@ impl UserAuth {
         }
     }
 
-    #[tracing::instrument(name = "required_member_of")]
     pub async fn required_member_of(
         &self,
         team_id: impl AsRef<str> + Debug,
     ) -> Result<(), HttpError> {
-        match self {
-            UserAuth::User(session, state) => {
-                if !Team::is_member(&state, &team_id, &session.user_id)
-                    .await
-                    .map_err(HttpError::from)?
-                {
-                    return Err(HttpError::Forbidden);
-                }
+        // Get current OpenTelemetry context to propagate
+        let parent_cx = Context::current();
+        
+        // Create span with proper parent context
+        let member_span = info_span!("required_member_of", team_id = ?team_id);
+        member_span.set_parent(parent_cx);
 
-                Ok(())
+        // Each request should have its own context path
+        async move {
+            match self {
+                UserAuth::User(session, state) => {
+                    if !Team::is_member(&state, &team_id, &session.user_id)
+                        .await
+                        .map_err(HttpError::from)?
+                    {
+                        return Err(HttpError::Forbidden);
+                    }
+
+                    Ok(())
+                }
+                UserAuth::None(_) => Err(HttpError::Unauthorized),
             }
-            UserAuth::None(_) => Err(HttpError::Unauthorized),
         }
+        .instrument(member_span)
+        .await
     }
 
-    #[tracing::instrument(name = "verify_access_to")]
     pub async fn verify_access_to(
         &self,
         resource: &impl AccessibleResource,
     ) -> Result<(), HttpError> {
-        match self {
-            UserAuth::User(session, state) => match resource
-                .has_access_to(state, &session.user_id)
-                .await
-                .map_err(HttpError::from)
-            {
-                Ok(true) => Ok(()),
-                Ok(false) => Err(HttpError::Forbidden),
-                Err(e) => Err(e),
-            },
-            UserAuth::None(_) => Err(HttpError::Unauthorized),
+        // Get current OpenTelemetry context to propagate
+        
+        // Create span with proper parent context
+        let access_span = info_span!("verify_access_to", resource = ?resource);
+        access_span.set_parent(Context::current());
+        
+        // Each request should have its own context path
+        async move {
+            match self {
+                UserAuth::User(session, state) => match resource
+                    .has_access_to(state, &session.user_id)
+                    .await
+                    .map_err(HttpError::from)
+                {
+                    Ok(true) => Ok(()),
+                    Ok(false) => Err(HttpError::Forbidden),
+                    Err(e) => Err(e),
+                },
+                UserAuth::None(_) => Err(HttpError::Unauthorized),
+            }
         }
+        .instrument(access_span)
+        .await
     }
 }
 

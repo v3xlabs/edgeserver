@@ -41,7 +41,8 @@ export const SitePreview: FC<{
             {previews && previews.length > 0 && (
                 <div className="bg-secondary aspect-video h-full min-h-24 overflow-hidden rounded-md border drop-shadow-sm md:max-h-48">
                     <img
-                        src={previews[0].file_path}
+                        alt="Deployment Preview"
+                        src={previews[0].preview_path}
                         className="size-full object-cover"
                     />
                 </div>

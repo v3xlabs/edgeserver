@@ -27,6 +27,7 @@ export async function insertDeploymentPreview(
   siteId: string,
   deploymentId: string,
   filePath: string,
+  fullPreviewPath: string,
   mimeType: string = 'image/webp'
 ): Promise<DeploymentPreview> {
   try {
@@ -34,11 +35,11 @@ export async function insertDeploymentPreview(
     
     // Check if the record already exists
     const checkResult = await client.query(
-      'SELECT * FROM deployment_previews WHERE site_id = $1 AND deployment_id = $2 AND file_path = $3',
+      'SELECT * FROM deployment_previews WHERE site_id = $1 AND deployment_id = $2 AND preview_path = $3',
       [siteId, deploymentId, filePath]
     );
     
-    if (checkResult.rowCount > 0) {
+    if (checkResult.rowCount && checkResult.rowCount > 0) {
       console.log('Deployment preview already exists, skipping insert');
       client.release();
       return checkResult.rows[0] as DeploymentPreview;
@@ -46,8 +47,8 @@ export async function insertDeploymentPreview(
     
     // Insert the new record
     const result = await client.query(
-      'INSERT INTO deployment_previews (site_id, deployment_id, file_path, mime_type) VALUES ($1, $2, $3, $4) RETURNING *',
-      [siteId, deploymentId, filePath, mimeType]
+      'INSERT INTO deployment_previews (site_id, deployment_id, preview_path, full_preview_path, mime_type) VALUES ($1, $2, $3, $4, $5) RETURNING *',
+      [siteId, deploymentId, filePath, fullPreviewPath, mimeType]
     );
     
     client.release();
