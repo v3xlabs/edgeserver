@@ -67,13 +67,17 @@ async fn main() {
             .with_error_fields_to_exceptions(true)
             .with_tracked_inactivity(true);
 
+        // Temporarily disable fmt_layer
+        // let fmt_layer = tracing_subscriber::fmt::layer();
         let fmt_layer = tracing_subscriber::fmt::layer();
-        let filter = tracing_subscriber::EnvFilter::from_default_env()
-            .add_directive("sqlx=trace".parse().unwrap());
+        let filter = tracing_subscriber::EnvFilter::from_default_env();
+        // Temporarily disable sqlx directive
+        // .add_directive("sqlx=trace".parse().unwrap());
         tracing_subscriber::registry()
-            .with(fmt_layer)
+            // .with(fmt_layer)
             // .with(sqlxshim::SqlxEventToSpanLayer)
             .with(telemetry_layer)
+            .with(fmt_layer)
             .with(filter)
             .init();
         // tracing_subscriber::fmt::init();

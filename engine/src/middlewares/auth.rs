@@ -32,13 +32,13 @@ impl<'a> ApiExtractor<'a> for UserAuth {
     type ParamType = ();
     type ParamRawType = ();
 
+    #[tracing::instrument(name = "auth", skip(req, body, _param_opts), fields(otel.kind = "server"))]
     async fn from_request(
         req: &'a Request,
         body: &mut RequestBody,
         _param_opts: ExtractParamOptions<Self::ParamType>,
     ) -> Result<Self> {
         // let span = global::tracer("edgeserver").start("auth");
-        let span = info_span!("auth");
         // span.set_parent(Context::current());
 
         let state = <Data<&State> as FromRequest>::from_request(req, body).await?;
@@ -67,7 +67,9 @@ impl<'a> ApiExtractor<'a> for UserAuth {
             .cache
             .raw
             .get_with(cache_key, async {
+                // Use tracing events instead of spans to avoid Send issues
                 info!("Cache miss for session: {}", token);
+                
                 // Hash the token
                 let hash = hash_session(&token);
 
@@ -79,7 +81,6 @@ impl<'a> ApiExtractor<'a> for UserAuth {
                     .unwrap();
 
                 serde_json::to_value(session).unwrap()
-                // Ok(UserAuth::User(session, state.clone())) as Result<UserAuth>
             })
             .await;
 
