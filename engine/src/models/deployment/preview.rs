@@ -1,8 +1,10 @@
 use chrono::{DateTime, Utc};
+use opentelemetry::Context;
 use serde::{Deserialize, Serialize};
 use poem_openapi::Object;
 use sqlx::FromRow;
 use tracing::{info, info_span};
+use tracing_opentelemetry::OpenTelemetrySpanExt;
 
 use crate::{database::Database, state::State};
 #[derive(Debug, Serialize, Deserialize, Object, FromRow)]
@@ -17,6 +19,7 @@ pub struct DeploymentPreview {
 impl DeploymentPreview {
     pub async fn get_by_deployment_id(db: &Database, site_id: &str, deployment_id: &str) -> Result<Vec<Self>, sqlx::Error> {
         let span = info_span!("DeploymentPreview::get_by_deployment_id");
+        span.set_parent(Context::current());
         let _guard = span.enter();
 
         let rows = sqlx::query_as!(
@@ -33,6 +36,7 @@ impl DeploymentPreview {
 
     pub async fn get_by_deployment_id_public(state: &State, site_id: &str, deployment_id: &str) -> Result<Vec<Self>, sqlx::Error> {
         let span = info_span!("DeploymentPreview::get_by_deployment_id_public");
+        span.set_parent(Context::current());
         let _guard = span.enter();
 
         let mut rows = DeploymentPreview::get_by_deployment_id(&state.database, site_id, deployment_id).await?;

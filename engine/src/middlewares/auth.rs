@@ -182,11 +182,10 @@ impl UserAuth {
         resource: &impl AccessibleResource,
     ) -> Result<(), HttpError> {
         // Get current OpenTelemetry context to propagate
-        let parent_cx = Context::current();
         
         // Create span with proper parent context
         let access_span = info_span!("verify_access_to", resource = ?resource);
-        access_span.set_parent(parent_cx);
+        access_span.set_parent(Context::current());
         
         // Each request should have its own context path
         async move {
