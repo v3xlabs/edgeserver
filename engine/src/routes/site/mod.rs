@@ -65,7 +65,7 @@ impl SiteApi {
     pub async fn get_sites(&self, user: UserAuth, state: Data<&State>) -> Result<Json<Vec<Site>>> {
         info!("Getting sites for user: {:?}", user);
 
-        let user = user.required()?;
+        let user = user.required_session()?;
 
         Site::get_by_user_id(&state.database, &user.user_id)
             .await
@@ -86,7 +86,7 @@ impl SiteApi {
     ) -> Result<Json<Site>> {
         info!("Creating site for user: {:?}", user);
 
-        let user = user.required()?;
+        let user = user.required_session()?;
 
         if !Team::is_owner(&state.database, &payload.team_id, &user.user_id)
             .await
@@ -167,7 +167,7 @@ impl SiteApi {
     ) -> Result<Json<Site>> {
         user.verify_access_to(&SiteId(&site_id.0)).await?;
 
-        let user_ = user.required()?;
+        let user_ = user.required_session()?;
 
         let site = Site::get_by_id(&state.database, &site_id.0)
             .await

@@ -693,6 +693,7 @@ export type paths = {
             path?: never;
             cookie?: never;
         };
+        /** Get the current user */
         get: {
             parameters: {
                 query?: never;
@@ -727,6 +728,7 @@ export type paths = {
             path?: never;
             cookie?: never;
         };
+        /** Get all users */
         get: {
             parameters: {
                 query?: never;
@@ -761,6 +763,7 @@ export type paths = {
             path?: never;
             cookie?: never;
         };
+        /** Get a user by id */
         get: {
             parameters: {
                 query?: never;
@@ -915,6 +918,7 @@ export type paths = {
             };
         };
         put?: never;
+        /** Create a team */
         post: {
             parameters: {
                 query?: never;
@@ -951,6 +955,7 @@ export type paths = {
             path?: never;
             cookie?: never;
         };
+        /** Get a team */
         get: {
             parameters: {
                 query?: never;
@@ -972,6 +977,10 @@ export type paths = {
                 };
             };
         };
+        /**
+         * Update a team
+         * @description Updates a team with the given name
+         */
         put: {
             parameters: {
                 query?: never;
@@ -994,6 +1003,10 @@ export type paths = {
             };
         };
         post?: never;
+        /**
+         * Delete a team
+         * @description Deletes a team
+         */
         delete: {
             parameters: {
                 query?: never;
@@ -1025,6 +1038,10 @@ export type paths = {
             path?: never;
             cookie?: never;
         };
+        /**
+         * Get team invites
+         * @description Gets a list of all the invites for a team
+         */
         get: {
             parameters: {
                 query?: never;
@@ -1047,6 +1064,7 @@ export type paths = {
             };
         };
         put?: never;
+        /** Invite a user to a team */
         post: {
             parameters: {
                 query?: never;
@@ -1088,6 +1106,7 @@ export type paths = {
         get?: never;
         put?: never;
         post?: never;
+        /** Delete a team invite */
         delete: {
             parameters: {
                 query?: never;
@@ -1120,6 +1139,10 @@ export type paths = {
             path?: never;
             cookie?: never;
         };
+        /**
+         * Get team sites
+         * @description Gets a list of all the sites for a team
+         */
         get: {
             parameters: {
                 query?: never;
@@ -1156,6 +1179,10 @@ export type paths = {
             path?: never;
             cookie?: never;
         };
+        /**
+         * Get team members
+         * @description Gets a list of all the members for a team
+         */
         get: {
             parameters: {
                 query?: never;
@@ -1194,6 +1221,10 @@ export type paths = {
         };
         get?: never;
         put?: never;
+        /**
+         * Upload a team avatar
+         * @description Uploads an avatar for a team
+         */
         post: {
             parameters: {
                 query?: never;
@@ -1492,7 +1523,7 @@ export type components = {
          * Deployment
          * @example {
          *       "context": "test",
-         *       "created_at": "2025-04-01T04:15:41.082945660+00:00",
+         *       "created_at": "2025-04-01T04:48:03.869905980+00:00",
          *       "deployment_id": "d_1234567890",
          *       "site_id": "s_1234567890"
          *     }
@@ -1559,13 +1590,13 @@ export type components = {
         /**
          * Key
          * @example {
-         *       "created_at": "2025-04-01T04:15:41.083013700+00:00",
+         *       "created_at": "2025-04-01T04:48:03.869973300+00:00",
          *       "created_by": "u_1234567890",
-         *       "expires_at": "2025-05-01T04:15:41.083013830+00:00",
+         *       "expires_at": "2025-05-01T04:48:03.869973470+00:00",
          *       "key_id": "k_site_12345678901234567890",
          *       "key_resource": "s_1234567890",
          *       "key_type": "site",
-         *       "last_used": "2025-04-01T04:15:41.083013760+00:00",
+         *       "last_used": "2025-04-01T04:48:03.869973410+00:00",
          *       "permissions": "TBD",
          *       "vanity": "4567890"
          *     }

@@ -94,7 +94,7 @@ impl InviteApi {
     ) -> Result<PlainText<String>> {
         info!("Accepting invite: {:?}", invite_id.0);
 
-        let user = user.required()?;
+        let user = user.required_session()?;
 
         let invite = UserTeamInvite::get_by_invite_id(&state.database, &invite_id.0)
             .await

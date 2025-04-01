@@ -52,7 +52,10 @@ impl Team {
     }
 
     #[tracing::instrument(name = "get_by_id", skip(db))]
-    pub async fn get_by_id(db: &Database, team_id: impl AsRef<str> + Debug) -> Result<Self, sqlx::Error> {
+    pub async fn get_by_id(
+        db: &Database,
+        team_id: impl AsRef<str> + Debug,
+    ) -> Result<Self, sqlx::Error> {
         let span = info_span!("Team::get_by_id");
         span.set_parent(Context::current());
         let _guard = span.enter();
@@ -127,11 +130,18 @@ impl Team {
     ) -> Result<bool, sqlx::Error> {
         let cache_key = format!("team:{}:member:{}", team_id.as_ref(), user_id.as_ref());
 
-        let is_member = state.cache.raw.get_with(cache_key.clone(), async {
-            let member = Team::_is_member(state.clone(), team_id, user_id).await.ok().unwrap_or(false);
+        let is_member = state
+            .cache
+            .raw
+            .get_with(cache_key.clone(), async {
+                let member = Team::_is_member(state.clone(), team_id, user_id)
+                    .await
+                    .ok()
+                    .unwrap_or(false);
 
-            serde_json::Value::from(member)
-        }).await;
+                serde_json::Value::from(member)
+            })
+            .await;
 
         let is_member: bool = serde_json::from_value(is_member).unwrap_or(false);
 
@@ -175,31 +185,51 @@ impl Team {
         .await
     }
 
-    pub async fn add_member(db: &Database, team_id: impl AsRef<str>, user_id: impl AsRef<str>) -> Result<(), sqlx::Error> {
+    pub async fn add_member(
+        db: &Database,
+        team_id: impl AsRef<str>,
+        user_id: impl AsRef<str>,
+    ) -> Result<(), sqlx::Error> {
         let span = info_span!("Team::add_member");
         span.set_parent(Context::current());
         let _guard = span.enter();
 
-        query!("INSERT INTO user_teams (team_id, user_id) VALUES ($1, $2)", team_id.as_ref(), user_id.as_ref())
-            .execute(&db.pool)
-            .await?;
+        query!(
+            "INSERT INTO user_teams (team_id, user_id) VALUES ($1, $2)",
+            team_id.as_ref(),
+            user_id.as_ref()
+        )
+        .execute(&db.pool)
+        .await?;
 
         Ok(())
     }
 
-    pub async fn update_name(db: &Database, team_id: impl AsRef<str>, name: impl AsRef<str>) -> Result<(), sqlx::Error> {
+    pub async fn update_name(
+        db: &Database,
+        team_id: impl AsRef<str>,
+        name: impl AsRef<str>,
+    ) -> Result<(), sqlx::Error> {
         let span = info_span!("Team::update_name");
         span.set_parent(Context::current());
         let _guard = span.enter();
 
-        query!("UPDATE teams SET name = $2 WHERE team_id = $1", team_id.as_ref(), name.as_ref())
-            .execute(&db.pool)
-            .await?;
+        query!(
+            "UPDATE teams SET name = $2 WHERE team_id = $1",
+            team_id.as_ref(),
+            name.as_ref()
+        )
+        .execute(&db.pool)
+        .await?;
 
         Ok(())
     }
 
-    pub async fn update_avatar(db: &Database, team_id: impl AsRef<str>, avatar_url: impl AsRef<str>) -> Result<Team, sqlx::Error> {
+    pub async fn update_avatar(
+        db: &Database,
+        team_id: impl AsRef<str>,
+        avatar_url: impl AsRef<str>,
+    ) -> Result<Team, sqlx::Error> {
         let span = info_span!("Team::update_avatar");
         span.set_parent(Context::current());
         let _guard = span.enter();
@@ -219,11 +249,26 @@ impl Team {
 pub struct TeamId<'a>(pub &'a str);
 
 impl<'a> AccessibleResource for TeamId<'a> {
-    async fn has_access_to(&self, state: &State, user_id: &str) -> Result<bool, HttpError> {
-        let x = Team::is_member(&state, self.0, user_id)
-            .await
-            .map_err(HttpError::from)?;
+    async fn has_access(
+        &self,
+        state: &State,
+        resource: &str,
+        resource_id: &str,
+    ) -> Result<bool, HttpError> {
+        if resource == "user" {
+            let x = Team::is_member(&state, self.0, resource_id)
+                .await
+                .map_err(HttpError::from)?;
 
-        Ok(x)
+            Ok(x)
+        } else if resource == "team" {
+            if self.0 == resource_id {
+                Ok(true)
+            } else {
+                Ok(false)
+            }
+        } else {
+            Ok(false)
+        }
     }
 }

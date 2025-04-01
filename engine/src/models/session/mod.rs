@@ -140,7 +140,7 @@ impl Session {
         resource: &impl AccessibleResource,
     ) -> Result<(), HttpError> {
         resource
-            .has_access_to(state, &self.user_id)
+            .has_access(state, "user", &self.user_id)
             .await
             .map_err(HttpError::from)?;
         Ok(())

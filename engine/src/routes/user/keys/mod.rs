@@ -27,7 +27,7 @@ impl UserKeysApi {
         user: UserAuth,
         state: Data<&State>,
     ) -> Result<Json<Vec<Key>>> {
-        let user = user.required()?;
+        let user = user.required_session()?;
 
         let keys = Key::get_for_resource(&state.database, "user", &user.user_id)
             .await
@@ -44,7 +44,7 @@ impl UserKeysApi {
         payload: Json<CreateUserKeyRequest>,
         state: Data<&State>,
     ) -> Result<Json<NewKey>> {
-        let user = user.required()?;
+        let user = user.required_session()?;
 
         let key = Key::new(
             &state.database,
@@ -70,7 +70,7 @@ impl UserKeysApi {
         #[oai(name = "key_id", style = "simple")] key_id: Path<String>,
         state: Data<&State>,
     ) -> Result<Json<serde_json::Value>> {
-        let user = user.required()?;
+        let user = user.required_session()?;
 
         let key = Key::get_by_id(&state.database, key_id.as_ref())
             .await

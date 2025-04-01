@@ -10,7 +10,7 @@ use tracing::{info, info_span, Instrument};
 use tracing_opentelemetry::OpenTelemetrySpanExt;
 
 use crate::{
-    models::{session::Session, team::Team},
+    models::{keys::Key, session::Session, team::Team},
     routes::error::HttpError,
     state::State,
     utils::hash::hash_session,
@@ -18,6 +18,7 @@ use crate::{
 
 pub enum UserAuth {
     User(Session, State),
+    Key(Key, State),
     None(State),
 }
 
@@ -60,39 +61,61 @@ impl<'a> ApiExtractor<'a> for UserAuth {
                 .map(|x| x.replace("Bearer ", ""));
 
             // Token could either be a session token or a pat token
-            if token.is_none() {
-                return Ok(UserAuth::None(state.clone()));
-            }
+            let token = match token {
+                Some(token) => token,
+                None => return Ok(UserAuth::None(state.clone())),
+            };
 
-            let token = token.unwrap();
+            // check the token
+            if token.starts_with("se_") {
+                let cache_key = format!("session:{}", token);
 
-            let cache_key = format!("session:{}", token);
+                let is_user = state
+                    .cache
+                    .raw
+                    .get_with(cache_key, async {
+                        // Use tracing events instead of spans to avoid Send issues
+                        info!("Cache miss for session: {}", token);
 
-            let is_user = state
-                .cache
-                .raw
-                .get_with(cache_key, async {
-                    // Use tracing events instead of spans to avoid Send issues
-                    info!("Cache miss for session: {}", token);
+                        // Hash the token
+                        let hash = hash_session(&token);
 
-                    // Hash the token
+                        // Check if active session exists with token
+                        let session = Session::try_access(&state.database, &hash)
+                            .await
+                            .unwrap()
+                            .ok_or(HttpError::Unauthorized)
+                            .unwrap();
+
+                        serde_json::to_value(session).unwrap()
+                    })
+                    .await;
+
+                let session: Option<Session> = serde_json::from_value(is_user).ok();
+
+                if let Some(session) = session {
+                    return Ok(UserAuth::User(session, state.clone()));
+                }
+            } else if token.starts_with("k_") {
+                let cache_key = format!("key:{}", token);
+
+                let is_key = state.cache.raw.get_with(cache_key, async {
                     let hash = hash_session(&token);
 
-                    // Check if active session exists with token
-                    let session = Session::try_access(&state.database, &hash)
+                    let key = Key::get_by_id(&state.database, hash.as_ref())
                         .await
                         .unwrap()
                         .ok_or(HttpError::Unauthorized)
                         .unwrap();
 
-                    serde_json::to_value(session).unwrap()
-                })
-                .await;
+                    serde_json::to_value(key).unwrap()
+                }).await;
 
-            let session: Option<Session> = serde_json::from_value(is_user).ok();
+                let key: Option<Key> = serde_json::from_value(is_key).ok();
 
-            if let Some(session) = session {
-                return Ok(UserAuth::User(session, state.clone()));
+                if let Some(key) = key {
+                    return Ok(UserAuth::Key(key, state.clone()));
+                }
             }
 
             Err(HttpError::Unauthorized.into())
@@ -124,16 +147,20 @@ impl<'a> ApiExtractor<'a> for UserAuth {
 }
 
 impl UserAuth {
-    pub fn ok(&self) -> Option<&Session> {
+    /// @deprecated
+    pub fn ok_session(&self) -> Option<&Session> {
         match self {
             UserAuth::User(session, _) => Some(session),
+            UserAuth::Key(_, _) => None,
             UserAuth::None(_) => None,
         }
     }
 
-    pub fn required(&self) -> Result<&Session> {
+    /// @deprecated
+    pub fn required_session(&self) -> Result<&Session> {
         match self {
             UserAuth::User(session, _) => Ok(session),
+            UserAuth::Key(_, _) => Err(HttpError::Unauthorized.into()),
             UserAuth::None(_) => Err(HttpError::Unauthorized.into()),
         }
     }
@@ -141,6 +168,7 @@ impl UserAuth {
     pub fn user_id(&self) -> Option<&str> {
         match self {
             UserAuth::User(session, _) => Some(&session.user_id),
+            UserAuth::Key(_, __) => None,
             UserAuth::None(_) => None,
         }
     }
@@ -168,7 +196,10 @@ impl UserAuth {
                     }
 
                     Ok(())
-                }
+                },
+                UserAuth::Key(key, _) => {
+                    Err(HttpError::Forbidden)
+                },
                 UserAuth::None(_) => Err(HttpError::Unauthorized),
             }
         }
@@ -190,7 +221,16 @@ impl UserAuth {
         async move {
             match self {
                 UserAuth::User(session, state) => match resource
-                    .has_access_to(state, &session.user_id)
+                    .has_access(state, "user", &session.user_id)
+                    .await
+                    .map_err(HttpError::from)
+                {
+                    Ok(true) => Ok(()),
+                    Ok(false) => Err(HttpError::Forbidden),
+                    Err(e) => Err(e),
+                },
+                UserAuth::Key(key, state) => match resource
+                    .has_access(state, &key.key_type, &key.key_resource)
                     .await
                     .map_err(HttpError::from)
                 {
@@ -207,9 +247,11 @@ impl UserAuth {
 }
 
 pub trait AccessibleResource: Debug {
-    fn has_access_to(
+    fn has_access(
         &self,
         state: &State,
-        user_id: &str,
+        // 'user' | 'site' | 'team'
+        resource: &str,
+        resource_id: &str,
     ) -> impl std::future::Future<Output = Result<bool, HttpError>> + Send;
 }

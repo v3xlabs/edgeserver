@@ -73,7 +73,7 @@ impl SiteDomainsApi {
     ) -> Result<Json<DomainSubmission>> {
         user.verify_access_to(&SiteId(&site_id.0)).await?;
 
-        let _user_ = user.required()?;
+        let _user_ = user.required_session()?;
 
         // validate domain is atleast 3 characters and has a dot seperator, no spaces, trim, etc
         // use regex to validate

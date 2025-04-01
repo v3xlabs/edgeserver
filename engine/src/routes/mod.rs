@@ -13,7 +13,6 @@ use poem::{
 };
 use poem_openapi::{OpenApi, OpenApiService, Tags};
 use serde_json::{self, Value};
-use team::TeamApi;
 use tracing::info;
 use user::UserApi;
 

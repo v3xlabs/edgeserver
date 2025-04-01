@@ -37,7 +37,7 @@ impl TeamApi {
     /// Gets a list of all the teams you have access to
     #[oai(path = "/team", method = "get", tag = "ApiTags::Team")]
     pub async fn get_teams(&self, user: UserAuth, state: Data<&State>) -> Result<Json<Vec<Team>>> {
-        let user = user.required()?;
+        let user = user.required_session()?;
         info!("Getting teams for user: {:?}", user);
 
         Team::get_by_user_id(&state.0.database, &user.user_id)
@@ -56,7 +56,7 @@ impl TeamApi {
         body: Json<CreateTeamRequest>,
     ) -> Result<Json<Team>> {
         info!("Creating team for user: {:?}", user);
-        let user = user.required()?;
+        let user = user.required_session()?;
 
         Team::new(&state.0.database, &body.name, &user.user_id)
             .await
@@ -126,7 +126,7 @@ impl TeamApi {
 
         user.verify_access_to(&TeamId(&team_id.0)).await?;
 
-        let user = user.required()?;
+        let user = user.required_session()?;
 
         if !Team::is_owner(&state.0.database, &team_id.0, &user.user_id)
             .await
@@ -175,7 +175,7 @@ impl TeamApi {
 
         user.verify_access_to(&TeamId(&team_id.0)).await?;
 
-        let user = user.required()?;
+        let user = user.required_session()?;
 
         if !Team::is_owner(&state.0.database, &team_id.0, &user.user_id)
             .await
@@ -251,7 +251,7 @@ impl TeamApi {
 
         user.verify_access_to(&TeamId(&team_id.0)).await?;
 
-        let user = user.required()?;
+        let user = user.required_session()?;
 
         if !Team::is_owner(&state.0.database, &team_id.0, &user.user_id)
             .await
@@ -276,7 +276,7 @@ impl TeamApi {
     ) -> Result<()> {
         info!("Deleting team: {:?} for user: {:?}", team_id.0, user);
 
-        let user = user.required()?;
+        let user = user.required_session()?;
 
         if !Team::is_owner(&state.0.database, &team_id.0, &user.user_id)
             .await
@@ -306,7 +306,7 @@ impl TeamApi {
     ) -> Result<Json<Team>> {
         user.verify_access_to(&TeamId(&team_id.0)).await?;
 
-        let user = user.required()?;
+        let user = user.required_session()?;
 
         if !Team::is_owner(&state.0.database, &team_id.0, &user.user_id)
             .await

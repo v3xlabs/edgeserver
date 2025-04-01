@@ -27,7 +27,7 @@ impl UserApi {
     pub async fn get_user(&self, user: UserAuth, state: Data<&State>) -> Result<Json<User>> {
         info!("Getting user: {:?}", user);
 
-        let user_id = &user.required()?.user_id;
+        let user_id = &user.required_session()?.user_id;
 
         let user = User::get_by_id(&state.database, &user_id)
             .await
@@ -43,7 +43,7 @@ impl UserApi {
         state: Data<&State>,
         auth: UserAuth,
     ) -> Result<Json<Vec<UserMinimal>>> {
-        auth.required()?;
+        auth.required_session()?;
 
         let users = User::get_all_minimal(&state.database)
             .await
@@ -61,7 +61,7 @@ impl UserApi {
         user_id: Path<String>,
         state: Data<&State>,
     ) -> Result<Json<User>> {
-        user.required()?;
+        user.required_session()?;
 
         User::get_by_id(&state.database, &user_id.0)
             .await
