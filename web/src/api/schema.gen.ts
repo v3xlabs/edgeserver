@@ -11,29 +11,7 @@ export type paths = {
             path?: never;
             cookie?: never;
         };
-        /**
-         * Get all sites personal
-         * @description Gets a list of all the sites you have access to
-         */
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json; charset=utf-8": components["schemas"]["Site"][];
-                    };
-                };
-            };
-        };
+        get?: never;
         put?: never;
         /**
          * Create a new site
@@ -1389,6 +1367,12 @@ export type paths = {
                         "application/json; charset=utf-8": components["schemas"]["TeamInviteData"];
                     };
                 };
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
             };
         };
         put?: never;
@@ -1429,7 +1413,23 @@ export type paths = {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain; charset=utf-8": string;
+                        "application/json; charset=utf-8": components["schemas"]["AcceptedResponse"];
+                    };
+                };
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json; charset=utf-8": components["schemas"]["NotFoundResponse"];
+                    };
+                };
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json; charset=utf-8": components["schemas"]["AlreadyExistsResponse"];
                     };
                 };
             };
@@ -1477,6 +1477,22 @@ export type paths = {
                         "application/json; charset=utf-8": components["schemas"]["BootstrapUserResponse"];
                     };
                 };
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json; charset=utf-8": components["schemas"]["NotFoundResponse"];
+                    };
+                };
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json; charset=utf-8": components["schemas"]["AlreadyExistsResponse"];
+                    };
+                };
             };
         };
         delete?: never;
@@ -1489,6 +1505,24 @@ export type paths = {
 export type webhooks = Record<string, never>;
 export type components = {
     schemas: {
+        /**
+         * AcceptedResponse
+         * @example {
+         *       "message": "Invite accepted"
+         *     }
+         */
+        AcceptedResponse: {
+            message: string;
+        };
+        /**
+         * AlreadyExistsResponse
+         * @example {
+         *       "message": "Invite already accepted"
+         *     }
+         */
+        AlreadyExistsResponse: {
+            message: string;
+        };
         /** BootstrapUserRequest */
         BootstrapUserRequest: {
             username: string;
@@ -1523,7 +1557,7 @@ export type components = {
          * Deployment
          * @example {
          *       "context": "test",
-         *       "created_at": "2025-04-01T05:07:32.960500396+00:00",
+         *       "created_at": "2025-04-01T05:35:50.968993860+00:00",
          *       "deployment_id": "d_1234567890",
          *       "site_id": "s_1234567890"
          *     }
@@ -1590,13 +1624,13 @@ export type components = {
         /**
          * Key
          * @example {
-         *       "created_at": "2025-04-01T05:07:32.960571266+00:00",
+         *       "created_at": "2025-04-01T05:35:50.969062001+00:00",
          *       "created_by": "u_1234567890",
-         *       "expires_at": "2025-05-01T05:07:32.960571426+00:00",
+         *       "expires_at": "2025-05-01T05:35:50.969062181+00:00",
          *       "key_id": "k_site_12345678901234567890",
          *       "key_resource": "s_1234567890",
          *       "key_type": "site",
-         *       "last_used": "2025-04-01T05:07:32.960571366+00:00",
+         *       "last_used": "2025-04-01T05:35:50.969062111+00:00",
          *       "permissions": "TBD",
          *       "vanity": "4567890"
          *     }
@@ -1643,6 +1677,15 @@ export type components = {
         NewKey: {
             key: string;
             object: components["schemas"]["Key"];
+        };
+        /**
+         * NotFoundResponse
+         * @example {
+         *       "message": "Invite not found"
+         *     }
+         */
+        NotFoundResponse: {
+            message: string;
         };
         /** Site */
         Site: {

@@ -2,7 +2,6 @@ use std::sync::Arc;
 
 use async_std::path::Path;
 use auth::AuthApi;
-use invite::InviteApi;
 use opentelemetry::global;
 use poem::middleware::OpenTelemetryMetrics;
 use poem::web::Data;
@@ -27,7 +26,7 @@ pub mod team;
 pub mod user;
 
 fn get_api() -> impl OpenApi {
-    (site::api_routes(), UserApi, AuthApi, team::api_routes(), InviteApi)
+    (site::api_routes(), UserApi, AuthApi, team::api_routes(), invite::api_routes())
 }
 
 #[derive(Tags)]

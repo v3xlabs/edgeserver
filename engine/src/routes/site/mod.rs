@@ -58,21 +58,6 @@ pub fn api_routes() -> impl OpenApi {
 
 #[OpenApi]
 impl SiteApi {
-    /// Get all sites personal
-    ///
-    /// Gets a list of all the sites you have access to
-    #[oai(path = "/site", method = "get", tag = "ApiTags::Site")]
-    pub async fn get_sites(&self, user: UserAuth, state: Data<&State>) -> Result<Json<Vec<Site>>> {
-        info!("Getting sites for user: {:?}", user);
-
-        let user = user.required_session()?;
-
-        Site::get_by_user_id(&state.database, &user.user_id)
-            .await
-            .map_err(HttpError::from)
-            .map(Json)
-            .map_err(poem::Error::from)
-    }
 
     /// Create a new site
     ///
