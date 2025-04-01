@@ -12,8 +12,7 @@ function RouteComponent() {
 
     return (
         <SCPage title="Deployments">
-            <div className="card">Deployments here</div>
-            <DeploymentList siteId={siteId} />
+            <DeploymentList siteId={siteId} showHeader={false} />
         </SCPage>
     );
 }

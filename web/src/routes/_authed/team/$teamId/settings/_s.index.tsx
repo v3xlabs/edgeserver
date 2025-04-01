@@ -6,6 +6,10 @@ import { TeamAvatarUpload } from '@/gui/settings/UploadAvatar';
 
 export const Route = createFileRoute('/_authed/team/$teamId/settings/_s/')({
     component: RouteComponent,
+    context: () => ({
+        title: 'Team Settings',
+        subtitle: 'Manage your team settings',
+    }),
 });
 
 function RouteComponent() {

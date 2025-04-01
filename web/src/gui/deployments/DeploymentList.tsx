@@ -6,10 +6,11 @@ import { useSiteDeployments } from '@/api';
 
 import { DeploymentPreview } from './DeploymentPreview';
 
-export const DeploymentList: FC<{ siteId?: string; max?: number }> = ({
-    siteId,
-    max,
-}) => {
+export const DeploymentList: FC<{
+    siteId?: string;
+    max?: number;
+    showHeader?: boolean;
+}> = ({ siteId, max, showHeader = true }) => {
     const { data: deployments } = useSiteDeployments(siteId);
 
     const maxEntries = max ?? deployments?.length ?? 10;
@@ -18,18 +19,20 @@ export const DeploymentList: FC<{ siteId?: string; max?: number }> = ({
 
     return (
         <div className="space-y-2">
-            <div className="flex items-center justify-between">
-                <h2 className="h2">Deployment List</h2>
-                {max && max > 0 && (
-                    <Link
-                        to="/site/$siteId/deployments"
-                        params={{ siteId: siteId ?? '' }}
-                        className="link flex items-center gap-1"
-                    >
-                        View More <FiArrowRight />
-                    </Link>
-                )}
-            </div>
+            {showHeader && (
+                <div className="flex items-center justify-between">
+                    <h2 className="h2">Deployment List</h2>
+                    {max && max > 0 && (
+                        <Link
+                            to="/site/$siteId/deployments"
+                            params={{ siteId: siteId ?? '' }}
+                            className="link flex items-center gap-1"
+                        >
+                            View More <FiArrowRight />
+                        </Link>
+                    )}
+                </div>
+            )}
             {deployments && deployments.length > 0 && (
                 <ul className="space-y-2">
                     {deployments.slice(0, maxEntries).map((deployment) => (

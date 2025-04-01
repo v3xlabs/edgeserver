@@ -1,5 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
 
+import { SiteCreateButton } from '@/gui/site/SiteCreateButton';
 import { SiteList } from '@/gui/site/SiteList';
 import { SCPage } from '@/layouts';
 
@@ -11,9 +12,8 @@ function RouteComponent() {
     const { teamId } = Route.useParams();
 
     return (
-        <SCPage title="Sites">
-            <div className="card">Sites go here brr</div>
-            <SiteList teamId={teamId} />
+        <SCPage title="Sites" suffix={<SiteCreateButton team_id={teamId} />}>
+            <SiteList teamId={teamId} showHeader={false} />
         </SCPage>
     );
 }

@@ -7,6 +7,10 @@ export const Route = createFileRoute(
     '/_authed/site/$siteId/settings/_s/transfer'
 )({
     component: RouteComponent,
+    context: () => ({
+        title: 'Site Transfer',
+        subtitle: 'Transfer your site to another team',
+    }),
 });
 
 function RouteComponent() {

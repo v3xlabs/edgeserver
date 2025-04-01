@@ -11,11 +11,34 @@ export type paths = {
             path?: never;
             cookie?: never;
         };
-        get?: never;
+        /**
+         * Get all sites personal
+         * @description Gets a list of all the sites you have access to
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json; charset=utf-8": components["schemas"]["Site"][];
+                    };
+                };
+            };
+        };
         put?: never;
         /**
          * Create a new site
          * @description Creates a new site given a create request
+         *     (user-only)
          */
         post: {
             parameters: {
@@ -594,7 +617,10 @@ export type paths = {
             };
         };
         put?: never;
-        /** Create a site key */
+        /**
+         * Create a site key
+         * @description (user-only)
+         */
         post: {
             parameters: {
                 query?: never;
@@ -636,7 +662,10 @@ export type paths = {
         get?: never;
         put?: never;
         post?: never;
-        /** Delete a site key */
+        /**
+         * Delete a site key
+         * @description (user-only)
+         */
         delete: {
             parameters: {
                 query?: never;
@@ -875,6 +904,7 @@ export type paths = {
         /**
          * Get all teams
          * @description Gets a list of all the teams you have access to
+         *     (user-only)
          */
         get: {
             parameters: {
@@ -896,7 +926,10 @@ export type paths = {
             };
         };
         put?: never;
-        /** Create a team */
+        /**
+         * Create a team
+         * @description (user-only)
+         */
         post: {
             parameters: {
                 query?: never;
@@ -958,6 +991,7 @@ export type paths = {
         /**
          * Update a team
          * @description Updates a team with the given name
+         *     (user-only) (due to team-owner overwrite)
          */
         put: {
             parameters: {
@@ -984,6 +1018,7 @@ export type paths = {
         /**
          * Delete a team
          * @description Deletes a team
+         *     (user-only) (due to team-owner overwrite)
          */
         delete: {
             parameters: {
@@ -1042,7 +1077,10 @@ export type paths = {
             };
         };
         put?: never;
-        /** Invite a user to a team */
+        /**
+         * Invite a user to a team
+         * @description (user-only) (due to team-owner overwrite)
+         */
         post: {
             parameters: {
                 query?: never;
@@ -1084,7 +1122,10 @@ export type paths = {
         get?: never;
         put?: never;
         post?: never;
-        /** Delete a team invite */
+        /**
+         * Delete a team invite
+         * @description (user-only) (due to team-owner overwrite)
+         */
         delete: {
             parameters: {
                 query?: never;
@@ -1202,6 +1243,7 @@ export type paths = {
         /**
          * Upload a team avatar
          * @description Uploads an avatar for a team
+         *     (user-only) (due to team-owner overwrite)
          */
         post: {
             parameters: {
@@ -1267,7 +1309,10 @@ export type paths = {
             };
         };
         put?: never;
-        /** Create a team key */
+        /**
+         * Create a team key
+         * @description (user-only)
+         */
         post: {
             parameters: {
                 query?: never;
@@ -1557,7 +1602,7 @@ export type components = {
          * Deployment
          * @example {
          *       "context": "test",
-         *       "created_at": "2025-04-01T05:35:50.968993860+00:00",
+         *       "created_at": "2025-04-01T05:55:46.154258712+00:00",
          *       "deployment_id": "d_1234567890",
          *       "site_id": "s_1234567890"
          *     }
@@ -1624,13 +1669,13 @@ export type components = {
         /**
          * Key
          * @example {
-         *       "created_at": "2025-04-01T05:35:50.969062001+00:00",
+         *       "created_at": "2025-04-01T05:55:46.154323592+00:00",
          *       "created_by": "u_1234567890",
-         *       "expires_at": "2025-05-01T05:35:50.969062181+00:00",
+         *       "expires_at": "2025-05-01T05:55:46.154323772+00:00",
          *       "key_id": "k_site_12345678901234567890",
          *       "key_resource": "s_1234567890",
          *       "key_type": "site",
-         *       "last_used": "2025-04-01T05:35:50.969062111+00:00",
+         *       "last_used": "2025-04-01T05:55:46.154323692+00:00",
          *       "permissions": "TBD",
          *       "vanity": "4567890"
          *     }

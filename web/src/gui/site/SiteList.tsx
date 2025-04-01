@@ -5,18 +5,23 @@ import { useSites, useTeamSites } from '@/api';
 import { SiteCreateButton } from './SiteCreateButton';
 import { SitePreview } from './SitePreview';
 
-export const SiteList: FC<{ teamId?: string; external?: boolean }> = ({
-    teamId,
-    external,
-}) => {
+export const SiteList: FC<{
+    teamId?: string;
+    external?: boolean;
+    showHeader?: boolean;
+}> = ({ teamId, external, showHeader = true }) => {
     const { data: sites } = teamId ? useTeamSites(teamId) : useSites();
 
     return (
         <div className="space-y-2">
-            <div className="flex items-center justify-between">
-                <h2 className="h2">Sites</h2>
-                {sites?.length != 0 && <SiteCreateButton team_id={teamId} />}
-            </div>
+            {showHeader && (
+                <div className="flex items-center justify-between">
+                    <h2 className="h2">Sites</h2>
+                    {sites?.length != 0 && (
+                        <SiteCreateButton team_id={teamId} />
+                    )}
+                </div>
+            )}
             {sites && sites.length > 0 && (
                 <ul className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
                     {sites.map((site) => (
