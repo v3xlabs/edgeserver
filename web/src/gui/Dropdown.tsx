@@ -145,7 +145,7 @@ const DropdownMenuItem = forwardRef<
             'rounded-sm outline-none',
 
             // Colors & States
-            'focus:bg-accent focus:text-accent-foreground',
+            'focus:bg-secondary focus:text-accent-foreground',
             'data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
 
             // SVG Styles

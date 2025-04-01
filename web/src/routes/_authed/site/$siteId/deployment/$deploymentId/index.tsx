@@ -1,5 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { FiMoreHorizontal } from 'react-icons/fi';
+import { FiGithub, FiMoreHorizontal } from 'react-icons/fi';
+import { LuPictureInPicture } from 'react-icons/lu';
+import { toast } from 'sonner';
 
 import {
     useDeployment,
@@ -7,7 +9,10 @@ import {
     useDeploymentPreviews,
 } from '@/api';
 import { Button } from '@/components';
-import { DeploymentContext } from '@/gui/deployments/context/context';
+import {
+    DeploymentContext,
+    parseDeploymentContext,
+} from '@/gui/deployments/context/context';
 import { FileExplorer } from '@/gui/deployments/files/FileExplorer';
 import {
     DropdownMenu,
@@ -32,6 +37,12 @@ function RouteComponent() {
     );
     const { data: previews } = useDeploymentPreviews(siteId, deploymentId);
 
+    const githubRootUrl = deployment?.context
+        ? parseDeploymentContext(deployment.context).data.commit.url.split(
+              '/commit/'
+          )[0]
+        : undefined;
+
     return (
         <SCPage
             title="Deployment Details"
@@ -42,14 +53,29 @@ function RouteComponent() {
                             <FiMoreHorizontal />
                         </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent>
-                        <DropdownMenuItem>Hello world</DropdownMenuItem>
+                    <DropdownMenuContent align="end">
+                        {githubRootUrl && (
+                            <DropdownMenuItem asChild>
+                                <a
+                                    href={githubRootUrl}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="cursor-pointer"
+                                >
+                                    <FiGithub />
+                                    <span className="pr-4">View on GitHub</span>
+                                </a>
+                            </DropdownMenuItem>
+                        )}
+
                         <DropdownMenuItem
                             onClick={() => {
                                 refreshDeploymentPreview();
+                                toast.success('Preview regeneration queued');
                             }}
                         >
-                            Refresh Preview
+                            <LuPictureInPicture />
+                            <span>Refresh Preview</span>
                         </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
