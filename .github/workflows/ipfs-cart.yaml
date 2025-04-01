@@ -1,10 +1,10 @@
-name: Build Bunshot Docker Image
+name: Build IPFS Cart Docker Image
 
 on:
     push:
         branches: [master]
         paths:
-            - "services/bunshot/**"
+            - "services/ipfs-cart/**"
     workflow_dispatch: # Allows manual triggering
 
 jobs:
@@ -30,9 +30,9 @@ jobs:
             - name: Build and push Docker image
               uses: docker/build-push-action@v5
               with:
-                  context: ./services/bunshot
-                  file: ./services/bunshot/Dockerfile
+                  context: ./services/ipfs-cart
+                  file: ./services/ipfs-cart/Dockerfile
                   push: true
-                  tags: ghcr.io/v3xlabs/bunshot:latest
+                  tags: ghcr.io/v3xlabs/ipfs-cart:latest
                   cache-from: type=gha
                   cache-to: type=gha,mode=max
