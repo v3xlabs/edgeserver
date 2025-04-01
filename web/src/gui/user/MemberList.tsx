@@ -8,9 +8,9 @@ export const MemberList: FC<{ team_id: string }> = ({ team_id }) => {
     const { data: members } = useTeamMembers(team_id);
 
     return (
-        <div className="space-y-2">
+        <>
             {members && (
-                <ul className="divide-y">
+                <ul className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
                     {members.map((member) => (
                         <li key={member.user_id}>
                             <UserPreview user={member} />
@@ -18,6 +18,6 @@ export const MemberList: FC<{ team_id: string }> = ({ team_id }) => {
                     ))}
                 </ul>
             )}
-        </div>
+        </>
     );
 };
