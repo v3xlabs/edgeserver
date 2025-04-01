@@ -13,6 +13,7 @@ pub struct TaskRabbit {
     channel: Channel,
 
     previews_queue_key: String,
+    car_queue_key: String,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -20,6 +21,12 @@ pub struct BunshotPayload {
     pub site_id: String,
     pub deployment_id: String,
     pub domain: String,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct CarRequest {
+    pub deployment_id: String,
+    pub file_path: String,
 }
 
 impl TaskRabbit {
@@ -53,10 +60,26 @@ impl TaskRabbit {
 
         info!("Bunshot queue declared");
 
+        let car_channel = connection.create_channel().await.unwrap();
+
+        let car_queue_key = config.car_queue.as_deref().unwrap_or("car").to_string();
+
+        car_channel
+            .queue_declare(
+                &car_queue_key,
+                QueueDeclareOptions {
+                    durable: true,
+                    ..QueueDeclareOptions::default()
+                },
+                FieldTable::default(),
+            )
+            .await
+            .unwrap();
         TaskRabbit {
             connection,
             channel: bunshot_channel,
             previews_queue_key,
+            car_queue_key,
         }
     }
 
@@ -87,6 +110,31 @@ impl TaskRabbit {
             info!("Message successfully published to screenshots queue");
         } else {
             info!("Failed to publish message to screenshots queue");
+        }
+    }
+
+    pub async fn queue_car(&self, request: CarRequest) {
+        let payload = serde_json::to_string(&request).unwrap();
+
+        // Publish to the car queue
+        let confirm = self
+            .channel
+            .basic_publish(
+                "",
+                &self.car_queue_key,
+                BasicPublishOptions::default(),
+                payload.as_bytes(),
+                BasicProperties::default().with_delivery_mode(2),
+            )
+            .await
+            .unwrap()
+            .await
+            .unwrap();
+
+        if confirm == Confirmation::NotRequested || confirm == Confirmation::Ack(None) {
+            info!("Message successfully published to car queue");
+        } else {
+            info!("Failed to publish message to car queue");
         }
     }
 }

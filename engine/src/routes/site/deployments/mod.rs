@@ -3,12 +3,11 @@ use poem_openapi::{param::Path, payload::Json, OpenApi};
 use tracing::info;
 
 use crate::{
-    middlewares::auth::UserAuth,
-    models::{
-        deployment::{preview::DeploymentPreview, Deployment, DeploymentFile, DeploymentFileEntry}, domain::Domain, site::{Site, SiteId}
-    },
-    routes::{error::HttpError, ApiTags},
-    state::State,
+    middlewares::auth::UserAuth, models::{
+        deployment::{preview::DeploymentPreview, Deployment, DeploymentFile, DeploymentFileEntry},
+        domain::Domain,
+        site::{Site, SiteId},
+    }, rabbit::CarRequest, routes::{error::HttpError, ApiTags}, state::State
 };
 
 use super::UploadPayload;
@@ -113,6 +112,22 @@ impl SiteDeploymentsApi {
         info!("Deployment complete");
 
         if let Some(data) = payload.data {
+            let data = data.into_vec().await.unwrap();
+
+            if let Some(car_bucket) = &state.storage.car_bucket {
+                let path = format!("{}/car.zip", deployment.deployment_id);
+                let _ = car_bucket.put_object(&path, &data).await.unwrap();
+                
+                info!("Car uploaded to: {:?}", path);
+
+                if let Some(rabbit) = &state.rabbit {
+                    rabbit.queue_car(CarRequest {
+                        deployment_id: deployment.deployment_id.clone(),
+                        file_path: path.clone(),
+                    }).await;
+                }
+            }
+
             Deployment::upload_files(&deployment, &state, data)
                 .await
                 .unwrap();
@@ -158,6 +173,22 @@ impl SiteDeploymentsApi {
         info!("Deployment complete");
 
         if let Some(data) = payload.data {
+            let data = data.into_vec().await.unwrap();
+
+            if let Some(car_bucket) = &state.storage.car_bucket {
+                let path = format!("{}/car.zip", deployment.deployment_id);
+                let _ = car_bucket.put_object(&path, &data).await.unwrap();
+
+                if let Some(rabbit) = &state.rabbit {
+                    rabbit.queue_car(CarRequest {
+                        deployment_id: deployment_id.clone(),
+                        file_path: path.clone(),
+                    }).await;
+                }
+
+                info!("Car uploaded to: {:?}", path);
+            }
+
             Deployment::upload_files(&deployment, &state, data)
                 .await
                 .unwrap();
@@ -182,7 +213,9 @@ impl SiteDeploymentsApi {
             if let Some(rabbit) = &state.rabbit {
                 info!("Queueing bunshot for domain: {:?}", domain);
                 let domain = domain.domain();
-                rabbit.queue_bunshot(&site_id.0, &deployment_id, &domain).await;
+                rabbit
+                    .queue_bunshot(&site_id.0, &deployment_id, &domain)
+                    .await;
             }
         } else {
             info!("No domain was found for this site");
@@ -246,7 +279,9 @@ impl SiteDeploymentsApi {
 
             if let Some(domain) = domain {
                 info!("Queueing bunshot for domain: {:?}", domain.domain());
-                rabbit.queue_bunshot(&site_id.0, &deployment_id.0, &domain.domain()).await;
+                rabbit
+                    .queue_bunshot(&site_id.0, &deployment_id.0, &domain.domain())
+                    .await;
             } else {
                 info!("No domain was found for this site");
             }

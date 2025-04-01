@@ -23,6 +23,7 @@ pub struct AppConfig {
     pub database_url: String,
     pub s3: S3Config,
     pub s3_previews: Option<S3PreviewsConfig>,
+    pub s3_car: Option<S3CarConfig>,
     pub github_app: Option<GithubAppConfig>,
     pub amqp: Option<AMQPConfig>,
 }
@@ -46,9 +47,19 @@ pub struct S3PreviewsConfig {
 }
 
 #[derive(Deserialize, Debug)]
+pub struct S3CarConfig {
+    pub endpoint_url: String,
+    pub region: String,
+    pub bucket_name: String,
+    pub access_key: String,
+    pub secret_key: String,
+}
+
+#[derive(Deserialize, Debug)]
 pub struct AMQPConfig {
     pub addr: String,
     pub previews_queue: Option<String>,
+    pub car_queue: Option<String>,
 }
 
 /// Github App Config
@@ -82,6 +93,8 @@ impl AppState {
                 .map(|key| format!("s3.{}", key.as_str().to_lowercase()).into()))
             .merge(Env::prefixed("S3_PREVIEWS_")
                 .map(|key| format!("s3_previews.{}", key.as_str().to_lowercase()).into()))
+            .merge(Env::prefixed("S3_CAR_")
+                .map(|key| format!("s3_car.{}", key.as_str().to_lowercase()).into()))
             .merge(Env::prefixed("GITHUB_APP_")
                 .map(|key| format!("github_app.{}", key.as_str().to_lowercase()).into()))
             .merge(Env::prefixed("AMQP_")

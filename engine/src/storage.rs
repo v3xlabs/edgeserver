@@ -8,6 +8,7 @@ use crate::state::AppConfig;
 pub struct Storage {
     pub bucket: Box<Bucket>,
     pub previews_bucket: Option<Box<Bucket>>,
+    pub car_bucket: Option<Box<Bucket>>,
 }
 
 impl Storage {
@@ -50,7 +51,29 @@ impl Storage {
             None
         };
 
-        Self { bucket, previews_bucket }
+        let car_bucket = if let Some(car_config) = &config.s3_car {
+            let car_region = Region::Custom {
+                region: car_config.region.clone(),
+                endpoint: car_config.endpoint_url.clone(),
+            };
+            let car_credentials = Credentials::new(
+                Some(&car_config.access_key),
+                Some(&car_config.secret_key),
+                None,
+                None,
+                None,
+            )
+            .unwrap();
+            let car_bucket = Bucket::new(&car_config.bucket_name, car_region, car_credentials)
+                .unwrap()
+                .with_path_style();
+
+            Some(car_bucket)
+        } else {
+            None
+        };
+
+        Self { bucket, previews_bucket, car_bucket }
     }
 
     pub async fn upload(

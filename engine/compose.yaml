@@ -32,6 +32,7 @@ services:
         mc alias set minio http://127.0.0.1:9000 minioadmin minioadmin     # setup Minio client
         mc mb minio/edgeserver || true                                    # create a test bucket
         mc mb minio/screenshots || true                                    # create a test bucket
+        mc mb minio/car || true                                    # create a test bucket
         mc anonymous set public minio/edgeserver                          # make the test bucket public
         mc anonymous set public minio/screenshots                          # make the test bucket public
         kill -s INT $(cat /tmp/minio.pid) && rm /tmp/minio.pid             # stop Minio

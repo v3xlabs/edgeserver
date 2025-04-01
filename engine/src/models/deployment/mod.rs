@@ -84,16 +84,14 @@ impl Deployment {
     // }
 
     #[tracing::instrument(name = "upload_files", skip(self, state, file))]
-    pub async fn upload_files(&self, state: &State, file: Upload) -> Result<(), sqlx::Error> {
+    pub async fn upload_files(&self, state: &State, file: Vec<u8>) -> Result<(), sqlx::Error> {
         let span = info_span!("Deployment::upload_files");
         span.set_parent(Context::current());
         let _guard = span.enter();
 
-        let file_stream = file.into_vec().await.unwrap();
-
         // TODO: Read file stream, extract zip file (contains multiple files), upload each file to s3 at the correct relevant path relative to deployment.deployment_id + '/'
 
-        let zip = ZipFileReader::new(file_stream).await.unwrap();
+        let zip = ZipFileReader::new(file).await.unwrap();
 
         for index in 0..zip.file().entries().len() {
             let file = zip.file().entries().get(index).unwrap();

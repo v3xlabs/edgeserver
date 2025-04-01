@@ -1,0 +1,8 @@
+{
+  "dependencies": {
+    "unzipper": "^0.12.3"
+  },
+  "devDependencies": {
+    "bun-types": "^1.2.8"
+  }
+}

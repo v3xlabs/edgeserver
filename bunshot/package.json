@@ -1,6 +1,6 @@
 {
   "name": "bunshot",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "A Bun service that takes screenshots of websites using Puppeteer and uploads them to S3",
   "main": "src/index.ts",
   "type": "module",
