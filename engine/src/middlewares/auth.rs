@@ -1,14 +1,13 @@
 use std::fmt::Debug;
 
-use opentelemetry::{global, trace::{Tracer, FutureExt}, Context};
+use opentelemetry::Context;
 use poem::{web::Data, FromRequest, Request, RequestBody, Result};
 use poem_openapi::{
     registry::{MetaSecurityScheme, Registry},
     ApiExtractor, ApiExtractorType, ExtractParamOptions,
 };
-use tracing::{info, info_span, Level, Instrument};
+use tracing::{info, info_span, Instrument};
 use tracing_opentelemetry::OpenTelemetrySpanExt;
-use uuid;
 
 use crate::{
     models::{session::Session, team::Team},
@@ -40,11 +39,11 @@ impl<'a> ApiExtractor<'a> for UserAuth {
     ) -> Result<Self> {
         // Get current OpenTelemetry context to propagate
         let parent_cx = Context::current();
-        
+
         // Create auth span with proper parent context
         let auth_span = info_span!("auth");
         auth_span.set_parent(parent_cx);
-        
+
         // Run the authentication logic within the auth span
         let auth_result = async move {
             let state = <Data<&State> as FromRequest>::from_request(req, body).await?;
@@ -75,7 +74,7 @@ impl<'a> ApiExtractor<'a> for UserAuth {
                 .get_with(cache_key, async {
                     // Use tracing events instead of spans to avoid Send issues
                     info!("Cache miss for session: {}", token);
-                    
+
                     // Hash the token
                     let hash = hash_session(&token);
 
@@ -152,7 +151,7 @@ impl UserAuth {
     ) -> Result<(), HttpError> {
         // Get current OpenTelemetry context to propagate
         let parent_cx = Context::current();
-        
+
         // Create span with proper parent context
         let member_span = info_span!("required_member_of", team_id = ?team_id);
         member_span.set_parent(parent_cx);
@@ -182,11 +181,11 @@ impl UserAuth {
         resource: &impl AccessibleResource,
     ) -> Result<(), HttpError> {
         // Get current OpenTelemetry context to propagate
-        
+
         // Create span with proper parent context
         let access_span = info_span!("verify_access_to", resource = ?resource);
         access_span.set_parent(Context::current());
-        
+
         // Each request should have its own context path
         async move {
             match self {

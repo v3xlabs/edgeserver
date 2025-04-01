@@ -1,7 +1,7 @@
 use std::sync::Arc;
 
 use color_eyre::eyre::Result;
-use figment::{Figment, providers::{Env, Format}};
+use figment::{Figment, providers::Env};
 use serde::Deserialize;
 
 use crate::{cache::Cache, database::Database, rabbit::TaskRabbit, storage::Storage};

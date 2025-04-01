@@ -1,6 +1,6 @@
 use std::fmt;
-use tracing::{Event, span, Level, Subscriber};
-use tracing_subscriber::{Layer, Registry, prelude::*};
+use tracing::{Event, span, Subscriber};
+use tracing_subscriber::{Layer, prelude::*};
 use tracing_subscriber::registry::LookupSpan;
 
 // Visitor to extract sqlx event fields.

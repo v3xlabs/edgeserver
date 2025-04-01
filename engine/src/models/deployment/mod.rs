@@ -257,6 +257,7 @@ impl DeploymentFile {
                 df.file_id as "deployment_file_file_id!",
                 df.file_path as "deployment_file_file_path!",
                 df.mime_type as "deployment_file_mime_type!",
+                f.file_hash as "file_hash!",
                 f.file_size,
                 f.file_deleted
             FROM deployment_files df
@@ -271,12 +272,13 @@ impl DeploymentFile {
 }
 
 // Add this new struct to represent the joined result
-#[derive(Debug, sqlx::FromRow, Object)]
+#[derive(Debug, Serialize, Deserialize, sqlx::FromRow, Object)]
 pub struct DeploymentFileEntry {
     pub deployment_file_deployment_id: String,
     pub deployment_file_file_id: i64,
     pub deployment_file_file_path: String,
     pub deployment_file_mime_type: String,
+    pub file_hash: String,
     pub file_size: Option<i64>,
     pub file_deleted: bool,
 }

@@ -2,7 +2,7 @@ use std::sync::Arc;
 
 use opentelemetry::{
     global,
-    trace::{FutureExt, Span, SpanKind, Status, Tracer, TraceContextExt},
+    trace::{FutureExt, Span, SpanKind, Tracer, TraceContextExt},
     Context, Key, KeyValue,
 };
 use opentelemetry_http::HeaderExtractor;

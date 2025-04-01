@@ -19,8 +19,9 @@ pub mod storage;
 pub mod utils;
 pub mod rabbit;
 pub mod sqlxshim;
+pub mod ipfs;
 
-use tracing_subscriber::{prelude::*, EnvFilter};
+use tracing_subscriber::prelude::*;
 
 #[async_std::main]
 async fn main() {

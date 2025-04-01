@@ -1,6 +1,6 @@
 use lapin::{
     options::*, publisher_confirm::Confirmation, types::FieldTable, BasicProperties, Channel,
-    Connection, ConnectionProperties, Queue, Result,
+    Connection, ConnectionProperties,
 };
 use serde::{Deserialize, Serialize};
 

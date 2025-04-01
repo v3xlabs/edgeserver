@@ -1,5 +1,7 @@
 # Bunshot
 
+> This service is optional. It is used to generate previous of deployments.
+
 A Bun service that takes screenshots of websites and uploads them to S3.
 
 ## Overview
