@@ -18,8 +18,8 @@ export const Route = createFileRoute('/_authed/team/$teamId/settings/_s/keys')({
             suffix: <TeamCreateKeyModal teamId={context.params.teamId} />,
             subtitle: (
                 <span>
-                    <span className="text-yellow-400">⚠️ CAUTION</span> This
-                    page contains sample data
+                    <span className="text-yellow-400">⚠️ CAUTION</span> Keys
+                    currently have no expiration date or permission scopes.
                 </span>
             ),
         };

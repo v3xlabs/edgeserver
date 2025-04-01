@@ -18,8 +18,8 @@ export const Route = createFileRoute('/_authed/site/$siteId/settings/_s/keys')({
             suffix: <SiteCreateKeyModal siteId={context.params.siteId} />,
             subtitle: (
                 <span>
-                    <span className="text-yellow-400">⚠️ CAUTION</span> This
-                    page is under construction
+                    <span className="text-yellow-400">⚠️ CAUTION</span> Keys
+                    currently have no expiration date or permission scopes.
                 </span>
             ),
         };
