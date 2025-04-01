@@ -95,12 +95,12 @@ impl SiteDeploymentsApi {
         site_id: Path<String>,
         payload: UploadPayload,
     ) -> Result<Json<Deployment>> {
+        user.verify_access_to(&SiteId(&site_id.0)).await?;
+
         info!(
             "Creating deployment for site: {:?} for user: {:?}",
             site_id.0, user
         );
-
-        user.verify_access_to(&SiteId(&site_id.0)).await?;
 
         let site_id = site_id.0;
 
@@ -140,12 +140,12 @@ impl SiteDeploymentsApi {
         deployment_id: Path<String>,
         payload: UploadPayload,
     ) -> Result<Json<Deployment>> {
+        user.verify_access_to(&SiteId(&site_id.0)).await?;
+
         info!(
             "Uploading files for deployment: {:?} for site: {:?} for user: {:?}",
             deployment_id.0, site_id.0, user
         );
-
-        user.verify_access_to(&SiteId(&site_id.0)).await?;
 
         let deployment_id = deployment_id.0;
 

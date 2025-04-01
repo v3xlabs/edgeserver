@@ -48,9 +48,12 @@ impl SiteDomainsApi {
     #[oai(path = "/site/:site_id/domains", method = "get", tag = "ApiTags::Site")]
     pub async fn get_site_domains(
         &self,
+        user: UserAuth,
         #[oai(name = "site_id", style = "simple")] site_id: Path<String>,
         state: Data<&State>,
     ) -> Result<Json<Vec<DomainSubmission>>> {
+        user.verify_access_to(&SiteId(&site_id.0)).await?;
+
         let domains = Domain::get_by_site_id(&site_id, &state)
             .await
             .map_err(HttpError::from)
@@ -72,8 +75,6 @@ impl SiteDomainsApi {
         payload: Json<CreateSiteDomainRequest>,
     ) -> Result<Json<DomainSubmission>> {
         user.verify_access_to(&SiteId(&site_id.0)).await?;
-
-        let _user_ = user.required_session()?;
 
         // validate domain is atleast 3 characters and has a dot seperator, no spaces, trim, etc
         // use regex to validate
@@ -152,10 +153,13 @@ impl SiteDomainsApi {
     )]
     pub async fn preflight_site_domain(
         &self,
+        user: UserAuth,
         state: Data<&State>,
         site_id: Path<String>,
         domain: Path<String>,
     ) -> Result<DomainPreflightResponse> {
+        user.verify_access_to(&SiteId(&site_id.0)).await?;
+
         // validate domain is atleast 3 characters and has a dot seperator, no spaces, trim, etc
         // use regex to validate
         let domain_regex = regex::Regex::new(r"^(\*\.)?([a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?\.)+[a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?$").unwrap();

@@ -35,6 +35,7 @@ impl TeamApi {
     /// Get all teams
     ///
     /// Gets a list of all the teams you have access to
+    /// (user-only)
     #[oai(path = "/team", method = "get", tag = "ApiTags::Team")]
     pub async fn get_teams(&self, user: UserAuth, state: Data<&State>) -> Result<Json<Vec<Team>>> {
         let user = user.required_session()?;
@@ -48,6 +49,8 @@ impl TeamApi {
     }
 
     /// Create a team
+    /// 
+    /// (user-only)
     #[oai(path = "/team", method = "post", tag = "ApiTags::Team")]
     pub async fn create_team(
         &self,
@@ -74,8 +77,9 @@ impl TeamApi {
         #[oai(name = "team_id", style = "simple")]
         team_id: Path<String>,
     ) -> Result<Json<Team>> {
-        info!("Getting team: {:?} for user: {:?}", team_id.0, user);
         user.verify_access_to(&TeamId(&team_id.0)).await?;
+
+        info!("Getting team: {:?} for user: {:?}", team_id.0, user);
 
         Team::get_by_id(&state.0.database, &team_id.0)
             .await
@@ -95,12 +99,12 @@ impl TeamApi {
         #[oai(name = "team_id", style = "simple")]
         team_id: Path<String>,
     ) -> Result<Json<Vec<UserTeamInvite>>> {
+        user.verify_access_to(&TeamId(&team_id.0)).await?;
+
         info!(
             "Getting team invites for team: {:?} for user: {:?}",
             team_id.0, user
         );
-
-        user.verify_access_to(&TeamId(&team_id.0)).await?;
 
         UserTeamInvite::get_by_team_id(&state.0.database, &team_id.0)
             .await
@@ -110,6 +114,8 @@ impl TeamApi {
     }
 
     /// Invite a user to a team
+    /// 
+    /// (user-only) (due to team-owner overwrite)
     #[oai(path = "/team/:team_id/invites", method = "post", tag = "ApiTags::Team")]
     pub async fn invite_user_to_team(
         &self,
@@ -119,12 +125,12 @@ impl TeamApi {
         team_id: Path<String>,
         body: Json<InviteUserToTeamRequest>,
     ) -> Result<Json<UserTeamInvite>> {
+        user.verify_access_to(&TeamId(&team_id.0)).await?;
+
         info!(
             "Inviting user to team: {:?} for user: {:?}",
             team_id.0, body.user_id
         );
-
-        user.verify_access_to(&TeamId(&team_id.0)).await?;
 
         let user = user.required_session()?;
 
@@ -154,6 +160,8 @@ impl TeamApi {
     }
 
     /// Delete a team invite
+    /// 
+    /// (user-only) (due to team-owner overwrite)
     #[oai(
         path = "/team/:team_id/invite/:invite_id",
         method = "delete",
@@ -168,12 +176,12 @@ impl TeamApi {
         #[oai(name = "invite_id", style = "simple")]
         invite_id: Path<String>,
     ) -> Result<()> {
+        user.verify_access_to(&TeamId(&team_id.0)).await?;
+
         info!(
             "Deleting team invite: {:?} for user: {:?}",
             invite_id.0, user
         );
-
-        user.verify_access_to(&TeamId(&team_id.0)).await?;
 
         let user = user.required_session()?;
 
@@ -202,12 +210,12 @@ impl TeamApi {
         #[oai(name = "team_id", style = "simple")]
         team_id: Path<String>,
     ) -> Result<Json<Vec<Site>>> {
+        user.verify_access_to(&TeamId(&team_id.0)).await?;
+
         info!(
             "Getting sites for team: {:?} for user: {:?}",
             team_id.0, user
         );
-
-        user.verify_access_to(&TeamId(&team_id.0)).await?;
 
         Site::get_by_team_id(&state.0.database, &team_id.0)
             .await
@@ -239,6 +247,7 @@ impl TeamApi {
     /// Update a team
     ///
     /// Updates a team with the given name
+    /// (user-only) (due to team-owner overwrite)
     #[oai(path = "/team/:team_id", method = "put", tag = "ApiTags::Team")]
     pub async fn update_team(
         &self,
@@ -247,9 +256,9 @@ impl TeamApi {
         #[oai(name = "team_id", style = "simple")]
         team_id: Path<String>,
     ) -> Result<Json<Team>> {
-        info!("Updating team: {:?} for user: {:?}", team_id.0, user);
-
         user.verify_access_to(&TeamId(&team_id.0)).await?;
+        
+        info!("Updating team: {:?} for user: {:?}", team_id.0, user);
 
         let user = user.required_session()?;
 
@@ -266,6 +275,7 @@ impl TeamApi {
     /// Delete a team
     ///
     /// Deletes a team
+    /// (user-only) (due to team-owner overwrite)
     #[oai(path = "/team/:team_id", method = "delete", tag = "ApiTags::Team")]
     pub async fn delete_team(
         &self,
@@ -274,9 +284,9 @@ impl TeamApi {
         #[oai(name = "team_id", style = "simple")]
         team_id: Path<String>,
     ) -> Result<()> {
-        info!("Deleting team: {:?} for user: {:?}", team_id.0, user);
-
         let user = user.required_session()?;
+        
+        info!("Deleting team: {:?} for user: {:?}", team_id.0, user);
 
         if !Team::is_owner(&state.0.database, &team_id.0, &user.user_id)
             .await
@@ -295,6 +305,7 @@ impl TeamApi {
     /// Upload a team avatar
     ///
     /// Uploads an avatar for a team
+    /// (user-only) (due to team-owner overwrite)
     #[oai(path = "/team/:team_id/avatar", method = "post", tag = "ApiTags::Team")]
     pub async fn upload_team_avatar(
         &self,

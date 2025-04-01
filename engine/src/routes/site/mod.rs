@@ -1,6 +1,3 @@
-use deployments::SiteDeploymentsApi;
-use domains::SiteDomainsApi;
-use keys::SiteKeysApi;
 use poem::{web::Data, Result};
 use poem_openapi::{
     param::Path, payload::Json, types::multipart::Upload, Multipart, Object, OpenApi,
@@ -20,8 +17,8 @@ use crate::{
 
 use super::error::HttpError;
 
-pub mod domains;
 pub mod deployments;
+pub mod domains;
 pub mod keys;
 
 #[derive(Debug, Deserialize, Serialize, Object)]
@@ -53,15 +50,36 @@ pub struct CreateSiteDomainRequest {
 pub struct SiteApi;
 
 pub fn api_routes() -> impl OpenApi {
-    (SiteApi, SiteDeploymentsApi, SiteDomainsApi, SiteKeysApi)
+    (
+        SiteApi,
+        deployments::SiteDeploymentsApi,
+        domains::SiteDomainsApi,
+        keys::SiteKeysApi,
+    )
 }
 
 #[OpenApi]
 impl SiteApi {
+    /// Get all sites personal
+    ///
+    /// Gets a list of all the sites you have access to
+    #[oai(path = "/site", method = "get", tag = "ApiTags::Site")]
+    pub async fn get_sites(&self, user: UserAuth, state: Data<&State>) -> Result<Json<Vec<Site>>> {
+        info!("Getting sites for user: {:?}", user);
+
+        let user = user.required_session()?;
+
+        Site::get_by_user_id(&state.database, &user.user_id)
+            .await
+            .map_err(HttpError::from)
+            .map(Json)
+            .map_err(poem::Error::from)
+    }
 
     /// Create a new site
     ///
     /// Creates a new site given a create request
+    /// (user-only)
     #[oai(path = "/site", method = "post", tag = "ApiTags::Site")]
     pub async fn create_site(
         &self,
@@ -69,9 +87,9 @@ impl SiteApi {
         state: Data<&State>,
         payload: Json<SiteCreateRequest>,
     ) -> Result<Json<Site>> {
-        info!("Creating site for user: {:?}", user);
-
         let user = user.required_session()?;
+
+        info!("Creating site for user: {:?}", user);
 
         if !Team::is_owner(&state.database, &payload.team_id, &user.user_id)
             .await
@@ -93,12 +111,11 @@ impl SiteApi {
         &self,
         user: UserAuth,
         state: Data<&State>,
-        #[oai(name = "site_id", style = "simple")]
-        site_id: Path<String>,
+        #[oai(name = "site_id", style = "simple")] site_id: Path<String>,
     ) -> Result<Json<Site>> {
-        info!("Getting site: {:?} for user: {:?}", site_id.0, user);
-
         user.verify_access_to(&SiteId(&site_id.0)).await?;
+
+        info!("Getting site: {:?} for user: {:?}", site_id.0, user);
 
         Site::get_by_id(&state.database, &site_id.0)
             .await
@@ -110,14 +127,13 @@ impl SiteApi {
     /// Update a site
     #[oai(path = "/site/:site_id", method = "put", tag = "ApiTags::Site")]
     pub async fn update_site(
-        &self, 
-        user: UserAuth, 
-        #[oai(name = "site_id", style = "simple")]
-        site_id: Path<String>
+        &self,
+        user: UserAuth,
+        #[oai(name = "site_id", style = "simple")] site_id: Path<String>,
     ) -> Result<Json<Site>> {
-        info!("Updating site: {:?} for user: {:?}", site_id.0, user);
-
         user.verify_access_to(&SiteId(&site_id.0)).await?;
+
+        info!("Updating site: {:?} for user: {:?}", site_id.0, user);
 
         todo!();
     }
@@ -125,14 +141,13 @@ impl SiteApi {
     /// Delete a site
     #[oai(path = "/site/:site_id", method = "delete", tag = "ApiTags::Site")]
     pub async fn delete_site(
-        &self, 
-        user: UserAuth, 
-        #[oai(name = "site_id", style = "simple")]
-        site_id: Path<String>
+        &self,
+        user: UserAuth,
+        #[oai(name = "site_id", style = "simple")] site_id: Path<String>,
     ) -> Result<Json<Site>> {
-        info!("Deleting site: {:?} for user: {:?}", site_id.0, user);
-
         user.verify_access_to(&SiteId(&site_id.0)).await?;
+
+        info!("Deleting site: {:?} for user: {:?}", site_id.0, user);
 
         todo!();
     }

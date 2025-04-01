@@ -6,7 +6,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::{
     middlewares::auth::UserAuth,
-    models::keys::{Key, NewKey},
+    models::{keys::{Key, NewKey}, team::TeamId},
     routes::{error::HttpError, ApiTags},
     state::State,
 };
@@ -24,9 +24,12 @@ impl TeamKeysApi {
     #[oai(path = "/team/:team_id/keys", method = "get", tag = "ApiTags::Team")]
     pub async fn get_team_keys(
         &self,
+        user: UserAuth,
         #[oai(name = "team_id", style = "simple")] team_id: Path<String>,
         state: Data<&State>,
     ) -> Result<Json<Vec<Key>>> {
+        user.verify_access_to(&TeamId(&team_id.0)).await?;
+
         let keys = Key::get_for_resource(&state.database, "team", team_id.as_ref())
             .await
             .map_err(HttpError::from)
@@ -35,6 +38,8 @@ impl TeamKeysApi {
     }
 
     /// Create a team key
+    /// 
+    /// (user-only)
     #[oai(path = "/team/:team_id/keys", method = "post", tag = "ApiTags::Team")]
     pub async fn create_team_key(
         &self,
@@ -43,6 +48,8 @@ impl TeamKeysApi {
         payload: Json<CreateTeamKeyRequest>,
         state: Data<&State>,
     ) -> Result<Json<NewKey>> {
+        user.verify_access_to(&TeamId(&team_id.0)).await?;
+
         let user = user.required_session()?;
 
         let key = Key::new(
@@ -70,7 +77,7 @@ impl TeamKeysApi {
         #[oai(name = "key_id", style = "simple")] key_id: Path<String>,
         state: Data<&State>,
     ) -> Result<Json<serde_json::Value>> {
-        let user = user.required_session()?;
+        user.verify_access_to(&TeamId(&team_id.0)).await?;
 
         let key = Key::get_by_id(&state.database, key_id.as_ref())
             .await
@@ -82,6 +89,10 @@ impl TeamKeysApi {
         }
 
         let key = key.unwrap();
+
+        if key.key_type != "team" || key.key_resource != team_id.0 {
+            return Err(poem::Error::from_status(StatusCode::FORBIDDEN));
+        }
 
         Key::delete(&state.database, key_id.as_ref())
             .await
