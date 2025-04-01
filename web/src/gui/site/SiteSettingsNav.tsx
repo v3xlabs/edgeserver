@@ -14,6 +14,7 @@ import {
     LuSettings,
     LuWebhook,
 } from 'react-icons/lu';
+import { SiIpfs } from 'react-icons/si';
 
 import { getSiteDomains } from '@/api';
 import { queryClient } from '@/util/query';
@@ -168,6 +169,11 @@ export const SiteSettingsNav = () => {
                                 path: '/settings/rules',
                                 label: 'Routing Rules',
                                 icon: <LuFilter key="rules" />,
+                            },
+                            {
+                                path: '/settings/ipfs',
+                                label: 'IPFS',
+                                icon: <SiIpfs key="ipfs" />,
                             },
                         ],
                     ],

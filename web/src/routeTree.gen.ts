@@ -45,6 +45,7 @@ import { Route as AuthedSiteSiteIdSettingsSWebhooksImport } from './routes/_auth
 import { Route as AuthedSiteSiteIdSettingsSTransferImport } from './routes/_authed/site/$siteId/settings/_s.transfer'
 import { Route as AuthedSiteSiteIdSettingsSRulesImport } from './routes/_authed/site/$siteId/settings/_s.rules'
 import { Route as AuthedSiteSiteIdSettingsSKeysImport } from './routes/_authed/site/$siteId/settings/_s.keys'
+import { Route as AuthedSiteSiteIdSettingsSIpfsImport } from './routes/_authed/site/$siteId/settings/_s.ipfs'
 import { Route as AuthedSiteSiteIdSettingsSDomainsImport } from './routes/_authed/site/$siteId/settings/_s.domains'
 import { Route as AuthedSiteSiteIdSettingsSCiImport } from './routes/_authed/site/$siteId/settings/_s.ci'
 import { Route as AuthedSiteSiteIdSettingsSActionsImport } from './routes/_authed/site/$siteId/settings/_s.actions'
@@ -287,6 +288,13 @@ const AuthedSiteSiteIdSettingsSKeysRoute =
     getParentRoute: () => AuthedSiteSiteIdSettingsSRoute,
   } as any)
 
+const AuthedSiteSiteIdSettingsSIpfsRoute =
+  AuthedSiteSiteIdSettingsSIpfsImport.update({
+    id: '/ipfs',
+    path: '/ipfs',
+    getParentRoute: () => AuthedSiteSiteIdSettingsSRoute,
+  } as any)
+
 const AuthedSiteSiteIdSettingsSDomainsRoute =
   AuthedSiteSiteIdSettingsSDomainsImport.update({
     id: '/domains',
@@ -494,6 +502,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthedSiteSiteIdSettingsSDomainsImport
       parentRoute: typeof AuthedSiteSiteIdSettingsSImport
     }
+    '/_authed/site/$siteId/settings/_s/ipfs': {
+      id: '/_authed/site/$siteId/settings/_s/ipfs'
+      path: '/ipfs'
+      fullPath: '/site/$siteId/settings/ipfs'
+      preLoaderRoute: typeof AuthedSiteSiteIdSettingsSIpfsImport
+      parentRoute: typeof AuthedSiteSiteIdSettingsSImport
+    }
     '/_authed/site/$siteId/settings/_s/keys': {
       id: '/_authed/site/$siteId/settings/_s/keys'
       path: '/keys'
@@ -642,6 +657,7 @@ interface AuthedSiteSiteIdSettingsSRouteChildren {
   AuthedSiteSiteIdSettingsSActionsRoute: typeof AuthedSiteSiteIdSettingsSActionsRoute
   AuthedSiteSiteIdSettingsSCiRoute: typeof AuthedSiteSiteIdSettingsSCiRoute
   AuthedSiteSiteIdSettingsSDomainsRoute: typeof AuthedSiteSiteIdSettingsSDomainsRoute
+  AuthedSiteSiteIdSettingsSIpfsRoute: typeof AuthedSiteSiteIdSettingsSIpfsRoute
   AuthedSiteSiteIdSettingsSKeysRoute: typeof AuthedSiteSiteIdSettingsSKeysRoute
   AuthedSiteSiteIdSettingsSRulesRoute: typeof AuthedSiteSiteIdSettingsSRulesRoute
   AuthedSiteSiteIdSettingsSTransferRoute: typeof AuthedSiteSiteIdSettingsSTransferRoute
@@ -656,6 +672,7 @@ const AuthedSiteSiteIdSettingsSRouteChildren: AuthedSiteSiteIdSettingsSRouteChil
     AuthedSiteSiteIdSettingsSCiRoute: AuthedSiteSiteIdSettingsSCiRoute,
     AuthedSiteSiteIdSettingsSDomainsRoute:
       AuthedSiteSiteIdSettingsSDomainsRoute,
+    AuthedSiteSiteIdSettingsSIpfsRoute: AuthedSiteSiteIdSettingsSIpfsRoute,
     AuthedSiteSiteIdSettingsSKeysRoute: AuthedSiteSiteIdSettingsSKeysRoute,
     AuthedSiteSiteIdSettingsSRulesRoute: AuthedSiteSiteIdSettingsSRulesRoute,
     AuthedSiteSiteIdSettingsSTransferRoute:
@@ -787,6 +804,7 @@ export interface FileRoutesByFullPath {
   '/site/$siteId/settings/actions': typeof AuthedSiteSiteIdSettingsSActionsRoute
   '/site/$siteId/settings/ci': typeof AuthedSiteSiteIdSettingsSCiRoute
   '/site/$siteId/settings/domains': typeof AuthedSiteSiteIdSettingsSDomainsRoute
+  '/site/$siteId/settings/ipfs': typeof AuthedSiteSiteIdSettingsSIpfsRoute
   '/site/$siteId/settings/keys': typeof AuthedSiteSiteIdSettingsSKeysRoute
   '/site/$siteId/settings/rules': typeof AuthedSiteSiteIdSettingsSRulesRoute
   '/site/$siteId/settings/transfer': typeof AuthedSiteSiteIdSettingsSTransferRoute
@@ -822,6 +840,7 @@ export interface FileRoutesByTo {
   '/site/$siteId/settings/actions': typeof AuthedSiteSiteIdSettingsSActionsRoute
   '/site/$siteId/settings/ci': typeof AuthedSiteSiteIdSettingsSCiRoute
   '/site/$siteId/settings/domains': typeof AuthedSiteSiteIdSettingsSDomainsRoute
+  '/site/$siteId/settings/ipfs': typeof AuthedSiteSiteIdSettingsSIpfsRoute
   '/site/$siteId/settings/keys': typeof AuthedSiteSiteIdSettingsSKeysRoute
   '/site/$siteId/settings/rules': typeof AuthedSiteSiteIdSettingsSRulesRoute
   '/site/$siteId/settings/transfer': typeof AuthedSiteSiteIdSettingsSTransferRoute
@@ -863,6 +882,7 @@ export interface FileRoutesById {
   '/_authed/site/$siteId/settings/_s/actions': typeof AuthedSiteSiteIdSettingsSActionsRoute
   '/_authed/site/$siteId/settings/_s/ci': typeof AuthedSiteSiteIdSettingsSCiRoute
   '/_authed/site/$siteId/settings/_s/domains': typeof AuthedSiteSiteIdSettingsSDomainsRoute
+  '/_authed/site/$siteId/settings/_s/ipfs': typeof AuthedSiteSiteIdSettingsSIpfsRoute
   '/_authed/site/$siteId/settings/_s/keys': typeof AuthedSiteSiteIdSettingsSKeysRoute
   '/_authed/site/$siteId/settings/_s/rules': typeof AuthedSiteSiteIdSettingsSRulesRoute
   '/_authed/site/$siteId/settings/_s/transfer': typeof AuthedSiteSiteIdSettingsSTransferRoute
@@ -903,6 +923,7 @@ export interface FileRouteTypes {
     | '/site/$siteId/settings/actions'
     | '/site/$siteId/settings/ci'
     | '/site/$siteId/settings/domains'
+    | '/site/$siteId/settings/ipfs'
     | '/site/$siteId/settings/keys'
     | '/site/$siteId/settings/rules'
     | '/site/$siteId/settings/transfer'
@@ -937,6 +958,7 @@ export interface FileRouteTypes {
     | '/site/$siteId/settings/actions'
     | '/site/$siteId/settings/ci'
     | '/site/$siteId/settings/domains'
+    | '/site/$siteId/settings/ipfs'
     | '/site/$siteId/settings/keys'
     | '/site/$siteId/settings/rules'
     | '/site/$siteId/settings/transfer'
@@ -976,6 +998,7 @@ export interface FileRouteTypes {
     | '/_authed/site/$siteId/settings/_s/actions'
     | '/_authed/site/$siteId/settings/_s/ci'
     | '/_authed/site/$siteId/settings/_s/domains'
+    | '/_authed/site/$siteId/settings/_s/ipfs'
     | '/_authed/site/$siteId/settings/_s/keys'
     | '/_authed/site/$siteId/settings/_s/rules'
     | '/_authed/site/$siteId/settings/_s/transfer'
@@ -1137,6 +1160,7 @@ export const routeTree = rootRoute
         "/_authed/site/$siteId/settings/_s/actions",
         "/_authed/site/$siteId/settings/_s/ci",
         "/_authed/site/$siteId/settings/_s/domains",
+        "/_authed/site/$siteId/settings/_s/ipfs",
         "/_authed/site/$siteId/settings/_s/keys",
         "/_authed/site/$siteId/settings/_s/rules",
         "/_authed/site/$siteId/settings/_s/transfer",
@@ -1174,6 +1198,10 @@ export const routeTree = rootRoute
     },
     "/_authed/site/$siteId/settings/_s/domains": {
       "filePath": "_authed/site/$siteId/settings/_s.domains.tsx",
+      "parent": "/_authed/site/$siteId/settings/_s"
+    },
+    "/_authed/site/$siteId/settings/_s/ipfs": {
+      "filePath": "_authed/site/$siteId/settings/_s.ipfs.tsx",
       "parent": "/_authed/site/$siteId/settings/_s"
     },
     "/_authed/site/$siteId/settings/_s/keys": {

@@ -42,6 +42,7 @@ export const Route = createFileRoute(
     context(context) {
         return {
             title: 'Domains',
+            subtitle: 'Manage your site domains',
             suffix: (
                 <SiteDomainCreateModal site_id={context.params.siteId}>
                     <Button>Add Domain</Button>
