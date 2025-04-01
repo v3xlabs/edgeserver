@@ -1,10 +1,14 @@
+use async_std::stream::StreamExt;
 use lapin::{
     options::*, publisher_confirm::Confirmation, types::FieldTable, BasicProperties, Channel,
     Connection, ConnectionProperties,
 };
 use serde::{Deserialize, Serialize};
 
-use crate::state::AMQPConfig;
+use crate::{
+    models::deployment::Deployment,
+    state::{AMQPConfig, AppState, State},
+};
 use tracing::info;
 
 #[derive(Debug)]
@@ -14,6 +18,7 @@ pub struct TaskRabbit {
 
     previews_queue_key: String,
     car_queue_key: String,
+    car_result_queue_key: String,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -27,6 +32,15 @@ pub struct BunshotPayload {
 pub struct CarRequest {
     pub deployment_id: String,
     pub file_path: String,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct CarResponse {
+    pub deployment_id: String,
+    pub success: bool,
+    pub error: Option<String>,
+    pub cid: Option<String>,
+    pub file_path: Option<String>,
 }
 
 impl TaskRabbit {
@@ -75,12 +89,67 @@ impl TaskRabbit {
             )
             .await
             .unwrap();
+
+        let car_result_queue_key = config
+            .car_result_queue
+            .as_deref()
+            .unwrap_or("car_results")
+            .to_string();
+
+        car_channel
+            .queue_declare(
+                &car_result_queue_key,
+                QueueDeclareOptions {
+                    durable: true,
+                    ..QueueDeclareOptions::default()
+                },
+                FieldTable::default(),
+            )
+            .await
+            .unwrap();
+
         TaskRabbit {
             connection,
             channel: bunshot_channel,
             previews_queue_key,
             car_queue_key,
+            car_result_queue_key,
         }
+    }
+
+    pub async fn do_consume(&self, state: &AppState) {
+        let mut consumer = self
+            .channel
+            .basic_consume(
+                &self.car_result_queue_key,
+                "edgeserver",
+                BasicConsumeOptions::default(),
+                FieldTable::default(),
+            )
+            .await
+            .unwrap();
+
+        while let Ok(delivery) = consumer.next().await.unwrap() {
+            let payload = match serde_json::from_slice::<CarResponse>(&delivery.data) {
+                Ok(payload) => payload,
+                Err(e) => {
+                    tracing::error!("Failed to deserialize car response NACKING: {}", e);
+                    delivery.nack(BasicNackOptions::default()).await.unwrap();
+                    continue;
+                }
+            };
+
+            tracing::info!("Received car response: {:?}", payload);
+
+            if let Some(ipfs_cid) = payload.cid {
+                Deployment::update_ipfs_cid(&state.database, &payload.deployment_id, &ipfs_cid)
+                    .await
+                    .ok();
+            }
+
+            delivery.ack(BasicAckOptions::default()).await.unwrap();
+        }
+        tracing::error!("Consumer stream ended");
     }
 
     pub async fn queue_bunshot(&self, site_id: &str, deployment_id: &str, domain: &str) {

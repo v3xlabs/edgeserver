@@ -22,6 +22,11 @@
         "ordinal": 3,
         "name": "context",
         "type_info": "Text"
+      },
+      {
+        "ordinal": 4,
+        "name": "ipfs_cid",
+        "type_info": "Text"
       }
     ],
     "parameters": {
@@ -35,6 +40,7 @@
       false,
       false,
       false,
+      true,
       true
     ]
   },

@@ -1,14 +1,17 @@
+use async_zip::base::read::mem::ZipFileReader;
 use chrono::{DateTime, Utc};
 use opentelemetry::Context;
-use poem_openapi::{types::{multipart::Upload, Example}, Object};
+use poem_openapi::{types::Example, Object};
 use serde::{Deserialize, Serialize};
 use sqlx::{query, query_as};
-use async_zip::base::read::mem::ZipFileReader;
 use tracing::{info, info_span};
 use tracing_opentelemetry::OpenTelemetrySpanExt;
 
 use crate::{
-    assets::AssetFile, database::Database, state::State, utils::id::{generate_id, IdType}
+    assets::AssetFile,
+    database::Database,
+    state::State,
+    utils::id::{generate_id, IdType},
 };
 
 pub mod preview;
@@ -20,6 +23,7 @@ pub struct Deployment {
     pub deployment_id: String,
     pub site_id: String,
     pub context: Option<String>,
+    pub ipfs_cid: Option<String>,
     pub created_at: DateTime<Utc>,
 }
 
@@ -28,7 +32,8 @@ impl Example for Deployment {
         Self {
             deployment_id: "d_1234567890".to_string(),
             site_id: "s_1234567890".to_string(),
-            context: Some("test".to_string()),
+            context: Some("{}".to_string()),
+            ipfs_cid: Some("Qm1234567890...".to_string()),
             created_at: Utc::now(),
         }
     }
@@ -109,11 +114,16 @@ impl Deployment {
             file_content.read_to_end_checked(&mut buf).await.unwrap();
 
             // hash the file
-            let (_file, newly_created_file, file_hash, content_type, _file_size) = AssetFile::from_buffer(state, &buf, path).await?;
+            let (_file, newly_created_file, file_hash, content_type, _file_size) =
+                AssetFile::from_buffer(state, &buf, path).await?;
 
             info!("Cataloging metadata for file: {:?}", path);
-            
-            let s = tracing::span!(tracing::Level::INFO, "cataloging_metadata", file_path = path);
+
+            let s = tracing::span!(
+                tracing::Level::INFO,
+                "cataloging_metadata",
+                file_path = path
+            );
             let _enter = s.enter();
 
             let _deployment_file = query_as!(
@@ -216,13 +226,33 @@ impl Deployment {
         .await
     }
 
-    pub async fn update_context(db: &Database, deployment_id: &str, context: &str) -> Result<(), sqlx::Error> {
+    pub async fn update_context(
+        db: &Database,
+        deployment_id: &str,
+        context: &str,
+    ) -> Result<(), sqlx::Error> {
         let span = info_span!("Deployment::update_context");
         let _guard = span.enter();
 
         query!(
             "UPDATE deployments SET context = $1 WHERE deployment_id = $2",
             context,
+            deployment_id
+        )
+        .execute(&db.pool)
+        .await?;
+
+        Ok(())
+    }
+
+    pub async fn update_ipfs_cid(
+        db: &Database,
+        deployment_id: &str,
+        ipfs_cid: &str,
+    ) -> Result<(), sqlx::Error> {
+        query!(
+            "UPDATE deployments SET ipfs_cid = $1 WHERE deployment_id = $2",
+            ipfs_cid,
             deployment_id
         )
         .execute(&db.pool)

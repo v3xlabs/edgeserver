@@ -41,17 +41,13 @@ const mimeFromExtension = (extension: string) => {
 
 export async function uploadToS3(
     buffer: Buffer,
-    siteId: string,
     deploymentId: string,
-    domain: string,
-    suffix?: string,
+    suffix: string,
     mimeType?: string
 ): Promise<string> {
     try {
         // Generate a clean filename
-        const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
-        const cleanDomain = domain.replace(/[^a-zA-Z0-9]/g, "-");
-        const key = `${siteId}/${deploymentId}/${cleanDomain}_${timestamp}${suffix ? `_${suffix}` : ''}.${mimeType ? mimeType : 'webp'}`;
+        const key = `${deploymentId}/${suffix}`;
 
         // Log detailed info for debugging
         console.log(`S3 Upload Info - Bucket: ${config.aws.bucket}, Region: ${config.aws.region}`);

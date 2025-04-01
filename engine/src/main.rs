@@ -1,5 +1,7 @@
 use std::env;
+use std::sync::Arc;
 
+use async_std::prelude::FutureExt;
 use opentelemetry::KeyValue;
 use opentelemetry::{global, trace::TracerProvider};
 use opentelemetry_otlp::WithExportConfig;
@@ -93,5 +95,11 @@ async fn main() {
         }
     };
 
-    routes::serve(state).await;
+    let app_state = Arc::new(state);
+
+    if let Some(rabbit) = &app_state.clone().rabbit {
+        rabbit.do_consume(&app_state.clone()).join(routes::serve(app_state)).await;
+    } else {
+        routes::serve(app_state).await;
+    }
 }

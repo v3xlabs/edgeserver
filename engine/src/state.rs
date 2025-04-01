@@ -60,6 +60,7 @@ pub struct AMQPConfig {
     pub addr: String,
     pub previews_queue: Option<String>,
     pub car_queue: Option<String>,
+    pub car_result_queue: Option<String>,
 }
 
 /// Github App Config

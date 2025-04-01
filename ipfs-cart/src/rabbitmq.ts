@@ -3,12 +3,10 @@
 import * as amqp from "amqplib";
 import config from "./config";
 import { downloadFromS3ToTempDir, uploadToS3 } from "./s3";
-import { CarRequest } from "./types";
-import { ScreenshotRequest } from "../../bunshot/src/types";
+import { CarRequest, CarResponse } from "./types";
 import { rm } from "fs/promises";
 import { join } from "path/posix";
-import { Extract } from "unzipper";
-import { createReadStream } from "fs";
+import AdmZip from "adm-zip";
 import { readdir } from "fs/promises";
 import { createCarFile } from "./car";
 import { mkdir } from "fs/promises";
@@ -73,6 +71,15 @@ export async function connectRabbitMQ() {
                     if (response.success) {
                         // Output the response
                         console.log("Processing complete:", response);
+
+                        // send response to rabbitmq
+                        channel.publish(
+                            "",
+                            config.rabbitmq.result_queue,
+                            Buffer.from(JSON.stringify(response)),
+                            { headers: { retryCount: 0 } }
+                        );
+
                         // Acknowledge the message
                         channel.ack(msg);
                     } else {
@@ -176,24 +183,24 @@ export async function connectRabbitMQ() {
 // Process a screenshot request
 async function processCarRequest(
     request: CarRequest
-): Promise<{ success: boolean, error?: string }> {
+): Promise<CarResponse> {
     console.log("Processing car request:", request);
 
     const [tempDir, zipPath] = await downloadFromS3ToTempDir(request.file_path);
 
     console.log("Downloaded car to temp dir:", tempDir);
 
+    const deployment_id = request.deployment_id;
+
+    let outputFilePath: string;
+    let outputCID: string;
+
     try {
         const outputDir = join(tempDir, "output");
         await mkdir(outputDir, { recursive: true });
 
-        // Extract the car.zip file using unzipper
-        await new Promise((resolve, reject) => {
-            createReadStream(zipPath)
-                .pipe(Extract({ path: outputDir }))
-                .on('close', resolve)
-                .on('error', reject);
-        });
+        const zip = new AdmZip(zipPath);
+        zip.extractAllTo(outputDir, true);
         
         // Clean up the zip file after extraction
         await rm(zipPath);
@@ -209,22 +216,25 @@ async function processCarRequest(
         const s3Key = await uploadToS3(
             Buffer.from(await Bun.file(carFilePath).arrayBuffer()),
             request.deployment_id,
-            request.deployment_id,
-            "car",
-            undefined,
-            "car"
+            "deploy.car",
         );
 
         console.log("CAR file uploaded to S3:", s3Key);
         console.log("Root CID:", rootCID);
 
+        outputFilePath = s3Key;
+        outputCID = rootCID;
     } catch (error) {
         console.error("Error processing car request:", error);
-        return { success: false, error: error instanceof Error ? error.message : String(error) };
+        return { success: false, error: error instanceof Error ? error.message : String(error), deployment_id };
     } finally {
         // delete temp dir
         await rm(tempDir, { recursive: true, force: true });
     }
 
-    return { success: true };
+    if (!outputFilePath || !outputCID) {
+        return { success: false, error: "Error processing car request", deployment_id };
+    }
+
+    return { success: true, cid: outputCID, file_path: outputFilePath, deployment_id };
 } 

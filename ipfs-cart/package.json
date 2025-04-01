@@ -12,16 +12,20 @@
     "dependencies": {
         "@aws-sdk/client-s3": "^3.779.0",
         "@aws-sdk/lib-storage": "^3.779.0",
+        "@ipld/car": "^5.4.0",
+        "@ipld/dag-cbor": "^9.2.2",
+        "@ipld/unixfs": "^3.0.0",
         "@types/node": "^22.13.15",
+        "adm-zip": "^0.5.16",
         "amqplib": "^0.10.7",
         "dotenv": "^16.4.7",
-        "@ipld/car": "^5.4.0",
         "files-from-path": "^1.1.4",
         "multiformats": "^13.3.2",
         "unzipper": "^0.10.14"
     },
     "devDependencies": {
-        "bun-types": "latest",
-        "@types/amqplib": "^0.10.7"
+        "@types/adm-zip": "^0.5.7",
+        "@types/amqplib": "^0.10.7",
+        "bun-types": "latest"
     }
 }

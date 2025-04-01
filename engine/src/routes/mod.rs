@@ -16,7 +16,7 @@ use tracing::info;
 use user::UserApi;
 
 use crate::middlewares::tracing::TraceId;
-use crate::state::AppState;
+use crate::state::{AppState, State};
 
 pub mod auth;
 pub mod error;
@@ -134,10 +134,8 @@ fn reorder_openapi_tags(json: &str, tag_order: &[&str]) -> String {
     }
 }
 
-pub async fn serve(state: AppState) {
+pub async fn serve(state: State) {
     info!("Serving HTTP");
-
-    let state = Arc::new(state);
 
     let openapi_description = include_str!("./README.md");
 
