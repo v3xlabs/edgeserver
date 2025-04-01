@@ -24,41 +24,43 @@ import { Route as AuthedSiteNewImport } from './routes/_authed/site/new'
 import { Route as AuthedSettingsSImport } from './routes/_authed/settings/_s'
 import { Route as AuthedAdminAImport } from './routes/_authed/admin/_a'
 import { Route as AuthedTeamTeamIdIndexImport } from './routes/_authed/team/$teamId/index'
-import { Route as AuthedSiteSiteIdIndexImport } from './routes/_authed/site/$siteId/index'
 import { Route as AuthedSettingsSIndexImport } from './routes/_authed/settings/_s.index'
 import { Route as AuthedAdminAIndexImport } from './routes/_authed/admin/_a/index'
 import { Route as AuthedTeamTeamIdSitesImport } from './routes/_authed/team/$teamId/sites'
-import { Route as AuthedSiteSiteIdDeploymentsImport } from './routes/_authed/site/$siteId/deployments'
-import { Route as AuthedSiteSiteIdAnalyticsImport } from './routes/_authed/site/$siteId/analytics'
+import { Route as AuthedSiteSiteIdSiteImport } from './routes/_authed/site/$siteId._site'
+import { Route as AuthedSiteSiteIdSiteIndexImport } from './routes/_authed/site/$siteId._site/index'
 import { Route as AuthedTeamTeamIdSettingsSImport } from './routes/_authed/team/$teamId/settings/_s'
-import { Route as AuthedSiteSiteIdSettingsSImport } from './routes/_authed/site/$siteId/settings/_s'
+import { Route as AuthedSiteSiteIdSiteDeploymentsImport } from './routes/_authed/site/$siteId._site/deployments'
+import { Route as AuthedSiteSiteIdSiteAnalyticsImport } from './routes/_authed/site/$siteId._site/analytics'
 import { Route as AuthedTeamTeamIdSettingsSIndexImport } from './routes/_authed/team/$teamId/settings/_s.index'
-import { Route as AuthedSiteSiteIdSettingsSIndexImport } from './routes/_authed/site/$siteId/settings/_s.index'
-import { Route as AuthedSiteSiteIdDeploymentDeploymentIdIndexImport } from './routes/_authed/site/$siteId/deployment/$deploymentId/index'
 import { Route as AuthedTeamTeamIdSettingsSWebhooksImport } from './routes/_authed/team/$teamId/settings/_s.webhooks'
 import { Route as AuthedTeamTeamIdSettingsSTransferImport } from './routes/_authed/team/$teamId/settings/_s.transfer'
 import { Route as AuthedTeamTeamIdSettingsSMembersImport } from './routes/_authed/team/$teamId/settings/_s.members'
 import { Route as AuthedTeamTeamIdSettingsSKeysImport } from './routes/_authed/team/$teamId/settings/_s.keys'
 import { Route as AuthedTeamTeamIdSettingsSCiImport } from './routes/_authed/team/$teamId/settings/_s.ci'
 import { Route as AuthedTeamTeamIdSettingsSActionsImport } from './routes/_authed/team/$teamId/settings/_s.actions'
-import { Route as AuthedSiteSiteIdSettingsSWebhooksImport } from './routes/_authed/site/$siteId/settings/_s.webhooks'
-import { Route as AuthedSiteSiteIdSettingsSTransferImport } from './routes/_authed/site/$siteId/settings/_s.transfer'
-import { Route as AuthedSiteSiteIdSettingsSRulesImport } from './routes/_authed/site/$siteId/settings/_s.rules'
-import { Route as AuthedSiteSiteIdSettingsSKeysImport } from './routes/_authed/site/$siteId/settings/_s.keys'
-import { Route as AuthedSiteSiteIdSettingsSIpfsImport } from './routes/_authed/site/$siteId/settings/_s.ipfs'
-import { Route as AuthedSiteSiteIdSettingsSDomainsImport } from './routes/_authed/site/$siteId/settings/_s.domains'
-import { Route as AuthedSiteSiteIdSettingsSCiImport } from './routes/_authed/site/$siteId/settings/_s.ci'
-import { Route as AuthedSiteSiteIdSettingsSActionsImport } from './routes/_authed/site/$siteId/settings/_s.actions'
+import { Route as AuthedSiteSiteIdSiteSettingsSImport } from './routes/_authed/site/$siteId._site/settings/_s'
+import { Route as AuthedSiteSiteIdSiteSettingsSIndexImport } from './routes/_authed/site/$siteId._site/settings/_s.index'
+import { Route as AuthedSiteSiteIdSiteDeploymentDeploymentIdIndexImport } from './routes/_authed/site/$siteId._site/deployment/$deploymentId/index'
+import { Route as AuthedSiteSiteIdSiteSettingsSWebhooksImport } from './routes/_authed/site/$siteId._site/settings/_s.webhooks'
+import { Route as AuthedSiteSiteIdSiteSettingsSTransferImport } from './routes/_authed/site/$siteId._site/settings/_s.transfer'
+import { Route as AuthedSiteSiteIdSiteSettingsSRulesImport } from './routes/_authed/site/$siteId._site/settings/_s.rules'
+import { Route as AuthedSiteSiteIdSiteSettingsSKeysImport } from './routes/_authed/site/$siteId._site/settings/_s.keys'
+import { Route as AuthedSiteSiteIdSiteSettingsSIpfsImport } from './routes/_authed/site/$siteId._site/settings/_s.ipfs'
+import { Route as AuthedSiteSiteIdSiteSettingsSDomainsImport } from './routes/_authed/site/$siteId._site/settings/_s.domains'
+import { Route as AuthedSiteSiteIdSiteSettingsSCiImport } from './routes/_authed/site/$siteId._site/settings/_s.ci'
+import { Route as AuthedSiteSiteIdSiteSettingsSActionsImport } from './routes/_authed/site/$siteId._site/settings/_s.actions'
 
 // Create Virtual Routes
 
 const AuthedSettingsImport = createFileRoute('/_authed/settings')()
 const AuthedAdminImport = createFileRoute('/_authed/admin')()
+const AuthedSiteSiteIdImport = createFileRoute('/_authed/site/$siteId')()
 const AuthedTeamTeamIdSettingsImport = createFileRoute(
   '/_authed/team/$teamId/settings',
 )()
-const AuthedSiteSiteIdSettingsImport = createFileRoute(
-  '/_authed/site/$siteId/settings',
+const AuthedSiteSiteIdSiteSettingsImport = createFileRoute(
+  '/_authed/site/$siteId/_site/settings',
 )()
 
 // Create/Update Routes
@@ -104,6 +106,12 @@ const AuthedIndexRoute = AuthedIndexImport.update({
   getParentRoute: () => AuthedRoute,
 } as any)
 
+const AuthedSiteSiteIdRoute = AuthedSiteSiteIdImport.update({
+  id: '/site/$siteId',
+  path: '/site/$siteId',
+  getParentRoute: () => AuthedRoute,
+} as any)
+
 const InviteInviteIdIndexRoute = InviteInviteIdIndexImport.update({
   id: '/invite/$inviteId/',
   path: '/invite/$inviteId/',
@@ -138,21 +146,9 @@ const AuthedTeamTeamIdSettingsRoute = AuthedTeamTeamIdSettingsImport.update({
   getParentRoute: () => AuthedRoute,
 } as any)
 
-const AuthedSiteSiteIdSettingsRoute = AuthedSiteSiteIdSettingsImport.update({
-  id: '/site/$siteId/settings',
-  path: '/site/$siteId/settings',
-  getParentRoute: () => AuthedRoute,
-} as any)
-
 const AuthedTeamTeamIdIndexRoute = AuthedTeamTeamIdIndexImport.update({
   id: '/team/$teamId/',
   path: '/team/$teamId/',
-  getParentRoute: () => AuthedRoute,
-} as any)
-
-const AuthedSiteSiteIdIndexRoute = AuthedSiteSiteIdIndexImport.update({
-  id: '/site/$siteId/',
-  path: '/site/$siteId/',
   getParentRoute: () => AuthedRoute,
 } as any)
 
@@ -174,17 +170,22 @@ const AuthedTeamTeamIdSitesRoute = AuthedTeamTeamIdSitesImport.update({
   getParentRoute: () => AuthedRoute,
 } as any)
 
-const AuthedSiteSiteIdDeploymentsRoute =
-  AuthedSiteSiteIdDeploymentsImport.update({
-    id: '/site/$siteId/deployments',
-    path: '/site/$siteId/deployments',
-    getParentRoute: () => AuthedRoute,
+const AuthedSiteSiteIdSiteRoute = AuthedSiteSiteIdSiteImport.update({
+  id: '/_site',
+  getParentRoute: () => AuthedSiteSiteIdRoute,
+} as any)
+
+const AuthedSiteSiteIdSiteSettingsRoute =
+  AuthedSiteSiteIdSiteSettingsImport.update({
+    id: '/settings',
+    path: '/settings',
+    getParentRoute: () => AuthedSiteSiteIdSiteRoute,
   } as any)
 
-const AuthedSiteSiteIdAnalyticsRoute = AuthedSiteSiteIdAnalyticsImport.update({
-  id: '/site/$siteId/analytics',
-  path: '/site/$siteId/analytics',
-  getParentRoute: () => AuthedRoute,
+const AuthedSiteSiteIdSiteIndexRoute = AuthedSiteSiteIdSiteIndexImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AuthedSiteSiteIdSiteRoute,
 } as any)
 
 const AuthedTeamTeamIdSettingsSRoute = AuthedTeamTeamIdSettingsSImport.update({
@@ -192,30 +193,25 @@ const AuthedTeamTeamIdSettingsSRoute = AuthedTeamTeamIdSettingsSImport.update({
   getParentRoute: () => AuthedTeamTeamIdSettingsRoute,
 } as any)
 
-const AuthedSiteSiteIdSettingsSRoute = AuthedSiteSiteIdSettingsSImport.update({
-  id: '/_s',
-  getParentRoute: () => AuthedSiteSiteIdSettingsRoute,
-} as any)
+const AuthedSiteSiteIdSiteDeploymentsRoute =
+  AuthedSiteSiteIdSiteDeploymentsImport.update({
+    id: '/deployments',
+    path: '/deployments',
+    getParentRoute: () => AuthedSiteSiteIdSiteRoute,
+  } as any)
+
+const AuthedSiteSiteIdSiteAnalyticsRoute =
+  AuthedSiteSiteIdSiteAnalyticsImport.update({
+    id: '/analytics',
+    path: '/analytics',
+    getParentRoute: () => AuthedSiteSiteIdSiteRoute,
+  } as any)
 
 const AuthedTeamTeamIdSettingsSIndexRoute =
   AuthedTeamTeamIdSettingsSIndexImport.update({
     id: '/',
     path: '/',
     getParentRoute: () => AuthedTeamTeamIdSettingsSRoute,
-  } as any)
-
-const AuthedSiteSiteIdSettingsSIndexRoute =
-  AuthedSiteSiteIdSettingsSIndexImport.update({
-    id: '/',
-    path: '/',
-    getParentRoute: () => AuthedSiteSiteIdSettingsSRoute,
-  } as any)
-
-const AuthedSiteSiteIdDeploymentDeploymentIdIndexRoute =
-  AuthedSiteSiteIdDeploymentDeploymentIdIndexImport.update({
-    id: '/site/$siteId/deployment/$deploymentId/',
-    path: '/site/$siteId/deployment/$deploymentId/',
-    getParentRoute: () => AuthedRoute,
   } as any)
 
 const AuthedTeamTeamIdSettingsSWebhooksRoute =
@@ -260,60 +256,80 @@ const AuthedTeamTeamIdSettingsSActionsRoute =
     getParentRoute: () => AuthedTeamTeamIdSettingsSRoute,
   } as any)
 
-const AuthedSiteSiteIdSettingsSWebhooksRoute =
-  AuthedSiteSiteIdSettingsSWebhooksImport.update({
+const AuthedSiteSiteIdSiteSettingsSRoute =
+  AuthedSiteSiteIdSiteSettingsSImport.update({
+    id: '/_s',
+    getParentRoute: () => AuthedSiteSiteIdSiteSettingsRoute,
+  } as any)
+
+const AuthedSiteSiteIdSiteSettingsSIndexRoute =
+  AuthedSiteSiteIdSiteSettingsSIndexImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthedSiteSiteIdSiteSettingsSRoute,
+  } as any)
+
+const AuthedSiteSiteIdSiteDeploymentDeploymentIdIndexRoute =
+  AuthedSiteSiteIdSiteDeploymentDeploymentIdIndexImport.update({
+    id: '/deployment/$deploymentId/',
+    path: '/deployment/$deploymentId/',
+    getParentRoute: () => AuthedSiteSiteIdSiteRoute,
+  } as any)
+
+const AuthedSiteSiteIdSiteSettingsSWebhooksRoute =
+  AuthedSiteSiteIdSiteSettingsSWebhooksImport.update({
     id: '/webhooks',
     path: '/webhooks',
-    getParentRoute: () => AuthedSiteSiteIdSettingsSRoute,
+    getParentRoute: () => AuthedSiteSiteIdSiteSettingsSRoute,
   } as any)
 
-const AuthedSiteSiteIdSettingsSTransferRoute =
-  AuthedSiteSiteIdSettingsSTransferImport.update({
+const AuthedSiteSiteIdSiteSettingsSTransferRoute =
+  AuthedSiteSiteIdSiteSettingsSTransferImport.update({
     id: '/transfer',
     path: '/transfer',
-    getParentRoute: () => AuthedSiteSiteIdSettingsSRoute,
+    getParentRoute: () => AuthedSiteSiteIdSiteSettingsSRoute,
   } as any)
 
-const AuthedSiteSiteIdSettingsSRulesRoute =
-  AuthedSiteSiteIdSettingsSRulesImport.update({
+const AuthedSiteSiteIdSiteSettingsSRulesRoute =
+  AuthedSiteSiteIdSiteSettingsSRulesImport.update({
     id: '/rules',
     path: '/rules',
-    getParentRoute: () => AuthedSiteSiteIdSettingsSRoute,
+    getParentRoute: () => AuthedSiteSiteIdSiteSettingsSRoute,
   } as any)
 
-const AuthedSiteSiteIdSettingsSKeysRoute =
-  AuthedSiteSiteIdSettingsSKeysImport.update({
+const AuthedSiteSiteIdSiteSettingsSKeysRoute =
+  AuthedSiteSiteIdSiteSettingsSKeysImport.update({
     id: '/keys',
     path: '/keys',
-    getParentRoute: () => AuthedSiteSiteIdSettingsSRoute,
+    getParentRoute: () => AuthedSiteSiteIdSiteSettingsSRoute,
   } as any)
 
-const AuthedSiteSiteIdSettingsSIpfsRoute =
-  AuthedSiteSiteIdSettingsSIpfsImport.update({
+const AuthedSiteSiteIdSiteSettingsSIpfsRoute =
+  AuthedSiteSiteIdSiteSettingsSIpfsImport.update({
     id: '/ipfs',
     path: '/ipfs',
-    getParentRoute: () => AuthedSiteSiteIdSettingsSRoute,
+    getParentRoute: () => AuthedSiteSiteIdSiteSettingsSRoute,
   } as any)
 
-const AuthedSiteSiteIdSettingsSDomainsRoute =
-  AuthedSiteSiteIdSettingsSDomainsImport.update({
+const AuthedSiteSiteIdSiteSettingsSDomainsRoute =
+  AuthedSiteSiteIdSiteSettingsSDomainsImport.update({
     id: '/domains',
     path: '/domains',
-    getParentRoute: () => AuthedSiteSiteIdSettingsSRoute,
+    getParentRoute: () => AuthedSiteSiteIdSiteSettingsSRoute,
   } as any)
 
-const AuthedSiteSiteIdSettingsSCiRoute =
-  AuthedSiteSiteIdSettingsSCiImport.update({
+const AuthedSiteSiteIdSiteSettingsSCiRoute =
+  AuthedSiteSiteIdSiteSettingsSCiImport.update({
     id: '/ci',
     path: '/ci',
-    getParentRoute: () => AuthedSiteSiteIdSettingsSRoute,
+    getParentRoute: () => AuthedSiteSiteIdSiteSettingsSRoute,
   } as any)
 
-const AuthedSiteSiteIdSettingsSActionsRoute =
-  AuthedSiteSiteIdSettingsSActionsImport.update({
+const AuthedSiteSiteIdSiteSettingsSActionsRoute =
+  AuthedSiteSiteIdSiteSettingsSActionsImport.update({
     id: '/actions',
     path: '/actions',
-    getParentRoute: () => AuthedSiteSiteIdSettingsSRoute,
+    getParentRoute: () => AuthedSiteSiteIdSiteSettingsSRoute,
   } as any)
 
 // Populate the FileRoutesByPath interface
@@ -404,19 +420,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof InviteInviteIdIndexImport
       parentRoute: typeof rootRoute
     }
-    '/_authed/site/$siteId/analytics': {
-      id: '/_authed/site/$siteId/analytics'
-      path: '/site/$siteId/analytics'
-      fullPath: '/site/$siteId/analytics'
-      preLoaderRoute: typeof AuthedSiteSiteIdAnalyticsImport
+    '/_authed/site/$siteId': {
+      id: '/_authed/site/$siteId'
+      path: '/site/$siteId'
+      fullPath: '/site/$siteId'
+      preLoaderRoute: typeof AuthedSiteSiteIdImport
       parentRoute: typeof AuthedImport
     }
-    '/_authed/site/$siteId/deployments': {
-      id: '/_authed/site/$siteId/deployments'
-      path: '/site/$siteId/deployments'
-      fullPath: '/site/$siteId/deployments'
-      preLoaderRoute: typeof AuthedSiteSiteIdDeploymentsImport
-      parentRoute: typeof AuthedImport
+    '/_authed/site/$siteId/_site': {
+      id: '/_authed/site/$siteId/_site'
+      path: '/site/$siteId'
+      fullPath: '/site/$siteId'
+      preLoaderRoute: typeof AuthedSiteSiteIdSiteImport
+      parentRoute: typeof AuthedSiteSiteIdRoute
     }
     '/_authed/team/$teamId/sites': {
       id: '/_authed/team/$teamId/sites'
@@ -439,13 +455,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthedSettingsSIndexImport
       parentRoute: typeof AuthedSettingsSImport
     }
-    '/_authed/site/$siteId/': {
-      id: '/_authed/site/$siteId/'
-      path: '/site/$siteId'
-      fullPath: '/site/$siteId'
-      preLoaderRoute: typeof AuthedSiteSiteIdIndexImport
-      parentRoute: typeof AuthedImport
-    }
     '/_authed/team/$teamId/': {
       id: '/_authed/team/$teamId/'
       path: '/team/$teamId'
@@ -453,19 +462,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthedTeamTeamIdIndexImport
       parentRoute: typeof AuthedImport
     }
-    '/_authed/site/$siteId/settings': {
-      id: '/_authed/site/$siteId/settings'
-      path: '/site/$siteId/settings'
-      fullPath: '/site/$siteId/settings'
-      preLoaderRoute: typeof AuthedSiteSiteIdSettingsImport
-      parentRoute: typeof AuthedImport
+    '/_authed/site/$siteId/_site/analytics': {
+      id: '/_authed/site/$siteId/_site/analytics'
+      path: '/analytics'
+      fullPath: '/site/$siteId/analytics'
+      preLoaderRoute: typeof AuthedSiteSiteIdSiteAnalyticsImport
+      parentRoute: typeof AuthedSiteSiteIdSiteImport
     }
-    '/_authed/site/$siteId/settings/_s': {
-      id: '/_authed/site/$siteId/settings/_s'
-      path: '/site/$siteId/settings'
-      fullPath: '/site/$siteId/settings'
-      preLoaderRoute: typeof AuthedSiteSiteIdSettingsSImport
-      parentRoute: typeof AuthedSiteSiteIdSettingsRoute
+    '/_authed/site/$siteId/_site/deployments': {
+      id: '/_authed/site/$siteId/_site/deployments'
+      path: '/deployments'
+      fullPath: '/site/$siteId/deployments'
+      preLoaderRoute: typeof AuthedSiteSiteIdSiteDeploymentsImport
+      parentRoute: typeof AuthedSiteSiteIdSiteImport
     }
     '/_authed/team/$teamId/settings': {
       id: '/_authed/team/$teamId/settings'
@@ -481,61 +490,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthedTeamTeamIdSettingsSImport
       parentRoute: typeof AuthedTeamTeamIdSettingsRoute
     }
-    '/_authed/site/$siteId/settings/_s/actions': {
-      id: '/_authed/site/$siteId/settings/_s/actions'
-      path: '/actions'
-      fullPath: '/site/$siteId/settings/actions'
-      preLoaderRoute: typeof AuthedSiteSiteIdSettingsSActionsImport
-      parentRoute: typeof AuthedSiteSiteIdSettingsSImport
+    '/_authed/site/$siteId/_site/': {
+      id: '/_authed/site/$siteId/_site/'
+      path: '/'
+      fullPath: '/site/$siteId/'
+      preLoaderRoute: typeof AuthedSiteSiteIdSiteIndexImport
+      parentRoute: typeof AuthedSiteSiteIdSiteImport
     }
-    '/_authed/site/$siteId/settings/_s/ci': {
-      id: '/_authed/site/$siteId/settings/_s/ci'
-      path: '/ci'
-      fullPath: '/site/$siteId/settings/ci'
-      preLoaderRoute: typeof AuthedSiteSiteIdSettingsSCiImport
-      parentRoute: typeof AuthedSiteSiteIdSettingsSImport
+    '/_authed/site/$siteId/_site/settings': {
+      id: '/_authed/site/$siteId/_site/settings'
+      path: '/settings'
+      fullPath: '/site/$siteId/settings'
+      preLoaderRoute: typeof AuthedSiteSiteIdSiteSettingsImport
+      parentRoute: typeof AuthedSiteSiteIdSiteImport
     }
-    '/_authed/site/$siteId/settings/_s/domains': {
-      id: '/_authed/site/$siteId/settings/_s/domains'
-      path: '/domains'
-      fullPath: '/site/$siteId/settings/domains'
-      preLoaderRoute: typeof AuthedSiteSiteIdSettingsSDomainsImport
-      parentRoute: typeof AuthedSiteSiteIdSettingsSImport
-    }
-    '/_authed/site/$siteId/settings/_s/ipfs': {
-      id: '/_authed/site/$siteId/settings/_s/ipfs'
-      path: '/ipfs'
-      fullPath: '/site/$siteId/settings/ipfs'
-      preLoaderRoute: typeof AuthedSiteSiteIdSettingsSIpfsImport
-      parentRoute: typeof AuthedSiteSiteIdSettingsSImport
-    }
-    '/_authed/site/$siteId/settings/_s/keys': {
-      id: '/_authed/site/$siteId/settings/_s/keys'
-      path: '/keys'
-      fullPath: '/site/$siteId/settings/keys'
-      preLoaderRoute: typeof AuthedSiteSiteIdSettingsSKeysImport
-      parentRoute: typeof AuthedSiteSiteIdSettingsSImport
-    }
-    '/_authed/site/$siteId/settings/_s/rules': {
-      id: '/_authed/site/$siteId/settings/_s/rules'
-      path: '/rules'
-      fullPath: '/site/$siteId/settings/rules'
-      preLoaderRoute: typeof AuthedSiteSiteIdSettingsSRulesImport
-      parentRoute: typeof AuthedSiteSiteIdSettingsSImport
-    }
-    '/_authed/site/$siteId/settings/_s/transfer': {
-      id: '/_authed/site/$siteId/settings/_s/transfer'
-      path: '/transfer'
-      fullPath: '/site/$siteId/settings/transfer'
-      preLoaderRoute: typeof AuthedSiteSiteIdSettingsSTransferImport
-      parentRoute: typeof AuthedSiteSiteIdSettingsSImport
-    }
-    '/_authed/site/$siteId/settings/_s/webhooks': {
-      id: '/_authed/site/$siteId/settings/_s/webhooks'
-      path: '/webhooks'
-      fullPath: '/site/$siteId/settings/webhooks'
-      preLoaderRoute: typeof AuthedSiteSiteIdSettingsSWebhooksImport
-      parentRoute: typeof AuthedSiteSiteIdSettingsSImport
+    '/_authed/site/$siteId/_site/settings/_s': {
+      id: '/_authed/site/$siteId/_site/settings/_s'
+      path: '/settings'
+      fullPath: '/site/$siteId/settings'
+      preLoaderRoute: typeof AuthedSiteSiteIdSiteSettingsSImport
+      parentRoute: typeof AuthedSiteSiteIdSiteSettingsRoute
     }
     '/_authed/team/$teamId/settings/_s/actions': {
       id: '/_authed/team/$teamId/settings/_s/actions'
@@ -579,26 +553,82 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthedTeamTeamIdSettingsSWebhooksImport
       parentRoute: typeof AuthedTeamTeamIdSettingsSImport
     }
-    '/_authed/site/$siteId/deployment/$deploymentId/': {
-      id: '/_authed/site/$siteId/deployment/$deploymentId/'
-      path: '/site/$siteId/deployment/$deploymentId'
-      fullPath: '/site/$siteId/deployment/$deploymentId'
-      preLoaderRoute: typeof AuthedSiteSiteIdDeploymentDeploymentIdIndexImport
-      parentRoute: typeof AuthedImport
-    }
-    '/_authed/site/$siteId/settings/_s/': {
-      id: '/_authed/site/$siteId/settings/_s/'
-      path: '/'
-      fullPath: '/site/$siteId/settings/'
-      preLoaderRoute: typeof AuthedSiteSiteIdSettingsSIndexImport
-      parentRoute: typeof AuthedSiteSiteIdSettingsSImport
-    }
     '/_authed/team/$teamId/settings/_s/': {
       id: '/_authed/team/$teamId/settings/_s/'
       path: '/'
       fullPath: '/team/$teamId/settings/'
       preLoaderRoute: typeof AuthedTeamTeamIdSettingsSIndexImport
       parentRoute: typeof AuthedTeamTeamIdSettingsSImport
+    }
+    '/_authed/site/$siteId/_site/settings/_s/actions': {
+      id: '/_authed/site/$siteId/_site/settings/_s/actions'
+      path: '/actions'
+      fullPath: '/site/$siteId/settings/actions'
+      preLoaderRoute: typeof AuthedSiteSiteIdSiteSettingsSActionsImport
+      parentRoute: typeof AuthedSiteSiteIdSiteSettingsSImport
+    }
+    '/_authed/site/$siteId/_site/settings/_s/ci': {
+      id: '/_authed/site/$siteId/_site/settings/_s/ci'
+      path: '/ci'
+      fullPath: '/site/$siteId/settings/ci'
+      preLoaderRoute: typeof AuthedSiteSiteIdSiteSettingsSCiImport
+      parentRoute: typeof AuthedSiteSiteIdSiteSettingsSImport
+    }
+    '/_authed/site/$siteId/_site/settings/_s/domains': {
+      id: '/_authed/site/$siteId/_site/settings/_s/domains'
+      path: '/domains'
+      fullPath: '/site/$siteId/settings/domains'
+      preLoaderRoute: typeof AuthedSiteSiteIdSiteSettingsSDomainsImport
+      parentRoute: typeof AuthedSiteSiteIdSiteSettingsSImport
+    }
+    '/_authed/site/$siteId/_site/settings/_s/ipfs': {
+      id: '/_authed/site/$siteId/_site/settings/_s/ipfs'
+      path: '/ipfs'
+      fullPath: '/site/$siteId/settings/ipfs'
+      preLoaderRoute: typeof AuthedSiteSiteIdSiteSettingsSIpfsImport
+      parentRoute: typeof AuthedSiteSiteIdSiteSettingsSImport
+    }
+    '/_authed/site/$siteId/_site/settings/_s/keys': {
+      id: '/_authed/site/$siteId/_site/settings/_s/keys'
+      path: '/keys'
+      fullPath: '/site/$siteId/settings/keys'
+      preLoaderRoute: typeof AuthedSiteSiteIdSiteSettingsSKeysImport
+      parentRoute: typeof AuthedSiteSiteIdSiteSettingsSImport
+    }
+    '/_authed/site/$siteId/_site/settings/_s/rules': {
+      id: '/_authed/site/$siteId/_site/settings/_s/rules'
+      path: '/rules'
+      fullPath: '/site/$siteId/settings/rules'
+      preLoaderRoute: typeof AuthedSiteSiteIdSiteSettingsSRulesImport
+      parentRoute: typeof AuthedSiteSiteIdSiteSettingsSImport
+    }
+    '/_authed/site/$siteId/_site/settings/_s/transfer': {
+      id: '/_authed/site/$siteId/_site/settings/_s/transfer'
+      path: '/transfer'
+      fullPath: '/site/$siteId/settings/transfer'
+      preLoaderRoute: typeof AuthedSiteSiteIdSiteSettingsSTransferImport
+      parentRoute: typeof AuthedSiteSiteIdSiteSettingsSImport
+    }
+    '/_authed/site/$siteId/_site/settings/_s/webhooks': {
+      id: '/_authed/site/$siteId/_site/settings/_s/webhooks'
+      path: '/webhooks'
+      fullPath: '/site/$siteId/settings/webhooks'
+      preLoaderRoute: typeof AuthedSiteSiteIdSiteSettingsSWebhooksImport
+      parentRoute: typeof AuthedSiteSiteIdSiteSettingsSImport
+    }
+    '/_authed/site/$siteId/_site/deployment/$deploymentId/': {
+      id: '/_authed/site/$siteId/_site/deployment/$deploymentId/'
+      path: '/deployment/$deploymentId'
+      fullPath: '/site/$siteId/deployment/$deploymentId'
+      preLoaderRoute: typeof AuthedSiteSiteIdSiteDeploymentDeploymentIdIndexImport
+      parentRoute: typeof AuthedSiteSiteIdSiteImport
+    }
+    '/_authed/site/$siteId/_site/settings/_s/': {
+      id: '/_authed/site/$siteId/_site/settings/_s/'
+      path: '/'
+      fullPath: '/site/$siteId/settings/'
+      preLoaderRoute: typeof AuthedSiteSiteIdSiteSettingsSIndexImport
+      parentRoute: typeof AuthedSiteSiteIdSiteSettingsSImport
     }
   }
 }
@@ -653,53 +683,90 @@ const AuthedSettingsRouteWithChildren = AuthedSettingsRoute._addFileChildren(
   AuthedSettingsRouteChildren,
 )
 
-interface AuthedSiteSiteIdSettingsSRouteChildren {
-  AuthedSiteSiteIdSettingsSActionsRoute: typeof AuthedSiteSiteIdSettingsSActionsRoute
-  AuthedSiteSiteIdSettingsSCiRoute: typeof AuthedSiteSiteIdSettingsSCiRoute
-  AuthedSiteSiteIdSettingsSDomainsRoute: typeof AuthedSiteSiteIdSettingsSDomainsRoute
-  AuthedSiteSiteIdSettingsSIpfsRoute: typeof AuthedSiteSiteIdSettingsSIpfsRoute
-  AuthedSiteSiteIdSettingsSKeysRoute: typeof AuthedSiteSiteIdSettingsSKeysRoute
-  AuthedSiteSiteIdSettingsSRulesRoute: typeof AuthedSiteSiteIdSettingsSRulesRoute
-  AuthedSiteSiteIdSettingsSTransferRoute: typeof AuthedSiteSiteIdSettingsSTransferRoute
-  AuthedSiteSiteIdSettingsSWebhooksRoute: typeof AuthedSiteSiteIdSettingsSWebhooksRoute
-  AuthedSiteSiteIdSettingsSIndexRoute: typeof AuthedSiteSiteIdSettingsSIndexRoute
+interface AuthedSiteSiteIdSiteSettingsSRouteChildren {
+  AuthedSiteSiteIdSiteSettingsSActionsRoute: typeof AuthedSiteSiteIdSiteSettingsSActionsRoute
+  AuthedSiteSiteIdSiteSettingsSCiRoute: typeof AuthedSiteSiteIdSiteSettingsSCiRoute
+  AuthedSiteSiteIdSiteSettingsSDomainsRoute: typeof AuthedSiteSiteIdSiteSettingsSDomainsRoute
+  AuthedSiteSiteIdSiteSettingsSIpfsRoute: typeof AuthedSiteSiteIdSiteSettingsSIpfsRoute
+  AuthedSiteSiteIdSiteSettingsSKeysRoute: typeof AuthedSiteSiteIdSiteSettingsSKeysRoute
+  AuthedSiteSiteIdSiteSettingsSRulesRoute: typeof AuthedSiteSiteIdSiteSettingsSRulesRoute
+  AuthedSiteSiteIdSiteSettingsSTransferRoute: typeof AuthedSiteSiteIdSiteSettingsSTransferRoute
+  AuthedSiteSiteIdSiteSettingsSWebhooksRoute: typeof AuthedSiteSiteIdSiteSettingsSWebhooksRoute
+  AuthedSiteSiteIdSiteSettingsSIndexRoute: typeof AuthedSiteSiteIdSiteSettingsSIndexRoute
 }
 
-const AuthedSiteSiteIdSettingsSRouteChildren: AuthedSiteSiteIdSettingsSRouteChildren =
+const AuthedSiteSiteIdSiteSettingsSRouteChildren: AuthedSiteSiteIdSiteSettingsSRouteChildren =
   {
-    AuthedSiteSiteIdSettingsSActionsRoute:
-      AuthedSiteSiteIdSettingsSActionsRoute,
-    AuthedSiteSiteIdSettingsSCiRoute: AuthedSiteSiteIdSettingsSCiRoute,
-    AuthedSiteSiteIdSettingsSDomainsRoute:
-      AuthedSiteSiteIdSettingsSDomainsRoute,
-    AuthedSiteSiteIdSettingsSIpfsRoute: AuthedSiteSiteIdSettingsSIpfsRoute,
-    AuthedSiteSiteIdSettingsSKeysRoute: AuthedSiteSiteIdSettingsSKeysRoute,
-    AuthedSiteSiteIdSettingsSRulesRoute: AuthedSiteSiteIdSettingsSRulesRoute,
-    AuthedSiteSiteIdSettingsSTransferRoute:
-      AuthedSiteSiteIdSettingsSTransferRoute,
-    AuthedSiteSiteIdSettingsSWebhooksRoute:
-      AuthedSiteSiteIdSettingsSWebhooksRoute,
-    AuthedSiteSiteIdSettingsSIndexRoute: AuthedSiteSiteIdSettingsSIndexRoute,
+    AuthedSiteSiteIdSiteSettingsSActionsRoute:
+      AuthedSiteSiteIdSiteSettingsSActionsRoute,
+    AuthedSiteSiteIdSiteSettingsSCiRoute: AuthedSiteSiteIdSiteSettingsSCiRoute,
+    AuthedSiteSiteIdSiteSettingsSDomainsRoute:
+      AuthedSiteSiteIdSiteSettingsSDomainsRoute,
+    AuthedSiteSiteIdSiteSettingsSIpfsRoute:
+      AuthedSiteSiteIdSiteSettingsSIpfsRoute,
+    AuthedSiteSiteIdSiteSettingsSKeysRoute:
+      AuthedSiteSiteIdSiteSettingsSKeysRoute,
+    AuthedSiteSiteIdSiteSettingsSRulesRoute:
+      AuthedSiteSiteIdSiteSettingsSRulesRoute,
+    AuthedSiteSiteIdSiteSettingsSTransferRoute:
+      AuthedSiteSiteIdSiteSettingsSTransferRoute,
+    AuthedSiteSiteIdSiteSettingsSWebhooksRoute:
+      AuthedSiteSiteIdSiteSettingsSWebhooksRoute,
+    AuthedSiteSiteIdSiteSettingsSIndexRoute:
+      AuthedSiteSiteIdSiteSettingsSIndexRoute,
   }
 
-const AuthedSiteSiteIdSettingsSRouteWithChildren =
-  AuthedSiteSiteIdSettingsSRoute._addFileChildren(
-    AuthedSiteSiteIdSettingsSRouteChildren,
+const AuthedSiteSiteIdSiteSettingsSRouteWithChildren =
+  AuthedSiteSiteIdSiteSettingsSRoute._addFileChildren(
+    AuthedSiteSiteIdSiteSettingsSRouteChildren,
   )
 
-interface AuthedSiteSiteIdSettingsRouteChildren {
-  AuthedSiteSiteIdSettingsSRoute: typeof AuthedSiteSiteIdSettingsSRouteWithChildren
+interface AuthedSiteSiteIdSiteSettingsRouteChildren {
+  AuthedSiteSiteIdSiteSettingsSRoute: typeof AuthedSiteSiteIdSiteSettingsSRouteWithChildren
 }
 
-const AuthedSiteSiteIdSettingsRouteChildren: AuthedSiteSiteIdSettingsRouteChildren =
+const AuthedSiteSiteIdSiteSettingsRouteChildren: AuthedSiteSiteIdSiteSettingsRouteChildren =
   {
-    AuthedSiteSiteIdSettingsSRoute: AuthedSiteSiteIdSettingsSRouteWithChildren,
+    AuthedSiteSiteIdSiteSettingsSRoute:
+      AuthedSiteSiteIdSiteSettingsSRouteWithChildren,
   }
 
-const AuthedSiteSiteIdSettingsRouteWithChildren =
-  AuthedSiteSiteIdSettingsRoute._addFileChildren(
-    AuthedSiteSiteIdSettingsRouteChildren,
+const AuthedSiteSiteIdSiteSettingsRouteWithChildren =
+  AuthedSiteSiteIdSiteSettingsRoute._addFileChildren(
+    AuthedSiteSiteIdSiteSettingsRouteChildren,
   )
+
+interface AuthedSiteSiteIdSiteRouteChildren {
+  AuthedSiteSiteIdSiteAnalyticsRoute: typeof AuthedSiteSiteIdSiteAnalyticsRoute
+  AuthedSiteSiteIdSiteDeploymentsRoute: typeof AuthedSiteSiteIdSiteDeploymentsRoute
+  AuthedSiteSiteIdSiteIndexRoute: typeof AuthedSiteSiteIdSiteIndexRoute
+  AuthedSiteSiteIdSiteSettingsRoute: typeof AuthedSiteSiteIdSiteSettingsRouteWithChildren
+  AuthedSiteSiteIdSiteDeploymentDeploymentIdIndexRoute: typeof AuthedSiteSiteIdSiteDeploymentDeploymentIdIndexRoute
+}
+
+const AuthedSiteSiteIdSiteRouteChildren: AuthedSiteSiteIdSiteRouteChildren = {
+  AuthedSiteSiteIdSiteAnalyticsRoute: AuthedSiteSiteIdSiteAnalyticsRoute,
+  AuthedSiteSiteIdSiteDeploymentsRoute: AuthedSiteSiteIdSiteDeploymentsRoute,
+  AuthedSiteSiteIdSiteIndexRoute: AuthedSiteSiteIdSiteIndexRoute,
+  AuthedSiteSiteIdSiteSettingsRoute:
+    AuthedSiteSiteIdSiteSettingsRouteWithChildren,
+  AuthedSiteSiteIdSiteDeploymentDeploymentIdIndexRoute:
+    AuthedSiteSiteIdSiteDeploymentDeploymentIdIndexRoute,
+}
+
+const AuthedSiteSiteIdSiteRouteWithChildren =
+  AuthedSiteSiteIdSiteRoute._addFileChildren(AuthedSiteSiteIdSiteRouteChildren)
+
+interface AuthedSiteSiteIdRouteChildren {
+  AuthedSiteSiteIdSiteRoute: typeof AuthedSiteSiteIdSiteRouteWithChildren
+}
+
+const AuthedSiteSiteIdRouteChildren: AuthedSiteSiteIdRouteChildren = {
+  AuthedSiteSiteIdSiteRoute: AuthedSiteSiteIdSiteRouteWithChildren,
+}
+
+const AuthedSiteSiteIdRouteWithChildren =
+  AuthedSiteSiteIdRoute._addFileChildren(AuthedSiteSiteIdRouteChildren)
 
 interface AuthedTeamTeamIdSettingsSRouteChildren {
   AuthedTeamTeamIdSettingsSActionsRoute: typeof AuthedTeamTeamIdSettingsSActionsRoute
@@ -751,14 +818,10 @@ interface AuthedRouteChildren {
   AuthedSettingsRoute: typeof AuthedSettingsRouteWithChildren
   AuthedSiteNewRoute: typeof AuthedSiteNewRoute
   AuthedTeamNewRoute: typeof AuthedTeamNewRoute
-  AuthedSiteSiteIdAnalyticsRoute: typeof AuthedSiteSiteIdAnalyticsRoute
-  AuthedSiteSiteIdDeploymentsRoute: typeof AuthedSiteSiteIdDeploymentsRoute
+  AuthedSiteSiteIdRoute: typeof AuthedSiteSiteIdRouteWithChildren
   AuthedTeamTeamIdSitesRoute: typeof AuthedTeamTeamIdSitesRoute
-  AuthedSiteSiteIdIndexRoute: typeof AuthedSiteSiteIdIndexRoute
   AuthedTeamTeamIdIndexRoute: typeof AuthedTeamTeamIdIndexRoute
-  AuthedSiteSiteIdSettingsRoute: typeof AuthedSiteSiteIdSettingsRouteWithChildren
   AuthedTeamTeamIdSettingsRoute: typeof AuthedTeamTeamIdSettingsRouteWithChildren
-  AuthedSiteSiteIdDeploymentDeploymentIdIndexRoute: typeof AuthedSiteSiteIdDeploymentDeploymentIdIndexRoute
 }
 
 const AuthedRouteChildren: AuthedRouteChildren = {
@@ -767,15 +830,10 @@ const AuthedRouteChildren: AuthedRouteChildren = {
   AuthedSettingsRoute: AuthedSettingsRouteWithChildren,
   AuthedSiteNewRoute: AuthedSiteNewRoute,
   AuthedTeamNewRoute: AuthedTeamNewRoute,
-  AuthedSiteSiteIdAnalyticsRoute: AuthedSiteSiteIdAnalyticsRoute,
-  AuthedSiteSiteIdDeploymentsRoute: AuthedSiteSiteIdDeploymentsRoute,
+  AuthedSiteSiteIdRoute: AuthedSiteSiteIdRouteWithChildren,
   AuthedTeamTeamIdSitesRoute: AuthedTeamTeamIdSitesRoute,
-  AuthedSiteSiteIdIndexRoute: AuthedSiteSiteIdIndexRoute,
   AuthedTeamTeamIdIndexRoute: AuthedTeamTeamIdIndexRoute,
-  AuthedSiteSiteIdSettingsRoute: AuthedSiteSiteIdSettingsRouteWithChildren,
   AuthedTeamTeamIdSettingsRoute: AuthedTeamTeamIdSettingsRouteWithChildren,
-  AuthedSiteSiteIdDeploymentDeploymentIdIndexRoute:
-    AuthedSiteSiteIdDeploymentDeploymentIdIndexRoute,
 }
 
 const AuthedRouteWithChildren =
@@ -792,32 +850,33 @@ export interface FileRoutesByFullPath {
   '/site/new': typeof AuthedSiteNewRoute
   '/team/new': typeof AuthedTeamNewRoute
   '/invite/$inviteId': typeof InviteInviteIdIndexRoute
-  '/site/$siteId/analytics': typeof AuthedSiteSiteIdAnalyticsRoute
-  '/site/$siteId/deployments': typeof AuthedSiteSiteIdDeploymentsRoute
+  '/site/$siteId': typeof AuthedSiteSiteIdSiteRouteWithChildren
   '/team/$teamId/sites': typeof AuthedTeamTeamIdSitesRoute
   '/admin/': typeof AuthedAdminAIndexRoute
   '/settings/': typeof AuthedSettingsSIndexRoute
-  '/site/$siteId': typeof AuthedSiteSiteIdIndexRoute
   '/team/$teamId': typeof AuthedTeamTeamIdIndexRoute
-  '/site/$siteId/settings': typeof AuthedSiteSiteIdSettingsSRouteWithChildren
+  '/site/$siteId/analytics': typeof AuthedSiteSiteIdSiteAnalyticsRoute
+  '/site/$siteId/deployments': typeof AuthedSiteSiteIdSiteDeploymentsRoute
   '/team/$teamId/settings': typeof AuthedTeamTeamIdSettingsSRouteWithChildren
-  '/site/$siteId/settings/actions': typeof AuthedSiteSiteIdSettingsSActionsRoute
-  '/site/$siteId/settings/ci': typeof AuthedSiteSiteIdSettingsSCiRoute
-  '/site/$siteId/settings/domains': typeof AuthedSiteSiteIdSettingsSDomainsRoute
-  '/site/$siteId/settings/ipfs': typeof AuthedSiteSiteIdSettingsSIpfsRoute
-  '/site/$siteId/settings/keys': typeof AuthedSiteSiteIdSettingsSKeysRoute
-  '/site/$siteId/settings/rules': typeof AuthedSiteSiteIdSettingsSRulesRoute
-  '/site/$siteId/settings/transfer': typeof AuthedSiteSiteIdSettingsSTransferRoute
-  '/site/$siteId/settings/webhooks': typeof AuthedSiteSiteIdSettingsSWebhooksRoute
+  '/site/$siteId/': typeof AuthedSiteSiteIdSiteIndexRoute
+  '/site/$siteId/settings': typeof AuthedSiteSiteIdSiteSettingsSRouteWithChildren
   '/team/$teamId/settings/actions': typeof AuthedTeamTeamIdSettingsSActionsRoute
   '/team/$teamId/settings/ci': typeof AuthedTeamTeamIdSettingsSCiRoute
   '/team/$teamId/settings/keys': typeof AuthedTeamTeamIdSettingsSKeysRoute
   '/team/$teamId/settings/members': typeof AuthedTeamTeamIdSettingsSMembersRoute
   '/team/$teamId/settings/transfer': typeof AuthedTeamTeamIdSettingsSTransferRoute
   '/team/$teamId/settings/webhooks': typeof AuthedTeamTeamIdSettingsSWebhooksRoute
-  '/site/$siteId/deployment/$deploymentId': typeof AuthedSiteSiteIdDeploymentDeploymentIdIndexRoute
-  '/site/$siteId/settings/': typeof AuthedSiteSiteIdSettingsSIndexRoute
   '/team/$teamId/settings/': typeof AuthedTeamTeamIdSettingsSIndexRoute
+  '/site/$siteId/settings/actions': typeof AuthedSiteSiteIdSiteSettingsSActionsRoute
+  '/site/$siteId/settings/ci': typeof AuthedSiteSiteIdSiteSettingsSCiRoute
+  '/site/$siteId/settings/domains': typeof AuthedSiteSiteIdSiteSettingsSDomainsRoute
+  '/site/$siteId/settings/ipfs': typeof AuthedSiteSiteIdSiteSettingsSIpfsRoute
+  '/site/$siteId/settings/keys': typeof AuthedSiteSiteIdSiteSettingsSKeysRoute
+  '/site/$siteId/settings/rules': typeof AuthedSiteSiteIdSiteSettingsSRulesRoute
+  '/site/$siteId/settings/transfer': typeof AuthedSiteSiteIdSiteSettingsSTransferRoute
+  '/site/$siteId/settings/webhooks': typeof AuthedSiteSiteIdSiteSettingsSWebhooksRoute
+  '/site/$siteId/deployment/$deploymentId': typeof AuthedSiteSiteIdSiteDeploymentDeploymentIdIndexRoute
+  '/site/$siteId/settings/': typeof AuthedSiteSiteIdSiteSettingsSIndexRoute
 }
 
 export interface FileRoutesByTo {
@@ -830,28 +889,28 @@ export interface FileRoutesByTo {
   '/site/new': typeof AuthedSiteNewRoute
   '/team/new': typeof AuthedTeamNewRoute
   '/invite/$inviteId': typeof InviteInviteIdIndexRoute
-  '/site/$siteId/analytics': typeof AuthedSiteSiteIdAnalyticsRoute
-  '/site/$siteId/deployments': typeof AuthedSiteSiteIdDeploymentsRoute
+  '/site/$siteId': typeof AuthedSiteSiteIdSiteIndexRoute
   '/team/$teamId/sites': typeof AuthedTeamTeamIdSitesRoute
-  '/site/$siteId': typeof AuthedSiteSiteIdIndexRoute
   '/team/$teamId': typeof AuthedTeamTeamIdIndexRoute
-  '/site/$siteId/settings': typeof AuthedSiteSiteIdSettingsSIndexRoute
+  '/site/$siteId/analytics': typeof AuthedSiteSiteIdSiteAnalyticsRoute
+  '/site/$siteId/deployments': typeof AuthedSiteSiteIdSiteDeploymentsRoute
   '/team/$teamId/settings': typeof AuthedTeamTeamIdSettingsSIndexRoute
-  '/site/$siteId/settings/actions': typeof AuthedSiteSiteIdSettingsSActionsRoute
-  '/site/$siteId/settings/ci': typeof AuthedSiteSiteIdSettingsSCiRoute
-  '/site/$siteId/settings/domains': typeof AuthedSiteSiteIdSettingsSDomainsRoute
-  '/site/$siteId/settings/ipfs': typeof AuthedSiteSiteIdSettingsSIpfsRoute
-  '/site/$siteId/settings/keys': typeof AuthedSiteSiteIdSettingsSKeysRoute
-  '/site/$siteId/settings/rules': typeof AuthedSiteSiteIdSettingsSRulesRoute
-  '/site/$siteId/settings/transfer': typeof AuthedSiteSiteIdSettingsSTransferRoute
-  '/site/$siteId/settings/webhooks': typeof AuthedSiteSiteIdSettingsSWebhooksRoute
+  '/site/$siteId/settings': typeof AuthedSiteSiteIdSiteSettingsSIndexRoute
   '/team/$teamId/settings/actions': typeof AuthedTeamTeamIdSettingsSActionsRoute
   '/team/$teamId/settings/ci': typeof AuthedTeamTeamIdSettingsSCiRoute
   '/team/$teamId/settings/keys': typeof AuthedTeamTeamIdSettingsSKeysRoute
   '/team/$teamId/settings/members': typeof AuthedTeamTeamIdSettingsSMembersRoute
   '/team/$teamId/settings/transfer': typeof AuthedTeamTeamIdSettingsSTransferRoute
   '/team/$teamId/settings/webhooks': typeof AuthedTeamTeamIdSettingsSWebhooksRoute
-  '/site/$siteId/deployment/$deploymentId': typeof AuthedSiteSiteIdDeploymentDeploymentIdIndexRoute
+  '/site/$siteId/settings/actions': typeof AuthedSiteSiteIdSiteSettingsSActionsRoute
+  '/site/$siteId/settings/ci': typeof AuthedSiteSiteIdSiteSettingsSCiRoute
+  '/site/$siteId/settings/domains': typeof AuthedSiteSiteIdSiteSettingsSDomainsRoute
+  '/site/$siteId/settings/ipfs': typeof AuthedSiteSiteIdSiteSettingsSIpfsRoute
+  '/site/$siteId/settings/keys': typeof AuthedSiteSiteIdSiteSettingsSKeysRoute
+  '/site/$siteId/settings/rules': typeof AuthedSiteSiteIdSiteSettingsSRulesRoute
+  '/site/$siteId/settings/transfer': typeof AuthedSiteSiteIdSiteSettingsSTransferRoute
+  '/site/$siteId/settings/webhooks': typeof AuthedSiteSiteIdSiteSettingsSWebhooksRoute
+  '/site/$siteId/deployment/$deploymentId': typeof AuthedSiteSiteIdSiteDeploymentDeploymentIdIndexRoute
 }
 
 export interface FileRoutesById {
@@ -868,34 +927,36 @@ export interface FileRoutesById {
   '/_authed/site/new': typeof AuthedSiteNewRoute
   '/_authed/team/new': typeof AuthedTeamNewRoute
   '/invite/$inviteId/': typeof InviteInviteIdIndexRoute
-  '/_authed/site/$siteId/analytics': typeof AuthedSiteSiteIdAnalyticsRoute
-  '/_authed/site/$siteId/deployments': typeof AuthedSiteSiteIdDeploymentsRoute
+  '/_authed/site/$siteId': typeof AuthedSiteSiteIdRouteWithChildren
+  '/_authed/site/$siteId/_site': typeof AuthedSiteSiteIdSiteRouteWithChildren
   '/_authed/team/$teamId/sites': typeof AuthedTeamTeamIdSitesRoute
   '/_authed/admin/_a/': typeof AuthedAdminAIndexRoute
   '/_authed/settings/_s/': typeof AuthedSettingsSIndexRoute
-  '/_authed/site/$siteId/': typeof AuthedSiteSiteIdIndexRoute
   '/_authed/team/$teamId/': typeof AuthedTeamTeamIdIndexRoute
-  '/_authed/site/$siteId/settings': typeof AuthedSiteSiteIdSettingsRouteWithChildren
-  '/_authed/site/$siteId/settings/_s': typeof AuthedSiteSiteIdSettingsSRouteWithChildren
+  '/_authed/site/$siteId/_site/analytics': typeof AuthedSiteSiteIdSiteAnalyticsRoute
+  '/_authed/site/$siteId/_site/deployments': typeof AuthedSiteSiteIdSiteDeploymentsRoute
   '/_authed/team/$teamId/settings': typeof AuthedTeamTeamIdSettingsRouteWithChildren
   '/_authed/team/$teamId/settings/_s': typeof AuthedTeamTeamIdSettingsSRouteWithChildren
-  '/_authed/site/$siteId/settings/_s/actions': typeof AuthedSiteSiteIdSettingsSActionsRoute
-  '/_authed/site/$siteId/settings/_s/ci': typeof AuthedSiteSiteIdSettingsSCiRoute
-  '/_authed/site/$siteId/settings/_s/domains': typeof AuthedSiteSiteIdSettingsSDomainsRoute
-  '/_authed/site/$siteId/settings/_s/ipfs': typeof AuthedSiteSiteIdSettingsSIpfsRoute
-  '/_authed/site/$siteId/settings/_s/keys': typeof AuthedSiteSiteIdSettingsSKeysRoute
-  '/_authed/site/$siteId/settings/_s/rules': typeof AuthedSiteSiteIdSettingsSRulesRoute
-  '/_authed/site/$siteId/settings/_s/transfer': typeof AuthedSiteSiteIdSettingsSTransferRoute
-  '/_authed/site/$siteId/settings/_s/webhooks': typeof AuthedSiteSiteIdSettingsSWebhooksRoute
+  '/_authed/site/$siteId/_site/': typeof AuthedSiteSiteIdSiteIndexRoute
+  '/_authed/site/$siteId/_site/settings': typeof AuthedSiteSiteIdSiteSettingsRouteWithChildren
+  '/_authed/site/$siteId/_site/settings/_s': typeof AuthedSiteSiteIdSiteSettingsSRouteWithChildren
   '/_authed/team/$teamId/settings/_s/actions': typeof AuthedTeamTeamIdSettingsSActionsRoute
   '/_authed/team/$teamId/settings/_s/ci': typeof AuthedTeamTeamIdSettingsSCiRoute
   '/_authed/team/$teamId/settings/_s/keys': typeof AuthedTeamTeamIdSettingsSKeysRoute
   '/_authed/team/$teamId/settings/_s/members': typeof AuthedTeamTeamIdSettingsSMembersRoute
   '/_authed/team/$teamId/settings/_s/transfer': typeof AuthedTeamTeamIdSettingsSTransferRoute
   '/_authed/team/$teamId/settings/_s/webhooks': typeof AuthedTeamTeamIdSettingsSWebhooksRoute
-  '/_authed/site/$siteId/deployment/$deploymentId/': typeof AuthedSiteSiteIdDeploymentDeploymentIdIndexRoute
-  '/_authed/site/$siteId/settings/_s/': typeof AuthedSiteSiteIdSettingsSIndexRoute
   '/_authed/team/$teamId/settings/_s/': typeof AuthedTeamTeamIdSettingsSIndexRoute
+  '/_authed/site/$siteId/_site/settings/_s/actions': typeof AuthedSiteSiteIdSiteSettingsSActionsRoute
+  '/_authed/site/$siteId/_site/settings/_s/ci': typeof AuthedSiteSiteIdSiteSettingsSCiRoute
+  '/_authed/site/$siteId/_site/settings/_s/domains': typeof AuthedSiteSiteIdSiteSettingsSDomainsRoute
+  '/_authed/site/$siteId/_site/settings/_s/ipfs': typeof AuthedSiteSiteIdSiteSettingsSIpfsRoute
+  '/_authed/site/$siteId/_site/settings/_s/keys': typeof AuthedSiteSiteIdSiteSettingsSKeysRoute
+  '/_authed/site/$siteId/_site/settings/_s/rules': typeof AuthedSiteSiteIdSiteSettingsSRulesRoute
+  '/_authed/site/$siteId/_site/settings/_s/transfer': typeof AuthedSiteSiteIdSiteSettingsSTransferRoute
+  '/_authed/site/$siteId/_site/settings/_s/webhooks': typeof AuthedSiteSiteIdSiteSettingsSWebhooksRoute
+  '/_authed/site/$siteId/_site/deployment/$deploymentId/': typeof AuthedSiteSiteIdSiteDeploymentDeploymentIdIndexRoute
+  '/_authed/site/$siteId/_site/settings/_s/': typeof AuthedSiteSiteIdSiteSettingsSIndexRoute
 }
 
 export interface FileRouteTypes {
@@ -911,15 +972,23 @@ export interface FileRouteTypes {
     | '/site/new'
     | '/team/new'
     | '/invite/$inviteId'
-    | '/site/$siteId/analytics'
-    | '/site/$siteId/deployments'
+    | '/site/$siteId'
     | '/team/$teamId/sites'
     | '/admin/'
     | '/settings/'
-    | '/site/$siteId'
     | '/team/$teamId'
-    | '/site/$siteId/settings'
+    | '/site/$siteId/analytics'
+    | '/site/$siteId/deployments'
     | '/team/$teamId/settings'
+    | '/site/$siteId/'
+    | '/site/$siteId/settings'
+    | '/team/$teamId/settings/actions'
+    | '/team/$teamId/settings/ci'
+    | '/team/$teamId/settings/keys'
+    | '/team/$teamId/settings/members'
+    | '/team/$teamId/settings/transfer'
+    | '/team/$teamId/settings/webhooks'
+    | '/team/$teamId/settings/'
     | '/site/$siteId/settings/actions'
     | '/site/$siteId/settings/ci'
     | '/site/$siteId/settings/domains'
@@ -928,15 +997,8 @@ export interface FileRouteTypes {
     | '/site/$siteId/settings/rules'
     | '/site/$siteId/settings/transfer'
     | '/site/$siteId/settings/webhooks'
-    | '/team/$teamId/settings/actions'
-    | '/team/$teamId/settings/ci'
-    | '/team/$teamId/settings/keys'
-    | '/team/$teamId/settings/members'
-    | '/team/$teamId/settings/transfer'
-    | '/team/$teamId/settings/webhooks'
     | '/site/$siteId/deployment/$deploymentId'
     | '/site/$siteId/settings/'
-    | '/team/$teamId/settings/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/bootstrap'
@@ -948,13 +1010,19 @@ export interface FileRouteTypes {
     | '/site/new'
     | '/team/new'
     | '/invite/$inviteId'
+    | '/site/$siteId'
+    | '/team/$teamId/sites'
+    | '/team/$teamId'
     | '/site/$siteId/analytics'
     | '/site/$siteId/deployments'
-    | '/team/$teamId/sites'
-    | '/site/$siteId'
-    | '/team/$teamId'
-    | '/site/$siteId/settings'
     | '/team/$teamId/settings'
+    | '/site/$siteId/settings'
+    | '/team/$teamId/settings/actions'
+    | '/team/$teamId/settings/ci'
+    | '/team/$teamId/settings/keys'
+    | '/team/$teamId/settings/members'
+    | '/team/$teamId/settings/transfer'
+    | '/team/$teamId/settings/webhooks'
     | '/site/$siteId/settings/actions'
     | '/site/$siteId/settings/ci'
     | '/site/$siteId/settings/domains'
@@ -963,12 +1031,6 @@ export interface FileRouteTypes {
     | '/site/$siteId/settings/rules'
     | '/site/$siteId/settings/transfer'
     | '/site/$siteId/settings/webhooks'
-    | '/team/$teamId/settings/actions'
-    | '/team/$teamId/settings/ci'
-    | '/team/$teamId/settings/keys'
-    | '/team/$teamId/settings/members'
-    | '/team/$teamId/settings/transfer'
-    | '/team/$teamId/settings/webhooks'
     | '/site/$siteId/deployment/$deploymentId'
   id:
     | '__root__'
@@ -984,34 +1046,36 @@ export interface FileRouteTypes {
     | '/_authed/site/new'
     | '/_authed/team/new'
     | '/invite/$inviteId/'
-    | '/_authed/site/$siteId/analytics'
-    | '/_authed/site/$siteId/deployments'
+    | '/_authed/site/$siteId'
+    | '/_authed/site/$siteId/_site'
     | '/_authed/team/$teamId/sites'
     | '/_authed/admin/_a/'
     | '/_authed/settings/_s/'
-    | '/_authed/site/$siteId/'
     | '/_authed/team/$teamId/'
-    | '/_authed/site/$siteId/settings'
-    | '/_authed/site/$siteId/settings/_s'
+    | '/_authed/site/$siteId/_site/analytics'
+    | '/_authed/site/$siteId/_site/deployments'
     | '/_authed/team/$teamId/settings'
     | '/_authed/team/$teamId/settings/_s'
-    | '/_authed/site/$siteId/settings/_s/actions'
-    | '/_authed/site/$siteId/settings/_s/ci'
-    | '/_authed/site/$siteId/settings/_s/domains'
-    | '/_authed/site/$siteId/settings/_s/ipfs'
-    | '/_authed/site/$siteId/settings/_s/keys'
-    | '/_authed/site/$siteId/settings/_s/rules'
-    | '/_authed/site/$siteId/settings/_s/transfer'
-    | '/_authed/site/$siteId/settings/_s/webhooks'
+    | '/_authed/site/$siteId/_site/'
+    | '/_authed/site/$siteId/_site/settings'
+    | '/_authed/site/$siteId/_site/settings/_s'
     | '/_authed/team/$teamId/settings/_s/actions'
     | '/_authed/team/$teamId/settings/_s/ci'
     | '/_authed/team/$teamId/settings/_s/keys'
     | '/_authed/team/$teamId/settings/_s/members'
     | '/_authed/team/$teamId/settings/_s/transfer'
     | '/_authed/team/$teamId/settings/_s/webhooks'
-    | '/_authed/site/$siteId/deployment/$deploymentId/'
-    | '/_authed/site/$siteId/settings/_s/'
     | '/_authed/team/$teamId/settings/_s/'
+    | '/_authed/site/$siteId/_site/settings/_s/actions'
+    | '/_authed/site/$siteId/_site/settings/_s/ci'
+    | '/_authed/site/$siteId/_site/settings/_s/domains'
+    | '/_authed/site/$siteId/_site/settings/_s/ipfs'
+    | '/_authed/site/$siteId/_site/settings/_s/keys'
+    | '/_authed/site/$siteId/_site/settings/_s/rules'
+    | '/_authed/site/$siteId/_site/settings/_s/transfer'
+    | '/_authed/site/$siteId/_site/settings/_s/webhooks'
+    | '/_authed/site/$siteId/_site/deployment/$deploymentId/'
+    | '/_authed/site/$siteId/_site/settings/_s/'
   fileRoutesById: FileRoutesById
 }
 
@@ -1056,14 +1120,10 @@ export const routeTree = rootRoute
         "/_authed/settings",
         "/_authed/site/new",
         "/_authed/team/new",
-        "/_authed/site/$siteId/analytics",
-        "/_authed/site/$siteId/deployments",
+        "/_authed/site/$siteId",
         "/_authed/team/$teamId/sites",
-        "/_authed/site/$siteId/",
         "/_authed/team/$teamId/",
-        "/_authed/site/$siteId/settings",
-        "/_authed/team/$teamId/settings",
-        "/_authed/site/$siteId/deployment/$deploymentId/"
+        "/_authed/team/$teamId/settings"
       ]
     },
     "/bootstrap": {
@@ -1118,13 +1178,23 @@ export const routeTree = rootRoute
     "/invite/$inviteId/": {
       "filePath": "invite/$inviteId/index.tsx"
     },
-    "/_authed/site/$siteId/analytics": {
-      "filePath": "_authed/site/$siteId/analytics.tsx",
-      "parent": "/_authed"
+    "/_authed/site/$siteId": {
+      "filePath": "_authed/site",
+      "parent": "/_authed",
+      "children": [
+        "/_authed/site/$siteId/_site"
+      ]
     },
-    "/_authed/site/$siteId/deployments": {
-      "filePath": "_authed/site/$siteId/deployments.tsx",
-      "parent": "/_authed"
+    "/_authed/site/$siteId/_site": {
+      "filePath": "_authed/site/$siteId._site.tsx",
+      "parent": "/_authed/site/$siteId",
+      "children": [
+        "/_authed/site/$siteId/_site/analytics",
+        "/_authed/site/$siteId/_site/deployments",
+        "/_authed/site/$siteId/_site/",
+        "/_authed/site/$siteId/_site/settings",
+        "/_authed/site/$siteId/_site/deployment/$deploymentId/"
+      ]
     },
     "/_authed/team/$teamId/sites": {
       "filePath": "_authed/team/$teamId/sites.tsx",
@@ -1138,35 +1208,17 @@ export const routeTree = rootRoute
       "filePath": "_authed/settings/_s.index.tsx",
       "parent": "/_authed/settings/_s"
     },
-    "/_authed/site/$siteId/": {
-      "filePath": "_authed/site/$siteId/index.tsx",
-      "parent": "/_authed"
-    },
     "/_authed/team/$teamId/": {
       "filePath": "_authed/team/$teamId/index.tsx",
       "parent": "/_authed"
     },
-    "/_authed/site/$siteId/settings": {
-      "filePath": "_authed/site/$siteId/settings",
-      "parent": "/_authed",
-      "children": [
-        "/_authed/site/$siteId/settings/_s"
-      ]
+    "/_authed/site/$siteId/_site/analytics": {
+      "filePath": "_authed/site/$siteId._site/analytics.tsx",
+      "parent": "/_authed/site/$siteId/_site"
     },
-    "/_authed/site/$siteId/settings/_s": {
-      "filePath": "_authed/site/$siteId/settings/_s.tsx",
-      "parent": "/_authed/site/$siteId/settings",
-      "children": [
-        "/_authed/site/$siteId/settings/_s/actions",
-        "/_authed/site/$siteId/settings/_s/ci",
-        "/_authed/site/$siteId/settings/_s/domains",
-        "/_authed/site/$siteId/settings/_s/ipfs",
-        "/_authed/site/$siteId/settings/_s/keys",
-        "/_authed/site/$siteId/settings/_s/rules",
-        "/_authed/site/$siteId/settings/_s/transfer",
-        "/_authed/site/$siteId/settings/_s/webhooks",
-        "/_authed/site/$siteId/settings/_s/"
-      ]
+    "/_authed/site/$siteId/_site/deployments": {
+      "filePath": "_authed/site/$siteId._site/deployments.tsx",
+      "parent": "/_authed/site/$siteId/_site"
     },
     "/_authed/team/$teamId/settings": {
       "filePath": "_authed/team/$teamId/settings",
@@ -1188,37 +1240,31 @@ export const routeTree = rootRoute
         "/_authed/team/$teamId/settings/_s/"
       ]
     },
-    "/_authed/site/$siteId/settings/_s/actions": {
-      "filePath": "_authed/site/$siteId/settings/_s.actions.tsx",
-      "parent": "/_authed/site/$siteId/settings/_s"
+    "/_authed/site/$siteId/_site/": {
+      "filePath": "_authed/site/$siteId._site/index.tsx",
+      "parent": "/_authed/site/$siteId/_site"
     },
-    "/_authed/site/$siteId/settings/_s/ci": {
-      "filePath": "_authed/site/$siteId/settings/_s.ci.tsx",
-      "parent": "/_authed/site/$siteId/settings/_s"
+    "/_authed/site/$siteId/_site/settings": {
+      "filePath": "_authed/site/$siteId._site/settings",
+      "parent": "/_authed/site/$siteId/_site",
+      "children": [
+        "/_authed/site/$siteId/_site/settings/_s"
+      ]
     },
-    "/_authed/site/$siteId/settings/_s/domains": {
-      "filePath": "_authed/site/$siteId/settings/_s.domains.tsx",
-      "parent": "/_authed/site/$siteId/settings/_s"
-    },
-    "/_authed/site/$siteId/settings/_s/ipfs": {
-      "filePath": "_authed/site/$siteId/settings/_s.ipfs.tsx",
-      "parent": "/_authed/site/$siteId/settings/_s"
-    },
-    "/_authed/site/$siteId/settings/_s/keys": {
-      "filePath": "_authed/site/$siteId/settings/_s.keys.tsx",
-      "parent": "/_authed/site/$siteId/settings/_s"
-    },
-    "/_authed/site/$siteId/settings/_s/rules": {
-      "filePath": "_authed/site/$siteId/settings/_s.rules.tsx",
-      "parent": "/_authed/site/$siteId/settings/_s"
-    },
-    "/_authed/site/$siteId/settings/_s/transfer": {
-      "filePath": "_authed/site/$siteId/settings/_s.transfer.tsx",
-      "parent": "/_authed/site/$siteId/settings/_s"
-    },
-    "/_authed/site/$siteId/settings/_s/webhooks": {
-      "filePath": "_authed/site/$siteId/settings/_s.webhooks.tsx",
-      "parent": "/_authed/site/$siteId/settings/_s"
+    "/_authed/site/$siteId/_site/settings/_s": {
+      "filePath": "_authed/site/$siteId._site/settings/_s.tsx",
+      "parent": "/_authed/site/$siteId/_site/settings",
+      "children": [
+        "/_authed/site/$siteId/_site/settings/_s/actions",
+        "/_authed/site/$siteId/_site/settings/_s/ci",
+        "/_authed/site/$siteId/_site/settings/_s/domains",
+        "/_authed/site/$siteId/_site/settings/_s/ipfs",
+        "/_authed/site/$siteId/_site/settings/_s/keys",
+        "/_authed/site/$siteId/_site/settings/_s/rules",
+        "/_authed/site/$siteId/_site/settings/_s/transfer",
+        "/_authed/site/$siteId/_site/settings/_s/webhooks",
+        "/_authed/site/$siteId/_site/settings/_s/"
+      ]
     },
     "/_authed/team/$teamId/settings/_s/actions": {
       "filePath": "_authed/team/$teamId/settings/_s.actions.tsx",
@@ -1244,17 +1290,49 @@ export const routeTree = rootRoute
       "filePath": "_authed/team/$teamId/settings/_s.webhooks.tsx",
       "parent": "/_authed/team/$teamId/settings/_s"
     },
-    "/_authed/site/$siteId/deployment/$deploymentId/": {
-      "filePath": "_authed/site/$siteId/deployment/$deploymentId/index.tsx",
-      "parent": "/_authed"
-    },
-    "/_authed/site/$siteId/settings/_s/": {
-      "filePath": "_authed/site/$siteId/settings/_s.index.tsx",
-      "parent": "/_authed/site/$siteId/settings/_s"
-    },
     "/_authed/team/$teamId/settings/_s/": {
       "filePath": "_authed/team/$teamId/settings/_s.index.tsx",
       "parent": "/_authed/team/$teamId/settings/_s"
+    },
+    "/_authed/site/$siteId/_site/settings/_s/actions": {
+      "filePath": "_authed/site/$siteId._site/settings/_s.actions.tsx",
+      "parent": "/_authed/site/$siteId/_site/settings/_s"
+    },
+    "/_authed/site/$siteId/_site/settings/_s/ci": {
+      "filePath": "_authed/site/$siteId._site/settings/_s.ci.tsx",
+      "parent": "/_authed/site/$siteId/_site/settings/_s"
+    },
+    "/_authed/site/$siteId/_site/settings/_s/domains": {
+      "filePath": "_authed/site/$siteId._site/settings/_s.domains.tsx",
+      "parent": "/_authed/site/$siteId/_site/settings/_s"
+    },
+    "/_authed/site/$siteId/_site/settings/_s/ipfs": {
+      "filePath": "_authed/site/$siteId._site/settings/_s.ipfs.tsx",
+      "parent": "/_authed/site/$siteId/_site/settings/_s"
+    },
+    "/_authed/site/$siteId/_site/settings/_s/keys": {
+      "filePath": "_authed/site/$siteId._site/settings/_s.keys.tsx",
+      "parent": "/_authed/site/$siteId/_site/settings/_s"
+    },
+    "/_authed/site/$siteId/_site/settings/_s/rules": {
+      "filePath": "_authed/site/$siteId._site/settings/_s.rules.tsx",
+      "parent": "/_authed/site/$siteId/_site/settings/_s"
+    },
+    "/_authed/site/$siteId/_site/settings/_s/transfer": {
+      "filePath": "_authed/site/$siteId._site/settings/_s.transfer.tsx",
+      "parent": "/_authed/site/$siteId/_site/settings/_s"
+    },
+    "/_authed/site/$siteId/_site/settings/_s/webhooks": {
+      "filePath": "_authed/site/$siteId._site/settings/_s.webhooks.tsx",
+      "parent": "/_authed/site/$siteId/_site/settings/_s"
+    },
+    "/_authed/site/$siteId/_site/deployment/$deploymentId/": {
+      "filePath": "_authed/site/$siteId._site/deployment/$deploymentId/index.tsx",
+      "parent": "/_authed/site/$siteId/_site"
+    },
+    "/_authed/site/$siteId/_site/settings/_s/": {
+      "filePath": "_authed/site/$siteId._site/settings/_s.index.tsx",
+      "parent": "/_authed/site/$siteId/_site/settings/_s"
     }
   }
 }
