@@ -3,11 +3,11 @@ use poem_openapi::{param::Path, payload::Json, OpenApi};
 use tracing::info;
 
 use crate::{
-    middlewares::auth::UserAuth, models::{
+    handlers::car::CarRequest, middlewares::auth::UserAuth, models::{
         deployment::{preview::DeploymentPreview, Deployment, DeploymentFile, DeploymentFileEntry},
         domain::Domain,
         site::{Site, SiteId},
-    }, rabbit::CarRequest, routes::{error::HttpError, ApiTags}, state::State
+    }, routes::{error::HttpError, ApiTags}, state::State
 };
 
 use super::UploadPayload;
@@ -121,10 +121,12 @@ impl SiteDeploymentsApi {
                 info!("Car uploaded to: {:?}", path);
 
                 if let Some(rabbit) = &state.rabbit {
-                    rabbit.queue_car(CarRequest {
-                        deployment_id: deployment.deployment_id.clone(),
-                        file_path: path.clone(),
-                    }).await;
+                    if let Some(car) = &rabbit.car {
+                        car.queue_car(CarRequest {
+                            deployment_id: deployment.deployment_id.clone(),
+                            file_path: path.clone(),
+                        }).await;
+                    }
                 }
             }
 
@@ -180,10 +182,12 @@ impl SiteDeploymentsApi {
                 let _ = car_bucket.put_object(&path, &data).await.unwrap();
 
                 if let Some(rabbit) = &state.rabbit {
-                    rabbit.queue_car(CarRequest {
-                        deployment_id: deployment_id.clone(),
-                        file_path: path.clone(),
-                    }).await;
+                    if let Some(car) = &rabbit.car {
+                        car.queue_car(CarRequest {
+                            deployment_id: deployment_id.clone(),
+                            file_path: path.clone(),
+                        }).await;
+                    }
                 }
 
                 info!("Car uploaded to: {:?}", path);
@@ -213,9 +217,10 @@ impl SiteDeploymentsApi {
             if let Some(rabbit) = &state.rabbit {
                 info!("Queueing bunshot for domain: {:?}", domain);
                 let domain = domain.domain();
-                rabbit
-                    .queue_bunshot(&site_id.0, &deployment_id, &domain)
-                    .await;
+                if let Some(previews) = &rabbit.previews {
+                    previews.queue_bunshot(&site_id.0, &deployment_id, &domain)
+                        .await;
+                }
             }
         } else {
             info!("No domain was found for this site");
@@ -279,9 +284,10 @@ impl SiteDeploymentsApi {
 
             if let Some(domain) = domain {
                 info!("Queueing bunshot for domain: {:?}", domain.domain());
-                rabbit
-                    .queue_bunshot(&site_id.0, &deployment_id.0, &domain.domain())
-                    .await;
+                if let Some(previews) = &rabbit.previews {
+                    previews.queue_bunshot(&site_id.0, &deployment_id.0, &domain.domain())
+                        .await;
+                }
             } else {
                 info!("No domain was found for this site");
             }

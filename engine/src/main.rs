@@ -19,8 +19,7 @@ pub mod routes;
 pub mod state;
 pub mod storage;
 pub mod utils;
-pub mod rabbit;
-pub mod sqlxshim;
+pub mod handlers;
 pub mod ipfs;
 
 use tracing_subscriber::prelude::*;

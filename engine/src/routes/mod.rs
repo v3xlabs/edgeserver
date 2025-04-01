@@ -16,7 +16,7 @@ use tracing::info;
 use user::UserApi;
 
 use crate::middlewares::tracing::TraceId;
-use crate::state::{AppState, State};
+use crate::state::State;
 
 pub mod auth;
 pub mod error;

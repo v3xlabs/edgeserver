@@ -4,7 +4,7 @@ use color_eyre::eyre::Result;
 use figment::{Figment, providers::Env};
 use serde::Deserialize;
 
-use crate::{cache::Cache, database::Database, rabbit::TaskRabbit, storage::Storage};
+use crate::{cache::Cache, database::Database, handlers::TaskRabbit, storage::Storage};
 
 pub type State = Arc<AppState>;
 
