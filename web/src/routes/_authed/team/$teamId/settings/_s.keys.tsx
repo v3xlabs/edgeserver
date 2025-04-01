@@ -1,14 +1,21 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { FiKey } from 'react-icons/fi';
+import { FC } from 'react';
 
+import {
+    useTeamKeyCreate,
+    useTeamKeyDelete,
+    useTeamKeys,
+} from '@/api/team/keys';
 import { Button } from '@/components';
+import { CreateKeyModal } from '@/gui/key/CreateKeyModal';
+import { KeyList } from '@/gui/key/KeyList';
 
 export const Route = createFileRoute('/_authed/team/$teamId/settings/_s/keys')({
     component: RouteComponent,
     context(context) {
         return {
             title: 'Access Keys',
-            suffix: <Button>Generate new key</Button>,
+            suffix: <TeamCreateKeyModal teamId={context.params.teamId} />,
             subtitle: (
                 <span>
                     <span className="text-yellow-400">⚠️ CAUTION</span> This
@@ -20,35 +27,40 @@ export const Route = createFileRoute('/_authed/team/$teamId/settings/_s/keys')({
 });
 
 function RouteComponent() {
+    const { teamId } = Route.useParams();
+    const { data: teamKeys } = useTeamKeys(teamId);
+    const { mutate: deleteTeamKey } = useTeamKeyDelete();
+
     return (
-        <>
-            <ul className="card no-padding divide-y">
-                {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((key) => (
-                    <li key={key} className="flex gap-4 p-4">
-                        <div className="py-1.5">
-                            <FiKey />
-                        </div>
-                        <div>
-                            <div className="font-mono">
-                                <span>*****</span>
-                                <span>8a9faa19</span>
-                            </div>
-                            <div>
-                                Created by{' '}
-                                <span className="font-bold">John Doe</span>
-                            </div>
-                            <div>
-                                Last used <span>1 hour ago</span>
-                            </div>
-                        </div>
-                        <div className="flex grow items-center justify-end">
-                            <Button variant="destructive" size="sm">
-                                Delete
-                            </Button>
-                        </div>
-                    </li>
-                ))}
-            </ul>
-        </>
+        <div className="card no-padding">
+            <KeyList
+                keys={teamKeys ?? []}
+                onDelete={(keyId, teamId) => deleteTeamKey({ keyId, teamId })}
+            />
+        </div>
     );
 }
+
+const TeamCreateKeyModal: FC<{ teamId: string }> = ({ teamId }) => {
+    const {
+        mutate: createTeamKey,
+        data: newTeamKey,
+        reset,
+    } = useTeamKeyCreate();
+
+    return (
+        <CreateKeyModal
+            resource="team"
+            resourceId={teamId}
+            onSubmit={(permissions) => {
+                createTeamKey({ teamId, permissions });
+            }}
+            onDismiss={() => {
+                reset();
+            }}
+            newSiteKey={newTeamKey}
+        >
+            <Button>Generate new key</Button>
+        </CreateKeyModal>
+    );
+};
