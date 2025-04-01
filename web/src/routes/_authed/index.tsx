@@ -13,7 +13,7 @@ function RouteComponent() {
     const { data: teams } = useTeams();
 
     return (
-        <SCPage title="Home" hideTitle>
+        <SCPage title="Home" hideHeader>
             <SiteList external />
             <TeamList />
         </SCPage>
