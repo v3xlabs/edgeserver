@@ -8,7 +8,7 @@
     },
     "type": "module",
     "scripts": {
-        "api-schema": "openapi-typescript http://localhost:3000/openapi.json -t -o ./src/api/schema.gen.ts",
+        "api-schema": "openapi-typescript http://0.0.0.0:3000/openapi.json -t -o ./src/api/schema.gen.ts",
         "build": "vite build && pnpm build:copy",
         "build:copy": "cp -r ./dist/* ../engine/www",
         "dev": "vite",

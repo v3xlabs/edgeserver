@@ -294,7 +294,7 @@ export type paths = {
             };
         };
         put?: never;
-        /** /site/:site_id/deployment/:deployment_id/preview */
+        /** Request a deployment preview */
         post: {
             parameters: {
                 query?: never;
@@ -443,10 +443,7 @@ export type paths = {
             path?: never;
             cookie?: never;
         };
-        /**
-         * /site/:site_id/domains
-         * @description Get all domains for a site
-         */
+        /** Get all site domains */
         get: {
             parameters: {
                 query?: never;
@@ -469,10 +466,7 @@ export type paths = {
             };
         };
         put?: never;
-        /**
-         * /site/:site_id/domains
-         * @description Create a new domain for a site
-         */
+        /** Create a site domain */
         post: {
             parameters: {
                 query?: never;
@@ -514,10 +508,7 @@ export type paths = {
         get?: never;
         put?: never;
         post?: never;
-        /**
-         * /site/:site_id/domains/:domain
-         * @description Delete a domain for a site
-         */
+        /** Delete a site domain */
         delete: {
             parameters: {
                 query?: never;
@@ -553,7 +544,7 @@ export type paths = {
             cookie?: never;
         };
         /**
-         * /site/:site_id/domains/:domain/preflight
+         * Preflight check a site domain
          * @description Checks wether or not the domain will require validation
          *     It does so by checking overlap
          */
@@ -590,6 +581,106 @@ export type paths = {
         put?: never;
         post?: never;
         delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/site/{site_id}/keys": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get all site keys */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    site_id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json; charset=utf-8": components["schemas"]["Key"][];
+                    };
+                };
+            };
+        };
+        put?: never;
+        /** Create a site key */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    site_id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json; charset=utf-8": components["schemas"]["CreateSiteKeyRequest"];
+                };
+            };
+            responses: {
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json; charset=utf-8": components["schemas"]["NewKey"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/site/{site_id}/keys/{key_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Delete a site key */
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    site_id: string;
+                    key_id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json; charset=utf-8": unknown;
+                    };
+                };
+            };
+        };
         options?: never;
         head?: never;
         patch?: never;
@@ -1137,6 +1228,106 @@ export type paths = {
         patch?: never;
         trace?: never;
     };
+    "/team/{team_id}/keys": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get all team keys */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    team_id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json; charset=utf-8": components["schemas"]["Key"][];
+                    };
+                };
+            };
+        };
+        put?: never;
+        /** Create a team key */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    team_id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json; charset=utf-8": components["schemas"]["CreateTeamKeyRequest"];
+                };
+            };
+            responses: {
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json; charset=utf-8": components["schemas"]["NewKey"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/team/{team_id}/keys/{key_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Delete a team key */
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    team_id: string;
+                    key_id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json; charset=utf-8": unknown;
+                    };
+                };
+            };
+        };
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/invite/{invite_id}": {
         parameters: {
             query?: never;
@@ -1285,6 +1476,14 @@ export type components = {
         CreateSiteDomainRequest: {
             domain: string;
         };
+        /** CreateSiteKeyRequest */
+        CreateSiteKeyRequest: {
+            permissions: string;
+        };
+        /** CreateTeamKeyRequest */
+        CreateTeamKeyRequest: {
+            permissions: string;
+        };
         /** CreateTeamRequest */
         CreateTeamRequest: {
             name: string;
@@ -1293,7 +1492,7 @@ export type components = {
          * Deployment
          * @example {
          *       "context": "test",
-         *       "created_at": "2025-03-31T19:18:27.284224766+00:00",
+         *       "created_at": "2025-04-01T04:15:41.082945660+00:00",
          *       "deployment_id": "d_1234567890",
          *       "site_id": "s_1234567890"
          *     }
@@ -1313,6 +1512,7 @@ export type components = {
             deployment_file_file_id: number;
             deployment_file_file_path: string;
             deployment_file_mime_type: string;
+            file_hash: string;
             /** Format: int64 */
             file_size?: number;
             file_deleted: boolean;
@@ -1357,6 +1557,34 @@ export type components = {
             user_id?: string;
         };
         /**
+         * Key
+         * @example {
+         *       "created_at": "2025-04-01T04:15:41.083013700+00:00",
+         *       "created_by": "u_1234567890",
+         *       "expires_at": "2025-05-01T04:15:41.083013830+00:00",
+         *       "key_id": "k_site_12345678901234567890",
+         *       "key_resource": "s_1234567890",
+         *       "key_type": "site",
+         *       "last_used": "2025-04-01T04:15:41.083013760+00:00",
+         *       "permissions": "TBD",
+         *       "vanity": "4567890"
+         *     }
+         */
+        Key: {
+            key_id: string;
+            vanity: string;
+            key_type: string;
+            key_resource: string;
+            permissions: string;
+            created_by: string;
+            /** Format: date-time */
+            created_at: string;
+            /** Format: date-time */
+            last_used?: string;
+            /** Format: date-time */
+            expires_at?: string;
+        };
+        /**
          * LoginRequest
          * @example {
          *       "password": "password123",
@@ -1379,6 +1607,11 @@ export type components = {
         /** MalformattedInputResponse */
         MalformattedInputResponse: {
             message: string;
+        };
+        /** NewKey */
+        NewKey: {
+            key: string;
+            object: components["schemas"]["Key"];
         };
         /** Site */
         Site: {

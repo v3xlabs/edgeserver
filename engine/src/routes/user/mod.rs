@@ -1,3 +1,4 @@
+use keys::UserKeysApi;
 use poem::{web::Data, Result};
 use poem_openapi::{param::Path, payload::Json, OpenApi};
 use tracing::info;
@@ -9,11 +10,18 @@ use crate::{
     state::State,
 };
 
+pub mod keys;
+
+pub fn api_routes() -> impl OpenApi {
+    (UserApi, UserKeysApi)
+}
+
 #[derive(Debug)]
 pub struct UserApi;
 
 #[OpenApi]
 impl UserApi {
+    /// Get the current user
     #[tracing::instrument(skip(user, state))]
     #[oai(path = "/user", method = "get", tag = "ApiTags::User")]
     pub async fn get_user(&self, user: UserAuth, state: Data<&State>) -> Result<Json<User>> {
@@ -28,6 +36,7 @@ impl UserApi {
         Ok(Json(user))
     }
 
+    /// Get all users
     #[oai(path = "/user/all", method = "get", tag = "ApiTags::User")]
     pub async fn get_all_users(
         &self,
@@ -43,6 +52,7 @@ impl UserApi {
         Ok(Json(users))
     }
 
+    /// Get a user by id
     #[oai(path = "/user/:user_id", method = "get", tag = "ApiTags::User")]
     pub async fn get_user_by_id(
         &self,

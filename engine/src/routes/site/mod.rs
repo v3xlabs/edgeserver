@@ -1,5 +1,6 @@
 use deployments::SiteDeploymentsApi;
 use domains::SiteDomainsApi;
+use keys::SiteKeysApi;
 use poem::{web::Data, Result};
 use poem_openapi::{
     param::Path, payload::Json, types::multipart::Upload, Multipart, Object, OpenApi,
@@ -21,6 +22,8 @@ use super::error::HttpError;
 
 pub mod domains;
 pub mod deployments;
+pub mod keys;
+
 #[derive(Debug, Deserialize, Serialize, Object)]
 pub struct SiteCreateRequest {
     pub name: String,
@@ -50,7 +53,7 @@ pub struct CreateSiteDomainRequest {
 pub struct SiteApi;
 
 pub fn api_routes() -> impl OpenApi {
-    (SiteApi, SiteDeploymentsApi, SiteDomainsApi)
+    (SiteApi, SiteDeploymentsApi, SiteDomainsApi, SiteKeysApi)
 }
 
 #[OpenApi]

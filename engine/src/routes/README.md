@@ -22,4 +22,4 @@ Hosting your own websites should be easy, and you should be able to do it.
 When you connect to edgeserver for the first time you will need to walk through the [#bootstrapping] process (dont worry this is easy).
 This should get you setup with an admin account on the instance.
 
-If you have a user account on an instance see the [Team Keys]() or [Site Keys]() endpoints and menus (in the UI) to get yourself setup with a key.
+If you have a user account on an instance see the [Team Keys](#tag/team/GET/team/{team_id}/keys) or [Site Keys](#tag/site/GET/site/{site_id}/keys) endpoints and menus (in the UI) to get yourself setup with a key.

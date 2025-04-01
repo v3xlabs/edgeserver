@@ -221,7 +221,7 @@ impl SiteDeploymentsApi {
             .map_err(poem::Error::from)
     }
 
-    /// /site/:site_id/deployment/:deployment_id/preview
+    /// Request a deployment preview
     #[oai(
         path = "/site/:site_id/deployment/:deployment_id/preview",
         method = "post",

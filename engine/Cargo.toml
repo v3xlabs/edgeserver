@@ -85,3 +85,4 @@ multihash = { version = "0.19.3", features = ["serde"] }
 rust-car = "0.1.4"
 cid = "0.11.1"
 walkdir = "2.4.0"
+rand = "0.9.0"

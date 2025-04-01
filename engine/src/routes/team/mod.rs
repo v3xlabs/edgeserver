@@ -1,3 +1,4 @@
+use keys::TeamKeysApi;
 use poem::{web::Data, Result};
 use poem_openapi::{param::Path, payload::Json, types::multipart::Upload, Multipart, Object, OpenApi};
 use serde::{Deserialize, Serialize};
@@ -10,6 +11,12 @@ use crate::{
         user::User,
     }, routes::{error::HttpError, ApiTags}, state::State
 };
+
+pub mod keys;
+
+pub fn api_routes() -> impl OpenApi {
+    (TeamApi, TeamKeysApi)
+}
 
 #[derive(Debug, Serialize, Deserialize, Object)]
 pub struct CreateTeamRequest {
@@ -40,6 +47,7 @@ impl TeamApi {
             .map_err(poem::Error::from)
     }
 
+    /// Create a team
     #[oai(path = "/team", method = "post", tag = "ApiTags::Team")]
     pub async fn create_team(
         &self,
@@ -57,6 +65,7 @@ impl TeamApi {
             .map_err(poem::Error::from)
     }
 
+    /// Get a team
     #[oai(path = "/team/:team_id", method = "get", tag = "ApiTags::Team")]
     pub async fn get_team(
         &self,
@@ -75,6 +84,9 @@ impl TeamApi {
             .map_err(poem::Error::from)
     }
 
+    /// Get team invites
+    ///
+    /// Gets a list of all the invites for a team
     #[oai(path = "/team/:team_id/invites", method = "get", tag = "ApiTags::Team")]
     pub async fn get_team_invites(
         &self,
@@ -97,6 +109,7 @@ impl TeamApi {
             .map_err(poem::Error::from)
     }
 
+    /// Invite a user to a team
     #[oai(path = "/team/:team_id/invites", method = "post", tag = "ApiTags::Team")]
     pub async fn invite_user_to_team(
         &self,
@@ -140,6 +153,7 @@ impl TeamApi {
             .map_err(poem::Error::from)
     }
 
+    /// Delete a team invite
     #[oai(
         path = "/team/:team_id/invite/:invite_id",
         method = "delete",
@@ -177,6 +191,9 @@ impl TeamApi {
         Ok(())
     }
 
+    /// Get team sites
+    ///
+    /// Gets a list of all the sites for a team
     #[oai(path = "/team/:team_id/sites", method = "get", tag = "ApiTags::Team")]
     pub async fn get_team_sites(
         &self,
@@ -199,6 +216,9 @@ impl TeamApi {
             .map_err(poem::Error::from)
     }
 
+    /// Get team members
+    ///
+    /// Gets a list of all the members for a team
     #[oai(path = "/team/:team_id/members", method = "get", tag = "ApiTags::Team")]
     pub async fn get_team_members(
         &self,
@@ -216,6 +236,9 @@ impl TeamApi {
             .map_err(poem::Error::from)
     }
 
+    /// Update a team
+    ///
+    /// Updates a team with the given name
     #[oai(path = "/team/:team_id", method = "put", tag = "ApiTags::Team")]
     pub async fn update_team(
         &self,
@@ -240,6 +263,9 @@ impl TeamApi {
         todo!();
     }
 
+    /// Delete a team
+    ///
+    /// Deletes a team
     #[oai(path = "/team/:team_id", method = "delete", tag = "ApiTags::Team")]
     pub async fn delete_team(
         &self,
@@ -266,6 +292,9 @@ impl TeamApi {
         Ok(())
     }
 
+    /// Upload a team avatar
+    ///
+    /// Uploads an avatar for a team
     #[oai(path = "/team/:team_id/avatar", method = "post", tag = "ApiTags::Team")]
     pub async fn upload_team_avatar(
         &self,

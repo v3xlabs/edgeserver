@@ -28,7 +28,7 @@ pub mod team;
 pub mod user;
 
 fn get_api() -> impl OpenApi {
-    (site::api_routes(), UserApi, AuthApi, TeamApi, InviteApi)
+    (site::api_routes(), UserApi, AuthApi, team::api_routes(), InviteApi)
 }
 
 #[derive(Tags)]

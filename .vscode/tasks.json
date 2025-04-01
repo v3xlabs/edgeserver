@@ -31,7 +31,7 @@
         {
             "label": "PNPM Dev",
             "type": "shell",
-            "command": "nix-shell --run 'pnpm install && pnpm dev'",
+            "command": "nix-shell --run 'pnpm install && pnpm api-schema && pnpm dev'",
             "options": {
                 "cwd": "${workspaceFolder}/web"
             },

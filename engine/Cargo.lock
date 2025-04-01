@@ -2091,6 +2091,7 @@ dependencies = [
  "opentelemetry_sdk",
  "poem",
  "poem-openapi",
+ "rand 0.9.0",
  "regex",
  "reqwest",
  "rust-car",

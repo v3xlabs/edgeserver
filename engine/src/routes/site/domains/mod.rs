@@ -44,9 +44,7 @@ struct DomainPreflightResponseData {
 
 #[OpenApi]
 impl SiteDomainsApi {
-    /// /site/:site_id/domains
-    ///
-    /// Get all domains for a site
+    /// Get all site domains
     #[oai(path = "/site/:site_id/domains", method = "get", tag = "ApiTags::Site")]
     pub async fn get_site_domains(
         &self,
@@ -60,9 +58,7 @@ impl SiteDomainsApi {
         Ok(Json(domains))
     }
 
-    /// /site/:site_id/domains
-    ///
-    /// Create a new domain for a site
+    /// Create a site domain
     #[oai(
         path = "/site/:site_id/domains",
         method = "post",
@@ -98,9 +94,7 @@ impl SiteDomainsApi {
         domain
     }
 
-    /// /site/:site_id/domains/:domain
-    ///
-    /// Delete a domain for a site
+    /// Delete a site domain
     #[oai(
         path = "/site/:site_id/domains/:domain",
         method = "delete",
@@ -147,7 +141,7 @@ impl SiteDomainsApi {
         Err(HttpError::NotFound.into())
     }
 
-    /// /site/:site_id/domains/:domain/preflight
+    /// Preflight check a site domain
     ///
     /// Checks wether or not the domain will require validation
     /// It does so by checking overlap
@@ -167,9 +161,11 @@ impl SiteDomainsApi {
         let domain_regex = regex::Regex::new(r"^(\*\.)?([a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?\.)+[a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?$").unwrap();
         if !domain_regex.is_match(&domain) {
             // invalid domain
-            return Ok(DomainPreflightResponse::MalformattedInput(Json(MalformattedInputResponse {
-                message: "Invalid domain".to_string(),
-            })));
+            return Ok(DomainPreflightResponse::MalformattedInput(Json(
+                MalformattedInputResponse {
+                    message: "Invalid domain".to_string(),
+                },
+            )));
         }
 
         let domain = domain.trim();
