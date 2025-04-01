@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE deployments SET ipfs_cid = $1 WHERE deployment_id = $2",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Text",
+        "Text"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "81851dc98696b81490e0e95349eaeed5c23444ecb1b9ee5805942fdb26fbe64a"
+}
