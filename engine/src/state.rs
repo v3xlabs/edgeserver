@@ -4,7 +4,7 @@ use color_eyre::eyre::Result;
 use figment::{Figment, providers::Env};
 use serde::Deserialize;
 
-use crate::{cache::Cache, database::Database, handlers::TaskRabbit, storage::Storage};
+use crate::{cache::Cache, database::Database, handlers::TaskRabbit, ipfs::IPFSModule, storage::Storage};
 
 pub type State = Arc<AppState>;
 
@@ -15,6 +15,7 @@ pub struct AppState {
     pub storage: Storage,
     pub cache: Cache,
     pub rabbit: Option<TaskRabbit>,
+    pub ipfs: Option<IPFSModule>,
 }
 
 #[derive(Deserialize, Debug)]
@@ -26,6 +27,7 @@ pub struct AppConfig {
     pub s3_car: Option<S3CarConfig>,
     pub github_app: Option<GithubAppConfig>,
     pub amqp: Option<AMQPConfig>,
+    pub ipfs: Option<IPFSConfig>,
 }
 
 #[derive(Deserialize, Debug)]
@@ -79,6 +81,12 @@ pub struct GithubAppConfig {
     pub client_secret: String,
 }
 
+#[derive(Deserialize, Debug)]
+pub struct IPFSConfig {
+    pub cluster_url: String,
+    pub public_cluster_url: String,
+}
+
 impl AppState {
     pub async fn new() -> Result<Self> {
         // let config = Config::builder()
@@ -100,6 +108,8 @@ impl AppState {
                 .map(|key| format!("github_app.{}", key.as_str().to_lowercase()).into()))
             .merge(Env::prefixed("AMQP_")
                 .map(|key| format!("amqp.{}", key.as_str().to_lowercase()).into()))
+            .merge(Env::prefixed("IPFS_")
+                .map(|key| format!("ipfs.{}", key.as_str().to_lowercase()).into()))
             .extract::<AppConfig>()
             .expect("Failed to load AppConfig configuration");
 
@@ -115,12 +125,19 @@ impl AppState {
             None
         };
 
+        let ipfs = if let Some(ipfs) = &config.ipfs {
+            Some(IPFSModule::new(ipfs.cluster_url.clone(), ipfs.public_cluster_url.clone()))
+        } else {
+            None
+        };
+
         Ok(Self {
             config,
             database,
             storage,
             cache,
             rabbit,
+            ipfs,
         })
     }
 }

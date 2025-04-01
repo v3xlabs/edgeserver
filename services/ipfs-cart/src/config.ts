@@ -19,6 +19,9 @@ const defaultConfig: Config = {
     bucket: process.env.S3_BUCKET_NAME || "",
     endpoint: process.env.S3_ENDPOINT_URL || undefined,
   },
+  ipfsCluster: {
+    url: process.env.IPFS_CLUSTER_URL || "http://0.0.0.0:9094",
+  },
 };
 
 export default defaultConfig; 

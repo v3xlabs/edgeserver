@@ -106,8 +106,19 @@ impl CarHandler {
             if let Some(ipfs_cid) = payload.cid {
                 Deployment::update_ipfs_cid(&state.database, &payload.deployment_id, &ipfs_cid)
                     .await
-                    .ok();
+                    .ok(); 
             }
+
+            // if let Some(file_path) = payload.file_path {
+            //     // todo pin file using ipfs-cluster
+
+            //     const ipfs_cluster_url = "http://0.0.0.0:44685";
+
+            //     // download from ipfs
+
+            //     // POST /add?local=true&format=car
+            //     // form-data, file: deploy.car                
+            // }
 
             delivery.ack(BasicAckOptions::default()).await.unwrap();
         }

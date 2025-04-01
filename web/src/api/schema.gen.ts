@@ -1546,6 +1546,48 @@ export type paths = {
         patch?: never;
         trace?: never;
     };
+    "/system/ipfs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                100: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json; charset=utf-8": string;
+                    };
+                };
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json; charset=utf-8": components["schemas"]["IPFSStatus"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 };
 export type webhooks = Record<string, never>;
 export type components = {
@@ -1602,7 +1644,7 @@ export type components = {
          * Deployment
          * @example {
          *       "context": "{}",
-         *       "created_at": "2025-04-01T19:51:39.464144819+00:00",
+         *       "created_at": "2025-04-01T21:53:11.861604759+00:00",
          *       "deployment_id": "d_1234567890",
          *       "ipfs_cid": "Qm1234567890...",
          *       "site_id": "s_1234567890"
@@ -1664,6 +1706,10 @@ export type components = {
             invalidates: components["schemas"]["Domain"][];
         };
         DomainSubmission: components["schemas"]["DomainPending"] | components["schemas"]["Domain"];
+        /** IPFSStatus */
+        IPFSStatus: {
+            public_cluster_url: string;
+        };
         /** InviteUserToTeamRequest */
         InviteUserToTeamRequest: {
             user_id?: string;
@@ -1671,13 +1717,13 @@ export type components = {
         /**
          * Key
          * @example {
-         *       "created_at": "2025-04-01T19:51:39.464211899+00:00",
+         *       "created_at": "2025-04-01T21:53:11.861681249+00:00",
          *       "created_by": "u_1234567890",
-         *       "expires_at": "2025-05-01T19:51:39.464212059+00:00",
+         *       "expires_at": "2025-05-01T21:53:11.861681439+00:00",
          *       "key_id": "k_site_12345678901234567890",
          *       "key_resource": "s_1234567890",
          *       "key_type": "site",
-         *       "last_used": "2025-04-01T19:51:39.464211989+00:00",
+         *       "last_used": "2025-04-01T21:53:11.861681349+00:00",
          *       "permissions": "TBD",
          *       "vanity": "4567890"
          *     }

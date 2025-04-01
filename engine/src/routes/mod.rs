@@ -24,9 +24,10 @@ pub mod invite;
 pub mod site;
 pub mod team;
 pub mod user;
+pub mod system;
 
 fn get_api() -> impl OpenApi {
-    (site::api_routes(), UserApi, AuthApi, team::api_routes(), invite::api_routes())
+    (site::api_routes(), UserApi, AuthApi, team::api_routes(), invite::api_routes(), system::SystemApi)
 }
 
 #[derive(Tags)]
@@ -41,6 +42,8 @@ pub enum ApiTags {
     Team,
     /// User-related endpoints
     User,
+    /// System-related endpoints
+    System,
     /// Authentication-related endpoints
     #[oai(rename = "Authentication")]
     Auth,
@@ -157,6 +160,7 @@ pub async fn serve(state: State) {
         "User",
         "Team",
         "Invite",
+        "System",
     ];
 
     // Reorder tags according to the specified order

@@ -10,6 +10,7 @@ import {
     useDeploymentPreviewRefetch,
     useDeploymentPreviews,
 } from '@/api';
+import { useIPFSStatus } from '@/api/system';
 import { Button } from '@/components';
 import {
     DeploymentContext,
@@ -39,6 +40,10 @@ function RouteComponent() {
     );
     const { data: previews } = useDeploymentPreviews(siteId, deploymentId);
 
+    const { data: ipfsStatus } = useIPFSStatus();
+    const cluster_url =
+        typeof ipfsStatus === 'object' ? ipfsStatus.public_cluster_url : '';
+
     const githubRootUrl = useMemo(() => {
         if (!deployment?.context) return;
 
@@ -54,10 +59,13 @@ function RouteComponent() {
             title="Deployment Details"
             suffix={
                 <div className="flex items-center justify-end gap-2">
-                    {deployment?.ipfs_cid && (
+                    {deployment?.ipfs_cid && cluster_url && (
                         <Button asChild>
                             <a
-                                href={`https://ipfs.c5.v3x.systems/ipfs/${deployment.ipfs_cid}`}
+                                href={combineIpfsClusterUrl(
+                                    cluster_url,
+                                    deployment.ipfs_cid
+                                )}
                                 target="_blank"
                                 rel="noreferrer"
                             >
@@ -134,3 +142,16 @@ function RouteComponent() {
         </SCPage>
     );
 }
+
+const combineIpfsClusterUrl = (cluster_url: string, cid: string) => {
+    const cluster_url_suffixed_with_slash = cluster_url.endsWith('/')
+        ? cluster_url
+        : `${cluster_url}/`;
+    const cluster_url_with_ipfs = cluster_url_suffixed_with_slash.includes(
+        'ipfs/'
+    )
+        ? cluster_url_suffixed_with_slash
+        : `${cluster_url_suffixed_with_slash}ipfs/`;
+
+    return `${cluster_url_with_ipfs}${cid}`;
+};

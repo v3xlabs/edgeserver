@@ -10,6 +10,7 @@ import AdmZip from "adm-zip";
 import { readdir } from "fs/promises";
 import { createCarFile } from "./car";
 import { mkdir } from "fs/promises";
+import { uploadCar } from "./uploadCar";
 
 // Maximum number of retries before marking a message as failed
 const MAX_RETRIES = 4;
@@ -221,6 +222,13 @@ async function processCarRequest(
 
         console.log("CAR file uploaded to S3:", s3Key);
         console.log("Root CID:", rootCID);
+
+        // upload to ipfs cluster
+        console.log("Uploading CAR file to IPFS cluster...");
+        
+        const ipfsResponse = await uploadCar(carFilePath);
+
+        console.log("IPFS response:", ipfsResponse);
 
         outputFilePath = s3Key;
         outputCID = rootCID;

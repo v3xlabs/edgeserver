@@ -13,6 +13,9 @@ export interface Config {
         bucket: string;
         endpoint?: string;
     };
+    ipfsCluster: {
+        url: string;
+    };
 }
 
 export interface CarRequest {
