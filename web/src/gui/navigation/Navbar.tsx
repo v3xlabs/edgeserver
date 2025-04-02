@@ -112,7 +112,7 @@ export const Navbar = () => {
                     </div>
                 </div>
             </div>
-            <div className="h-7">
+            <div className="h-10">
                 <AnimatePresence>
                     {state !== 'none' && (
                         <Subbar
