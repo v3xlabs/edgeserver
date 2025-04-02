@@ -27,7 +27,7 @@ export const detectFramework = (
         }
     }
 
-    return 'mdbook';
+    return undefined;
 };
 
 export const useFramework = (siteId: string, deploymentId: string) => {
