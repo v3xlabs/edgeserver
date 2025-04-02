@@ -1,6 +1,7 @@
 import { FC } from 'react';
 
 import { useUsers } from '@/api';
+import { useTeamMembers } from '@/api/team';
 
 import {
     FieldSelect,
@@ -12,17 +13,25 @@ export const UserSelect: FC<
         value: string;
         name?: string;
         forceCategory?: string;
+        teamId: string;
         onChange: (_value: string) => void;
     } & Partial<FieldSelectProperties>
-> = ({ value, name, forceCategory, onChange, ...properties }) => {
+> = ({ value, name, forceCategory, teamId, onChange, ...properties }) => {
     const { data: users } = useUsers();
+    const { data: teamMembers } = useTeamMembers(teamId);
 
-    const options = (users || []).map((user) => {
-        return {
+    const options = (users || [])
+        .filter((user) => {
+            if (!teamMembers) return true;
+
+            return !teamMembers.some(
+                (member) => member.user_id === user.user_id
+            );
+        })
+        .map((user) => ({
             label: user.name,
             value: user.user_id,
-        };
-    });
+        }));
 
     return (
         <FieldSelect

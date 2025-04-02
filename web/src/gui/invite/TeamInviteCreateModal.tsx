@@ -1,9 +1,11 @@
 import { FC, PropsWithChildren, useState } from 'react';
 import { FiLink, FiUserPlus } from 'react-icons/fi';
+import { toast } from 'sonner';
 
 import { useTeamInviteCreate } from '@/api/team';
 import { Button } from '@/components/button';
 import {
+    ModalClose,
     ModalContent,
     ModalDescription,
     ModalRoot,
@@ -21,6 +23,34 @@ export const TeamInviteCreateModal: FC<
     });
     const isDisabled = !userId;
 
+    const handleCreateInvite = (userId?: string) => {
+        createInvite(
+            { userId },
+            {
+                onSuccess: (data) => {
+                    if (!userId) {
+                        const inviteUrl = `${window.location.origin}/invite/${data.invite_id}`;
+
+                        navigator.clipboard.writeText(inviteUrl);
+                    }
+
+                    toast.success(
+                        userId
+                            ? 'Invite sent successfully'
+                            : 'Invite link copied to clipboard'
+                    );
+                    setUserId('');
+                },
+                onError: () =>
+                    toast.error(
+                        userId
+                            ? 'Failed to send invite'
+                            : 'Failed to create invite link'
+                    ),
+            }
+        );
+    };
+
     return (
         <>
             <ModalRoot>
@@ -35,6 +65,7 @@ export const TeamInviteCreateModal: FC<
                     <UserSelect
                         placeholder="Choose an individual"
                         value={userId}
+                        teamId={team_id}
                         onChange={(user) => {
                             setUserId(user);
 
@@ -43,25 +74,27 @@ export const TeamInviteCreateModal: FC<
                     />
 
                     <div className="flex flex-row gap-2">
-                        <Button
-                            className="w-full"
-                            onClick={() => createInvite({})}
-                        >
-                            <FiLink /> Copy link
-                        </Button>
-                        <Button
-                            className="w-full"
-                            variant="primary"
-                            disabled={isDisabled}
-                            onClick={() => {
-                                if (isDisabled) return;
-
-                                createInvite({ userId });
-                            }}
-                        >
-                            <FiUserPlus />
-                            Send
-                        </Button>
+                        <ModalClose asChild>
+                            <Button
+                                className="w-full"
+                                onClick={() => handleCreateInvite()}
+                            >
+                                <FiLink /> Copy link
+                            </Button>
+                        </ModalClose>
+                        <ModalClose asChild>
+                            <Button
+                                className="w-full"
+                                variant="primary"
+                                disabled={isDisabled}
+                                onClick={() => {
+                                    handleCreateInvite(userId);
+                                }}
+                            >
+                                <FiUserPlus />
+                                Send
+                            </Button>
+                        </ModalClose>
                     </div>
                 </ModalContent>
             </ModalRoot>
