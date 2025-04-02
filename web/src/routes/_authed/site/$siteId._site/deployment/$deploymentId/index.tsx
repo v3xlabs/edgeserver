@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { useMemo } from 'react';
 import { FiGithub, FiMoreHorizontal } from 'react-icons/fi';
-import { LuPictureInPicture } from 'react-icons/lu';
+import { LuCopy, LuPictureInPicture } from 'react-icons/lu';
 import { SiIpfs } from 'react-icons/si';
 import { toast } from 'sonner';
 
@@ -11,7 +11,7 @@ import {
     useDeploymentPreviews,
 } from '@/api';
 import { useIPFSStatus } from '@/api/system';
-import { Button } from '@/components';
+import { Button, Input } from '@/components';
 import {
     DeploymentContext,
     parseDeploymentContext,
@@ -119,6 +119,38 @@ function RouteComponent() {
                     siteId={siteId}
                     deploymentId={deploymentId}
                 />
+            )}
+            {!!deployment?.ipfs_cid && (
+                <div className="card space-y-1">
+                    <div className="flex items-center gap-1.5 pl-0.5">
+                        <SiIpfs />
+                        <div className="font-bold">
+                            Interplanetary File System
+                        </div>
+                    </div>
+                    <p>
+                        Your page has been deployed to IPFS and is pinned. You
+                        can set the CID in your ENS name or share it directly
+                    </p>
+                    <div className="flex w-full items-center gap-2">
+                        <Input
+                            value={'ipfs://' + deployment.ipfs_cid}
+                            readOnly
+                            className="w-full"
+                        />
+                        <Button
+                            size="icon"
+                            onClick={() => {
+                                navigator.clipboard.writeText(
+                                    'ipfs://' + deployment.ipfs_cid
+                                );
+                                toast.success('Copied to clipboard');
+                            }}
+                        >
+                            <LuCopy />
+                        </Button>
+                    </div>
+                </div>
             )}
             <FileExplorer siteId={siteId} deploymentId={deploymentId} />
         </SCPage>

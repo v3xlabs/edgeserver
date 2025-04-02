@@ -1,15 +1,19 @@
 import * as Collapsible from '@radix-ui/react-collapsible';
 import byteSize from 'byte-size';
+import clsx from 'clsx';
 import { FC, useState } from 'react';
 import {
-    BsFileEarmarkFont,
-    BsFiletypeCss,
-    BsFiletypeHtml,
-    BsFiletypeJs,
-    BsFiletypeJson,
-    BsFiletypeXml,
-} from 'react-icons/bs';
-import { FiFile, FiFolderMinus, FiFolderPlus, FiImage } from 'react-icons/fi';
+    LuChevronRight,
+    LuFile,
+    LuFileCode,
+    LuFileCog,
+    LuFileImage,
+    LuFileJson,
+    LuFileText,
+    LuFileType,
+    LuFolderClosed,
+    LuFolderOpen,
+} from 'react-icons/lu';
 
 import { useDeploymentFiles } from '@/api';
 import { components } from '@/api/schema.gen';
@@ -81,39 +85,52 @@ export const FileExplorer: FC<{ siteId: string; deploymentId: string }> = ({
     }
 
     return (
-        <div className="space-y-4">
-            <div className="card">
-                <div className="bg-secondary rounded-md border p-4">
-                    <TreeEntry node={tree} name="/" />
-                </div>
+        <div className="card space-y-3">
+            <div className="space-y-2">
+                <div className="font-bold">File Explorer</div>
             </div>
-            {/* {deploymentFiles && (
-                <div className="card text-wrap break-words">
-                    <pre className="w-full whitespace-break-spaces">
-                        {JSON.stringify(deploymentFiles, undefined, 2)}
-                    </pre>
-                </div>
-            )} */}
+            <div className="bg-secondary rounded-md border">
+                <TreeEntry node={tree} name="/" isRoot hideRoot />
+            </div>
         </div>
     );
 };
 
-export const TreeEntry: FC<{ node: TreeNode; name: string }> = ({
-    node,
-    name,
-}) => {
+export const TreeEntry: FC<{
+    node: TreeNode;
+    name: string;
+    isRoot?: boolean;
+    hideRoot?: boolean;
+}> = ({ node, name, isRoot = false, hideRoot = false }) => {
     if (node.type === 'file') {
         return <FileEntry file={node.file} name={name} />;
     }
 
-    return <FolderEntry node={node} name={name} />;
+    return (
+        <FolderEntry
+            node={node}
+            name={name}
+            isRoot={isRoot}
+            hideRoot={hideRoot}
+        />
+    );
 };
 
-export const FolderEntry: FC<{ node: FolderNode; name: string }> = ({
-    node,
-    name,
-}) => {
+export const FolderEntry: FC<{
+    node: FolderNode;
+    name: string;
+    isRoot?: boolean;
+    hideRoot?: boolean;
+}> = ({ node, name, isRoot = false, hideRoot = false }) => {
     const [isOpen, setIsOpen] = useState(true);
+
+    if (isRoot && hideRoot) {
+        return (
+            <ul className="" role="group">
+                <SubTree node={node} />
+            </ul>
+        );
+    }
 
     return (
         <Collapsible.Root open={isOpen} onOpenChange={setIsOpen} asChild>
@@ -125,44 +142,56 @@ export const FolderEntry: FC<{ node: FolderNode; name: string }> = ({
             >
                 <Collapsible.Trigger asChild>
                     <div
-                        className="flex cursor-pointer items-center gap-2"
+                        className="hover:bg-muted flex cursor-pointer items-center gap-2 rounded-sm px-2 py-1"
                         role="button"
                         tabIndex={0}
                     >
-                        {isOpen ? <FiFolderMinus /> : <FiFolderPlus />}
+                        <LuChevronRight
+                            className={clsx(
+                                'transition-transform',
+                                isOpen && 'rotate-90'
+                            )}
+                        />
+                        {isOpen ? (
+                            <LuFolderOpen className="text-blue-500" />
+                        ) : (
+                            <LuFolderClosed className="text-blue-500" />
+                        )}
                         <span>{name}</span>
                     </div>
                 </Collapsible.Trigger>
 
                 <Collapsible.Content>
-                    <ul className="pl-4" role="group">
-                        {Object.entries(node.files)
-                            .sort(([aName, a], [bName, b]) => {
-                                if (
-                                    a.type === 'directory' &&
-                                    b.type === 'file'
-                                ) {
-                                    return -1;
-                                }
-
-                                if (
-                                    a.type === 'file' &&
-                                    b.type === 'directory'
-                                ) {
-                                    return 1;
-                                }
-
-                                return aName.localeCompare(bName);
-                            })
-                            .map(([key, value]) => (
-                                <li key={key}>
-                                    <TreeEntry node={value} name={key} />
-                                </li>
-                            ))}
+                    <ul className="ml-4 border-l pl-2" role="group">
+                        <SubTree node={node} />
                     </ul>
                 </Collapsible.Content>
             </div>
         </Collapsible.Root>
+    );
+};
+
+export const SubTree: FC<{ node: FolderNode }> = ({ node }) => {
+    return (
+        <>
+            {Object.entries(node.files)
+                .sort(([aName, a], [bName, b]) => {
+                    if (a.type === 'directory' && b.type === 'file') {
+                        return -1;
+                    }
+
+                    if (a.type === 'file' && b.type === 'directory') {
+                        return 1;
+                    }
+
+                    return aName.localeCompare(bName);
+                })
+                .map(([key, value]) => (
+                    <li key={key}>
+                        <TreeEntry node={value} name={key} />
+                    </li>
+                ))}
+        </>
     );
 };
 
@@ -174,16 +203,22 @@ export const FileEntry: FC<{ file: DeploymentFile; name: string }> = ({
 
     return (
         <div
-            className="flex items-center justify-between gap-2"
+            className="hover:bg-muted flex items-center justify-between gap-2 px-2 py-1"
             // eslint-disable-next-line jsx-a11y/role-has-required-aria-props
             role="treeitem"
             aria-label={name}
         >
             <div className="flex items-center gap-2">
-                <CustomFileIcon mime_type={file.deployment_file_mime_type} />
+                <span
+                    className={mimeTypeToColor(file.deployment_file_mime_type)}
+                >
+                    <CustomFileIcon
+                        mime_type={file.deployment_file_mime_type}
+                    />
+                </span>
                 <span>{name}</span>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="text-muted flex items-center gap-2">
                 <span>{file.deployment_file_mime_type}</span>
                 {file_size && <span>{file_size.toString()}</span>}
             </div>
@@ -193,11 +228,11 @@ export const FileEntry: FC<{ file: DeploymentFile; name: string }> = ({
 
 export const CustomFileIcon: FC<{ mime_type: string }> = ({ mime_type }) => {
     if (mime_type === 'text/html') {
-        return <BsFiletypeHtml />;
+        return <LuFileText />;
     }
 
     if (mime_type === 'text/xml') {
-        return <BsFiletypeXml />;
+        return <LuFileText />;
     }
 
     if (
@@ -209,7 +244,7 @@ export const CustomFileIcon: FC<{ mime_type: string }> = ({ mime_type }) => {
             'image/webp',
         ].includes(mime_type)
     ) {
-        return <FiImage />;
+        return <LuFileImage />;
     }
 
     if (
@@ -219,20 +254,26 @@ export const CustomFileIcon: FC<{ mime_type: string }> = ({ mime_type }) => {
             'application/font-sfnt',
         ].includes(mime_type)
     ) {
-        return <BsFileEarmarkFont />;
+        return <LuFileType />;
     }
 
     if (mime_type === 'text/css') {
-        return <BsFiletypeCss />;
+        return <LuFileCog />;
     }
 
     if (mime_type === 'text/javascript') {
-        return <BsFiletypeJs />;
+        return <LuFileCode />;
     }
 
     if (mime_type === 'application/json') {
-        return <BsFiletypeJson />;
+        return <LuFileJson />;
     }
 
-    return <FiFile />;
+    return <LuFile />;
+};
+
+export const mimeTypeToColor = (mime_type: string) => {
+    if (mime_type === 'text/html') {
+        return 'text-yellow-500';
+    }
 };
