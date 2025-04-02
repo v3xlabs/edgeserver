@@ -27,7 +27,7 @@ export const SidePage: FC<SidePageProperties> = ({
     return (
         <div
             className={cn(
-                'p-4 mt-8 mx-auto w-container-dynamic space-y-4 pb-64 flex gap-8 justify-center md:flex-row flex-col',
+                'p-4 mt-2 mx-auto w-container-dynamic space-y-4 pb-64 flex gap-8 justify-center md:flex-row flex-col',
                 className
             )}
         >
