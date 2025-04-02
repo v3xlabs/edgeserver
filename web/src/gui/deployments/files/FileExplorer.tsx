@@ -2,21 +2,17 @@ import * as Collapsible from '@radix-ui/react-collapsible';
 import byteSize from 'byte-size';
 import clsx from 'clsx';
 import { FC, useState } from 'react';
-import {
-    LuChevronRight,
-    LuFile,
-    LuFileCode,
-    LuFileCog,
-    LuFileImage,
-    LuFileJson,
-    LuFileText,
-    LuFileType,
-    LuFolderClosed,
-    LuFolderOpen,
-} from 'react-icons/lu';
+import { LuChevronRight, LuFolderClosed, LuFolderOpen } from 'react-icons/lu';
 
 import { useDeploymentFiles } from '@/api';
 import { components } from '@/api/schema.gen';
+import {
+    getFrameworkColor,
+    getFrameworkIcon,
+    useFramework,
+} from '@/util/files/detection';
+import { mimeTypeToColor } from '@/util/files/mime';
+import { CustomFileIcon } from '@/util/files/mime';
 
 type DeploymentFile = components['schemas']['DeploymentFileEntry'];
 
@@ -86,8 +82,12 @@ export const FileExplorer: FC<{ siteId: string; deploymentId: string }> = ({
 
     return (
         <div className="card space-y-3">
-            <div className="space-y-2">
+            <div className="flex justify-between">
                 <div className="font-bold">File Explorer</div>
+                <FrameworkDetection
+                    siteId={siteId}
+                    deploymentId={deploymentId}
+                />
             </div>
             <div className="bg-secondary rounded-md border">
                 <TreeEntry node={tree} name="/" isRoot hideRoot />
@@ -226,54 +226,16 @@ export const FileEntry: FC<{ file: DeploymentFile; name: string }> = ({
     );
 };
 
-export const CustomFileIcon: FC<{ mime_type: string }> = ({ mime_type }) => {
-    if (mime_type === 'text/html') {
-        return <LuFileText />;
-    }
+export const FrameworkDetection: FC<{
+    siteId: string;
+    deploymentId: string;
+}> = ({ siteId, deploymentId }) => {
+    const framework = useFramework(siteId, deploymentId);
 
-    if (mime_type === 'text/xml') {
-        return <LuFileText />;
-    }
-
-    if (
-        [
-            'image/png',
-            'image/jpeg',
-            'image/gif',
-            'image/svg+xml',
-            'image/webp',
-        ].includes(mime_type)
-    ) {
-        return <LuFileImage />;
-    }
-
-    if (
-        [
-            'application/font-woff',
-            'application/font-woff2',
-            'application/font-sfnt',
-        ].includes(mime_type)
-    ) {
-        return <LuFileType />;
-    }
-
-    if (mime_type === 'text/css') {
-        return <LuFileCog />;
-    }
-
-    if (mime_type === 'text/javascript') {
-        return <LuFileCode />;
-    }
-
-    if (mime_type === 'application/json') {
-        return <LuFileJson />;
-    }
-
-    return <LuFile />;
-};
-
-export const mimeTypeToColor = (mime_type: string) => {
-    if (mime_type === 'text/html') {
-        return 'text-yellow-500';
-    }
+    return (
+        <div className="text-muted flex items-center gap-2">
+            {getFrameworkIcon(framework)}
+            <span className={getFrameworkColor(framework)}>{framework}</span>
+        </div>
+    );
 };
