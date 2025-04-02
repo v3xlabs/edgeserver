@@ -1,9 +1,3 @@
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
-} from '@radix-ui/react-dropdown-menu';
 import { createFileRoute, Link } from '@tanstack/react-router';
 import { FC, useMemo } from 'react';
 import { FiGithub, FiMoreHorizontal } from 'react-icons/fi';
@@ -14,6 +8,12 @@ import { useIPFSStatus } from '@/api/system';
 import { Button } from '@/components';
 import { parseDeploymentContext } from '@/gui/deployments/context/context';
 import { DeploymentList } from '@/gui/deployments/DeploymentList';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from '@/gui/Dropdown';
 import { SCPage } from '@/layouts';
 import { combineIpfsClusterUrl } from '@/util/ipfs';
 import { queryClient } from '@/util/query';
