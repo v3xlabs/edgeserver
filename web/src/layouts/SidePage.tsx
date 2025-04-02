@@ -27,12 +27,12 @@ export const SidePage: FC<SidePageProperties> = ({
     return (
         <div
             className={cn(
-                'p-4 mt-2 mx-auto w-container-dynamic space-y-4 pb-64 flex gap-8 justify-center md:flex-row flex-col',
+                'p-4 mt-2 mx-auto w-container-dynamic pb-64 flex gap-8 justify-center md:flex-row flex-col',
                 className
             )}
         >
             {sidebar && <div className="w-full md:w-96">{sidebar}</div>}
-            <div className="w-full space-y-4">
+            <div className="mt-2 w-full space-y-4">
                 <div className="flex w-full items-end justify-between">
                     <div>
                         <h1 className="h1 pl-4">{title}</h1>
