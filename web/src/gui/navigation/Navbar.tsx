@@ -37,7 +37,7 @@ const UserProfile = () => {
                     </DropdownMenuTrigger>
                 </div>
                 <DropdownMenuPortal>
-                    <DropdownMenuContent>
+                    <DropdownMenuContent align="end">
                         <DropdownMenuItem className="flex items-center justify-between gap-6">
                             <div>Theme</div>
                             <ThemeSwitcher />
