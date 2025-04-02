@@ -1,12 +1,14 @@
 import { FC } from 'react';
 
-import { useDeploymentPreviews } from '@/api';
+import { useDeploymentPreviews, useLastPreviewDeployment } from '@/api';
 
 export const DeploymentPreviewCover: FC<{
     siteId: string;
-    deploymentId: string;
+    deploymentId?: string;
 }> = ({ siteId, deploymentId }) => {
-    const { data: previews } = useDeploymentPreviews(siteId, deploymentId);
+    const { data: previews } = deploymentId
+        ? useDeploymentPreviews(siteId, deploymentId)
+        : useLastPreviewDeployment(siteId);
 
     if (!previews || previews.length === 0) {
         return <></>;

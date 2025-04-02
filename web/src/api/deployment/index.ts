@@ -5,6 +5,7 @@ import { decorateGithubDeploymentContext } from '@/gui/deployments/context/githu
 
 import { apiRequest } from '../core';
 import { components } from '../schema.gen';
+import { useSiteDeployments } from '../site';
 
 export type Deployment = components['schemas']['Deployment'];
 
@@ -94,16 +95,24 @@ export const getDeploymentFiles = (siteId: string, deploymentId: string) =>
 export const useDeploymentFiles = (siteId: string, deploymentId: string) =>
     useQuery(getDeploymentFiles(siteId, deploymentId));
 
-export const getDeploymentPreviews = (siteId: string, deploymentId: string) =>
+export const getDeploymentPreviews = (
+    siteId: string,
+    deploymentId: string | undefined
+) =>
     queryOptions({
-        queryKey: [
-            'auth',
-            'deployment',
-            '{deployment_id}',
-            deploymentId,
-            'previews',
-        ],
+        // @ts-ignore
+        queryKey: deploymentId
+            ? ([
+                  'auth',
+                  'deployment',
+                  '{deployment_id}',
+                  deploymentId,
+                  'previews',
+              ] as unknown)
+            : (undefined as unknown),
         queryFn: async () => {
+            if (!deploymentId) return;
+
             const response = await apiRequest(
                 '/site/{site_id}/deployment/{deployment_id}/preview',
                 'get',
@@ -117,10 +126,13 @@ export const getDeploymentPreviews = (siteId: string, deploymentId: string) =>
 
             return response.data;
         },
+        enabled: Boolean(deploymentId),
     });
 
-export const useDeploymentPreviews = (siteId: string, deploymentId: string) =>
-    useQuery(getDeploymentPreviews(siteId, deploymentId));
+export const useDeploymentPreviews = (
+    siteId: string,
+    deploymentId: string | undefined
+) => useQuery(getDeploymentPreviews(siteId, deploymentId));
 
 export const useDeploymentPreviewRefetch = (
     siteId: string,
@@ -142,3 +154,33 @@ export const useDeploymentPreviewRefetch = (
             return response.data;
         },
     });
+
+// Gets the last main deployment
+export const useLastDeployment = (siteId: string) => {
+    const { data: deployments } = useSiteDeployments(siteId);
+
+    const deployment = deployments?.at(0);
+
+    return { data: deployment };
+};
+
+export const useLastPreviewDeployment = (siteId: string | undefined) => {
+    if (!siteId) return { data: undefined };
+
+    const { data: deployments } = useSiteDeployments(siteId);
+    const { data: preview_one } = useDeploymentPreviews(
+        siteId,
+        deployments?.at(0)?.deployment_id
+    );
+    const { data: preview_two } = useDeploymentPreviews(
+        siteId,
+        deployments?.at(1)?.deployment_id
+    );
+
+    console.log({ preview_one, preview_two });
+
+    return {
+        data:
+            preview_one && preview_one?.length > 0 ? preview_one : preview_two,
+    };
+};

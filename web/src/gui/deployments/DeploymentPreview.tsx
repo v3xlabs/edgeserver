@@ -4,7 +4,12 @@ import { FiClock, FiFileText, FiGitCommit } from 'react-icons/fi';
 import TimeAgo from 'react-timeago-i18n';
 import { match } from 'ts-pattern';
 
-import { Deployment, useDeployment, useDeploymentPreviews } from '@/api';
+import {
+    Deployment,
+    useDeployment,
+    useDeploymentPreviews,
+    useLastPreviewDeployment,
+} from '@/api';
 import { startsWithEmoji } from '@/util/emoji';
 import { LiveAgo, secondsToDuration } from '@/util/time';
 
@@ -27,10 +32,9 @@ export const DeploymentPreview: FC<{
         deployment_id ?? ''
     );
 
-    const { data: previews } = useDeploymentPreviews(
-        siteIdQuery ?? '',
-        deployment_id ?? ''
-    );
+    const { data: previews } = deployment_id
+        ? useDeploymentPreviews(siteIdQuery ?? '', deployment_id ?? '')
+        : useLastPreviewDeployment(siteIdQuery ?? '');
 
     const deploymentContext = deployment?.context
         ? parseDeploymentContext(deployment.context)
