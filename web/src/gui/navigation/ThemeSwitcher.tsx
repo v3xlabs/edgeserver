@@ -21,7 +21,7 @@ export const ThemeSwitcher = () => {
     };
 
     return (
-        <div className="bg-muted mx-auto flex size-full gap-1 rounded-xl">
+        <div className="bg-muted mx-auto flex size-full gap-1 rounded-sm shadow-sm">
             {(
                 [
                     ['light', <FiSun key="light" />],
@@ -38,7 +38,7 @@ export const ThemeSwitcher = () => {
                     }}
                     className={cn(
                         currentTheme === theme && 'bg-hover',
-                        'h-full flex items-center px-1 aspect-square rounded-full'
+                        'h-full flex items-center p-2 aspect-square rounded-md'
                     )}
                 >
                     {icon}

@@ -124,6 +124,8 @@ export const FolderEntry: FC<{
 }> = ({ node, name, isRoot = false, hideRoot = false }) => {
     const [isOpen, setIsOpen] = useState(true);
 
+    const { fileCount, directoryCount } = countFilesAndDirectories(node);
+
     if (isRoot && hideRoot) {
         return (
             <ul className="" role="group">
@@ -142,22 +144,45 @@ export const FolderEntry: FC<{
             >
                 <Collapsible.Trigger asChild>
                     <div
-                        className="hover:bg-muted flex cursor-pointer items-center gap-2 rounded-sm px-2 py-1"
+                        className="hover:bg-muted flex cursor-pointer items-center justify-between gap-2 rounded-sm px-2 py-1"
                         role="button"
                         tabIndex={0}
                     >
-                        <LuChevronRight
-                            className={clsx(
-                                'transition-transform',
-                                isOpen && 'rotate-90'
+                        <div className="flex items-center gap-2">
+                            <LuChevronRight
+                                className={clsx(
+                                    'transition-transform',
+                                    isOpen && 'rotate-90'
+                                )}
+                            />
+                            {isOpen ? (
+                                <LuFolderOpen className="text-blue-500" />
+                            ) : (
+                                <LuFolderClosed className="text-blue-500" />
                             )}
-                        />
-                        {isOpen ? (
-                            <LuFolderOpen className="text-blue-500" />
-                        ) : (
-                            <LuFolderClosed className="text-blue-500" />
-                        )}
-                        <span>{name}</span>
+                            <span>{name}</span>
+                        </div>
+                        <div className="text-muted flex justify-end gap-1.5">
+                            {[
+                                fileCount &&
+                                    `${fileCount} file${
+                                        fileCount > 1 ? 's' : ''
+                                    }`,
+                                directoryCount &&
+                                    `${directoryCount} director${
+                                        directoryCount > 1 ? 'ies' : 'y'
+                                    }`,
+                            ]
+                                .filter(Boolean)
+                                .map((count) => (
+                                    <div
+                                        key={count}
+                                        className="text-muted rounded-md border px-2"
+                                    >
+                                        {count}
+                                    </div>
+                                ))}
+                        </div>
                     </div>
                 </Collapsible.Trigger>
 
@@ -238,4 +263,31 @@ export const FrameworkDetection: FC<{
             <span className={getFrameworkColor(framework)}>{framework}</span>
         </div>
     );
+};
+
+const countFilesAndDirectories = (
+    node: TreeNode
+): {
+    fileCount: number;
+    directoryCount: number;
+} => {
+    if (node.type !== 'directory') return { fileCount: 0, directoryCount: 0 };
+
+    let fileCount = 0;
+    let directoryCount = 0;
+
+    for (const fileOrFolder of Object.values(node.files)) {
+        if (fileOrFolder.type === 'file') {
+            fileCount++;
+        } else {
+            const { fileCount: _fileCount, directoryCount: _directoryCount } =
+                countFilesAndDirectories(fileOrFolder);
+
+            fileCount += _fileCount;
+            directoryCount += _directoryCount;
+            directoryCount++;
+        }
+    }
+
+    return { fileCount, directoryCount };
 };
