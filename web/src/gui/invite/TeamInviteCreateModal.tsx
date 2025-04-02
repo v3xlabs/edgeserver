@@ -29,7 +29,13 @@ export const TeamInviteCreateModal: FC<
         createInvite(
             { userId },
             {
-                onSuccess: () => {
+                onSuccess: (data) => {
+                    if (!userId) {
+                        const inviteUrl = `${window.location.origin}/invite/${data.invite_id}`;
+
+                        navigator.clipboard.writeText(inviteUrl);
+                    }
+
                     toast.success(
                         userId
                             ? 'Invite sent successfully'
