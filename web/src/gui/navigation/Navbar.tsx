@@ -42,6 +42,7 @@ const UserProfile = () => {
                             <div>Theme</div>
                             <ThemeSwitcher />
                         </DropdownMenuItem>
+                        <DropdownMenuSeparator />
                         {me?.admin && (
                             <DropdownMenuItem asChild>
                                 <Button
@@ -59,7 +60,7 @@ const UserProfile = () => {
                         <DropdownMenuSeparator />
                         <DropdownMenuItem asChild>
                             <Button
-                                className="flex w-full cursor-pointer items-start px-4 py-2"
+                                className="flex w-full cursor-pointer justify-start py-2"
                                 onClick={() => {
                                     authStore.send({
                                         type: 'clearAuthToken',
