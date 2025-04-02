@@ -46,7 +46,7 @@ const UserProfile = () => {
                         {me?.admin && (
                             <DropdownMenuItem asChild>
                                 <Button
-                                    className="w-full justify-start"
+                                    className="w-full cursor-pointer justify-start"
                                     variant="ghost"
                                     asChild
                                 >
