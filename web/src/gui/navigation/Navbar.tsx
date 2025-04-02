@@ -44,20 +44,22 @@ const UserProfile = () => {
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         {me?.admin && (
-                            <DropdownMenuItem asChild>
-                                <Button
-                                    className="w-full cursor-pointer justify-start"
-                                    variant="ghost"
-                                    asChild
-                                >
-                                    <Link to="/admin">
-                                        <FiServer />
-                                        Administration
-                                    </Link>
-                                </Button>
-                            </DropdownMenuItem>
+                            <>
+                                <DropdownMenuItem asChild>
+                                    <Button
+                                        className="w-full cursor-pointer justify-start"
+                                        variant="ghost"
+                                        asChild
+                                    >
+                                        <Link to="/admin">
+                                            <FiServer />
+                                            Administration
+                                        </Link>
+                                    </Button>
+                                </DropdownMenuItem>
+                                <DropdownMenuSeparator />
+                            </>
                         )}
-                        <DropdownMenuSeparator />
                         <DropdownMenuItem asChild>
                             <Button
                                 className="flex w-full cursor-pointer justify-start py-2"
