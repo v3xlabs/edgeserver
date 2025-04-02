@@ -5,6 +5,7 @@ import { FiServer } from 'react-icons/fi';
 import { useMe } from '@/api';
 import { authStore } from '@/api/auth/store';
 import { Avatar, Button } from '@/components';
+import { AvatarGradient } from '@/components/avatar/gradient';
 
 import {
     DropdownMenu,
@@ -20,30 +21,32 @@ import { ThemeSwitcher } from './ThemeSwitcher';
 
 const UserProfile = () => {
     const { data: me } = useMe();
+    const firstLetter = me?.name?.[0]?.toUpperCase() || '?';
 
     return (
         <DropdownMenu>
             <div className="flex h-full items-end">
                 <div className="flex h-full w-fit items-center px-2 group-hover:bg-black/10">
-                    <DropdownMenuTrigger>
-                        <span>{me?.name}</span>
-                        {/* <AvatarOrGradient
-                    src={avatar}
-                    hash={user || ''}
-                    className="ml-2 size-8 overflow-hidden rounded-full bg-white"
-                /> */}
+                    <DropdownMenuTrigger className="flex items-center gap-2">
+                        <div className="relative size-8 overflow-hidden rounded-full">
+                            <AvatarGradient s={me?.user_id || ''} />
+                            <div className="absolute inset-0 flex items-center justify-center font-medium text-white">
+                                {firstLetter}
+                            </div>
+                        </div>
                     </DropdownMenuTrigger>
                 </div>
                 <DropdownMenuPortal>
-                    <DropdownMenuContent>
+                    <DropdownMenuContent align="end">
                         <DropdownMenuItem className="flex items-center justify-between gap-6">
                             <div>Theme</div>
                             <ThemeSwitcher />
                         </DropdownMenuItem>
+                        <DropdownMenuSeparator />
                         {me?.admin && (
                             <DropdownMenuItem asChild>
                                 <Button
-                                    className="w-full justify-start"
+                                    className="w-full cursor-pointer justify-start"
                                     variant="ghost"
                                     asChild
                                 >
@@ -57,7 +60,7 @@ const UserProfile = () => {
                         <DropdownMenuSeparator />
                         <DropdownMenuItem asChild>
                             <Button
-                                className="flex w-full cursor-pointer items-start px-4 py-2"
+                                className="flex w-full cursor-pointer justify-start py-2"
                                 onClick={() => {
                                     authStore.send({
                                         type: 'clearAuthToken',
@@ -82,7 +85,7 @@ export const Navbar = () => {
     return (
         <div className="w-full">
             <div className="relative z-30 h-14 w-full">
-                <div className="bg-default z-10 h-14 w-full border-b px-4">
+                <div className="z-10 h-14 w-full border-b bg-default px-4">
                     <div className="w-container-dynamic flex h-full items-center justify-between px-6">
                         <div className="flex h-full">
                             <div className="relative h-full w-8">
