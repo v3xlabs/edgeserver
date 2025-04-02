@@ -35,6 +35,9 @@ export async function takeScreenshot(url: string): Promise<ScreenshotResult> {
       height: config.screenshot.height,
     });
 
+    // force light mode
+    await page.emulateMediaFeatures([{ name: "prefers-color-scheme", value: "light" }]);
+
     // Navigate to the URL with timeout from config
     await page.goto(url, {
       waitUntil: "networkidle2",

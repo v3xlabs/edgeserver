@@ -1,5 +1,6 @@
 import { FC } from 'react';
 
+import { DeploymentPreviewCover } from '../DeploymentPreviewCover';
 import { GithubDeploymentContext, GithubDeploymentContextType } from './github';
 
 type DeploymentContextType = GithubDeploymentContextType;
@@ -17,15 +18,26 @@ export const DeploymentContext: FC<{
 }> = ({ context, siteId, deploymentId }) => {
     const parsedContext = parseDeploymentContext(context);
 
-    if (parsedContext.contextType === 'github-action') {
-        return (
+    const result =
+        parsedContext.contextType === 'github-action' ? (
             <GithubDeploymentContext
                 context={parsedContext}
                 siteId={siteId}
                 deploymentId={deploymentId}
             />
+        ) : (
+            <div>{JSON.stringify(parsedContext, undefined, 2)}</div>
         );
-    }
 
-    return <div>{JSON.stringify(parsedContext, undefined, 2)}</div>;
+    return (
+        <div className="card no-padding flex gap-4 p-4">
+            <div className="">
+                <DeploymentPreviewCover
+                    siteId={siteId}
+                    deploymentId={deploymentId}
+                />
+            </div>
+            {result}
+        </div>
+    );
 };

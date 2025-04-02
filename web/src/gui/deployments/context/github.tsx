@@ -7,7 +7,6 @@ import { match } from 'ts-pattern';
 import { startsWithEmoji } from '@/util/emoji';
 import { LiveAgo, secondsToDuration } from '@/util/time';
 
-import { DeploymentPreviewCover } from '../DeploymentPreviewCover';
 import { WorkflowStatusIndicator } from '../WorkflowStatusIndicator';
 
 export type GithubDeploymentContextType = {
@@ -104,123 +103,117 @@ export const GithubDeploymentContext: FC<{
     );
 
     return (
-        <div className="card no-padding flex gap-4 p-5">
-            <DeploymentPreviewCover
-                siteId={siteId}
-                deploymentId={deploymentId}
-            />
-            <div className="grow space-y-4">
-                <div className="flex items-start justify-between gap-4">
-                    <div className="h-full space-y-1">
-                        <div className="flex items-center gap-2">
-                            <div className="font-bold">
-                                {context.data.commit.message}
-                            </div>
-                            {decoratedContext.workflowUrl && (
-                                <Link
-                                    to={decoratedContext.workflowUrl}
-                                    className="hover:text-link flex items-center gap-2 hover:underline"
-                                    target="_blank"
-                                >
-                                    <FiFileText />
-                                </Link>
-                            )}
-                            {decoratedContext.data.commit.url && (
-                                <Link
-                                    to={decoratedContext.data.commit.url}
-                                    className="hover:text-link flex items-center gap-2 hover:underline"
-                                    target="_blank"
-                                >
-                                    <FiGitCommit />
-                                </Link>
-                            )}
+        <div className="flex grow flex-col justify-center gap-2">
+            <div className="flex grow items-start justify-between gap-4">
+                <div className="flex h-full flex-col justify-center gap-1">
+                    <div className="flex items-center gap-2">
+                        <div className="font-bold">
+                            {context.data.commit.message}
                         </div>
-                        <div className="space-y-2">
+                        {decoratedContext.workflowUrl && (
                             <Link
-                                to={decoratedContext.repoUrl}
-                                className="hover:text-link text-muted flex w-fit items-center gap-1 hover:underline"
+                                to={decoratedContext.workflowUrl}
+                                className="hover:text-link flex items-center gap-2 hover:underline"
+                                target="_blank"
+                            >
+                                <FiFileText />
+                            </Link>
+                        )}
+                        {decoratedContext.data.commit.url && (
+                            <Link
+                                to={decoratedContext.data.commit.url}
+                                className="hover:text-link flex items-center gap-2 hover:underline"
                                 target="_blank"
                             >
                                 <FiGitCommit />
-                                {decoratedContext.data.commit.id.slice(0, 7)}
                             </Link>
-                        </div>
+                        )}
                     </div>
-                    <div className="flex flex-col items-end justify-center">
-                        <div className="bg-secondary w-fit rounded-md border px-2 py-0">
-                            {context.data.event}
-                        </div>
-                        <div>
-                            <TimeAgo
-                                date={new Date(context.data.commit.timestamp)}
-                            />
-                        </div>
-                    </div>
-                </div>
-                <div className="grid grid-flow-col">
-                    <div className="space-y-1">
-                        <div className="text-muted">Created by</div>
+                    <div className="space-y-2">
                         <Link
-                            to={
-                                `https://github.com/${context.data.commit.author.username}` as any
-                            }
-                            className="hover:text-link flex items-center gap-2 hover:underline"
+                            to={decoratedContext.repoUrl}
+                            className="hover:text-link text-muted flex w-fit items-center gap-1 hover:underline"
                             target="_blank"
                         >
-                            <img
-                                src={`https://github.com/${context.data.commit.author.username}.png`}
-                                className="size-6 rounded-md"
-                                alt={context.data.commit.author.name}
-                            />
-                            {context.data.commit.author.name}
+                            <FiGitCommit />
+                            {decoratedContext.data.commit.id.slice(0, 7)}
                         </Link>
                     </div>
-                    {decoratedContext.data.workflow_status && (
-                        <div>
-                            <div className="text-muted">Status</div>
-                            <WorkflowStatusIndicator
-                                status={decoratedContext.data.workflow_status}
-                                variant="expanded"
-                            />
-                        </div>
-                    )}
-                    {decoratedContext.duration && (
-                        <div>
-                            <div className="text-muted">Duration</div>
-                            {match(decoratedContext.duration)
-                                .with({ type: 'completed' }, (duration) => (
-                                    <div className="text-default flex items-center gap-1.5">
-                                        <FiClock />
-                                        {secondsToDuration(duration.duration)}
-                                    </div>
-                                ))
-                                .with({ type: 'pending' }, (duration) => (
-                                    <div className="flex animate-pulse items-center gap-1.5 text-cyan-500 dark:text-cyan-300">
-                                        <FiClock className="animate-spin" />
-                                        <LiveAgo
-                                            date={new Date(duration.startedAt)}
-                                        />
-                                    </div>
-                                ))
-                                .otherwise(() => (
-                                    <></>
-                                ))}
-                        </div>
-                    )}
-                    {decoratedContext.data.workflow && (
-                        <div>
-                            <div className="text-muted">Workflow</div>
-                            <Link
-                                to={decoratedContext.workflowUrl}
-                                className="flex items-center gap-1.5 hover:underline"
-                                target="_blank"
-                            >
-                                {!workflowStartsWithEmoji && <FiFileText />}
-                                <span>{decoratedContext.data.workflow}</span>
-                            </Link>
-                        </div>
-                    )}
                 </div>
+                <div className="flex flex-col items-end justify-center">
+                    <div className="bg-secondary w-fit rounded-md border px-2 py-0">
+                        {context.data.event}
+                    </div>
+                    <div>
+                        <TimeAgo
+                            date={new Date(context.data.commit.timestamp)}
+                        />
+                    </div>
+                </div>
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+                <div className="mt-auto space-y-1">
+                    <div className="text-muted">Created by</div>
+                    <Link
+                        to={
+                            `https://github.com/${context.data.commit.author.username}` as any
+                        }
+                        className="hover:text-link flex items-center gap-2 hover:underline"
+                        target="_blank"
+                    >
+                        <img
+                            src={`https://github.com/${context.data.commit.author.username}.png`}
+                            className="size-6 rounded-md"
+                            alt={context.data.commit.author.name}
+                        />
+                        {context.data.commit.author.name}
+                    </Link>
+                </div>
+                {decoratedContext.data.workflow_status && (
+                    <div className="mt-auto">
+                        <div className="text-muted">Status</div>
+                        <WorkflowStatusIndicator
+                            status={decoratedContext.data.workflow_status}
+                            variant="expanded"
+                        />
+                    </div>
+                )}
+                {decoratedContext.duration && (
+                    <div className="mt-auto">
+                        <div className="text-muted">Duration</div>
+                        {match(decoratedContext.duration)
+                            .with({ type: 'completed' }, (duration) => (
+                                <div className="text-default flex items-center gap-1.5">
+                                    <FiClock />
+                                    {secondsToDuration(duration.duration)}
+                                </div>
+                            ))
+                            .with({ type: 'pending' }, (duration) => (
+                                <div className="flex animate-pulse items-center gap-1.5 text-cyan-500 dark:text-cyan-300">
+                                    <FiClock className="animate-spin" />
+                                    <LiveAgo
+                                        date={new Date(duration.startedAt)}
+                                    />
+                                </div>
+                            ))
+                            .otherwise(() => (
+                                <></>
+                            ))}
+                    </div>
+                )}
+                {decoratedContext.data.workflow && (
+                    <div className="mt-auto">
+                        <div className="text-muted">Workflow</div>
+                        <Link
+                            to={decoratedContext.workflowUrl}
+                            className="flex items-center gap-1.5 hover:underline"
+                            target="_blank"
+                        >
+                            {!workflowStartsWithEmoji && <FiFileText />}
+                            <span>{decoratedContext.data.workflow}</span>
+                        </Link>
+                    </div>
+                )}
             </div>
         </div>
     );
