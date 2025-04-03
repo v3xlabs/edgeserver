@@ -16,6 +16,7 @@ import {
     DropdownMenuTrigger,
 } from '../Dropdown';
 import { InteractiveNavigator } from './InteractiveNavigator';
+import { Notifications } from './Notifications';
 import { Subbar } from './Subbar';
 import { ThemeSwitcher } from './ThemeSwitcher';
 
@@ -112,6 +113,7 @@ export const Navbar = () => {
                         </div>
 
                         <div className="flex h-full items-center">
+                            <Notifications />
                             <UserProfile />
                         </div>
                     </div>
