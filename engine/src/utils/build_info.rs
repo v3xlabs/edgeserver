@@ -38,7 +38,7 @@ pub fn build_build_information() -> BuildInformation {
         git_branch,
         git_tags,
         git_dirty,
-        build_time: info.timestamp.to_rfc3339(),
+        build_time: info.timestamp.to_string(),
         rust_version: info.compiler.version.to_string(),
     }
 }
