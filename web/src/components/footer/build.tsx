@@ -1,4 +1,5 @@
 import { format, formatDistance } from 'date-fns';
+import { useMemo } from 'react';
 
 import { useBuildInfo } from '@/api';
 
@@ -6,6 +7,16 @@ import { Tooltip } from '../tooltip';
 
 export const BuildInfo = () => {
     const { data: buildInfo } = useBuildInfo();
+
+    const buildTime = useMemo(() => {
+        if (!buildInfo) return;
+
+        try {
+            return new Date(buildInfo.build_time);
+        } catch (error) {
+            console.error('failed to parse build time', error);
+        }
+    }, [buildInfo, buildInfo?.build_time]);
 
     const branch =
         !buildInfo?.git_branch || buildInfo.git_branch === 'master' ? (
@@ -27,21 +38,14 @@ export const BuildInfo = () => {
                             }
                         >
                             <p>
-                                {buildInfo.build_time &&
-                                    format(
-                                        new Date(buildInfo.build_time),
-                                        'yyyy-MM-dd HH:mm:ss'
-                                    )}
+                                {buildTime &&
+                                    format(buildTime, 'yyyy-MM-dd HH:mm:ss')}
                             </p>
                             <p>
-                                {buildInfo.build_time &&
-                                    formatDistance(
-                                        new Date(buildInfo.build_time),
-                                        new Date(),
-                                        {
-                                            addSuffix: true,
-                                        }
-                                    )}
+                                {buildTime &&
+                                    formatDistance(buildTime, new Date(), {
+                                        addSuffix: true,
+                                    })}
                             </p>
                         </Tooltip>
                     </span>
