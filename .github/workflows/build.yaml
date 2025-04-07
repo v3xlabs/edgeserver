@@ -111,6 +111,7 @@ jobs:
                   SQLX_OFFLINE: true
                   CROSS_CONFIG: cross.toml
                   CROSS_CONTAINER_OPTS: --volume ../.git=./.git
+                  CROSS_BUILD_OPTS: --volume ../.git=./.git
               run: cross build --target ${{ matrix.platform.arch }} --release
 
             # 📦 Save our binary for later
