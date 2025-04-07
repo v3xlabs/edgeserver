@@ -73,7 +73,7 @@ jobs:
 
             # Set up Rust with the specific target we need
             - name: Install Rust
-              run: rustup toolchain install stable --profile minimal --no-self-update
+              run: rustup toolchain install stable --profile minimal --no-self-update --target ${{ matrix.platform.arch }}
 
             # Speed up builds by caching dependencies
             - name: Cache Rust
