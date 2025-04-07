@@ -90,3 +90,4 @@ build-info = "0.0.33"
 
 [build-dependencies]
 build-info-build = "0.0.33"
+build-info = "0.0.33"
