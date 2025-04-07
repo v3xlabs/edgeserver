@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "SELECT DISTINCT ON (s.site_id) s.* FROM sites s \n            LEFT JOIN deployments d ON s.site_id = d.site_id \n            WHERE s.team_id IN (SELECT team_id FROM user_teams WHERE user_id = $1) \n            OR s.team_id IN (SELECT team_id FROM teams WHERE owner_id = $1)\n            GROUP BY s.site_id, s.team_id, s.name, s.created_at\n            ORDER BY s.site_id, MAX(d.created_at) DESC NULLS LAST",
+  "query": "SELECT s.* FROM sites s\n            LEFT JOIN (\n                SELECT site_id, MAX(created_at) as latest_deploy\n                FROM deployments\n                GROUP BY site_id\n            ) d ON s.site_id = d.site_id\n            WHERE s.team_id = $1\n            ORDER BY d.latest_deploy DESC NULLS LAST, s.created_at DESC",
   "describe": {
     "columns": [
       {
@@ -36,5 +36,5 @@
       false
     ]
   },
-  "hash": "c6f7f01048b15e5eca0a5216f43cc951d75cc29da0d4e963579a2ef1ed17ad4c"
+  "hash": "dbe14616c7e4231b00463c2e30ffd6270d9e8166c40b7f687dda47ce36e305c0"
 }
