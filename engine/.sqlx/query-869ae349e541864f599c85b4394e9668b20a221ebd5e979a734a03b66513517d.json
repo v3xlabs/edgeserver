@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "SELECT * FROM sites WHERE team_id = $1",
+  "query": "SELECT DISTINCT ON (s.site_id) s.* FROM sites s \n            LEFT JOIN deployments d ON s.site_id = d.site_id \n            WHERE s.team_id = $1\n            GROUP BY s.site_id, s.team_id, s.name, s.created_at\n            ORDER BY s.site_id, MAX(d.created_at) DESC NULLS LAST",
   "describe": {
     "columns": [
       {
@@ -36,5 +36,5 @@
       false
     ]
   },
-  "hash": "628f41d8644ae0f1497dd8a0063da9b68f88d4693f9cfb9f9bfe4269e43792d2"
+  "hash": "869ae349e541864f599c85b4394e9668b20a221ebd5e979a734a03b66513517d"
 }
