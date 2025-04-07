@@ -27,19 +27,21 @@ export const BuildInfo = () => {
                             }
                         >
                             <p>
-                                {format(
-                                    new Date(buildInfo.build_time),
-                                    'yyyy-MM-dd HH:mm:ss'
-                                )}
+                                {buildInfo.build_time &&
+                                    format(
+                                        new Date(buildInfo.build_time),
+                                        'yyyy-MM-dd HH:mm:ss'
+                                    )}
                             </p>
                             <p>
-                                {formatDistance(
-                                    new Date(buildInfo.build_time),
-                                    new Date(),
-                                    {
-                                        addSuffix: true,
-                                    }
-                                )}
+                                {buildInfo.build_time &&
+                                    formatDistance(
+                                        new Date(buildInfo.build_time),
+                                        new Date(),
+                                        {
+                                            addSuffix: true,
+                                        }
+                                    )}
                             </p>
                         </Tooltip>
                     </span>

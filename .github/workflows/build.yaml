@@ -109,14 +109,6 @@ jobs:
               env:
                   BINARY_NAME: ${{ env.ENGINE_BINARY_NAME }}
                   SQLX_OFFLINE: true
-                  # Pass git information to the cross environment
-                  # Enable idempotent vergen builds
-                  VERGEN_IDEMPOTENT: true
-                  VERGEN_GIT_BRANCH: ${{ github.ref_name }}
-                  VERGEN_GIT_SHA: ${{ github.sha }}
-                  VERGEN_GIT_COMMIT_TIMESTAMP: ${{ github.event.head_commit.timestamp }}
-                  VERGEN_GIT_DESCRIBE: ${{ github.ref_type == 'tag' && github.ref_name || '' }}
-                  VERGEN_GIT_DIRTY: "false"
                   CROSS_CONFIG: cross.toml
               run: cross build --target ${{ matrix.platform.arch }} --release
 
