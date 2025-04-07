@@ -89,7 +89,12 @@ impl Site {
 
         query_as!(
             Site,
-            "SELECT * FROM sites WHERE team_id IN (SELECT team_id FROM user_teams WHERE user_id = $1) OR team_id IN (SELECT team_id FROM teams WHERE owner_id = $1)",
+            "SELECT DISTINCT ON (s.site_id) s.* FROM sites s 
+            LEFT JOIN deployments d ON s.site_id = d.site_id 
+            WHERE s.team_id IN (SELECT team_id FROM user_teams WHERE user_id = $1) 
+            OR s.team_id IN (SELECT team_id FROM teams WHERE owner_id = $1)
+            GROUP BY s.site_id, s.team_id, s.name, s.created_at
+            ORDER BY s.site_id, MAX(d.created_at) DESC NULLS LAST",
             user_id.as_ref()
         )
         .fetch_all(&db.pool)

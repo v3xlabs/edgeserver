@@ -41,17 +41,6 @@ export const DeploymentPreviewCover: FC<{
                     </div>
                 </ModalContent>
             </ModalRoot>
-            {/* {previews &&
-                previews.length > 0 &&
-                previews[0].full_preview_path && (
-                    <div className="w-full max-w-sm overflow-hidden rounded-md bg-gray-100">
-                        <img
-                            alt="Deployment Preview"
-                            src={previews[0].full_preview_path}
-                            className="size-full object-cover"
-                        />
-                    </div>
-                )} */}
         </div>
     );
 };
