@@ -44,7 +44,7 @@ export const BuildInfo = () => {
                         </Tooltip>
                     </span>
                 )}
-                {buildInfo?.git_commit && (
+                {buildInfo?.git_commit && !buildInfo.git_dirty && (
                     <span>
                         <a
                             href={`https://github.com/v3xlabs/edgeserver/commit/${buildInfo.git_commit}`}
@@ -58,7 +58,25 @@ export const BuildInfo = () => {
                 )}
                 {branch}
                 {buildInfo?.git_dirty && (
-                    <span className="text-red-500">*</span>
+                    <>
+                        <span className="text-red-500">+ local changes</span>
+                        {buildInfo?.git_commit && (
+                            <span>
+                                (based on{' '}
+                                <span>
+                                    <a
+                                        href={`https://github.com/v3xlabs/edgeserver/commit/${buildInfo.git_commit}`}
+                                        target="_blank"
+                                        className="link"
+                                        rel="noreferrer"
+                                    >
+                                        #{buildInfo.git_commit.slice(0, 7)}
+                                    </a>
+                                </span>
+                                )
+                            </span>
+                        )}
+                    </>
                 )}
             </div>
         </div>

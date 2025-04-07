@@ -73,7 +73,7 @@ jobs:
 
             # Set up Rust with the specific target we need
             - name: Install Rust
-              run: rustup toolchain install stable --profile minimal --no-self-update --target ${{ matrix.platform.arch }}
+              run: rustup toolchain install stable --profile minimal --no-self-update
 
             # Speed up builds by caching dependencies
             - name: Cache Rust
@@ -109,7 +109,15 @@ jobs:
               env:
                   BINARY_NAME: ${{ env.ENGINE_BINARY_NAME }}
                   SQLX_OFFLINE: true
-              run: cargo build --target ${{ matrix.platform.arch }} --release
+                  # Pass git information to the cross environment
+                  # Enable idempotent vergen builds
+                  VERGEN_IDEMPOTENT: true
+                  VERGEN_GIT_BRANCH: ${{ github.ref_name }}
+                  VERGEN_GIT_SHA: ${{ github.sha }}
+                  VERGEN_GIT_COMMIT_TIMESTAMP: ${{ github.event.head_commit.timestamp }}
+                  VERGEN_GIT_DESCRIBE: ${{ github.ref_type == 'tag' && github.ref_name || '' }}
+                  VERGEN_GIT_DIRTY: "false"
+              run: cross build --target ${{ matrix.platform.arch }} --release
 
             # 📦 Save our binary for later
             - name: Upload built binary as artifact

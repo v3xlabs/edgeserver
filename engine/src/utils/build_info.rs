@@ -1,8 +1,6 @@
 use poem_openapi::Object;
 use serde::{Deserialize, Serialize};
-
-// This enables the crate to collect build information at compile time
-build_info::build_info!(fn build_info);
+use std::env;
 
 #[derive(Debug, Clone, Serialize, Deserialize, Object)]
 pub struct BuildInformation {
@@ -16,27 +14,13 @@ pub struct BuildInformation {
 }
 
 pub fn build_build_information() -> BuildInformation {
-    let info = build_info();
-
-    let (git_commit, git_branch, git_tags, git_dirty) =
-        if let Some(git_info) = info.version_control.as_ref().and_then(|v| v.git()) {
-            (
-                Some(git_info.commit_id.clone()),
-                git_info.branch.clone(),
-                Some(git_info.tags.clone()),
-                git_info.dirty,
-            )
-        } else {
-            (None, None, None, false)
-        };
-
     BuildInformation {
-        version: info.crate_info.version.to_string(),
-        git_commit,
-        git_branch,
-        git_tags,
-        git_dirty,
-        build_time: info.timestamp.to_rfc3339(),
-        rust_version: info.compiler.version.to_string(),
+        version: env::var("CARGO_PKG_VERSION").unwrap_or_else(|_| "unknown".to_string()),
+        git_commit: env::var("VERGEN_GIT_SHA").ok(),
+        git_branch: env::var("VERGEN_GIT_BRANCH").ok(),
+        git_tags: env::var("VERGEN_GIT_DESCRIBE").ok().map(|desc| vec![desc]),
+        git_dirty: env::var("VERGEN_GIT_DIRTY").unwrap_or_else(|_| "false".to_string()) == "true",
+        build_time: env::var("VERGEN_BUILD_TIMESTAMP").unwrap_or_else(|_| "unknown".to_string()),
+        rust_version: env::var("VERGEN_RUSTC_SEMVER").unwrap_or_else(|_| "unknown".to_string()),
     }
 }

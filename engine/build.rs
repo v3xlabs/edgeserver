@@ -1,3 +1,12 @@
+use vergen::EmitBuilder;
+
 fn main() {
-    build_info_build::build_script();
+    // Configure and emit the cargo instructions
+    EmitBuilder::builder()
+        .all_git()
+        .all_build()
+        .all_cargo()
+        .all_rustc()
+        .emit()
+        .expect("Failed to generate build information");
 }
