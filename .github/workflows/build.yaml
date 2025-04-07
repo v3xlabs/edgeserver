@@ -117,6 +117,7 @@ jobs:
                   VERGEN_GIT_COMMIT_TIMESTAMP: ${{ github.event.head_commit.timestamp }}
                   VERGEN_GIT_DESCRIBE: ${{ github.ref_type == 'tag' && github.ref_name || '' }}
                   VERGEN_GIT_DIRTY: "false"
+                  CROSS_CONFIG: cross.toml
               run: cross build --target ${{ matrix.platform.arch }} --release
 
             # 📦 Save our binary for later
@@ -141,8 +142,8 @@ jobs:
                 platform:
                     - arch: x86_64-unknown-linux-musl
                       docker: linux/amd64
-                    - arch: aarch64-unknown-linux-musl
-                      docker: linux/arm64
+                    # - arch: aarch64-unknown-linux-musl
+                    #   docker: linux/arm64
         steps:
             - name: Checkout
               uses: actions/checkout@v4
