@@ -2060,7 +2060,7 @@ dependencies = [
 
 [[package]]
 name = "edgeserver"
-version = "0.0.1"
+version = "2.0.0-beta.1"
 dependencies = [
  "async-std",
  "async_zip",
@@ -2096,6 +2096,7 @@ dependencies = [
  "reqwest",
  "rust-car",
  "rust-s3",
+ "rustc_version_runtime",
  "rustls 0.23.20",
  "serde",
  "serde_cbor",
@@ -5122,6 +5123,16 @@ version = "0.4.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "cfcb3a22ef46e85b45de6ee7e79d063319ebb6594faafcf1c225ea92ab6e9b92"
 dependencies = [
+ "semver 1.0.24",
+]
+
+[[package]]
+name = "rustc_version_runtime"
+version = "0.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2dd18cd2bae1820af0b6ad5e54f4a51d0f3fcc53b05f845675074efcc7af071d"
+dependencies = [
+ "rustc_version 0.4.1",
  "semver 1.0.24",
 ]
 

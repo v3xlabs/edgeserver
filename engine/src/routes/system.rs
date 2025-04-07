@@ -1,6 +1,8 @@
 use crate::state::State;
+use crate::utils::build_info::{BuildInfo, build_info_build};
 use poem::web::Data;
 use poem_openapi::{payload::Json, ApiResponse, Object, OpenApi};
+use crate::routes::ApiTags;
 
 pub struct SystemApi;
 
@@ -17,9 +19,15 @@ pub enum IPFSStatusResponse {
     FeatureDisabled(Json<String>),
 }
 
+#[derive(ApiResponse)]
+pub enum BuildInfoResponse {
+    #[oai(status = 200)]
+    Ok(Json<BuildInfo>),
+}
+
 #[OpenApi]
 impl SystemApi {
-    #[oai(path = "/system/ipfs", method = "get")]
+    #[oai(path = "/system/ipfs", method = "get", tag = "ApiTags::System")]
     async fn status(&self, state: Data<&State>) -> IPFSStatusResponse {
         match &state.ipfs {
             Some(ipfs) => IPFSStatusResponse::Ok(Json(IPFSStatus {
@@ -27,5 +35,10 @@ impl SystemApi {
             })),
             None => IPFSStatusResponse::FeatureDisabled(Json("IPFS is not enabled".to_string())),
         }
+    }
+
+    #[oai(path = "/system/build", method = "get", tag = "ApiTags::System")]
+    async fn build(&self, _state: Data<&State>) -> BuildInfoResponse {
+        BuildInfoResponse::Ok(Json(build_info_build()))
     }
 }

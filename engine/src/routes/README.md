@@ -9,7 +9,7 @@ Hosting your own websites should be easy, and you should be able to do it.
 | Teams            | x           | ✓                   |
 | Domains          | ✓           | ✓                   |
 | Wildcard Domains | x           | ✓                   |
-| IPFS Pinning     | Partial     | Not Implemented Yet |
+| IPFS Pinning     | Partial     | ✓                   |
 | ENS Updating     | Partial     | Not Implemented Yet |
 
 <details>

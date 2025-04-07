@@ -1,6 +1,9 @@
 import { queryOptions, useQuery } from '@tanstack/react-query';
 
 import { apiRequest } from '../core';
+import { components } from '../schema.gen';
+
+export type IPFSStatus = components['schemas']['IPFSStatus'];
 
 export const getIPFSStatus = () =>
     queryOptions({
@@ -14,4 +17,18 @@ export const getIPFSStatus = () =>
 
 export const useIPFSStatus = () => {
     return useQuery(getIPFSStatus());
+};
+
+export const getBuildInfo = () =>
+    queryOptions({
+        queryKey: ['system', 'build'],
+        queryFn: async () => {
+            const response = await apiRequest('/system/build', 'get', {});
+
+            return response.data;
+        },
+    });
+
+export const useBuildInfo = () => {
+    return useQuery(getBuildInfo());
 };

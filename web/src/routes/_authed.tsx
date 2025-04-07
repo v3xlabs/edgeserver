@@ -9,6 +9,7 @@ import { useEffect } from 'react';
 import { preflightAuth, useAuth } from '@/api';
 import { CommandPalette } from '@/gui/command/CommandPalette';
 import { Navbar } from '@/gui/navigation/Navbar';
+import { Footer } from '@/components/footer';
 
 export const Route = createFileRoute('/_authed')({
     component: RouteComponent,
@@ -39,6 +40,7 @@ function RouteComponent() {
             <Navbar />
             <CommandPalette />
             <Outlet />
+            <Footer />
         </>
     );
 }
