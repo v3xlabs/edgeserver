@@ -1,5 +1,5 @@
 use crate::state::State;
-use crate::utils::build_info::{BuildInfo, build_info_build};
+use crate::utils::build_info::{BuildInformation, build_build_information};
 use poem::web::Data;
 use poem_openapi::{payload::Json, ApiResponse, Object, OpenApi};
 use crate::routes::ApiTags;
@@ -22,7 +22,7 @@ pub enum IPFSStatusResponse {
 #[derive(ApiResponse)]
 pub enum BuildInfoResponse {
     #[oai(status = 200)]
-    Ok(Json<BuildInfo>),
+    Ok(Json<BuildInformation>),
 }
 
 #[OpenApi]
@@ -39,6 +39,7 @@ impl SystemApi {
 
     #[oai(path = "/system/build", method = "get", tag = "ApiTags::System")]
     async fn build(&self, _state: Data<&State>) -> BuildInfoResponse {
-        BuildInfoResponse::Ok(Json(build_info_build()))
+        BuildInfoResponse::Ok(Json(build_build_information()))
     }
 }
+

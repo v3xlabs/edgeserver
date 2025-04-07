@@ -1,73 +1,39 @@
-use std::process::Command;
 use poem_openapi::Object;
 use serde::{Deserialize, Serialize};
-use chrono::Utc;
+
+// This enables the crate to collect build information at compile time
+build_info::build_info!(fn build_info);
 
 #[derive(Debug, Clone, Serialize, Deserialize, Object)]
-pub struct BuildInfo {
+pub struct BuildInformation {
     pub version: String,
     pub git_commit: Option<String>,
     pub git_branch: Option<String>,
-    pub git_tag: Option<String>,
+    pub git_tags: Option<Vec<String>>,
     pub build_time: String,
     pub rust_version: String,
 }
 
-pub fn build_info_build() -> BuildInfo {
-    BuildInfo {
-        version: env!("CARGO_PKG_VERSION").to_string(),
-        git_commit: get_git_commit(),
-        git_branch: get_git_branch(),
-        git_tag: get_git_tag(),
-        build_time: Utc::now().to_rfc3339(),
-        rust_version: rustc_version_runtime::version().to_string(),
+pub fn build_build_information() -> BuildInformation {
+    let info = build_info();
+
+    let (git_commit, git_branch, git_tags) =
+        if let Some(git_info) = info.version_control.as_ref().and_then(|v| v.git()) {
+            (
+                Some(git_info.commit_id.clone()),
+                git_info.branch.clone(),
+                Some(git_info.tags.clone()),
+            )
+        } else {
+            (None, None, None)
+        };
+
+    BuildInformation {
+        version: info.crate_info.version.to_string(),
+        git_commit,
+        git_branch,
+        git_tags,
+        build_time: info.timestamp.to_rfc3339(),
+        rust_version: info.compiler.version.to_string(),
     }
 }
-
-fn get_git_commit() -> Option<String> {
-    Command::new("git")
-        .args(["rev-parse", "HEAD"])
-        .output()
-        .ok()
-        .and_then(|output| {
-            if output.status.success() {
-                String::from_utf8(output.stdout)
-                    .ok()
-                    .map(|s| s.trim().to_string())
-            } else {
-                None
-            }
-        })
-}
-
-fn get_git_branch() -> Option<String> {
-    Command::new("git")
-        .args(["rev-parse", "--abbrev-ref", "HEAD"])
-        .output()
-        .ok()
-        .and_then(|output| {
-            if output.status.success() {
-                String::from_utf8(output.stdout)
-                    .ok()
-                    .map(|s| s.trim().to_string())
-            } else {
-                None
-            }
-        })
-}
-
-fn get_git_tag() -> Option<String> {
-    Command::new("git")
-        .args(["describe", "--tags", "--abbrev=0"])
-        .output()
-        .ok()
-        .and_then(|output| {
-            if output.status.success() {
-                String::from_utf8(output.stdout)
-                    .ok()
-                    .map(|s| s.trim().to_string())
-            } else {
-                None
-            }
-        })
-} 
