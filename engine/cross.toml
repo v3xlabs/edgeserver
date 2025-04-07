@@ -1,7 +1,7 @@
 [build.env]
-volumes = [
-    "../.git=./.git"
-]
+# volumes = [
+#     "../.git=./.git"
+# ]
 passthrough = [
   "VERGEN_IDEMPOTENT",
   "VERGEN_GIT_BRANCH",
