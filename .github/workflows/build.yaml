@@ -88,7 +88,7 @@ jobs:
 
             # Update version number in engine/Cargo.toml
             # If tag is a release use that
-            # Otherwise use the version number in the engine/Cargo.toml and append it with -alpha
+            # Otherwise use the version number in the engine/Cargo.toml and append it with -beta
             - name: Update version number
               run: |
                   if [[ "${{ github.ref }}" =~ ^refs/tags/v[0-9]+\.[0-9]+\.[0-9]+.*$ ]]; then
@@ -100,7 +100,12 @@ jobs:
                     # parse version from Cargo.toml using regex
                     version=$(grep -oP 'version = "([^"]+?)"' engine/Cargo.toml | head -n 1 | sed 's/^version = "\(.*\)"$/\1/')
                     echo "Current version: $version"
-                    sed -i '0,/^version = .*/s//version = "'${version}'-alpha"/' engine/Cargo.toml
+                    if [[ "$version" == *"-beta"* ]]; then
+                        final_version="$version"
+                    else
+                        final_version="${version}-beta"
+                    fi
+                    sed -i "0,/^version = .*/s//version = \"${final_version}\"/" engine/Cargo.toml
                   fi
 
             # 🔨 Build our static binary
