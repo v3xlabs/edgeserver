@@ -59,8 +59,8 @@ jobs:
                 platform:
                     - arch: x86_64-unknown-linux-musl
                       docker: linux/amd64
-                    - arch: aarch64-unknown-linux-musl
-                      docker: linux/arm64
+                    # - arch: aarch64-unknown-linux-musl
+                    #   docker: linux/arm64
         timeout-minutes: 20 # Prevent hanging builds
         runs-on: ubuntu-latest
         permissions:
@@ -69,7 +69,6 @@ jobs:
             - name: Checkout
               uses: actions/checkout@v4
               with:
-                  fetch-depth: 0
                   fetch-tags: true
 
             # Set up Rust with the specific target we need
@@ -84,8 +83,8 @@ jobs:
                   key: ${{ matrix.platform.arch }}
 
             # Install cross
-            - name: Install cross
-              run: cargo install cross
+            # - name: Install cross
+            #   run: cargo install cross
 
             # Update version number in engine/Cargo.toml
             # If tag is a release use that
@@ -110,7 +109,7 @@ jobs:
               env:
                   BINARY_NAME: ${{ env.ENGINE_BINARY_NAME }}
                   SQLX_OFFLINE: true
-              run: cross build --target ${{ matrix.platform.arch }} --release
+              run: cargo build --target ${{ matrix.platform.arch }} --release
 
             # 📦 Save our binary for later
             - name: Upload built binary as artifact
