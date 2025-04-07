@@ -1,4 +1,2 @@
 [build.env]
-volumes = [
-    "../.git"
-]
+volumes = ["../.git:/project/../.git:ro"]
