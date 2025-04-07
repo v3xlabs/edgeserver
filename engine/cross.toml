@@ -1,6 +1,6 @@
 [build.env]
 volumes = [
-    "../.git=./.git"
+    "../.git"
 ]
 passthrough = [
   "VERGEN_IDEMPOTENT",
