@@ -57,6 +57,9 @@ export const BuildInfo = () => {
                     </span>
                 )}
                 {branch}
+                {buildInfo?.git_dirty && (
+                    <span className="text-red-500">*</span>
+                )}
             </div>
         </div>
     );
