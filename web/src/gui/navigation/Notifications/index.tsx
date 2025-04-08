@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { FiBell } from 'react-icons/fi';
 
 import {
@@ -8,12 +9,14 @@ import {
     DropdownMenuTrigger,
 } from '../../Dropdown';
 
+type Notification = {
+    id: number;
+    message: string;
+    time: string;
+};
+
 const Notifications = () => {
-    const notifications = [
-        { id: 1, message: 'New deployment completed', time: '2 minutes ago' },
-        { id: 2, message: 'Domain verification pending', time: '1 hour ago' },
-        { id: 3, message: 'System update available', time: '2 hours ago' },
-    ];
+    const [notifications, setNotifications] = useState<Notification[]>([]);
 
     return (
         <DropdownMenu>
