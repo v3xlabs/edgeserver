@@ -60,7 +60,7 @@ export const DeploymentPreview: FC<{
                     }}
                     className="block h-fit w-full cursor-pointer md:h-screen md:max-h-32 md:w-fit"
                 >
-                    <div className="bg-secondary aspect-video h-full min-h-24 rounded-md border drop-shadow-sm md:max-h-48">
+                    <div className="aspect-video h-full min-h-24 rounded-md border bg-secondary drop-shadow-sm md:max-h-48">
                         {previews && previews.length > 0 && (
                             <img
                                 alt="Deployment Preview"
@@ -78,7 +78,7 @@ export const DeploymentPreview: FC<{
                                 deploymentId: deployment?.deployment_id ?? '',
                                 siteId: deployment?.site_id ?? '',
                             }}
-                            className="hover:text-link flex w-fit items-center gap-2 hover:underline"
+                            className="flex w-fit items-center gap-2 hover:text-link hover:underline"
                         >
                             {githubContext.data.commit.message}
                         </Link>
@@ -89,7 +89,7 @@ export const DeploymentPreview: FC<{
                     <div className="w-fit">
                         <Link
                             to={githubContext.data.commit.url}
-                            className="hover:text-link text-muted flex w-fit items-center gap-1 hover:underline"
+                            className="flex w-fit items-center gap-1 text-muted hover:text-link hover:underline"
                             target="_blank"
                         >
                             <FiGitCommit />
@@ -97,7 +97,7 @@ export const DeploymentPreview: FC<{
                         </Link>
                         <Link
                             to={githubContext.workflowUrl}
-                            className="hover:text-link text-muted flex w-fit items-center gap-1 hover:underline"
+                            className="flex w-fit items-center gap-1 text-muted hover:text-link hover:underline"
                             target="_blank"
                         >
                             {!workflowStartsWithEmoji && <FiFileText />}
@@ -106,13 +106,13 @@ export const DeploymentPreview: FC<{
                         {githubContext.duration &&
                             match(githubContext.duration)
                                 .with({ type: 'completed' }, (duration) => (
-                                    <div className="text-muted flex items-center gap-1">
+                                    <div className="flex items-center gap-1 text-muted">
                                         <FiClock />
                                         {secondsToDuration(duration.duration)}
                                     </div>
                                 ))
                                 .with({ type: 'pending' }, (duration) => (
-                                    <div className="text-muted flex animate-pulse items-center gap-1">
+                                    <div className="flex animate-pulse items-center gap-1 text-muted">
                                         <FiClock className="animate-spin" />
                                         <LiveAgo
                                             date={new Date(duration.startedAt)}
@@ -122,10 +122,10 @@ export const DeploymentPreview: FC<{
                                 .otherwise(() => <></>)}
                     </div>
                 </div>
-                <div className="flex flex-col items-end justify-center gap-2 ">
+                <div className="flex flex-col items-end gap-2 ">
                     <Link
                         to={githubContext.workflowUrl}
-                        className="bg-secondary w-fit rounded-md border px-2 py-0"
+                        className="w-fit rounded-md border bg-secondary px-2 py-0"
                         target="_blank"
                     >
                         {githubContext.data.event} #{' '}
@@ -135,7 +135,7 @@ export const DeploymentPreview: FC<{
                         to={
                             `https://github.com/${githubContext.data.commit.author.username}` as any
                         }
-                        className="hover:text-link flex items-center gap-2 hover:underline"
+                        className="flex items-center gap-2 hover:text-link hover:underline"
                         target="_blank"
                     >
                         <span>{githubContext.data.commit.author.name}</span>
@@ -177,7 +177,7 @@ export const DeploymentPreview: FC<{
                 }}
                 className="block h-fit w-full cursor-pointer md:h-screen md:max-h-32 md:w-fit"
             >
-                <div className="bg-secondary aspect-video h-full min-h-24 overflow-hidden rounded-md border drop-shadow-sm md:max-h-48">
+                <div className="aspect-video h-full min-h-24 overflow-hidden rounded-md border bg-secondary drop-shadow-sm md:max-h-48">
                     {previews && previews.length > 0 && (
                         <img
                             alt="Deployment Preview"
