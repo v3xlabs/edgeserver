@@ -70,7 +70,7 @@ export const DeploymentPreview: FC<{
                         )}
                     </div>
                 </Link>
-                <div className="w-full py-2 md:w-fit md:grow">
+                <div className="w-full md:w-fit md:grow">
                     <div className="flex w-fit items-center gap-2">
                         <Link
                             to="/site/$siteId/deployment/$deploymentId"
