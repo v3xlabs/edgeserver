@@ -115,6 +115,7 @@ export const GithubDeploymentContext: FC<{
                                 to={decoratedContext.workflowUrl}
                                 className="flex items-center gap-2 hover:text-link hover:underline"
                                 target="_blank"
+                                title="View workflow run"
                             >
                                 <FiFileText />
                             </Link>
@@ -124,6 +125,7 @@ export const GithubDeploymentContext: FC<{
                                 to={decoratedContext.data.commit.url}
                                 className="flex items-center gap-2 hover:text-link hover:underline"
                                 target="_blank"
+                                title="View commit details"
                             >
                                 <FiGitCommit />
                             </Link>
@@ -134,6 +136,7 @@ export const GithubDeploymentContext: FC<{
                             to={decoratedContext.repoUrl}
                             className="flex w-fit items-center gap-1 text-muted hover:text-link hover:underline"
                             target="_blank"
+                            title="View repository"
                         >
                             <FiGitCommit />
                             {decoratedContext.data.commit.id.slice(0, 7)}
@@ -160,6 +163,7 @@ export const GithubDeploymentContext: FC<{
                         }
                         className="flex items-center gap-2 hover:text-link hover:underline"
                         target="_blank"
+                        title={`View ${context.data.commit.author.name}'s GitHub profile`}
                     >
                         <img
                             src={`https://github.com/${context.data.commit.author.username}.png`}
@@ -208,6 +212,7 @@ export const GithubDeploymentContext: FC<{
                             to={decoratedContext.workflowUrl}
                             className="flex items-center gap-1.5 hover:underline"
                             target="_blank"
+                            title="View workflow details"
                         >
                             {!workflowStartsWithEmoji && <FiFileText />}
                             <span>{decoratedContext.data.workflow}</span>
