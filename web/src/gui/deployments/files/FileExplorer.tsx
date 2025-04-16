@@ -3,6 +3,7 @@ import byteSize from 'byte-size';
 import clsx from 'clsx';
 import { FC, useState } from 'react';
 import { LuChevronRight, LuFolderClosed, LuFolderOpen } from 'react-icons/lu';
+import { VscCollapseAll } from 'react-icons/vsc';
 
 import { useDeploymentFiles } from '@/api';
 import { components } from '@/api/schema.gen';
@@ -84,12 +85,20 @@ export const FileExplorer: FC<{ siteId: string; deploymentId: string }> = ({
         <div className="card space-y-3">
             <div className="flex justify-between">
                 <div className="font-bold">File Explorer</div>
-                <FrameworkDetection
-                    siteId={siteId}
-                    deploymentId={deploymentId}
-                />
+                <div className="flex items-center gap-2">
+                    <FrameworkDetection
+                        siteId={siteId}
+                        deploymentId={deploymentId}
+                    />
+                    <div
+                        title="Collapse all folders"
+                        className="hover:text-foreground cursor-pointer text-muted"
+                    >
+                        <VscCollapseAll className="size-5" />
+                    </div>
+                </div>
             </div>
-            <div className="bg-secondary rounded-md border">
+            <div className="rounded-md border bg-secondary">
                 <TreeEntry node={tree} name="/" isRoot hideRoot />
             </div>
         </div>
@@ -144,7 +153,7 @@ export const FolderEntry: FC<{
             >
                 <Collapsible.Trigger asChild>
                     <div
-                        className="hover:bg-muted flex cursor-pointer items-center justify-between gap-2 rounded-sm px-2 py-1"
+                        className="flex cursor-pointer items-center justify-between gap-2 rounded-sm px-2 py-1 hover:bg-muted"
                         role="button"
                         tabIndex={0}
                     >
@@ -162,7 +171,7 @@ export const FolderEntry: FC<{
                             )}
                             <span>{name}</span>
                         </div>
-                        <div className="text-muted flex justify-end gap-1.5">
+                        <div className="flex justify-end gap-1.5 text-muted">
                             {[
                                 fileCount &&
                                     `${fileCount} file${
@@ -177,7 +186,7 @@ export const FolderEntry: FC<{
                                 .map((count) => (
                                     <div
                                         key={count}
-                                        className="text-muted rounded-md border px-2"
+                                        className="rounded-md border px-2 text-muted"
                                     >
                                         {count}
                                     </div>
@@ -228,7 +237,7 @@ export const FileEntry: FC<{ file: DeploymentFile; name: string }> = ({
 
     return (
         <div
-            className="hover:bg-muted flex items-center justify-between gap-2 px-2 py-1"
+            className="flex items-center justify-between gap-2 px-2 py-1 hover:bg-muted"
             // eslint-disable-next-line jsx-a11y/role-has-required-aria-props
             role="treeitem"
             aria-label={name}
@@ -243,7 +252,7 @@ export const FileEntry: FC<{ file: DeploymentFile; name: string }> = ({
                 </span>
                 <span>{name}</span>
             </div>
-            <div className="text-muted flex items-center gap-2">
+            <div className="flex items-center gap-2 text-muted">
                 <span>{file.deployment_file_mime_type}</span>
                 {file_size && <span>{file_size.toString()}</span>}
             </div>
@@ -258,7 +267,7 @@ export const FrameworkDetection: FC<{
     const framework = useFramework(siteId, deploymentId);
 
     return (
-        <div className="text-muted flex items-center gap-2">
+        <div className="flex items-center gap-2 text-muted">
             {getFrameworkIcon(framework)}
             <span className={getFrameworkColor(framework)}>{framework}</span>
         </div>
