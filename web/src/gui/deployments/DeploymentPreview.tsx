@@ -1,4 +1,4 @@
-import { Link } from '@tanstack/react-router';
+import { Link, useNavigate } from '@tanstack/react-router';
 import { FC } from 'react';
 import { FiClock, FiFileText, FiGitCommit } from 'react-icons/fi';
 import TimeAgo from 'react-timeago-i18n';
@@ -31,6 +31,7 @@ export const DeploymentPreview: FC<{
         siteIdQuery ?? '',
         deployment_id ?? ''
     );
+    const navigate = useNavigate();
 
     const { data: previews } = deployment_id
         ? useDeploymentPreviews(siteIdQuery ?? '', deployment_id ?? '')
@@ -49,9 +50,27 @@ export const DeploymentPreview: FC<{
         githubContext?.data.workflow ?? ''
     );
 
+    const handleCardClick = (event: any) => {
+        event.preventDefault();
+
+        navigate({
+            to: '/site/$siteId/deployment/$deploymentId',
+            params: {
+                siteId: deployment?.site_id ?? '',
+                deploymentId: deployment?.deployment_id ?? '',
+            },
+        });
+    };
+
     if (githubContext) {
         return (
-            <div className="card flex flex-wrap items-stretch justify-stretch gap-4">
+            <div
+                onClick={handleCardClick}
+                onKeyDown={handleCardClick}
+                role="button"
+                tabIndex={0}
+                className="card flex flex-wrap items-stretch justify-stretch gap-4"
+            >
                 <Link
                     to="/site/$siteId/deployment/$deploymentId"
                     params={{
@@ -60,6 +79,7 @@ export const DeploymentPreview: FC<{
                     }}
                     className="block h-fit w-full cursor-pointer md:h-screen md:max-h-32 md:w-fit"
                     title="View deployment details"
+                    onClick={(event) => event.stopPropagation()}
                 >
                     <div className="aspect-video h-full min-h-24 rounded-md border bg-secondary drop-shadow-sm md:max-h-48">
                         {previews && previews.length > 0 && (
@@ -83,6 +103,7 @@ export const DeploymentPreview: FC<{
                                 }}
                                 className="flex w-fit items-center gap-2 hover:text-link hover:underline"
                                 title="View deployment details"
+                                onClick={(event) => event.stopPropagation()}
                             >
                                 {githubContext.data.commit.message}
                             </Link>
@@ -96,6 +117,7 @@ export const DeploymentPreview: FC<{
                                 className="flex w-fit items-center gap-1 text-muted hover:text-link hover:underline"
                                 target="_blank"
                                 title="View commit on GitHub"
+                                onClick={(event) => event.stopPropagation()}
                             >
                                 <FiGitCommit />
                                 {githubContext.data.commit.id.slice(0, 7)}
@@ -105,6 +127,7 @@ export const DeploymentPreview: FC<{
                                 className="flex w-fit items-center gap-1 text-muted hover:text-link hover:underline"
                                 target="_blank"
                                 title="View workflow on GitHub"
+                                onClick={(event) => event.stopPropagation()}
                             >
                                 {!workflowStartsWithEmoji && <FiFileText />}
                                 {githubContext.data.workflow}
@@ -138,6 +161,7 @@ export const DeploymentPreview: FC<{
                             className="w-fit rounded-md bg-secondary px-2 py-0"
                             target="_blank"
                             title="View workflow run on GitHub"
+                            onClick={(event) => event.stopPropagation()}
                         >
                             {githubContext.data.event} #{' '}
                             {githubContext.data.runNumber}
@@ -149,6 +173,7 @@ export const DeploymentPreview: FC<{
                             className="flex items-center gap-2 hover:text-link hover:underline"
                             target="_blank"
                             title="View author's GitHub profile"
+                            onClick={(event) => event.stopPropagation()}
                         >
                             <span>{githubContext.data.commit.author.name}</span>
                             <img
