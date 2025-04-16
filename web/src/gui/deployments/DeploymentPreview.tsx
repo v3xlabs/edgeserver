@@ -59,6 +59,7 @@ export const DeploymentPreview: FC<{
                         siteId: deployment?.site_id ?? '',
                     }}
                     className="block h-fit w-full cursor-pointer md:h-screen md:max-h-32 md:w-fit"
+                    title="View deployment details"
                 >
                     <div className="aspect-video h-full min-h-24 rounded-md border bg-secondary drop-shadow-sm md:max-h-48">
                         {previews && previews.length > 0 && (
@@ -81,6 +82,7 @@ export const DeploymentPreview: FC<{
                                     siteId: deployment?.site_id ?? '',
                                 }}
                                 className="flex w-fit items-center gap-2 hover:text-link hover:underline"
+                                title="View deployment details"
                             >
                                 {githubContext.data.commit.message}
                             </Link>
@@ -93,6 +95,7 @@ export const DeploymentPreview: FC<{
                                 to={githubContext.data.commit.url}
                                 className="flex w-fit items-center gap-1 text-muted hover:text-link hover:underline"
                                 target="_blank"
+                                title="View commit on GitHub"
                             >
                                 <FiGitCommit />
                                 {githubContext.data.commit.id.slice(0, 7)}
@@ -101,6 +104,7 @@ export const DeploymentPreview: FC<{
                                 to={githubContext.workflowUrl}
                                 className="flex w-fit items-center gap-1 text-muted hover:text-link hover:underline"
                                 target="_blank"
+                                title="View workflow on GitHub"
                             >
                                 {!workflowStartsWithEmoji && <FiFileText />}
                                 {githubContext.data.workflow}
@@ -133,6 +137,7 @@ export const DeploymentPreview: FC<{
                             to={githubContext.workflowUrl}
                             className="w-fit rounded-md bg-secondary px-2 py-0"
                             target="_blank"
+                            title="View workflow run on GitHub"
                         >
                             {githubContext.data.event} #{' '}
                             {githubContext.data.runNumber}
@@ -143,6 +148,7 @@ export const DeploymentPreview: FC<{
                             }
                             className="flex items-center gap-2 hover:text-link hover:underline"
                             target="_blank"
+                            title="View author's GitHub profile"
                         >
                             <span>{githubContext.data.commit.author.name}</span>
                             <img
@@ -183,6 +189,7 @@ export const DeploymentPreview: FC<{
                     siteId: deployment?.site_id ?? '',
                 }}
                 className="block h-fit w-full cursor-pointer md:h-screen md:max-h-32 md:w-fit"
+                title="View deployment details"
             >
                 <div className="aspect-video h-full min-h-24 overflow-hidden rounded-md border bg-secondary drop-shadow-sm md:max-h-48">
                     {previews && previews.length > 0 && (
