@@ -16,6 +16,7 @@ import {
     DropdownMenuTrigger,
 } from '../Dropdown';
 import { InteractiveNavigator } from './InteractiveNavigator';
+import { Notifications } from './Notifications';
 import { Subbar } from './Subbar';
 import { ThemeSwitcher } from './ThemeSwitcher';
 
@@ -44,20 +45,22 @@ const UserProfile = () => {
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         {me?.admin && (
-                            <DropdownMenuItem asChild>
-                                <Button
-                                    className="w-full cursor-pointer justify-start"
-                                    variant="ghost"
-                                    asChild
-                                >
-                                    <Link to="/admin">
-                                        <FiServer />
-                                        Administration
-                                    </Link>
-                                </Button>
-                            </DropdownMenuItem>
+                            <>
+                                <DropdownMenuItem asChild>
+                                    <Button
+                                        className="w-full cursor-pointer justify-start"
+                                        variant="ghost"
+                                        asChild
+                                    >
+                                        <Link to="/admin">
+                                            <FiServer />
+                                            Administration
+                                        </Link>
+                                    </Button>
+                                </DropdownMenuItem>
+                                <DropdownMenuSeparator />
+                            </>
                         )}
-                        <DropdownMenuSeparator />
                         <DropdownMenuItem asChild>
                             <Button
                                 className="flex w-full cursor-pointer justify-start py-2"
@@ -110,6 +113,7 @@ export const Navbar = () => {
                         </div>
 
                         <div className="flex h-full items-center">
+                            <Notifications />
                             <UserProfile />
                         </div>
                     </div>
