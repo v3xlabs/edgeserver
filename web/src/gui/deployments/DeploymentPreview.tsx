@@ -70,98 +70,105 @@ export const DeploymentPreview: FC<{
                         )}
                     </div>
                 </Link>
-                <div className="w-full md:w-fit md:grow">
-                    <div className="flex w-fit items-center gap-2">
-                        <Link
-                            to="/site/$siteId/deployment/$deploymentId"
-                            params={{
-                                deploymentId: deployment?.deployment_id ?? '',
-                                siteId: deployment?.site_id ?? '',
-                            }}
-                            className="flex w-fit items-center gap-2 hover:text-link hover:underline"
-                        >
-                            {githubContext.data.commit.message}
-                        </Link>
-                        <WorkflowStatusIndicator
-                            status={githubContext.data.workflow_status}
-                        />
-                    </div>
-                    <div className="w-fit">
-                        <Link
-                            to={githubContext.data.commit.url}
-                            className="flex w-fit items-center gap-1 text-muted hover:text-link hover:underline"
-                            target="_blank"
-                        >
-                            <FiGitCommit />
-                            {githubContext.data.commit.id.slice(0, 7)}
-                        </Link>
-                        <Link
-                            to={githubContext.workflowUrl}
-                            className="flex w-fit items-center gap-1 text-muted hover:text-link hover:underline"
-                            target="_blank"
-                        >
-                            {!workflowStartsWithEmoji && <FiFileText />}
-                            {githubContext.data.workflow}
-                        </Link>
-                        {githubContext.duration &&
-                            match(githubContext.duration)
-                                .with({ type: 'completed' }, (duration) => (
-                                    <div className="flex items-center gap-1 text-muted">
-                                        <FiClock />
-                                        {secondsToDuration(duration.duration)}
-                                    </div>
-                                ))
-                                .with({ type: 'pending' }, (duration) => (
-                                    <div className="flex animate-pulse items-center gap-1 text-muted">
-                                        <FiClock className="animate-spin" />
-                                        <LiveAgo
-                                            date={new Date(duration.startedAt)}
-                                        />
-                                    </div>
-                                ))
-                                .otherwise(() => <></>)}
-                    </div>
-                </div>
-                <div className="flex flex-col items-end gap-2 ">
-                    <Link
-                        to={githubContext.workflowUrl}
-                        className="w-fit rounded-md border bg-secondary px-2 py-0"
-                        target="_blank"
-                    >
-                        {githubContext.data.event} #{' '}
-                        {githubContext.data.runNumber}
-                    </Link>
-                    <Link
-                        to={
-                            `https://github.com/${githubContext.data.commit.author.username}` as any
-                        }
-                        className="flex items-center gap-2 hover:text-link hover:underline"
-                        target="_blank"
-                    >
-                        <span>{githubContext.data.commit.author.name}</span>
-                        <img
-                            src={`https://github.com/${githubContext.data.commit.author.username}.png`}
-                            className="size-6 rounded-sm"
-                            alt={githubContext.data.commit.author.name}
-                        />
-                    </Link>
-                    {githubContext.data.commit.timestamp && (
-                        <div className="text-muted">
-                            <TimeAgo
-                                date={
-                                    new Date(
-                                        githubContext.data.commit.timestamp
-                                    )
-                                }
-                                formatOptions={{
-                                    numeric: 'always',
-                                    style: 'long',
+                <div className="flex grow flex-wrap justify-between">
+                    <div className="md:w-fit md:grow">
+                        <div className="flex w-fit items-center gap-2">
+                            <Link
+                                to="/site/$siteId/deployment/$deploymentId"
+                                params={{
+                                    deploymentId:
+                                        deployment?.deployment_id ?? '',
+                                    siteId: deployment?.site_id ?? '',
                                 }}
+                                className="flex w-fit items-center gap-2 hover:text-link hover:underline"
+                            >
+                                {githubContext.data.commit.message}
+                            </Link>
+                            <WorkflowStatusIndicator
+                                status={githubContext.data.workflow_status}
                             />
                         </div>
-                    )}
+                        <div className="w-fit">
+                            <Link
+                                to={githubContext.data.commit.url}
+                                className="flex w-fit items-center gap-1 text-muted hover:text-link hover:underline"
+                                target="_blank"
+                            >
+                                <FiGitCommit />
+                                {githubContext.data.commit.id.slice(0, 7)}
+                            </Link>
+                            <Link
+                                to={githubContext.workflowUrl}
+                                className="flex w-fit items-center gap-1 text-muted hover:text-link hover:underline"
+                                target="_blank"
+                            >
+                                {!workflowStartsWithEmoji && <FiFileText />}
+                                {githubContext.data.workflow}
+                            </Link>
+                            {githubContext.duration &&
+                                match(githubContext.duration)
+                                    .with({ type: 'completed' }, (duration) => (
+                                        <div className="flex items-center gap-1 text-muted">
+                                            <FiClock />
+                                            {secondsToDuration(
+                                                duration.duration
+                                            )}
+                                        </div>
+                                    ))
+                                    .with({ type: 'pending' }, (duration) => (
+                                        <div className="flex animate-pulse items-center gap-1 text-muted">
+                                            <FiClock className="animate-spin" />
+                                            <LiveAgo
+                                                date={
+                                                    new Date(duration.startedAt)
+                                                }
+                                            />
+                                        </div>
+                                    ))
+                                    .otherwise(() => <></>)}
+                        </div>
+                    </div>
+                    <div className="flex flex-col items-end gap-2">
+                        <Link
+                            to={githubContext.workflowUrl}
+                            className="w-fit rounded-md bg-secondary px-2 py-0"
+                            target="_blank"
+                        >
+                            {githubContext.data.event} #{' '}
+                            {githubContext.data.runNumber}
+                        </Link>
+                        <Link
+                            to={
+                                `https://github.com/${githubContext.data.commit.author.username}` as any
+                            }
+                            className="flex items-center gap-2 hover:text-link hover:underline"
+                            target="_blank"
+                        >
+                            <span>{githubContext.data.commit.author.name}</span>
+                            <img
+                                src={`https://github.com/${githubContext.data.commit.author.username}.png`}
+                                className="size-6 rounded-sm"
+                                alt={githubContext.data.commit.author.name}
+                            />
+                        </Link>
+                        {githubContext.data.commit.timestamp && (
+                            <div className="text-muted">
+                                <TimeAgo
+                                    date={
+                                        new Date(
+                                            githubContext.data.commit.timestamp
+                                        )
+                                    }
+                                    formatOptions={{
+                                        numeric: 'always',
+                                        style: 'long',
+                                    }}
+                                />
+                            </div>
+                        )}
 
-                    {/* <div>{githubContext.data.commit.timestamp}</div> */}
+                        {/* <div>{githubContext.data.commit.timestamp}</div> */}
+                    </div>
                 </div>
             </div>
         );
