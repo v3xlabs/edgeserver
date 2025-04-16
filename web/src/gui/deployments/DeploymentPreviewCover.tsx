@@ -18,7 +18,7 @@ export const DeploymentPreviewCover: FC<{
     return (
         <div className="flex">
             <ModalRoot>
-                <div className="aspect-video h-fit w-full max-w-sm overflow-hidden rounded-md border border-gray-200 bg-gray-100">
+                <div className="aspect-video h-fit w-full overflow-hidden rounded-md border border-gray-200 bg-gray-100 md:max-w-md">
                     <ModalTrigger>
                         {previews && previews.length > 0 && (
                             <img
