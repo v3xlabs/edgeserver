@@ -3,7 +3,7 @@ import byteSize from 'byte-size';
 import clsx from 'clsx';
 import { FC, useEffect, useState } from 'react';
 import { LuChevronRight, LuFolderClosed, LuFolderOpen } from 'react-icons/lu';
-import { VscCollapseAll } from 'react-icons/vsc';
+import { VscCollapseAll, VscExpandAll } from 'react-icons/vsc';
 
 import { useDeploymentFiles } from '@/api';
 import { components } from '@/api/schema.gen';
@@ -101,7 +101,11 @@ export const FileExplorer: FC<{ siteId: string; deploymentId: string }> = ({
                         onClick={() => setAllCollapsed((previous) => !previous)}
                         aria-label={collapseAllLabel}
                     >
-                        <VscCollapseAll className="size-5" />
+                        {allCollapsed ? (
+                            <VscExpandAll className="size-5" />
+                        ) : (
+                            <VscCollapseAll className="size-5" />
+                        )}
                     </button>
                 </div>
             </div>
