@@ -1,7 +1,7 @@
 import * as Collapsible from '@radix-ui/react-collapsible';
 import byteSize from 'byte-size';
 import clsx from 'clsx';
-import { FC, useState } from 'react';
+import { FC, useEffect, useState } from 'react';
 import { LuChevronRight, LuFolderClosed, LuFolderOpen } from 'react-icons/lu';
 import { VscCollapseAll } from 'react-icons/vsc';
 
@@ -76,10 +76,15 @@ export const FileExplorer: FC<{ siteId: string; deploymentId: string }> = ({
 }) => {
     const { data: deploymentFiles } = useDeploymentFiles(siteId, deploymentId);
     const tree = reorgFilesIntoTree(deploymentFiles);
+    const [allCollapsed, setAllCollapsed] = useState(false);
 
     if (!deploymentFiles) {
         return;
     }
+
+    const collapseAllLabel = allCollapsed
+        ? 'Expand all folders'
+        : 'Collapse all folders';
 
     return (
         <div className="card space-y-3">
@@ -90,16 +95,24 @@ export const FileExplorer: FC<{ siteId: string; deploymentId: string }> = ({
                         siteId={siteId}
                         deploymentId={deploymentId}
                     />
-                    <div
-                        title="Collapse all folders"
+                    <button
+                        title={collapseAllLabel}
                         className="hover:text-foreground cursor-pointer text-muted"
+                        onClick={() => setAllCollapsed((previous) => !previous)}
+                        aria-label={collapseAllLabel}
                     >
                         <VscCollapseAll className="size-5" />
-                    </div>
+                    </button>
                 </div>
             </div>
             <div className="rounded-md border bg-secondary">
-                <TreeEntry node={tree} name="/" isRoot hideRoot />
+                <TreeEntry
+                    node={tree}
+                    name="/"
+                    isRoot
+                    hideRoot
+                    allCollapsed={allCollapsed}
+                />
             </div>
         </div>
     );
@@ -110,7 +123,14 @@ export const TreeEntry: FC<{
     name: string;
     isRoot?: boolean;
     hideRoot?: boolean;
-}> = ({ node, name, isRoot = false, hideRoot = false }) => {
+    allCollapsed?: boolean;
+}> = ({
+    node,
+    name,
+    isRoot = false,
+    hideRoot = false,
+    allCollapsed = false,
+}) => {
     if (node.type === 'file') {
         return <FileEntry file={node.file} name={name} />;
     }
@@ -121,6 +141,7 @@ export const TreeEntry: FC<{
             name={name}
             isRoot={isRoot}
             hideRoot={hideRoot}
+            allCollapsed={allCollapsed}
         />
     );
 };
@@ -130,15 +151,26 @@ export const FolderEntry: FC<{
     name: string;
     isRoot?: boolean;
     hideRoot?: boolean;
-}> = ({ node, name, isRoot = false, hideRoot = false }) => {
+    allCollapsed?: boolean;
+}> = ({
+    node,
+    name,
+    isRoot = false,
+    hideRoot = false,
+    allCollapsed = false,
+}) => {
     const [isOpen, setIsOpen] = useState(true);
+
+    useEffect(() => {
+        setIsOpen(!allCollapsed);
+    }, [allCollapsed]);
 
     const { fileCount, directoryCount } = countFilesAndDirectories(node);
 
     if (isRoot && hideRoot) {
         return (
             <ul className="" role="group">
-                <SubTree node={node} />
+                <SubTree node={node} allCollapsed={allCollapsed} />
             </ul>
         );
     }
@@ -197,7 +229,7 @@ export const FolderEntry: FC<{
 
                 <Collapsible.Content>
                     <ul className="ml-4 border-l pl-2" role="group">
-                        <SubTree node={node} />
+                        <SubTree node={node} allCollapsed={allCollapsed} />
                     </ul>
                 </Collapsible.Content>
             </div>
@@ -205,7 +237,10 @@ export const FolderEntry: FC<{
     );
 };
 
-export const SubTree: FC<{ node: FolderNode }> = ({ node }) => {
+export const SubTree: FC<{ node: FolderNode; allCollapsed?: boolean }> = ({
+    node,
+    allCollapsed = false,
+}) => {
     return (
         <>
             {Object.entries(node.files)
@@ -222,7 +257,11 @@ export const SubTree: FC<{ node: FolderNode }> = ({ node }) => {
                 })
                 .map(([key, value]) => (
                     <li key={key}>
-                        <TreeEntry node={value} name={key} />
+                        <TreeEntry
+                            node={value}
+                            name={key}
+                            allCollapsed={allCollapsed}
+                        />
                     </li>
                 ))}
         </>
