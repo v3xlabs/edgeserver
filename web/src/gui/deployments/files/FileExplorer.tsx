@@ -1,8 +1,9 @@
 import * as Collapsible from '@radix-ui/react-collapsible';
 import byteSize from 'byte-size';
 import clsx from 'clsx';
-import { FC, useState } from 'react';
+import { FC, useEffect, useState } from 'react';
 import { LuChevronRight, LuFolderClosed, LuFolderOpen } from 'react-icons/lu';
+import { VscCollapseAll, VscExpandAll } from 'react-icons/vsc';
 
 import { useDeploymentFiles } from '@/api';
 import { components } from '@/api/schema.gen';
@@ -75,22 +76,47 @@ export const FileExplorer: FC<{ siteId: string; deploymentId: string }> = ({
 }) => {
     const { data: deploymentFiles } = useDeploymentFiles(siteId, deploymentId);
     const tree = reorgFilesIntoTree(deploymentFiles);
+    const [allCollapsed, setAllCollapsed] = useState(false);
 
     if (!deploymentFiles) {
         return;
     }
 
+    const collapseAllLabel = allCollapsed
+        ? 'Expand all folders'
+        : 'Collapse all folders';
+
     return (
         <div className="card space-y-3">
             <div className="flex justify-between">
                 <div className="font-bold">File Explorer</div>
-                <FrameworkDetection
-                    siteId={siteId}
-                    deploymentId={deploymentId}
-                />
+                <div className="flex items-center gap-2">
+                    <FrameworkDetection
+                        siteId={siteId}
+                        deploymentId={deploymentId}
+                    />
+                    <button
+                        title={collapseAllLabel}
+                        className="hover:text-foreground cursor-pointer text-muted"
+                        onClick={() => setAllCollapsed((previous) => !previous)}
+                        aria-label={collapseAllLabel}
+                    >
+                        {allCollapsed ? (
+                            <VscExpandAll className="size-5" />
+                        ) : (
+                            <VscCollapseAll className="size-5" />
+                        )}
+                    </button>
+                </div>
             </div>
-            <div className="bg-secondary rounded-md border">
-                <TreeEntry node={tree} name="/" isRoot hideRoot />
+            <div className="rounded-md border bg-secondary">
+                <TreeEntry
+                    node={tree}
+                    name="/"
+                    isRoot
+                    hideRoot
+                    allCollapsed={allCollapsed}
+                />
             </div>
         </div>
     );
@@ -101,7 +127,14 @@ export const TreeEntry: FC<{
     name: string;
     isRoot?: boolean;
     hideRoot?: boolean;
-}> = ({ node, name, isRoot = false, hideRoot = false }) => {
+    allCollapsed?: boolean;
+}> = ({
+    node,
+    name,
+    isRoot = false,
+    hideRoot = false,
+    allCollapsed = false,
+}) => {
     if (node.type === 'file') {
         return <FileEntry file={node.file} name={name} />;
     }
@@ -112,6 +145,7 @@ export const TreeEntry: FC<{
             name={name}
             isRoot={isRoot}
             hideRoot={hideRoot}
+            allCollapsed={allCollapsed}
         />
     );
 };
@@ -121,15 +155,26 @@ export const FolderEntry: FC<{
     name: string;
     isRoot?: boolean;
     hideRoot?: boolean;
-}> = ({ node, name, isRoot = false, hideRoot = false }) => {
+    allCollapsed?: boolean;
+}> = ({
+    node,
+    name,
+    isRoot = false,
+    hideRoot = false,
+    allCollapsed = false,
+}) => {
     const [isOpen, setIsOpen] = useState(true);
+
+    useEffect(() => {
+        setIsOpen(!allCollapsed);
+    }, [allCollapsed]);
 
     const { fileCount, directoryCount } = countFilesAndDirectories(node);
 
     if (isRoot && hideRoot) {
         return (
             <ul className="" role="group">
-                <SubTree node={node} />
+                <SubTree node={node} allCollapsed={allCollapsed} />
             </ul>
         );
     }
@@ -144,7 +189,7 @@ export const FolderEntry: FC<{
             >
                 <Collapsible.Trigger asChild>
                     <div
-                        className="hover:bg-muted flex cursor-pointer items-center justify-between gap-2 rounded-sm px-2 py-1"
+                        className="flex cursor-pointer items-center justify-between gap-2 rounded-sm px-2 py-1 hover:bg-muted"
                         role="button"
                         tabIndex={0}
                     >
@@ -162,7 +207,7 @@ export const FolderEntry: FC<{
                             )}
                             <span>{name}</span>
                         </div>
-                        <div className="text-muted flex justify-end gap-1.5">
+                        <div className="flex justify-end gap-1.5 text-muted">
                             {[
                                 fileCount &&
                                     `${fileCount} file${
@@ -177,7 +222,7 @@ export const FolderEntry: FC<{
                                 .map((count) => (
                                     <div
                                         key={count}
-                                        className="text-muted rounded-md border px-2"
+                                        className="rounded-md border px-2 text-muted"
                                     >
                                         {count}
                                     </div>
@@ -188,7 +233,7 @@ export const FolderEntry: FC<{
 
                 <Collapsible.Content>
                     <ul className="ml-4 border-l pl-2" role="group">
-                        <SubTree node={node} />
+                        <SubTree node={node} allCollapsed={allCollapsed} />
                     </ul>
                 </Collapsible.Content>
             </div>
@@ -196,7 +241,10 @@ export const FolderEntry: FC<{
     );
 };
 
-export const SubTree: FC<{ node: FolderNode }> = ({ node }) => {
+export const SubTree: FC<{ node: FolderNode; allCollapsed?: boolean }> = ({
+    node,
+    allCollapsed = false,
+}) => {
     return (
         <>
             {Object.entries(node.files)
@@ -213,7 +261,11 @@ export const SubTree: FC<{ node: FolderNode }> = ({ node }) => {
                 })
                 .map(([key, value]) => (
                     <li key={key}>
-                        <TreeEntry node={value} name={key} />
+                        <TreeEntry
+                            node={value}
+                            name={key}
+                            allCollapsed={allCollapsed}
+                        />
                     </li>
                 ))}
         </>
@@ -228,7 +280,7 @@ export const FileEntry: FC<{ file: DeploymentFile; name: string }> = ({
 
     return (
         <div
-            className="hover:bg-muted flex items-center justify-between gap-2 px-2 py-1"
+            className="flex items-center justify-between gap-2 px-2 py-1 hover:bg-muted"
             // eslint-disable-next-line jsx-a11y/role-has-required-aria-props
             role="treeitem"
             aria-label={name}
@@ -243,7 +295,7 @@ export const FileEntry: FC<{ file: DeploymentFile; name: string }> = ({
                 </span>
                 <span>{name}</span>
             </div>
-            <div className="text-muted flex items-center gap-2">
+            <div className="flex items-center gap-2 text-muted">
                 <span>{file.deployment_file_mime_type}</span>
                 {file_size && <span>{file_size.toString()}</span>}
             </div>
@@ -258,7 +310,7 @@ export const FrameworkDetection: FC<{
     const framework = useFramework(siteId, deploymentId);
 
     return (
-        <div className="text-muted flex items-center gap-2">
+        <div className="flex items-center gap-2 text-muted">
             {getFrameworkIcon(framework)}
             <span className={getFrameworkColor(framework)}>{framework}</span>
         </div>

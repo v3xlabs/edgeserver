@@ -105,7 +105,7 @@ export const GithubDeploymentContext: FC<{
     return (
         <div className="flex grow flex-col justify-center gap-2">
             <div className="flex grow items-start justify-between gap-4">
-                <div className="flex h-full flex-col justify-center gap-1">
+                <div className="flex h-full flex-col justify-center gap-1 md:justify-start">
                     <div className="flex items-center gap-2">
                         <div className="font-bold">
                             {context.data.commit.message}
@@ -113,8 +113,9 @@ export const GithubDeploymentContext: FC<{
                         {decoratedContext.workflowUrl && (
                             <Link
                                 to={decoratedContext.workflowUrl}
-                                className="hover:text-link flex items-center gap-2 hover:underline"
+                                className="flex items-center gap-2 hover:text-link hover:underline"
                                 target="_blank"
+                                title="View workflow run"
                             >
                                 <FiFileText />
                             </Link>
@@ -122,8 +123,9 @@ export const GithubDeploymentContext: FC<{
                         {decoratedContext.data.commit.url && (
                             <Link
                                 to={decoratedContext.data.commit.url}
-                                className="hover:text-link flex items-center gap-2 hover:underline"
+                                className="flex items-center gap-2 hover:text-link hover:underline"
                                 target="_blank"
+                                title="View commit details"
                             >
                                 <FiGitCommit />
                             </Link>
@@ -132,8 +134,9 @@ export const GithubDeploymentContext: FC<{
                     <div className="space-y-2">
                         <Link
                             to={decoratedContext.repoUrl}
-                            className="hover:text-link text-muted flex w-fit items-center gap-1 hover:underline"
+                            className="flex w-fit items-center gap-1 text-muted hover:text-link hover:underline"
                             target="_blank"
+                            title="View repository"
                         >
                             <FiGitCommit />
                             {decoratedContext.data.commit.id.slice(0, 7)}
@@ -141,7 +144,7 @@ export const GithubDeploymentContext: FC<{
                     </div>
                 </div>
                 <div className="flex flex-col items-end justify-center">
-                    <div className="bg-secondary w-fit rounded-md border px-2 py-0">
+                    <div className="w-fit rounded-md border bg-secondary px-2 py-0">
                         {context.data.event}
                     </div>
                     <div>
@@ -151,15 +154,16 @@ export const GithubDeploymentContext: FC<{
                     </div>
                 </div>
             </div>
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid gap-2 sm:grid-cols-1 lg:grid-cols-2">
                 <div className="mt-auto space-y-1">
                     <div className="text-muted">Created by</div>
                     <Link
                         to={
                             `https://github.com/${context.data.commit.author.username}` as any
                         }
-                        className="hover:text-link flex items-center gap-2 hover:underline"
+                        className="flex items-center gap-2 hover:text-link hover:underline"
                         target="_blank"
+                        title={`View ${context.data.commit.author.name}'s GitHub profile`}
                     >
                         <img
                             src={`https://github.com/${context.data.commit.author.username}.png`}
@@ -183,7 +187,7 @@ export const GithubDeploymentContext: FC<{
                         <div className="text-muted">Duration</div>
                         {match(decoratedContext.duration)
                             .with({ type: 'completed' }, (duration) => (
-                                <div className="text-default flex items-center gap-1.5">
+                                <div className="flex items-center gap-1.5 text-default">
                                     <FiClock />
                                     {secondsToDuration(duration.duration)}
                                 </div>
@@ -208,6 +212,7 @@ export const GithubDeploymentContext: FC<{
                             to={decoratedContext.workflowUrl}
                             className="flex items-center gap-1.5 hover:underline"
                             target="_blank"
+                            title="View workflow details"
                         >
                             {!workflowStartsWithEmoji && <FiFileText />}
                             <span>{decoratedContext.data.workflow}</span>

@@ -30,7 +30,7 @@ export const DeploymentContext: FC<{
         );
 
     return (
-        <div className="card no-padding flex gap-4 p-4">
+        <div className="card no-padding flex flex-col gap-4 p-4 md:flex-row">
             <div className="">
                 <DeploymentPreviewCover
                     siteId={siteId}

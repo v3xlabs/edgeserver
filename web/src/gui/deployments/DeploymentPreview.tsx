@@ -1,4 +1,4 @@
-import { Link } from '@tanstack/react-router';
+import { Link, useNavigate } from '@tanstack/react-router';
 import { FC } from 'react';
 import { FiClock, FiFileText, FiGitCommit } from 'react-icons/fi';
 import TimeAgo from 'react-timeago-i18n';
@@ -31,6 +31,7 @@ export const DeploymentPreview: FC<{
         siteIdQuery ?? '',
         deployment_id ?? ''
     );
+    const navigate = useNavigate();
 
     const { data: previews } = deployment_id
         ? useDeploymentPreviews(siteIdQuery ?? '', deployment_id ?? '')
@@ -49,9 +50,27 @@ export const DeploymentPreview: FC<{
         githubContext?.data.workflow ?? ''
     );
 
+    const handleCardClick = (event: any) => {
+        event.preventDefault();
+
+        navigate({
+            to: '/site/$siteId/deployment/$deploymentId',
+            params: {
+                siteId: deployment?.site_id ?? '',
+                deploymentId: deployment?.deployment_id ?? '',
+            },
+        });
+    };
+
     if (githubContext) {
         return (
-            <div className="card flex flex-wrap items-stretch justify-stretch gap-4">
+            <div
+                onClick={handleCardClick}
+                onKeyDown={handleCardClick}
+                role="button"
+                tabIndex={0}
+                className="card flex flex-wrap items-stretch justify-stretch gap-4"
+            >
                 <Link
                     to="/site/$siteId/deployment/$deploymentId"
                     params={{
@@ -59,8 +78,10 @@ export const DeploymentPreview: FC<{
                         siteId: deployment?.site_id ?? '',
                     }}
                     className="block h-fit w-full cursor-pointer md:h-screen md:max-h-32 md:w-fit"
+                    title="View deployment details"
+                    onClick={(event) => event.stopPropagation()}
                 >
-                    <div className="bg-secondary aspect-video h-full min-h-24 rounded-md border drop-shadow-sm md:max-h-48">
+                    <div className="aspect-video h-full min-h-24 rounded-md border bg-secondary drop-shadow-sm md:max-h-48">
                         {previews && previews.length > 0 && (
                             <img
                                 alt="Deployment Preview"
@@ -70,98 +91,115 @@ export const DeploymentPreview: FC<{
                         )}
                     </div>
                 </Link>
-                <div className="w-full py-2 md:w-fit md:grow">
-                    <div className="flex w-fit items-center gap-2">
-                        <Link
-                            to="/site/$siteId/deployment/$deploymentId"
-                            params={{
-                                deploymentId: deployment?.deployment_id ?? '',
-                                siteId: deployment?.site_id ?? '',
-                            }}
-                            className="hover:text-link flex w-fit items-center gap-2 hover:underline"
-                        >
-                            {githubContext.data.commit.message}
-                        </Link>
-                        <WorkflowStatusIndicator
-                            status={githubContext.data.workflow_status}
-                        />
-                    </div>
-                    <div className="w-fit">
-                        <Link
-                            to={githubContext.data.commit.url}
-                            className="hover:text-link text-muted flex w-fit items-center gap-1 hover:underline"
-                            target="_blank"
-                        >
-                            <FiGitCommit />
-                            {githubContext.data.commit.id.slice(0, 7)}
-                        </Link>
-                        <Link
-                            to={githubContext.workflowUrl}
-                            className="hover:text-link text-muted flex w-fit items-center gap-1 hover:underline"
-                            target="_blank"
-                        >
-                            {!workflowStartsWithEmoji && <FiFileText />}
-                            {githubContext.data.workflow}
-                        </Link>
-                        {githubContext.duration &&
-                            match(githubContext.duration)
-                                .with({ type: 'completed' }, (duration) => (
-                                    <div className="text-muted flex items-center gap-1">
-                                        <FiClock />
-                                        {secondsToDuration(duration.duration)}
-                                    </div>
-                                ))
-                                .with({ type: 'pending' }, (duration) => (
-                                    <div className="text-muted flex animate-pulse items-center gap-1">
-                                        <FiClock className="animate-spin" />
-                                        <LiveAgo
-                                            date={new Date(duration.startedAt)}
-                                        />
-                                    </div>
-                                ))
-                                .otherwise(() => <></>)}
-                    </div>
-                </div>
-                <div className="flex flex-col items-end justify-center gap-2 ">
-                    <Link
-                        to={githubContext.workflowUrl}
-                        className="bg-secondary w-fit rounded-md border px-2 py-0"
-                        target="_blank"
-                    >
-                        {githubContext.data.event} #{' '}
-                        {githubContext.data.runNumber}
-                    </Link>
-                    <Link
-                        to={
-                            `https://github.com/${githubContext.data.commit.author.username}` as any
-                        }
-                        className="hover:text-link flex items-center gap-2 hover:underline"
-                        target="_blank"
-                    >
-                        <span>{githubContext.data.commit.author.name}</span>
-                        <img
-                            src={`https://github.com/${githubContext.data.commit.author.username}.png`}
-                            className="size-6 rounded-sm"
-                            alt={githubContext.data.commit.author.name}
-                        />
-                    </Link>
-                    {githubContext.data.commit.timestamp && (
-                        <div className="text-muted">
-                            <TimeAgo
-                                date={
-                                    new Date(
-                                        githubContext.data.commit.timestamp
-                                    )
-                                }
-                                formatOptions={{
-                                    numeric: 'always',
-                                    style: 'long',
+                <div className="flex grow flex-wrap justify-between">
+                    <div className="md:w-fit md:grow">
+                        <div className="flex w-fit items-center gap-2">
+                            <Link
+                                to="/site/$siteId/deployment/$deploymentId"
+                                params={{
+                                    deploymentId:
+                                        deployment?.deployment_id ?? '',
+                                    siteId: deployment?.site_id ?? '',
                                 }}
+                                className="flex w-fit items-center gap-2 hover:text-link hover:underline"
+                                title="View deployment details"
+                                onClick={(event) => event.stopPropagation()}
+                            >
+                                {githubContext.data.commit.message}
+                            </Link>
+                            <WorkflowStatusIndicator
+                                status={githubContext.data.workflow_status}
                             />
                         </div>
-                    )}
+                        <div className="w-fit">
+                            <Link
+                                to={githubContext.data.commit.url}
+                                className="flex w-fit items-center gap-1 text-muted hover:text-link hover:underline"
+                                target="_blank"
+                                title="View commit on GitHub"
+                                onClick={(event) => event.stopPropagation()}
+                            >
+                                <FiGitCommit />
+                                {githubContext.data.commit.id.slice(0, 7)}
+                            </Link>
+                            <Link
+                                to={githubContext.workflowUrl}
+                                className="flex w-fit items-center gap-1 text-muted hover:text-link hover:underline"
+                                target="_blank"
+                                title="View workflow on GitHub"
+                                onClick={(event) => event.stopPropagation()}
+                            >
+                                {!workflowStartsWithEmoji && <FiFileText />}
+                                {githubContext.data.workflow}
+                            </Link>
+                            {githubContext.duration &&
+                                match(githubContext.duration)
+                                    .with({ type: 'completed' }, (duration) => (
+                                        <div className="flex items-center gap-1 text-muted">
+                                            <FiClock />
+                                            {secondsToDuration(
+                                                duration.duration
+                                            )}
+                                        </div>
+                                    ))
+                                    .with({ type: 'pending' }, (duration) => (
+                                        <div className="flex animate-pulse items-center gap-1 text-muted">
+                                            <FiClock className="animate-spin" />
+                                            <LiveAgo
+                                                date={
+                                                    new Date(duration.startedAt)
+                                                }
+                                            />
+                                        </div>
+                                    ))
+                                    .otherwise(() => <></>)}
+                        </div>
+                    </div>
+                    <div className="flex flex-col items-end gap-2">
+                        <Link
+                            to={githubContext.workflowUrl}
+                            className="w-fit rounded-md bg-secondary px-2 py-0"
+                            target="_blank"
+                            title="View workflow run on GitHub"
+                            onClick={(event) => event.stopPropagation()}
+                        >
+                            {githubContext.data.event} #{' '}
+                            {githubContext.data.runNumber}
+                        </Link>
+                        <Link
+                            to={
+                                `https://github.com/${githubContext.data.commit.author.username}` as any
+                            }
+                            className="flex items-center gap-2 hover:text-link hover:underline"
+                            target="_blank"
+                            title="View author's GitHub profile"
+                            onClick={(event) => event.stopPropagation()}
+                        >
+                            <span>{githubContext.data.commit.author.name}</span>
+                            <img
+                                src={`https://github.com/${githubContext.data.commit.author.username}.png`}
+                                className="size-6 rounded-sm"
+                                alt={githubContext.data.commit.author.name}
+                            />
+                        </Link>
+                        {githubContext.data.commit.timestamp && (
+                            <div className="text-muted">
+                                <TimeAgo
+                                    date={
+                                        new Date(
+                                            githubContext.data.commit.timestamp
+                                        )
+                                    }
+                                    formatOptions={{
+                                        numeric: 'always',
+                                        style: 'long',
+                                    }}
+                                />
+                            </div>
+                        )}
 
-                    {/* <div>{githubContext.data.commit.timestamp}</div> */}
+                        {/* <div>{githubContext.data.commit.timestamp}</div> */}
+                    </div>
                 </div>
             </div>
         );
@@ -176,8 +214,9 @@ export const DeploymentPreview: FC<{
                     siteId: deployment?.site_id ?? '',
                 }}
                 className="block h-fit w-full cursor-pointer md:h-screen md:max-h-32 md:w-fit"
+                title="View deployment details"
             >
-                <div className="bg-secondary aspect-video h-full min-h-24 overflow-hidden rounded-md border drop-shadow-sm md:max-h-48">
+                <div className="aspect-video h-full min-h-24 overflow-hidden rounded-md border bg-secondary drop-shadow-sm md:max-h-48">
                     {previews && previews.length > 0 && (
                         <img
                             alt="Deployment Preview"

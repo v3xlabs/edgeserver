@@ -105,6 +105,7 @@ function RouteComponent() {
                                         'Preview regeneration queued'
                                     );
                                 }}
+                                className="cursor-pointer"
                             >
                                 <LuPictureInPicture />
                                 <span>Refresh Preview</span>
