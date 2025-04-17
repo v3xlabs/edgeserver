@@ -83,8 +83,8 @@ jobs:
                   key: ${{ matrix.platform.arch }}
 
             # Install cross
-            # - name: Install cross
-            #   run: cargo install cross
+            - name: Install cross
+              run: cargo install cross
 
             # Update version number in engine/Cargo.toml
             # If tag is a release use that
