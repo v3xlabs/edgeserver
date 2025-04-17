@@ -1,6 +1,6 @@
 import { useNavigate, useParams } from '@tanstack/react-router';
 import { Command } from 'cmdk';
-import { FC, useEffect, useState } from 'react';
+import { createContext, FC, useContext, useEffect, useState } from 'react';
 import { FiArrowRight, FiChevronRight } from 'react-icons/fi';
 
 import { useMe, useSite, useTeam } from '@/api';
@@ -16,6 +16,18 @@ import {
 } from './command';
 import { SiteEntries } from './entries/SiteEntry';
 import { TeamEntries } from './entries/TeamEntry';
+
+interface CommandContextType {
+    requestClose: () => void;
+}
+
+const CommandContext = createContext<CommandContextType>({
+    requestClose: () => {},
+});
+
+export const useCommand = () => {
+    return useContext(CommandContext);
+};
 
 export const CommandPalette = () => {
     const [open, setOpen] = useState(false);
@@ -34,28 +46,33 @@ export const CommandPalette = () => {
         return () => window.removeEventListener('keydown', down);
     }, []);
 
+    const value = {
+        requestClose: () => setOpen(false),
+    };
+
     return (
-        <ModalRoot open={open} onOpenChange={setOpen}>
-            <ModalContent
-                noPadding
-                noCloseButton
-                // frosted glass effect
-                // noBg
-                // className="dark:text-default bg-white/90 text-neutral-700 backdrop-blur-sm dark:bg-black/30"
-                className=""
-            >
-                <CommandPaletteInternal requestClose={() => setOpen(false)} />
-            </ModalContent>
-        </ModalRoot>
+        <CommandContext.Provider value={value}>
+            <ModalRoot open={open} onOpenChange={setOpen}>
+                <ModalContent
+                    noPadding
+                    noCloseButton
+                    // frosted glass effect
+                    // noBg
+                    // className="dark:text-default bg-white/90 text-neutral-700 backdrop-blur-sm dark:bg-black/30"
+                    className=""
+                >
+                    <CommandPaletteInternal />
+                </ModalContent>
+            </ModalRoot>
+        </CommandContext.Provider>
     );
 };
 
-const CommandPaletteInternal: FC<{ requestClose: () => void }> = ({
-    requestClose,
-}) => {
+const CommandPaletteInternal: FC = () => {
     const routeParameters = useParams({ from: undefined as any });
     const { data: site } = useSite(routeParameters['siteId']);
     const { data: team } = useTeam(routeParameters['teamId'] || site?.team_id);
+    const { requestClose } = useCommand();
     const { data: user } = useMe();
     const navigate = useNavigate();
 

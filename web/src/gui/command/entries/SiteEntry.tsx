@@ -12,6 +12,8 @@ import {
     useTeamSites,
 } from '@/api';
 
+import { useCommand } from '../CommandPalette';
+
 export const SiteEntry: FC<{ site_id: string }> = ({ site_id }) => {
     const { data: site } = useSite(site_id);
     const { data: deployments } = useSiteDeployments(site_id);
@@ -20,6 +22,7 @@ export const SiteEntry: FC<{ site_id: string }> = ({ site_id }) => {
         deployments?.[0]?.deployment_id ?? ''
     );
     const navigate = useNavigate();
+    const { requestClose } = useCommand();
 
     if (!site) return <></>;
 
@@ -34,6 +37,7 @@ export const SiteEntry: FC<{ site_id: string }> = ({ site_id }) => {
                         siteId: site_id,
                     },
                 });
+                requestClose();
             }}
         >
             <div className="flex items-center gap-2">
