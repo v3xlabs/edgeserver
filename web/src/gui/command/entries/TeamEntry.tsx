@@ -6,9 +6,12 @@ import { FiUsers } from 'react-icons/fi';
 import { useTeam, useTeams } from '@/api';
 import { Avatar } from '@/components';
 
+import { useCommand } from '../CommandPalette';
+
 export const TeamEntry: FC<{ team_id: string }> = ({ team_id }) => {
     const { data: team } = useTeam(team_id);
     const navigate = useNavigate();
+    const { requestClose } = useCommand();
 
     if (!team) return <></>;
 
@@ -23,6 +26,7 @@ export const TeamEntry: FC<{ team_id: string }> = ({ team_id }) => {
                         teamId: team_id,
                     },
                 });
+                requestClose();
             }}
         >
             <div className="flex w-full items-center gap-2">
@@ -32,7 +36,7 @@ export const TeamEntry: FC<{ team_id: string }> = ({ team_id }) => {
 
                 <div>{team.name}</div>
             </div>
-            <div className="text-muted flex items-center gap-1">
+            <div className="flex items-center gap-1 text-muted">
                 <FiUsers className="text-sm" />
                 <span>team</span>
             </div>

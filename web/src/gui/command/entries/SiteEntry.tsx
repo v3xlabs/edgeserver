@@ -12,6 +12,8 @@ import {
     useTeamSites,
 } from '@/api';
 
+import { useCommand } from '../CommandPalette';
+
 export const SiteEntry: FC<{ site_id: string }> = ({ site_id }) => {
     const { data: site } = useSite(site_id);
     const { data: deployments } = useSiteDeployments(site_id);
@@ -20,6 +22,7 @@ export const SiteEntry: FC<{ site_id: string }> = ({ site_id }) => {
         deployments?.[0]?.deployment_id ?? ''
     );
     const navigate = useNavigate();
+    const { requestClose } = useCommand();
 
     if (!site) return <></>;
 
@@ -34,6 +37,7 @@ export const SiteEntry: FC<{ site_id: string }> = ({ site_id }) => {
                         siteId: site_id,
                     },
                 });
+                requestClose();
             }}
         >
             <div className="flex items-center gap-2">
@@ -48,7 +52,7 @@ export const SiteEntry: FC<{ site_id: string }> = ({ site_id }) => {
                 )}
                 <div>{site.name}</div>
             </div>
-            <div className="text-muted flex items-center gap-1">
+            <div className="flex items-center gap-1 text-muted">
                 <FiGlobe className="text-sm" />
                 <span>site</span>
             </div>
@@ -60,7 +64,7 @@ export const TeamSiteEntries: FC<{ team_id: string }> = ({ team_id }) => {
     const { data: team } = useTeam(team_id);
     const { data: sites } = useTeamSites(team_id);
 
-    if (!team || !sites) return <></>;
+    if (!team || !sites || sites.length === 0) return <></>;
 
     return (
         <Command.Group heading={team.name}>
