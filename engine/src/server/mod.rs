@@ -17,6 +17,8 @@ use crate::models::domain::Domain;
 use crate::models::site::Site;
 use crate::routes::error::HttpError;
 use crate::state::State;
+use opentelemetry::metrics::Meter;
+use opentelemetry::KeyValue;
 
 const HTML_CACHE_SIZE_LIMIT: u64 = 1024 * 1024 * 5; // 5MB threshold
 const HTML_CACHE_FILE_EXTENSIONS: [&str; 6] = ["html", "htm", "json", "xml", "css", "svg"];
@@ -75,6 +77,17 @@ async fn resolve_http(request: &Request, state: Data<&State>) -> impl IntoRespon
     let raw_path = request.uri().path();
     let path = raw_path.trim_start_matches('/').to_string();
     let state_ref = *state;
+
+    // Record metrics for domain and path
+    let meter = global::meter("edgeserver");
+    let request_counter = meter
+        .u64_counter("http_requests_total")
+        .with_description("Count of HTTP requests by domain and path")
+        .build();
+    request_counter.add(1, &[
+        KeyValue::new("domain", host.to_string()),
+        KeyValue::new("path", path.clone()),
+    ]);
 
     info!("Router request at: {} {}", host, path);
 
