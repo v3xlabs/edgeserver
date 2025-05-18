@@ -151,7 +151,8 @@ where
                     // Track content length if available
                     if let Some(content_length) = resp.headers().typed_get::<headers::ContentLength>() {
                         span.set_attribute(KeyValue::new(
-                            attribute::HTTP_RESPONSE_BODY_SIZE,
+                            // attribute::HTTP_RESPONSE_BODY_SIZE,
+                            "http.response_body_size",
                             content_length.0 as i64,
                         ));
                     }

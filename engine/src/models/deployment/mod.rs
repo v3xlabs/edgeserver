@@ -341,7 +341,7 @@ impl DeploymentFile {
 }
 
 // Add this new struct to represent the joined result
-#[derive(Debug, Serialize, Deserialize, sqlx::FromRow, Object)]
+#[derive(Debug, Serialize, Deserialize, sqlx::FromRow, Object, Clone)]
 pub struct DeploymentFileEntry {
     pub deployment_file_deployment_id: String,
     pub deployment_file_file_id: i64,
