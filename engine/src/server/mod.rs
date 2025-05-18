@@ -198,7 +198,7 @@ async fn serve_deployment_file(
     cid: Option<String>,
     state: &State,
 ) -> Response {
-    let mime = deployment_file.deployment_file_mime_type.clone();
+    let mime = polyfill_mime_type(&deployment_file.deployment_file_mime_type.clone(), &deployment_file.deployment_file_file_path);
     let file_key = deployment_file.file_hash.clone();
     // let cid_path = format!("{}/{}", cid.unwrap_or("".to_string()), deployment_file.deployment_file_file_path);
 
@@ -291,5 +291,15 @@ async fn serve_deployment_file(
                 .status(StatusCode::INTERNAL_SERVER_ERROR)
                 .body(Body::from_string("Failed to stream file".to_string()))
         }
+    }
+}
+
+fn polyfill_mime_type(mime: &str, file_name: &str) -> String {
+    let extension = file_name.split('.').last().unwrap_or("");
+
+    if mime == "text/xml" && extension == "svg" {
+        "image/svg+xml".to_string()
+    } else {
+        mime.to_string()
     }
 }
