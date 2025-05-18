@@ -1,5 +1,6 @@
 use std::sync::Arc;
 use std::io::{Error as IoError, ErrorKind};
+use chrono::{DateTime, Utc};
 
 use futures::StreamExt;
 use opentelemetry::global;
@@ -36,7 +37,7 @@ pub async fn serve(state: State) {
 }
 
 /// Attempt an SPA fallback by serving `index.html` from the same deployment.
-async fn spa_fallback(deployment_id: &str, state: &State) -> Response {
+async fn spa_fallback(deployment_id: &str, last_modified: DateTime<Utc>, cid: Option<String>, state: &State) -> Response {
     let spa_key = format!("{}:index.html", deployment_id);
     let deployment_str = deployment_id.to_string();
     let spa_entry: Option<DeploymentFileEntry> = state
@@ -47,7 +48,7 @@ async fn spa_fallback(deployment_id: &str, state: &State) -> Response {
         })
         .await;
     if let Some(entry) = spa_entry {
-        return serve_deployment_file(entry, state).await;
+        return serve_deployment_file(entry, last_modified, cid, state).await;
     }
     // default 404
     info!("SPA fallback failed for deployment {}", deployment_id);
@@ -78,7 +79,10 @@ async fn resolve_http(request: &Request, state: Data<&State>) -> impl IntoRespon
             .status(StatusCode::NOT_FOUND)
             .body(Body::from_string(include_str!("./404.html").to_string()));
     };
+    let cid = deployment.ipfs_cid;
     let deployment_id = deployment.deployment_id;
+    // record Last-Modified header value from this deployment
+    let last_modified = deployment.created_at;
 
     // 2) deployment_id + path -> DeploymentFileEntry
     let entry_key = format!("{}:{}", &deployment_id, path);
@@ -89,17 +93,16 @@ async fn resolve_http(request: &Request, state: Data<&State>) -> impl IntoRespon
         DeploymentFile::get_file_by_path(&state_for_file_str.database, &deployment_str, &path).await.ok()
     }).await;
     if let Some(deployment_file) = maybe_file {
-        return serve_deployment_file(deployment_file, state_ref).await;
+        return serve_deployment_file(deployment_file, last_modified, cid, state_ref).await;
     }
 
     // 3) SPA fallback -> index.html
-    let spa_key = format!("{}:index.html", &deployment_id);
-    let deployment_str = deployment_id.to_string();
+    let spa_key = format!("{}:index.html", deployment_id);
     let maybe_spa = state_ref.cache.file_entry.get_with(spa_key.clone(), async move {
-        DeploymentFile::get_file_by_path(&state_for_file.database, &deployment_str, "index.html").await.ok()
+        DeploymentFile::get_file_by_path(&state_for_file.database, &deployment_id, "index.html").await.ok()
     }).await;
     if let Some(deployment_file) = maybe_spa {
-        return serve_deployment_file(deployment_file, state_ref).await;
+        return serve_deployment_file(deployment_file, last_modified, cid, state_ref).await;
     }
 
     // 4) 404
@@ -140,51 +143,74 @@ async fn get_last_deployment(host: &str, state: &State) -> Result<Deployment, Ht
 }
 
 /// Serve a deployment file entry, using full in-memory cache for eligible files or streaming otherwise.
-async fn serve_deployment_file(deployment_file: DeploymentFileEntry, state: &State) -> Response {
+async fn serve_deployment_file(deployment_file: DeploymentFileEntry, last_modified: DateTime<Utc>, cid: Option<String>, state: &State) -> Response {
     let mime = deployment_file.deployment_file_mime_type.clone();
     let file_key = deployment_file.file_hash.clone();
+    // let cid_path = format!("{}/{}", cid.unwrap_or("".to_string()), deployment_file.deployment_file_file_path);
+
     // full cache eligibility
     if (mime == "text/html" || HTML_CACHE_FILE_EXTENSIONS.contains(&deployment_file.deployment_file_file_path.split('.').last().unwrap_or("")))
         && deployment_file.file_size.unwrap_or(0) <= HTML_CACHE_SIZE_LIMIT as i64
     {
         // in-memory cache hit
         if let Some(bytes) = state.cache.file_bytes.get(&file_key).await {
-            return Response::builder()
+            // build response with standard headers
+            let mut resp = Response::builder()
                 .status(StatusCode::OK)
                 .header("content-type", mime.clone())
-                .body(Body::from_bytes(bytes.clone()));
+                .header("ETag", format!("\"{}\"", file_key))
+                .header("Last-Modified", last_modified.to_rfc2822());
+            // optionally include IPFS path
+            if let Some(cid_val) = &cid {
+                let ipfs_path = format!("{}/{}", cid_val, deployment_file.deployment_file_file_path);
+                resp = resp.header("x-ipfs-path", ipfs_path);
+            }
+            return resp.body(Body::from_bytes(bytes.clone()));
         }
         // fetch and cache
         if let Ok(data) = state.storage.bucket.get_object(&file_key).await {
             let bytes = data.into_bytes();
-            state.cache.file_bytes.insert(file_key.clone(), bytes.clone()).await;
-            return Response::builder()
+            state.cache.file_bytes.insert(file_key.clone(), bytes.clone());
+            let mut resp = Response::builder()
                 .status(StatusCode::OK)
                 .header("content-type", mime.clone())
-                .body(Body::from_bytes(bytes));
+                .header("ETag", format!("\"{}\"", file_key))
+                .header("Last-Modified", last_modified.to_rfc2822());
+            if let Some(cid_val) = &cid {
+                let ipfs_path = format!("{}/{}", cid_val, deployment_file.deployment_file_file_path);
+                resp = resp.header("x-ipfs-path", ipfs_path);
+            }
+            return resp.body(Body::from_bytes(bytes));
         }
         // on error, fallthrough to internal error
         return Response::builder()
             .status(StatusCode::INTERNAL_SERVER_ERROR)
             .body(Body::from_string("Failed to load file".to_string()));
     }
-    // streaming fallback
-    match state.storage.bucket.get_object_stream(file_key).await {
-                Ok(s3_data) => {
-                    let stream = s3_data.bytes.map(|chunk| {
-                        chunk.map_err(|e| {
-                        info!("Error streaming file: {}", e);
+    // streaming fallback (clone key so we can still use file_key afterwards)
+    let s3_key = file_key.clone();
+    match state.storage.bucket.get_object_stream(s3_key).await {
+        Ok(s3_data) => {
+            let stream = s3_data.bytes.map(|chunk| {
+                chunk.map_err(|e| {
+                    info!("Error streaming file: {}", e);
                     IoError::new(ErrorKind::Other, e)
-                    })
-                });
-                let body = Body::from_bytes_stream(stream);
-            Response::builder()
-                    .status(StatusCode::OK)
+                })
+            });
+            let body = Body::from_bytes_stream(stream);
+            let mut resp = Response::builder()
+                .status(StatusCode::OK)
                 .header("content-type", mime)
-                .body(body)
-                }
-        Err(_) => Response::builder()
-                        .status(StatusCode::INTERNAL_SERVER_ERROR)
+                .header("ETag", format!("\"{}\"", file_key))
+                .header("Last-Modified", last_modified.to_rfc2822());
+            if let Some(cid_val) = &cid {
+                let ipfs_path = format!("{}/{}", cid_val, deployment_file.deployment_file_file_path);
+                resp = resp.header("x-ipfs-path", ipfs_path);
+            }
+            return resp.body(body);
+        }
+        Err(_) => return Response::builder()
+            .status(StatusCode::INTERNAL_SERVER_ERROR)
             .body(Body::from_string("Failed to stream file".to_string())),
     }
 }
