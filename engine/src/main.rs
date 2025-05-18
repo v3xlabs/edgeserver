@@ -2,6 +2,7 @@ use std::env;
 use std::sync::Arc;
 
 use async_std::prelude::FutureExt;
+use async_std::task::JoinHandle;
 use opentelemetry::KeyValue;
 use opentelemetry::{global, trace::TracerProvider};
 use opentelemetry_otlp::WithExportConfig;
@@ -21,6 +22,7 @@ pub mod storage;
 pub mod utils;
 pub mod handlers;
 pub mod ipfs;
+pub mod server;
 
 use tracing_subscriber::prelude::*;
 
@@ -96,9 +98,17 @@ async fn main() {
 
     let app_state = Arc::new(state);
 
+    // Concurrently run HTTP routes, router, and optionally RabbitMQ consumer
     if let Some(rabbit) = &app_state.clone().rabbit {
-        rabbit.do_consume(&app_state.clone()).join(routes::serve(app_state)).await;
+        rabbit
+            .do_consume(&app_state.clone())
+            .join(routes::serve(app_state.clone()))
+            .join(server::serve(app_state.clone()))
+            .await;
     } else {
-        routes::serve(app_state).await;
+        info!("No RabbitMQ connection found, running without RabbitMQ");
+        routes::serve(app_state.clone())
+            .join(server::serve(app_state.clone()))
+            .await;
     }
 }
