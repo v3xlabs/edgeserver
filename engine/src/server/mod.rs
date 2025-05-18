@@ -1,6 +1,6 @@
-use std::sync::Arc;
-use std::io::{Error as IoError, ErrorKind};
 use chrono::{DateTime, Utc};
+use std::io::{Error as IoError, ErrorKind};
+use std::sync::Arc;
 
 use futures::StreamExt;
 use opentelemetry::global;
@@ -37,14 +37,21 @@ pub async fn serve(state: State) {
 }
 
 /// Attempt an SPA fallback by serving `index.html` from the same deployment.
-async fn spa_fallback(deployment_id: &str, last_modified: DateTime<Utc>, cid: Option<String>, state: &State) -> Response {
+async fn spa_fallback(
+    deployment_id: &str,
+    last_modified: DateTime<Utc>,
+    cid: Option<String>,
+    state: &State,
+) -> Response {
     let spa_key = format!("{}:index.html", deployment_id);
     let deployment_str = deployment_id.to_string();
     let spa_entry: Option<DeploymentFileEntry> = state
         .cache
         .file_entry
         .get_with(spa_key.clone(), async move {
-            DeploymentFile::get_file_by_path(&state.database, &deployment_str, "index.html").await.ok()
+            DeploymentFile::get_file_by_path(&state.database, &deployment_str, "index.html")
+                .await
+                .ok()
         })
         .await;
     if let Some(entry) = spa_entry {
@@ -61,7 +68,10 @@ async fn spa_fallback(deployment_id: &str, last_modified: DateTime<Utc>, cid: Op
 async fn resolve_http(request: &Request, state: Data<&State>) -> impl IntoResponse {
     // extract host and path
     let headers = request.headers();
-    let host = headers.get("host").and_then(|h| h.to_str().ok()).unwrap_or("localhost");
+    let host = headers
+        .get("host")
+        .and_then(|h| h.to_str().ok())
+        .unwrap_or("localhost");
     let raw_path = request.uri().path();
     let path = raw_path.trim_start_matches('/').to_string();
     let state_ref = *state;
@@ -71,10 +81,16 @@ async fn resolve_http(request: &Request, state: Data<&State>) -> impl IntoRespon
     // 1) domain -> Deployment
     let domain_key = host.to_string();
     let state_for_domain = state_ref.clone();
-    let maybe_dep = state_ref.cache.domain.get_with(domain_key.clone(), async move {
-        get_last_deployment(host, &state_for_domain).await.ok()
-    }).await;
-    let deployment = if let Some(dep) = maybe_dep { dep } else {
+    let maybe_dep = state_ref
+        .cache
+        .domain
+        .get_with(domain_key.clone(), async move {
+            get_last_deployment(host, &state_for_domain).await.ok()
+        })
+        .await;
+    let deployment = if let Some(dep) = maybe_dep {
+        dep
+    } else {
         return Response::builder()
             .status(StatusCode::NOT_FOUND)
             .body(Body::from_string(include_str!("./404.html").to_string()));
@@ -89,18 +105,30 @@ async fn resolve_http(request: &Request, state: Data<&State>) -> impl IntoRespon
     let state_for_file = state_ref.clone();
     let deployment_str = deployment_id.to_string();
     let state_for_file_str = state_for_file.clone();
-    let maybe_file = state_ref.cache.file_entry.get_with(entry_key.clone(), async move {
-        DeploymentFile::get_file_by_path(&state_for_file_str.database, &deployment_str, &path).await.ok()
-    }).await;
+    let maybe_file = state_ref
+        .cache
+        .file_entry
+        .get_with(entry_key.clone(), async move {
+            DeploymentFile::get_file_by_path(&state_for_file_str.database, &deployment_str, &path)
+                .await
+                .ok()
+        })
+        .await;
     if let Some(deployment_file) = maybe_file {
         return serve_deployment_file(deployment_file, last_modified, cid, state_ref).await;
     }
 
     // 3) SPA fallback -> index.html
     let spa_key = format!("{}:index.html", deployment_id);
-    let maybe_spa = state_ref.cache.file_entry.get_with(spa_key.clone(), async move {
-        DeploymentFile::get_file_by_path(&state_for_file.database, &deployment_id, "index.html").await.ok()
-    }).await;
+    let maybe_spa = state_ref
+        .cache
+        .file_entry
+        .get_with(spa_key.clone(), async move {
+            DeploymentFile::get_file_by_path(&state_for_file.database, &deployment_id, "index.html")
+                .await
+                .ok()
+        })
+        .await;
     if let Some(deployment_file) = maybe_spa {
         return serve_deployment_file(deployment_file, last_modified, cid, state_ref).await;
     }
@@ -143,13 +171,25 @@ async fn get_last_deployment(host: &str, state: &State) -> Result<Deployment, Ht
 }
 
 /// Serve a deployment file entry, using full in-memory cache for eligible files or streaming otherwise.
-async fn serve_deployment_file(deployment_file: DeploymentFileEntry, last_modified: DateTime<Utc>, cid: Option<String>, state: &State) -> Response {
+async fn serve_deployment_file(
+    deployment_file: DeploymentFileEntry,
+    last_modified: DateTime<Utc>,
+    cid: Option<String>,
+    state: &State,
+) -> Response {
     let mime = deployment_file.deployment_file_mime_type.clone();
     let file_key = deployment_file.file_hash.clone();
     // let cid_path = format!("{}/{}", cid.unwrap_or("".to_string()), deployment_file.deployment_file_file_path);
 
     // full cache eligibility
-    if (mime == "text/html" || HTML_CACHE_FILE_EXTENSIONS.contains(&deployment_file.deployment_file_file_path.split('.').last().unwrap_or("")))
+    if (mime == "text/html"
+        || HTML_CACHE_FILE_EXTENSIONS.contains(
+            &deployment_file
+                .deployment_file_file_path
+                .split('.')
+                .last()
+                .unwrap_or(""),
+        ))
         && deployment_file.file_size.unwrap_or(0) <= HTML_CACHE_SIZE_LIMIT as i64
     {
         // in-memory cache hit
@@ -162,7 +202,10 @@ async fn serve_deployment_file(deployment_file: DeploymentFileEntry, last_modifi
                 .header("Last-Modified", last_modified.to_rfc2822());
             // optionally include IPFS path
             if let Some(cid_val) = &cid {
-                let ipfs_path = format!("{}/{}", cid_val, deployment_file.deployment_file_file_path);
+                let ipfs_path = format!(
+                    "/ipfs/{}/{}",
+                    cid_val, deployment_file.deployment_file_file_path
+                );
                 resp = resp.header("x-ipfs-path", ipfs_path);
             }
             return resp.body(Body::from_bytes(bytes.clone()));
@@ -170,14 +213,20 @@ async fn serve_deployment_file(deployment_file: DeploymentFileEntry, last_modifi
         // fetch and cache
         if let Ok(data) = state.storage.bucket.get_object(&file_key).await {
             let bytes = data.into_bytes();
-            state.cache.file_bytes.insert(file_key.clone(), bytes.clone());
+            state
+                .cache
+                .file_bytes
+                .insert(file_key.clone(), bytes.clone());
             let mut resp = Response::builder()
                 .status(StatusCode::OK)
                 .header("content-type", mime.clone())
                 .header("ETag", format!("\"{}\"", file_key))
                 .header("Last-Modified", last_modified.to_rfc2822());
             if let Some(cid_val) = &cid {
-                let ipfs_path = format!("{}/{}", cid_val, deployment_file.deployment_file_file_path);
+                let ipfs_path = format!(
+                    "/ipfs/{}/{}",
+                    cid_val, deployment_file.deployment_file_file_path
+                );
                 resp = resp.header("x-ipfs-path", ipfs_path);
             }
             return resp.body(Body::from_bytes(bytes));
@@ -204,13 +253,19 @@ async fn serve_deployment_file(deployment_file: DeploymentFileEntry, last_modifi
                 .header("ETag", format!("\"{}\"", file_key))
                 .header("Last-Modified", last_modified.to_rfc2822());
             if let Some(cid_val) = &cid {
-                let ipfs_path = format!("{}/{}", cid_val, deployment_file.deployment_file_file_path);
+                let ipfs_path = format!(
+                    "/ipfs/{}/{}",
+                    cid_val, deployment_file.deployment_file_file_path
+                );
                 resp = resp.header("x-ipfs-path", ipfs_path);
             }
-            return resp.body(body);
+
+            resp.body(body)
         }
-        Err(_) => return Response::builder()
-            .status(StatusCode::INTERNAL_SERVER_ERROR)
-            .body(Body::from_string("Failed to stream file".to_string())),
+        Err(_) => {
+            Response::builder()
+                .status(StatusCode::INTERNAL_SERVER_ERROR)
+                .body(Body::from_string("Failed to stream file".to_string()))
+        }
     }
 }
