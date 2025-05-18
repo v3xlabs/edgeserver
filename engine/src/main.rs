@@ -2,7 +2,6 @@ use std::env;
 use std::sync::Arc;
 
 use async_std::prelude::FutureExt;
-use async_std::task::JoinHandle;
 use opentelemetry::KeyValue;
 use opentelemetry::{global, trace::TracerProvider};
 use opentelemetry_otlp::WithExportConfig;

@@ -260,6 +260,20 @@ impl Deployment {
 
         Ok(())
     }
+
+    pub async fn get_last_by_site_id(db: &Database, site_id: &str) -> Result<Self, sqlx::Error> {
+        let span = info_span!("Deployment::get_last_by_site_id");
+        span.set_parent(Context::current());
+        let _guard = span.enter();
+
+        query_as!(
+            Deployment,
+            "SELECT * FROM deployments WHERE site_id = $1 ORDER BY created_at DESC LIMIT 1",
+            site_id
+        )
+        .fetch_one(&db.pool)
+        .await
+    }
 }
 
 #[derive(Debug, Serialize, Deserialize, Object)]
@@ -295,6 +309,33 @@ impl DeploymentFile {
             deployment_id
         )
         .fetch_all(&db.pool)
+        .await
+    }
+
+    pub async fn get_file_by_path(db: &Database, deployment_id: &str, path: &str) -> Result<DeploymentFileEntry, sqlx::Error> {
+        let span = info_span!("DeploymentFile::get_file_by_path");
+        span.set_parent(Context::current());
+        let _guard = span.enter();
+
+        query_as!(
+            DeploymentFileEntry,
+            r#"
+            SELECT
+                df.deployment_id as "deployment_file_deployment_id!",
+                df.file_id as "deployment_file_file_id!",
+                df.file_path as "deployment_file_file_path!",
+                df.mime_type as "deployment_file_mime_type!",
+                f.file_hash as "file_hash!",
+                f.file_size,
+                f.file_deleted
+            FROM deployment_files df
+            JOIN files f ON df.file_id = f.file_id
+            WHERE df.deployment_id = $1 AND df.file_path = $2
+            "#,
+            deployment_id,
+            path
+        )
+        .fetch_one(&db.pool)
         .await
     }
 }
