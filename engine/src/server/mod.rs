@@ -1,6 +1,6 @@
 use std::sync::Arc;
+use std::io::{Error as IoError, ErrorKind};
 
-use crate::cache::ResolveResult;
 use futures::StreamExt;
 use opentelemetry::global;
 use poem::middleware::OpenTelemetryMetrics;
@@ -11,7 +11,7 @@ use reqwest::StatusCode;
 use tracing::info;
 
 use crate::middlewares::tracing::TraceId;
-use crate::models::deployment::{Deployment, DeploymentFile};
+use crate::models::deployment::{Deployment, DeploymentFile, DeploymentFileEntry};
 use crate::models::domain::Domain;
 use crate::models::site::Site;
 use crate::routes::error::HttpError;
@@ -35,258 +35,77 @@ pub async fn serve(state: State) {
     Server::new(listener).run(app).await.unwrap()
 }
 
+/// Attempt an SPA fallback by serving `index.html` from the same deployment.
+async fn spa_fallback(deployment_id: &str, state: &State) -> Response {
+    let spa_key = format!("{}:index.html", deployment_id);
+    let deployment_str = deployment_id.to_string();
+    let spa_entry: Option<DeploymentFileEntry> = state
+        .cache
+        .file_entry
+        .get_with(spa_key.clone(), async move {
+            DeploymentFile::get_file_by_path(&state.database, &deployment_str, "index.html").await.ok()
+        })
+        .await;
+    if let Some(entry) = spa_entry {
+        return serve_deployment_file(entry, state).await;
+    }
+    // default 404
+    info!("SPA fallback failed for deployment {}", deployment_id);
+    Response::builder()
+        .status(StatusCode::NOT_FOUND)
+        .body(Body::from_string(include_str!("./404.html").to_string()))
+}
+
 #[handler]
 async fn resolve_http(request: &Request, state: Data<&State>) -> impl IntoResponse {
     // extract host and path
     let headers = request.headers();
-    let host = headers
-        .get("host")
-        .and_then(|h| h.to_str().ok())
-        .unwrap_or("localhost");
+    let host = headers.get("host").and_then(|h| h.to_str().ok()).unwrap_or("localhost");
     let raw_path = request.uri().path();
-    let path = raw_path.trim_start_matches('/');
+    let path = raw_path.trim_start_matches('/').to_string();
+    let state_ref = *state;
 
     info!("Router request at: {} {}", host, path);
 
-    // resolution cache for domain + path lookup
-    let cache_key = format!("resolve:{}:{}", host, path);
-    let state_for_cache = state.clone();
-    let host_for_cache = host.to_string();
-    let path_for_cache = path.to_string();
+    // 1) domain -> Deployment
+    let domain_key = host.to_string();
+    let state_for_domain = state_ref.clone();
+    let maybe_dep = state_ref.cache.domain.get_with(domain_key.clone(), async move {
+        get_last_deployment(host, &state_for_domain).await.ok()
+    }).await;
+    let deployment = if let Some(dep) = maybe_dep { dep } else {
+        return Response::builder()
+            .status(StatusCode::NOT_FOUND)
+            .body(Body::from_string(include_str!("./404.html").to_string()));
+    };
+    let deployment_id = deployment.deployment_id;
 
-    let cached_resolve: ResolveResult = state
-        .cache
-        .resolve
-        .get_with(cache_key.clone(), async move {
-            match get_last_deployment(&host_for_cache, &state_for_cache.clone()).await {
-                Ok(deployment) => {
-                    let lookup_path = if path_for_cache.is_empty() {
-                        "index.html"
-                    } else {
-                        path_for_cache.as_str()
-                    };
-                    match DeploymentFile::get_file_by_path(
-                        &state_for_cache.clone().database,
-                        &deployment.deployment_id,
-                        lookup_path,
-                    )
-                    .await
-                    {
-                        Ok(entry) => ResolveResult::Success(entry),
-                        Err(_) => {
-                            ResolveResult::NotFound(format!("File not found: {}", lookup_path))
-                        }
-                    }
-                }
-                Err(err) => {
-                    let msg = err.to_string();
-                    if let HttpError::NotFound = err {
-                        ResolveResult::NotFound(msg)
-                    } else {
-                        ResolveResult::Error(msg)
-                    }
-                }
-            }
-        })
-        .await;
-
-    // handle the resolved result
-    match cached_resolve {
-        ResolveResult::Success(deployment_file) => {
-            info!(
-                "Serving file: {} (cached lookup)",
-                deployment_file.file_hash
-            );
-            // if eligible for full caching
-            if (deployment_file.deployment_file_mime_type == "text/html"
-                || HTML_CACHE_FILE_EXTENSIONS.contains(
-                    &deployment_file
-                        .deployment_file_file_path
-                        .split('.')
-                        .last()
-                        .unwrap_or(""),
-                ))
-                && deployment_file.file_size.unwrap_or(0) <= HTML_CACHE_SIZE_LIMIT as i64
-            {
-                let file_key = deployment_file.file_hash.clone();
-                // serve from in-memory cache if present
-                if let Some(cached_bytes) = state.cache.file_bytes.get(&file_key).await {
-                    let body = Body::from_bytes(cached_bytes.clone());
-                    return Response::builder()
-                        .status(StatusCode::OK)
-                        .header(
-                            "content-type",
-                            deployment_file.deployment_file_mime_type.clone(),
-                        )
-                        .body(body);
-                }
-                // fetch from S3 and cache
-                match state.storage.bucket.get_object(&file_key).await {
-                    Ok(data) => {
-                        let bytes = data.into_bytes();
-                        state
-                            .cache
-                            .file_bytes
-                            .insert(file_key.clone(), bytes.clone());
-                        let body = Body::from_bytes(bytes);
-                        return Response::builder()
-                            .status(StatusCode::OK)
-                            .header(
-                                "content-type",
-                                deployment_file.deployment_file_mime_type.clone(),
-                            )
-                            .body(body);
-                    }
-                    Err(e) => {
-                        info!("Error loading full HTML file: {}", e);
-                        return Response::builder()
-                            .status(StatusCode::INTERNAL_SERVER_ERROR)
-                            .body(Body::from_string(e.to_string()));
-                    }
-                }
-            }
-            // otherwise, stream as before
-            let s3_path = deployment_file.file_hash.clone();
-            match state.storage.bucket.get_object_stream(s3_path).await {
-                Ok(s3_data) => {
-                    let stream = s3_data.bytes.map(|chunk| {
-                        chunk.map_err(|e| {
-                            info!("Error streaming file: {}", e);
-                            std::io::Error::new(std::io::ErrorKind::Other, e)
-                        })
-                    });
-                    let body = Body::from_bytes_stream(stream);
-                    return Response::builder()
-                        .status(StatusCode::OK)
-                        .header(
-                            "content-type",
-                            deployment_file.deployment_file_mime_type.clone(),
-                        )
-                        .body(body);
-                }
-                Err(e) => {
-                    info!("Error streaming file: {}", e);
-                    return Response::builder()
-                        .status(StatusCode::INTERNAL_SERVER_ERROR)
-                        .body(Body::from_string(e.to_string()));
-                }
-            }
-        }
-        ResolveResult::NotFound(reason) => {
-            // SPA fallback when the specific file isn't found
-            info!("Not found: {}, attempting SPA fallback", reason);
-            // Try index.html for SPA routing
-            let spa_cache_key = format!("resolve:{}:index.html", host);
-            let state_for_spa = state.clone();
-            let host_for_spa = host.to_string();
-            let spa_result: ResolveResult = state
-                .cache
-                .resolve
-                .get_with(spa_cache_key.clone(), async move {
-                    match get_last_deployment(&host_for_spa, &state_for_spa.clone()).await {
-                        Ok(deployment) => {
-                            match DeploymentFile::get_file_by_path(
-                                &state_for_spa.clone().database,
-                                &deployment.deployment_id,
-                                "index.html",
-                            )
-                            .await
-                            {
-                                Ok(entry) => ResolveResult::Success(entry),
-                                Err(_) => {
-                                    ResolveResult::NotFound("SPA index.html not found".to_string())
-                                }
-                            }
-                        }
-                        Err(err) => {
-                            let msg = err.to_string();
-                            if let HttpError::NotFound = err {
-                                ResolveResult::NotFound(msg)
-                            } else {
-                                ResolveResult::Error(msg)
-                            }
-                        }
-                    }
-                })
-                .await;
-            // If SPA index.html found, serve it using same caching logic
-            if let ResolveResult::Success(deployment_file) = spa_result {
-                info!("Serving SPA index.html for {} {}", host, path);
-                // full in-memory cache eligible?
-                if (deployment_file.deployment_file_mime_type == "text/html"
-                    || HTML_CACHE_FILE_EXTENSIONS.contains(
-                        &deployment_file
-                            .deployment_file_file_path
-                            .split('.')
-                            .last()
-                            .unwrap_or(""),
-                    ))
-                    && deployment_file.file_size.unwrap_or(0) <= HTML_CACHE_SIZE_LIMIT as i64
-                {
-                    let file_key = deployment_file.file_hash.clone();
-                    // check in-memory cache
-                    if let Some(cached_bytes) = state.cache.file_bytes.get(&file_key).await {
-                        let body = Body::from_bytes(cached_bytes.clone());
-                        return Response::builder()
-                            .status(StatusCode::OK)
-                            .header(
-                                "content-type",
-                                deployment_file.deployment_file_mime_type.clone(),
-                            )
-                            .body(body);
-                    }
-                    // fetch and cache
-                    if let Ok(data) = state.storage.bucket.get_object(&file_key).await {
-                        let bytes = data.into_bytes();
-                        state
-                            .cache
-                            .file_bytes
-                            .insert(file_key.clone(), bytes.clone());
-                        let body = Body::from_bytes(bytes);
-                        return Response::builder()
-                            .status(StatusCode::OK)
-                            .header(
-                                "content-type",
-                                deployment_file.deployment_file_mime_type.clone(),
-                            )
-                            .body(body);
-                    }
-                }
-                // otherwise, stream from S3
-                let s3_path = deployment_file.file_hash.clone();
-                if let Ok(s3_data) = state.storage.bucket.get_object_stream(s3_path).await {
-                    let stream = s3_data.bytes.map(|chunk| {
-                        chunk.map_err(|e| {
-                            info!("Error streaming SPA index: {}", e);
-                            std::io::Error::new(std::io::ErrorKind::Other, e)
-                        })
-                    });
-                    let body = Body::from_bytes_stream(stream);
-                    return Response::builder()
-                        .status(StatusCode::OK)
-                        .header(
-                            "content-type",
-                            deployment_file.deployment_file_mime_type.clone(),
-                        )
-                        .body(body);
-                }
-            }
-            // default 404 if SPA fallback failed
-            info!(
-                "SPA fallback failed for {} {}, returning default 404",
-                host, path
-            );
-            return Response::builder()
-                .status(StatusCode::NOT_FOUND)
-                .body(Body::from_string(include_str!("./404.html").to_string()));
-        }
-        ResolveResult::Error(err) => {
-            info!("Resolution error: {}", err);
-            return Response::builder()
-                .status(StatusCode::INTERNAL_SERVER_ERROR)
-                .body(Body::from_string(err));
-        }
+    // 2) deployment_id + path -> DeploymentFileEntry
+    let entry_key = format!("{}:{}", &deployment_id, path);
+    let state_for_file = state_ref.clone();
+    let deployment_str = deployment_id.to_string();
+    let state_for_file_str = state_for_file.clone();
+    let maybe_file = state_ref.cache.file_entry.get_with(entry_key.clone(), async move {
+        DeploymentFile::get_file_by_path(&state_for_file_str.database, &deployment_str, &path).await.ok()
+    }).await;
+    if let Some(deployment_file) = maybe_file {
+        return serve_deployment_file(deployment_file, state_ref).await;
     }
+
+    // 3) SPA fallback -> index.html
+    let spa_key = format!("{}:index.html", &deployment_id);
+    let deployment_str = deployment_id.to_string();
+    let maybe_spa = state_ref.cache.file_entry.get_with(spa_key.clone(), async move {
+        DeploymentFile::get_file_by_path(&state_for_file.database, &deployment_str, "index.html").await.ok()
+    }).await;
+    if let Some(deployment_file) = maybe_spa {
+        return serve_deployment_file(deployment_file, state_ref).await;
+    }
+
+    // 4) 404
+    Response::builder()
+        .status(StatusCode::NOT_FOUND)
+        .body(Body::from_string(include_str!("./404.html").to_string()))
 }
 
 async fn get_last_deployment(host: &str, state: &State) -> Result<Deployment, HttpError> {
@@ -318,4 +137,54 @@ async fn get_last_deployment(host: &str, state: &State) -> Result<Deployment, Ht
     }
 
     Err(HttpError::NotFound)
+}
+
+/// Serve a deployment file entry, using full in-memory cache for eligible files or streaming otherwise.
+async fn serve_deployment_file(deployment_file: DeploymentFileEntry, state: &State) -> Response {
+    let mime = deployment_file.deployment_file_mime_type.clone();
+    let file_key = deployment_file.file_hash.clone();
+    // full cache eligibility
+    if (mime == "text/html" || HTML_CACHE_FILE_EXTENSIONS.contains(&deployment_file.deployment_file_file_path.split('.').last().unwrap_or("")))
+        && deployment_file.file_size.unwrap_or(0) <= HTML_CACHE_SIZE_LIMIT as i64
+    {
+        // in-memory cache hit
+        if let Some(bytes) = state.cache.file_bytes.get(&file_key).await {
+            return Response::builder()
+                .status(StatusCode::OK)
+                .header("content-type", mime.clone())
+                .body(Body::from_bytes(bytes.clone()));
+        }
+        // fetch and cache
+        if let Ok(data) = state.storage.bucket.get_object(&file_key).await {
+            let bytes = data.into_bytes();
+            state.cache.file_bytes.insert(file_key.clone(), bytes.clone());
+            return Response::builder()
+                .status(StatusCode::OK)
+                .header("content-type", mime.clone())
+                .body(Body::from_bytes(bytes));
+        }
+        // on error, fallthrough to internal error
+        return Response::builder()
+            .status(StatusCode::INTERNAL_SERVER_ERROR)
+            .body(Body::from_string("Failed to load file".to_string()));
+    }
+    // streaming fallback
+    match state.storage.bucket.get_object_stream(file_key).await {
+                Ok(s3_data) => {
+                    let stream = s3_data.bytes.map(|chunk| {
+                        chunk.map_err(|e| {
+                        info!("Error streaming file: {}", e);
+                    IoError::new(ErrorKind::Other, e)
+                    })
+                });
+                let body = Body::from_bytes_stream(stream);
+            Response::builder()
+                    .status(StatusCode::OK)
+                .header("content-type", mime)
+                .body(body)
+                }
+        Err(_) => Response::builder()
+                        .status(StatusCode::INTERNAL_SERVER_ERROR)
+            .body(Body::from_string("Failed to stream file".to_string())),
+    }
 }

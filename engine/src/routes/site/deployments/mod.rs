@@ -5,7 +5,7 @@ use tracing::info;
 use crate::{
     handlers::car::CarRequest, middlewares::auth::UserAuth, models::{
         deployment::{preview::DeploymentPreview, Deployment, DeploymentFile, DeploymentFileEntry},
-        domain::Domain,
+        domain::{Domain, DomainSubmission},
         site::{Site, SiteId},
     }, routes::{error::HttpError, ApiTags}, state::State
 };
@@ -105,7 +105,7 @@ impl SiteDeploymentsApi {
 
         info!("Uploading file: {:?}", payload.data);
 
-        let deployment = Deployment::new(&state.database, site_id, payload.context)
+        let deployment = Deployment::new(&state.database, site_id.clone(), payload.context)
             .await
             .map_err(HttpError::from)?;
 
@@ -133,6 +133,14 @@ impl SiteDeploymentsApi {
             Deployment::upload_files(&deployment, &state, data)
                 .await
                 .unwrap();
+
+            // Invalidate cache for all verified domains of this site
+            let site_id = site_id.clone();
+            if let Ok(domains) = Domain::get_by_site_id(&site_id, &*state).await {
+                for ds in domains.into_iter() {
+                    state.cache.bump_domain(&ds.domain());
+                }
+            }
         }
 
         // let cutoff_date = Utc::now() - Duration::days(365);
@@ -196,6 +204,13 @@ impl SiteDeploymentsApi {
             Deployment::upload_files(&deployment, &state, data)
                 .await
                 .unwrap();
+
+            // Invalidate cache for verified domains on file update
+            if let Ok(domains) = Domain::get_by_site_id(&site_id.0, &*state).await {
+                for ds in domains.into_iter() {
+                    state.cache.bump_domain(&ds.domain());
+                }
+            }
         }
 
         // update context on deployment

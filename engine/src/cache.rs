@@ -1,43 +1,45 @@
 use std::time::Duration;
 use bytes::Bytes;
-use serde::{Serialize, Deserialize};
-use crate::models::deployment::DeploymentFileEntry;
-
-/// Result of resolving a host and path to a deployment file entry or an error reason.
-#[derive(Clone, Debug, Serialize, Deserialize)]
-pub enum ResolveResult {
-    /// Successfully found a deployment file entry.
-    Success(DeploymentFileEntry),
-    /// The resource was not found, with a reason message.
-    NotFound(String),
-    /// An internal error occurred during resolution, with an error message.
-    Error(String),
-}
+use serde_json::Value;
+use crate::models::deployment::{Deployment, DeploymentFileEntry};
 
 #[derive(Debug)]
 pub struct Cache {
-    // pub raw: DashMap<String, Shared<BoxFuture<'static, CachedValue<serde_json::Value>>>>,
-    pub raw: moka::future::Cache<String, serde_json::Value>,
-    /// Cache for HTTP resolution results (domain + path).
-    pub resolve: moka::future::Cache<String, ResolveResult>,
-    /// Cache for bytes of small files to avoid repeated S3 fetches.
+    /// Raw JSON-based cache used elsewhere in the app.
+    pub raw: moka::future::Cache<String, Value>,
+    /// Cache domain -> Deployment
+    pub domain: moka::future::Cache<String, Option<Deployment>>,
+    /// Cache deployment_id:path -> DeploymentFileEntry
+    pub file_entry: moka::future::Cache<String, Option<DeploymentFileEntry>>,
+    /// Cache file_hash -> Bytes for small files
     pub file_bytes: moka::future::Cache<String, Bytes>,
 }
 
 impl Default for Cache {
     fn default() -> Self {
-        Self {
-            raw: moka::future::Cache::builder()
-                .max_capacity(1000)
-                .time_to_live(Duration::from_secs(10))
-                .build(),
-            resolve: moka::future::Cache::builder()
-                .max_capacity(1000)
-                .time_to_live(Duration::from_secs(60)) // TTL for resolution cache
-                .build(),
-            file_bytes: moka::future::Cache::builder()
-                .max_capacity(1000)
-                .build(),
-        }
+        let raw = moka::future::Cache::builder()
+            .max_capacity(1000)
+            .time_to_live(Duration::from_secs(10))
+            .build();
+        let domain = moka::future::Cache::builder()
+            .max_capacity(1000)
+            .time_to_live(Duration::from_secs(300))
+            .build();
+        let file_entry = moka::future::Cache::builder()
+            .max_capacity(10000)
+            .time_to_live(Duration::from_secs(60))
+            .build();
+        let file_bytes = moka::future::Cache::builder()
+            .max_capacity(1000)
+            .time_to_live(Duration::from_secs(60 * 60))
+            .build();
+        Self { raw, domain, file_entry, file_bytes }
+    }
+}
+
+impl Cache {
+    /// Invalidate cached deployment for this domain.
+    pub fn bump_domain(&self, domain: &str) {
+        self.domain.invalidate(domain);
     }
 }
