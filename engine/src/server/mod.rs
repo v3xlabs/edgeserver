@@ -105,17 +105,38 @@ async fn resolve_http(request: &Request, state: Data<&State>) -> impl IntoRespon
     let state_for_file = state_ref.clone();
     let deployment_str = deployment_id.to_string();
     let state_for_file_str = state_for_file.clone();
+    let path_str = path.clone();
     let maybe_file = state_ref
         .cache
         .file_entry
         .get_with(entry_key.clone(), async move {
-            DeploymentFile::get_file_by_path(&state_for_file_str.database, &deployment_str, &path)
+            DeploymentFile::get_file_by_path(&state_for_file_str.database, &deployment_str, &path_str)
                 .await
                 .ok()
         })
         .await;
     if let Some(deployment_file) = maybe_file {
         return serve_deployment_file(deployment_file, last_modified, cid, state_ref).await;
+    }
+
+    // 2b) if path is a directory, try <path>/index.html
+    if !path.is_empty() {
+        let index_path = format!("{}/index.html", path);
+        let index_key = format!("{}:{}", deployment_id, index_path);
+        let state_for_index = state_ref.clone();
+        let deployment_id_index = deployment_id.clone();
+        let maybe_index = state_ref
+            .cache
+            .file_entry
+            .get_with(index_key.clone(), async move {
+                DeploymentFile::get_file_by_path(&state_for_index.database, &deployment_id_index, &index_path)
+                    .await
+                    .ok()
+            })
+            .await;
+        if let Some(deployment_file) = maybe_index {
+            return serve_deployment_file(deployment_file, last_modified, cid, state_ref).await;
+        }
     }
 
     // 3) SPA fallback -> index.html
@@ -199,7 +220,8 @@ async fn serve_deployment_file(
                 .status(StatusCode::OK)
                 .header("content-type", mime.clone())
                 .header("ETag", format!("\"{}\"", file_key))
-                .header("Last-Modified", last_modified.to_rfc2822());
+                .header("Last-Modified", last_modified.to_rfc2822())
+                .header("Cache-Control", "max-age=300");
             // optionally include IPFS path
             if let Some(cid_val) = &cid {
                 let ipfs_path = format!(
@@ -221,7 +243,8 @@ async fn serve_deployment_file(
                 .status(StatusCode::OK)
                 .header("content-type", mime.clone())
                 .header("ETag", format!("\"{}\"", file_key))
-                .header("Last-Modified", last_modified.to_rfc2822());
+                .header("Last-Modified", last_modified.to_rfc2822())
+                .header("Cache-Control", "max-age=300");
             if let Some(cid_val) = &cid {
                 let ipfs_path = format!(
                     "/ipfs/{}/{}",
@@ -251,7 +274,8 @@ async fn serve_deployment_file(
                 .status(StatusCode::OK)
                 .header("content-type", mime)
                 .header("ETag", format!("\"{}\"", file_key))
-                .header("Last-Modified", last_modified.to_rfc2822());
+                .header("Last-Modified", last_modified.to_rfc2822())
+                .header("Cache-Control", "max-age=300");
             if let Some(cid_val) = &cid {
                 let ipfs_path = format!(
                     "/ipfs/{}/{}",
