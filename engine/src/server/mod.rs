@@ -157,7 +157,7 @@ async fn serve_deployment_file(deployment_file: DeploymentFileEntry, state: &Sta
         // fetch and cache
         if let Ok(data) = state.storage.bucket.get_object(&file_key).await {
             let bytes = data.into_bytes();
-            state.cache.file_bytes.insert(file_key.clone(), bytes.clone());
+            state.cache.file_bytes.insert(file_key.clone(), bytes.clone()).await;
             return Response::builder()
                 .status(StatusCode::OK)
                 .header("content-type", mime.clone())
