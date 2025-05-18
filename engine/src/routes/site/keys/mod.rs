@@ -81,7 +81,7 @@ impl SiteKeysApi {
     ) -> Result<Json<serde_json::Value>> {
         user.verify_access_to(&SiteId(&site_id.0)).await?;
 
-        let user = user.required_session()?;
+        let _user = user.required_session()?;
 
         let key = Key::get_by_id(&state.database, key_id.as_ref())
             .await

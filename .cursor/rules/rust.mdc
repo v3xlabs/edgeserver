@@ -1,0 +1,11 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+---
+description: This is helpful for working on Rust files
+globs: **.rs
+---
+
+This Rust project uses the async-std runtime, the anyhow error handling crate, the Poem HTTP framework, and rustls-tls for secure TLS. Assume these dependencies are available and imported when generating code.

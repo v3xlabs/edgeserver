@@ -197,7 +197,7 @@ impl UserAuth {
 
                     Ok(())
                 },
-                UserAuth::Key(key, _) => {
+                UserAuth::Key(_key, _) => {
                     Err(HttpError::Forbidden)
                 },
                 UserAuth::None(_) => Err(HttpError::Unauthorized),
