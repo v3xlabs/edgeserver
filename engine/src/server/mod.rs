@@ -62,10 +62,11 @@ async fn resolve_http(request: &Request, state: Data<&State>) -> impl IntoRespon
 
             // stream file from s3 storage and return it
             let s3_path = deployment_file.file_hash.clone();
-            if let Ok(s3_data) = state.storage.bucket.get_object_stream(s3_path).await {
-                // Stream the S3 response bytes directly to the client
-                let stream = s3_data.bytes.map(|chunk| {
-                    chunk.map_err(|e| {
+            match state.storage.bucket.get_object_stream(s3_path).await {
+                Ok(s3_data) => {
+                    // Stream the S3 response bytes directly to the client
+                    let stream = s3_data.bytes.map(|chunk| {
+                        chunk.map_err(|e| {
                         info!("Error streaming file: {}", e);
                         std::io::Error::new(std::io::ErrorKind::Other, e)
                     })
@@ -76,8 +77,14 @@ async fn resolve_http(request: &Request, state: Data<&State>) -> impl IntoRespon
                     .status(StatusCode::OK)
                     .header("content-type", deployment_file.deployment_file_mime_type.clone())
                     .body(body);
-            } else {
-                info!("File not found in s3");
+                }
+                Err(e) => {
+                    info!("Error streaming file: {}", e);
+
+                    return Response::builder()
+                        .status(StatusCode::INTERNAL_SERVER_ERROR)
+                        .body(Body::from_string(e.to_string()))
+                }
             }
         } else {
             info!("No file found");
