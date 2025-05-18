@@ -28,19 +28,13 @@ use tracing_subscriber::prelude::*;
 #[async_std::main]
 async fn main() {
     dotenvy::dotenv().ok();
-    // tracing_log::LogTracer::init().expect("Failed to initialize logger");
-
-    // let exporter = opentelemetry_otlp::SpanExporter::builder()
-    //     .with_http()
-    //     .with_endpoint("http://localhost:4317")
-    //     .build()
-    //     // .install_batch(opentelemetry_sdk::runtime::AsyncStd)
-    //     .expect("Couldn't create OTLP tracer");
 
     let otlp_endpoint = env::var("OTLP_ENDPOINT").ok();
 
     if let Some(endpoint) = otlp_endpoint {
         info!("Starting Edgerouter with OTLP tracing");
+        
+        // Set up propagator for trace context
         opentelemetry::global::set_text_map_propagator(TraceContextPropagator::new());
 
         let exporter = opentelemetry_otlp::SpanExporter::builder()
@@ -56,6 +50,7 @@ async fn main() {
             .with_attribute(KeyValue::new("host.name", hostname))
             .build();
 
+        // Use a simple tracer provider configuration
         let trace_provider = opentelemetry_sdk::trace::SdkTracerProvider::builder()
             .with_resource(resource)
             .with_batch_exporter(exporter)
@@ -65,17 +60,20 @@ async fn main() {
 
         let tracer = trace_provider.tracer("edgeserver");
 
+        // Simple telemetry layer
         let telemetry_layer = tracing_opentelemetry::layer()
-            .with_tracer(tracer.clone())
-            .with_error_fields_to_exceptions(true)
-            .with_tracked_inactivity(true);
+            .with_tracer(tracer);
 
-        let fmt_layer = tracing_subscriber::fmt::layer().with_span_events(tracing_subscriber::fmt::format::FmtSpan::CLOSE);
+        // Create a formatting layer with span closure events
+        let fmt_layer = tracing_subscriber::fmt::layer()
+            .with_span_events(tracing_subscriber::fmt::format::FmtSpan::CLOSE);
         
+        // Set up filter for relevant components
         let filter = tracing_subscriber::EnvFilter::from_default_env()
             .add_directive("poem=info".parse().unwrap())
             .add_directive("edgeserver=debug".parse().unwrap());
             
+        // Register layers with the subscriber
         tracing_subscriber::registry()
             .with(filter)
             .with(fmt_layer)

@@ -2,7 +2,7 @@ use std::sync::Arc;
 
 use opentelemetry::{
     global,
-    trace::{FutureExt, Span, SpanKind, Tracer, TraceContextExt},
+    trace::{Span, SpanKind, Tracer, TraceContextExt},
     Context, Key, KeyValue,
 };
 use opentelemetry_http::HeaderExtractor;
@@ -68,11 +68,6 @@ where
             .map(|addr| addr.to_string())
             .unwrap_or_else(|| req.remote_addr().to_string());
 
-        // Extract parent context from request headers if present
-        let parent_cx = global::get_text_map_propagator(|propagator| {
-            propagator.extract(&HeaderExtractor(req.headers()))
-        });
-
         // Prepare span attributes
         let mut attributes = Vec::new();
         attributes.push(KeyValue::new(
@@ -101,99 +96,95 @@ where
         // Get method for span name
         let method = req.method().to_string();
         
-        // Create an OpenTelemetry span
+        // Create a completely new span for this request
         let mut span = self
             .tracer
             .span_builder(format!("{} {}", method, req.uri()))
             .with_kind(SpanKind::Server)
             .with_attributes(attributes)
-            .start_with_context(&*self.tracer, &parent_cx);
-
+            .start_with_context(&*self.tracer, &Context::new()); // Use a new blank context
+            
         // Record request start event
         span.add_event("request.started".to_string(), vec![]);
         
         // Get trace ID for response header
         let trace_id = span.span_context().trace_id().to_string();
 
-        // Use FutureExt to maintain context across async boundaries
-        async move {
-            // Process the request with the inner endpoint
-            let res = self.inner.call(req).await;
-            
-            // Get current context with span
-            let cx = Context::current();
-            let span = cx.span();
-            
-            // Process the response
-            match res {
-                Ok(resp) => {
-                    let mut resp = resp.into_response();
-                    
-                    // Update span with path pattern if available
-                    if let Some(path_pattern) = resp.data::<PathPattern>() {
-                        const HTTP_PATH_PATTERN: Key = Key::from_static_str("http.path_pattern");
-                        span.update_name(format!("{} {}", method, path_pattern.0));
-                        span.set_attribute(KeyValue::new(
-                            HTTP_PATH_PATTERN,
-                            path_pattern.0.to_string(),
-                        ));
-                    }
-                    
-                    // Record successful completion
-                    span.add_event("request.completed".to_string(), vec![]);
-                    
-                    // Set response status
+        // Process the request with the inner endpoint
+        let res = self.inner.call(req).await;
+        
+        // Process the response
+        match res {
+            Ok(resp) => {
+                let mut resp = resp.into_response();
+                
+                // Update span with path pattern if available
+                if let Some(path_pattern) = resp.data::<PathPattern>() {
+                    const HTTP_PATH_PATTERN: Key = Key::from_static_str("http.path_pattern");
+                    span.update_name(format!("{} {}", method, path_pattern.0));
                     span.set_attribute(KeyValue::new(
-                        attribute::HTTP_RESPONSE_STATUS_CODE,
-                        resp.status().as_u16() as i64,
+                        HTTP_PATH_PATTERN,
+                        path_pattern.0.to_string(),
                     ));
-                    
-                    // Track content length if available
-                    if let Some(content_length) = resp.headers().typed_get::<headers::ContentLength>() {
-                        span.set_attribute(KeyValue::new(
-                            // attribute::HTTP_RESPONSE_BODY_SIZE,
-                            "http.response_body_size",
-                            content_length.0 as i64,
-                        ));
-                    }
-                    
-                    // Add trace ID to response headers
-                    resp.headers_mut().insert(
-                        "X-Trace-Id",
-                        HeaderValue::from_str(&trace_id)
-                            .unwrap_or_else(|_| HeaderValue::from_static("unknown")),
-                    );
-                    
-                    Ok(resp)
                 }
-                Err(err) => {
-                    // Update span with path pattern if error has it
-                    if let Some(path_pattern) = err.data::<PathPattern>() {
-                        const HTTP_PATH_PATTERN: Key = Key::from_static_str("http.path_pattern");
-                        span.update_name(format!("{} {}", method, path_pattern.0));
-                        span.set_attribute(KeyValue::new(
-                            HTTP_PATH_PATTERN,
-                            path_pattern.0.to_string(),
-                        ));
-                    }
-                    
-                    // Set error status code
+                
+                // Record successful completion
+                span.add_event("request.completed".to_string(), vec![]);
+                
+                // Set response status
+                span.set_attribute(KeyValue::new(
+                    attribute::HTTP_RESPONSE_STATUS_CODE,
+                    resp.status().as_u16() as i64,
+                ));
+                
+                // Track content length if available
+                if let Some(content_length) = resp.headers().typed_get::<headers::ContentLength>() {
                     span.set_attribute(KeyValue::new(
-                        attribute::HTTP_RESPONSE_STATUS_CODE,
-                        err.status().as_u16() as i64,
+                        "http.response_body_size",
+                        content_length.0 as i64,
                     ));
-                    
-                    // Record error event
-                    span.add_event(
-                        "request.error".to_string(),
-                        vec![KeyValue::new(attribute::EXCEPTION_MESSAGE, err.to_string())],
-                    );
-                    
-                    Err(err)
                 }
+                
+                // Add trace ID to response headers
+                resp.headers_mut().insert(
+                    "X-Trace-Id",
+                    HeaderValue::from_str(&trace_id)
+                        .unwrap_or_else(|_| HeaderValue::from_static("unknown")),
+                );
+                
+                // End the span
+                span.end();
+                
+                Ok(resp)
+            }
+            Err(err) => {
+                // Update span with path pattern if error has it
+                if let Some(path_pattern) = err.data::<PathPattern>() {
+                    const HTTP_PATH_PATTERN: Key = Key::from_static_str("http.path_pattern");
+                    span.update_name(format!("{} {}", method, path_pattern.0));
+                    span.set_attribute(KeyValue::new(
+                        HTTP_PATH_PATTERN,
+                        path_pattern.0.to_string(),
+                    ));
+                }
+                
+                // Set error status code
+                span.set_attribute(KeyValue::new(
+                    attribute::HTTP_RESPONSE_STATUS_CODE,
+                    err.status().as_u16() as i64,
+                ));
+                
+                // Record error event
+                span.add_event(
+                    "request.error".to_string(),
+                    vec![KeyValue::new(attribute::EXCEPTION_MESSAGE, err.to_string())],
+                );
+                
+                // End the span
+                span.end();
+                
+                Err(err)
             }
         }
-        .with_context(Context::current_with_span(span)) // Key to proper context propagation
-        .await
     }
 }
