@@ -80,6 +80,17 @@ fn content_type_from_file_name(file_name: &str) -> String {
         "js" => "text/javascript".to_string(),
         "css" => "text/css".to_string(),
         "json" => "application/json".to_string(),
+        "svg" => "image/svg+xml".to_string(),
+        "png" => "image/png".to_string(),
+        "jpg" => "image/jpeg".to_string(),
+        "jpeg" => "image/jpeg".to_string(),
+        "gif" => "image/gif".to_string(),
+        "ico" => "image/x-icon".to_string(),
+        "webp" => "image/webp".to_string(),
+        "woff" => "font/woff".to_string(),
+        "woff2" => "font/woff2".to_string(),
+        "ttf" => "font/ttf".to_string(),
+        "otf" => "font/otf".to_string(),        
         _ => {
             info!("Unknown file extension: {:?}", extension);
             "application/octet-stream".to_string()
