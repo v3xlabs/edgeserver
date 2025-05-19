@@ -108,7 +108,7 @@ export const GithubDeploymentContext: FC<{
                 <div className="flex h-full flex-col justify-center gap-1">
                     <div className="flex items-center gap-2">
                         <div className="font-bold">
-                            {context.data.commit.message}
+                            {context.data.commit?.message}
                         </div>
                         {decoratedContext.workflowUrl && (
                             <Link

@@ -80,7 +80,7 @@ export const DeploymentPreview: FC<{
                             }}
                             className="hover:text-link flex w-fit items-center gap-2 hover:underline"
                         >
-                            {githubContext.data.commit.message}
+                            {githubContext.data.commit?.message}
                         </Link>
                         <WorkflowStatusIndicator
                             status={githubContext.data.workflow_status}
@@ -93,7 +93,7 @@ export const DeploymentPreview: FC<{
                             target="_blank"
                         >
                             <FiGitCommit />
-                            {githubContext.data.commit.id.slice(0, 7)}
+                            {githubContext.data.commit?.id.slice(0, 7)}
                         </Link>
                         <Link
                             to={githubContext.workflowUrl}
