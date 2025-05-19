@@ -1691,7 +1691,7 @@ export type components = {
          * Deployment
          * @example {
          *       "context": "{}",
-         *       "created_at": "2025-05-18T19:52:11.327096482+00:00",
+         *       "created_at": "2025-05-19T17:40:31.375895638+00:00",
          *       "deployment_id": "d_1234567890",
          *       "ipfs_cid": "Qm1234567890...",
          *       "site_id": "s_1234567890"
@@ -1764,13 +1764,13 @@ export type components = {
         /**
          * Key
          * @example {
-         *       "created_at": "2025-05-18T19:52:11.327172962+00:00",
+         *       "created_at": "2025-05-19T17:40:31.375979498+00:00",
          *       "created_by": "u_1234567890",
-         *       "expires_at": "2025-06-17T19:52:11.327173112+00:00",
+         *       "expires_at": "2025-06-18T17:40:31.375979708+00:00",
          *       "key_id": "k_site_12345678901234567890",
          *       "key_resource": "s_1234567890",
          *       "key_type": "site",
-         *       "last_used": "2025-05-18T19:52:11.327173042+00:00",
+         *       "last_used": "2025-05-19T17:40:31.375979618+00:00",
          *       "permissions": "TBD",
          *       "vanity": "4567890"
          *     }

@@ -31,7 +31,7 @@ impl Site {
         team_id: impl AsRef<str>,
     ) -> Result<Self, sqlx::Error> {
         let span = info_span!("Site::new");
-        span.set_parent(Context::current());
+        // span.set_parent(Context::current());
         let _guard = span.enter();
 
         let site_id = generate_id(IdType::SITE);
@@ -49,7 +49,7 @@ impl Site {
 
     pub async fn get_by_id(db: &Database, site_id: impl AsRef<str>) -> Result<Self, sqlx::Error> {
         let span = info_span!("Site::get_by_id");
-        span.set_parent(Context::current());
+        // span.set_parent(Context::current());
         let _guard = span.enter();
 
         query_as!(
@@ -66,7 +66,7 @@ impl Site {
         team_id: impl AsRef<str>,
     ) -> Result<Vec<Self>, sqlx::Error> {
         let span = info_span!("Site::get_by_team_id");
-        span.set_parent(Context::current());
+        // span.set_parent(Context::current());
         let _guard = span.enter();
 
         query_as!(
@@ -91,7 +91,7 @@ impl Site {
         user_id: impl AsRef<str>,
     ) -> Result<Vec<Self>, sqlx::Error> {
         let span = info_span!("Site::get_by_user_id");
-        span.set_parent(Context::current());
+        // span.set_parent(Context::current());
         let _guard = span.enter();
 
         query_as!(
@@ -116,7 +116,7 @@ impl Site {
         site_id: impl AsRef<str>,
     ) -> Result<Vec<Deployment>, sqlx::Error> {
         let span = info_span!("Site::get_deployments");
-        span.set_parent(Context::current());
+        // span.set_parent(Context::current());
         let _guard = span.enter();
 
         query_as!(
@@ -134,7 +134,7 @@ impl Site {
         team_id: impl AsRef<str>,
     ) -> Result<(), sqlx::Error> {
         let span = info_span!("Site::update_team");
-        span.set_parent(Context::current());
+        // span.set_parent(Context::current());
         let _guard = span.enter();
 
         query!(

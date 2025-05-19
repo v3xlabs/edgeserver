@@ -29,7 +29,7 @@ impl UserTeamInvite {
         sender_id: impl AsRef<str>,
     ) -> Result<Self, sqlx::Error> {
         let span = info_span!("UserTeamInvite::new");
-        span.set_parent(Context::current());
+        // span.set_parent(Context::current());
         let _guard = span.enter();
 
         let invite_id = generate_id(IdType::TEAM_INVITE);
@@ -51,7 +51,7 @@ impl UserTeamInvite {
         invite_id: impl AsRef<str>,
     ) -> Result<Self, sqlx::Error> {
         let span = info_span!("UserTeamInvite::get_by_invite_id");
-        span.set_parent(Context::current());
+        // span.set_parent(Context::current());
         let _guard = span.enter();
 
         sqlx::query_as!(
@@ -68,7 +68,7 @@ impl UserTeamInvite {
         team_id: impl AsRef<str>,
     ) -> Result<Vec<Self>, sqlx::Error> {
         let span = info_span!("UserTeamInvite::get_by_team_id");
-        span.set_parent(Context::current());
+        // span.set_parent(Context::current());
         let _guard = span.enter();
 
         sqlx::query_as!(
@@ -86,7 +86,7 @@ impl UserTeamInvite {
         user_id: impl AsRef<str>,
     ) -> Result<Self, sqlx::Error> {
         let span = info_span!("UserTeamInvite::get_by_team_and_user");
-        span.set_parent(Context::current());
+        // span.set_parent(Context::current());
         let _guard = span.enter();
 
         sqlx::query_as!(
@@ -104,7 +104,7 @@ impl UserTeamInvite {
         invite_id: impl AsRef<str>,
     ) -> Result<(), sqlx::Error> {
         let span = info_span!("UserTeamInvite::delete_by_id");
-        span.set_parent(Context::current());
+        // span.set_parent(Context::current());
         let _guard = span.enter();
 
         sqlx::query!(
@@ -123,7 +123,7 @@ impl UserTeamInvite {
         user_id: impl AsRef<str>,
     ) -> Result<(), sqlx::Error> {
         let span = info_span!("UserTeamInvite::accept_invite");
-        span.set_parent(Context::current());
+        // span.set_parent(Context::current());
         let _guard = span.enter();
 
         // Mark invite as accepted and mark user as a member of the team

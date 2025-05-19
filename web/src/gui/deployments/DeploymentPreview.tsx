@@ -88,7 +88,7 @@ export const DeploymentPreview: FC<{
                     </div>
                     <div className="w-fit">
                         <Link
-                            to={githubContext.data.commit.url}
+                            to={githubContext.data.commit?.url}
                             className="hover:text-link text-muted flex w-fit items-center gap-1 hover:underline"
                             target="_blank"
                         >

@@ -1,11 +1,9 @@
 use std::sync::Arc;
 
 use opentelemetry::{
-    global,
-    trace::{Span, SpanKind, Tracer, TraceContextExt},
+    trace::{Span, SpanKind, Tracer},
     Context, Key, KeyValue,
 };
-use opentelemetry_http::HeaderExtractor;
 use opentelemetry_semantic_conventions::{attribute, resource};
 use poem::{
     http::HeaderValue,
@@ -16,6 +14,8 @@ use poem::{
     },
     Endpoint, FromRequest, IntoResponse, PathPattern, Request, Response, Result,
 };
+use tracing::{info_span, Instrument};
+
 
 /// Middleware that injects the OpenTelemetry trace ID into the response headers.
 #[derive(Default)]
@@ -103,6 +103,12 @@ where
             .with_kind(SpanKind::Server)
             .with_attributes(attributes)
             .start_with_context(&*self.tracer, &Context::new()); // Use a new blank context
+
+        // Luc testing tracing compat
+        let uri = req.uri().to_string();
+        let tracing_span = info_span!("request", method = method, uri = uri);
+        // tracing_span.set_parent(span.span_context());
+        let _guard = tracing_span.enter();
             
         // Record request start event
         span.add_event("request.started".to_string(), vec![]);

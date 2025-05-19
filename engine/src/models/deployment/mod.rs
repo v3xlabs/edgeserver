@@ -62,7 +62,6 @@ impl Deployment {
         context: Option<String>,
     ) -> Result<Self, sqlx::Error> {
         let span = info_span!("Deployment::new");
-        span.set_parent(Context::current());
         let _guard = span.enter();
 
         let deployment_id: String = generate_id(IdType::DEPLOYMENT);
@@ -91,7 +90,6 @@ impl Deployment {
     #[tracing::instrument(name = "upload_files", skip(self, state, file))]
     pub async fn upload_files(&self, state: &State, file: Vec<u8>) -> Result<(), sqlx::Error> {
         let span = info_span!("Deployment::upload_files");
-        span.set_parent(Context::current());
         let _guard = span.enter();
 
         // TODO: Read file stream, extract zip file (contains multiple files), upload each file to s3 at the correct relevant path relative to deployment.deployment_id + '/'
@@ -168,7 +166,6 @@ impl Deployment {
         cutoff_date: DateTime<Utc>,
     ) -> Result<Vec<File>, sqlx::Error> {
         let span = info_span!("Deployment::cleanup_old_files");
-        span.set_parent(Context::current());
         let _guard = span.enter();
 
         tracing::info!("Checking for unused files before: {:?}", cutoff_date);
@@ -214,7 +211,6 @@ impl Deployment {
 
     pub async fn get_by_id(db: &Database, deployment_id: &str) -> Result<Self, sqlx::Error> {
         let span = info_span!("Deployment::get_by_id");
-        span.set_parent(Context::current());
         let _guard = span.enter();
 
         query_as!(
@@ -263,7 +259,6 @@ impl Deployment {
 
     pub async fn get_last_by_site_id(db: &Database, site_id: &str) -> Result<Self, sqlx::Error> {
         let span = info_span!("Deployment::get_last_by_site_id");
-        span.set_parent(Context::current());
         let _guard = span.enter();
 
         query_as!(
@@ -288,7 +283,6 @@ impl DeploymentFile {
         deployment_id: &str,
     ) -> Result<Vec<DeploymentFileEntry>, sqlx::Error> {
         let span = info_span!("DeploymentFile::get_deployment_files");
-        span.set_parent(Context::current());
         let _guard = span.enter();
 
         query_as!(
@@ -314,7 +308,6 @@ impl DeploymentFile {
 
     pub async fn get_file_by_path(db: &Database, deployment_id: &str, path: &str) -> Result<DeploymentFileEntry, sqlx::Error> {
         let span = info_span!("DeploymentFile::get_file_by_path");
-        span.set_parent(Context::current());
         let _guard = span.enter();
 
         query_as!(

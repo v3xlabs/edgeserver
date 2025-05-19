@@ -23,7 +23,6 @@ impl Domain {
         state: &State,
     ) -> Result<Vec<Domain>, Error> {
         let span = info_span!("Domain::get_soft_overlap");
-        span.set_parent(Context::current());
         let _guard = span.enter();
 
         let overlap = if domain.starts_with("*.") {
@@ -51,7 +50,6 @@ impl Domain {
         state: &State,
     ) -> Result<Vec<DomainSubmission>, Error> {
         let span = info_span!("Domain::get_by_site_id");
-        span.set_parent(Context::current());
         let _guard = span.enter();
 
         let mut domains: Vec<Domain> =
@@ -84,7 +82,6 @@ impl Domain {
         state: &State,
     ) -> Result<Option<Domain>, Error> {
         let span = info_span!("Domain::get_by_site_id_and_domain");
-        span.set_parent(Context::current());
         let _guard = span.enter();
 
         let domain = sqlx::query_as!(
@@ -105,7 +102,6 @@ impl Domain {
         state: &State,
     ) -> Result<(), Error> {
         let span = info_span!("Domain::delete_by_site_id_and_domain");
-        span.set_parent(Context::current());
         let _guard = span.enter();
 
         sqlx::query!(
@@ -125,7 +121,6 @@ impl Domain {
         state: &State,
     ) -> Result<DomainSubmission, Error> {
         let span = info_span!("Domain::create_for_site");
-        span.set_parent(Context::current());
         let _guard = span.enter();
 
         // check if domain exist by name, the domains from initial overlap are to be overwritten if this gets validated
@@ -185,7 +180,6 @@ impl Domain {
         state: &State,
     ) -> Result<Domain, Error> {
         let span = info_span!("Domain::create_for_site_superceded");
-        span.set_parent(Context::current());
         let _guard = span.enter();
 
         let domain = sqlx::query_as!(Domain, "INSERT INTO domains (site_id, domain) VALUES ($1, $2) RETURNING *", site_id, domain)
@@ -200,7 +194,6 @@ impl Domain {
         state: &State,
     ) -> Result<Option<Domain>, Error> {
         let span = info_span!("Domain::existing_domain_by_name");
-        span.set_parent(Context::current());
         let _guard = span.enter();
 
         let domain = sqlx::query_as!(Domain, "SELECT * FROM domains WHERE domain = $1", domain)
@@ -218,7 +211,6 @@ impl Domain {
         state: &State,
     ) -> Result<Vec<Domain>, Error> {
         let span = info_span!("Domain::existing_wildcard_overlap_by_name");
-        span.set_parent(Context::current());
         let _guard = span.enter();
 
         // require that the domain starts with `*.`
@@ -249,7 +241,6 @@ impl Domain {
         state: &State,
     ) -> Result<Vec<Domain>, Error> {
         let span = info_span!("Domain::overlap_upwards_wildcard");
-        span.set_parent(Context::current());
         let _guard = span.enter();
 
         let domain = domain[2..].to_string();
@@ -285,7 +276,6 @@ impl DomainPending {
         state: &State,
     ) -> Result<DomainPending, Error> {
         let span = info_span!("DomainPending::create");
-        span.set_parent(Context::current());
         let _guard = span.enter();
 
         let challenge = uuid::Uuid::new_v4().to_string();
@@ -311,7 +301,6 @@ impl DomainPending {
         state: &State,
     ) -> Result<Option<DomainPending>, Error> {
         let span = info_span!("DomainPending::get_by_site_id_and_domain");
-        span.set_parent(Context::current());
         let _guard = span.enter();
 
         let domain_pending = sqlx::query_as!(
@@ -332,7 +321,6 @@ impl DomainPending {
         state: &State,
     ) -> Result<(), Error> {
         let span = info_span!("DomainPending::delete_by_site_id_and_domain");
-        span.set_parent(Context::current());
         let _guard = span.enter();
 
         sqlx::query!(
@@ -347,7 +335,6 @@ impl DomainPending {
     }
     pub async fn do_challenge(&self, state: &State) -> Result<(), Error> {
         let span = info_span!("DomainPending::do_challenge");
-        span.set_parent(Context::current());
         let _guard = span.enter();
 
         // get the dns txt record `_edgeserver-challenge` and if its equal to the challenge, update the status to verified

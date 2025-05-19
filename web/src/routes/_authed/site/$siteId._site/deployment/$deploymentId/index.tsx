@@ -51,7 +51,7 @@ function RouteComponent() {
         const context = parseDeploymentContext(deployment.context);
 
         if (context.contextType === 'github-action') {
-            return context.data.commit.url.split('/commit/')[0];
+            return context.data.commit?.url?.split('/commit/')[0];
         }
     }, [deployment]);
 

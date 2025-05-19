@@ -61,7 +61,7 @@ export const decorateGithubDeploymentContext = (
     context: GithubDeploymentContextType
 ) => {
     // strip `/commit/*` from the url
-    const repoUrl = context.data.commit.url.replace(/\/commit\/.*/, '');
+    const repoUrl = context.data.commit?.url.replace(/\/commit\/.*/, '');
     const workflowUrl = `${repoUrl}/actions/runs/${context.data.runId}`;
 
     let duration: GithubRunDuration | undefined;
@@ -119,7 +119,7 @@ export const GithubDeploymentContext: FC<{
                                 <FiFileText />
                             </Link>
                         )}
-                        {decoratedContext.data.commit.url && (
+                        {decoratedContext.data.commit?.url && (
                             <Link
                                 to={decoratedContext.data.commit.url}
                                 className="hover:text-link flex items-center gap-2 hover:underline"

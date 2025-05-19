@@ -40,7 +40,7 @@ impl User {
         default_team: Option<String>,
     ) -> Result<(Self, Team), sqlx::Error> {
         let span = info_span!("User::new");
-        span.set_parent(Context::current());
+        // span.set_parent(Context::current());
         let _guard = span.enter();
 
         let user_id = generate_id(IdType::USER);
@@ -86,7 +86,7 @@ impl User {
 
     pub async fn get_by_id(db: &Database, user_id: impl AsRef<str>) -> Result<Self, sqlx::Error> {
         let span = info_span!("User::get_by_id");
-        span.set_parent(Context::current());
+        // span.set_parent(Context::current());
         let _guard = span.enter();
 
         query_as!(
@@ -104,7 +104,7 @@ impl User {
         password: impl AsRef<str>,
     ) -> Result<Self, sqlx::Error> {
         let span = info_span!("User::get_by_name_and_password");
-        span.set_parent(Context::current());
+        // span.set_parent(Context::current());
         let _guard = span.enter();
 
         query_as!(
@@ -119,7 +119,7 @@ impl User {
 
     pub async fn get_all_minimal(db: &Database) -> Result<Vec<UserMinimal>, sqlx::Error> {
         let span = info_span!("User::get_all_minimal");
-        span.set_parent(Context::current());
+        // span.set_parent(Context::current());
         let _guard = span.enter();
 
         query_as!(UserMinimal, "SELECT user_id, name, avatar_url, admin FROM users")
@@ -129,7 +129,7 @@ impl User {
 
     pub async fn can_bootstrap(db: &Database) -> Result<bool, sqlx::Error> {
         let span = info_span!("User::can_bootstrap");
-        span.set_parent(Context::current());
+        // span.set_parent(Context::current());
         let _guard = span.enter();
 
         Ok(query_scalar!("SELECT COUNT(*) FROM users")
