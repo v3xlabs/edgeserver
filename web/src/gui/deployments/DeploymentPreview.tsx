@@ -133,24 +133,24 @@ export const DeploymentPreview: FC<{
                     </Link>
                     <Link
                         to={
-                            `https://github.com/${githubContext.data.commit.author.username}` as any
+                            `https://github.com/${githubContext.data.commit?.author.username}` as any
                         }
                         className="hover:text-link flex items-center gap-2 hover:underline"
                         target="_blank"
                     >
-                        <span>{githubContext.data.commit.author.name}</span>
+                        <span>{githubContext.data.commit?.author.name}</span>
                         <img
-                            src={`https://github.com/${githubContext.data.commit.author.username}.png`}
+                            src={`https://github.com/${githubContext.data.commit?.author.username}.png`}
                             className="size-6 rounded-sm"
-                            alt={githubContext.data.commit.author.name}
+                            alt={githubContext.data.commit?.author.name}
                         />
                     </Link>
-                    {githubContext.data.commit.timestamp && (
+                    {githubContext.data.commit?.timestamp && (
                         <div className="text-muted">
                             <TimeAgo
                                 date={
                                     new Date(
-                                        githubContext.data.commit.timestamp
+                                        githubContext.data.commit?.timestamp
                                     )
                                 }
                                 formatOptions={{

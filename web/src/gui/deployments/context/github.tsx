@@ -136,7 +136,7 @@ export const GithubDeploymentContext: FC<{
                             target="_blank"
                         >
                             <FiGitCommit />
-                            {decoratedContext.data.commit.id.slice(0, 7)}
+                            {decoratedContext.data.commit?.id.slice(0, 7)}
                         </Link>
                     </div>
                 </div>
@@ -146,7 +146,7 @@ export const GithubDeploymentContext: FC<{
                     </div>
                     <div>
                         <TimeAgo
-                            date={new Date(context.data.commit.timestamp)}
+                            date={new Date(context.data.commit?.timestamp)}
                         />
                     </div>
                 </div>
@@ -156,17 +156,17 @@ export const GithubDeploymentContext: FC<{
                     <div className="text-muted">Created by</div>
                     <Link
                         to={
-                            `https://github.com/${context.data.commit.author.username}` as any
+                            `https://github.com/${context.data.commit?.author?.username}` as any
                         }
                         className="hover:text-link flex items-center gap-2 hover:underline"
                         target="_blank"
                     >
                         <img
-                            src={`https://github.com/${context.data.commit.author.username}.png`}
+                            src={`https://github.com/${context.data.commit?.author?.username}.png`}
                             className="size-6 rounded-md"
-                            alt={context.data.commit.author.name}
+                            alt={context.data.commit?.author?.name}
                         />
-                        {context.data.commit.author.name}
+                        {context.data.commit?.author?.name}
                     </Link>
                 </div>
                 {decoratedContext.data.workflow_status && (
