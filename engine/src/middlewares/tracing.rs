@@ -106,9 +106,9 @@ where
 
         // Luc testing tracing compat
         let uri = req.uri().to_string();
-        let tracing_span = info_span!("request", method = method, uri = uri);
+        // let tracing_span = info_span!("request", method = method, uri = uri);
         // tracing_span.set_parent(span.span_context());
-        let _guard = tracing_span.enter();
+        // let _guard = tracing_span.enter();
             
         // Record request start event
         span.add_event("request.started".to_string(), vec![]);

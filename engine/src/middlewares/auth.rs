@@ -1,6 +1,6 @@
 use std::fmt::Debug;
 
-use opentelemetry::Context;
+use opentelemetry::{trace::Tracer, Context};
 use poem::{web::Data, FromRequest, Request, RequestBody, Result};
 use poem_openapi::{
     registry::{MetaSecurityScheme, Registry},
@@ -37,8 +37,12 @@ impl<'a> ApiExtractor<'a> for UserAuth {
         body: &mut RequestBody,
         _param_opts: ExtractParamOptions<Self::ParamType>,
     ) -> Result<Self> {
-        let span = info_span!("auth");
-        
+        let span = info_span!("authz");
+        let _guard = span.enter();
+
+        // let tracer = opentelemetry::global::tracer("edgeserver");
+        // let span = tracer.span_builder("authz").with_kind(opentelemetry::trace::SpanKind::Server).start(&tracer);
+                
         // Use instrument to track the auth span
         async {
             let state = <Data<&State> as FromRequest>::from_request(req, body).await?;
@@ -114,7 +118,6 @@ impl<'a> ApiExtractor<'a> for UserAuth {
 
             Err(HttpError::Unauthorized.into())
         }
-        .instrument(span)
         .await
     }
 
@@ -169,7 +172,7 @@ impl UserAuth {
         &self,
         team_id: impl AsRef<str> + Debug,
     ) -> Result<(), HttpError> {
-        let span = info_span!("required_member_of", team_id = ?team_id);
+        // let span = info_span!("required_member_of", team_id = ?team_id);
         
         // Use instrument to track the span
         async {
@@ -190,7 +193,7 @@ impl UserAuth {
                 UserAuth::None(_) => Err(HttpError::Unauthorized),
             }
         }
-        .instrument(span)
+        // .instrument(span)
         .await
     }
 
@@ -198,7 +201,7 @@ impl UserAuth {
         &self,
         resource: &impl AccessibleResource,
     ) -> Result<(), HttpError> {
-        let span = info_span!("verify_access_to", resource = ?resource);
+        // let span = info_span!("verify_access_to", resource = ?resource);
         
         // Use instrument to track the span
         async {
@@ -224,7 +227,7 @@ impl UserAuth {
                 UserAuth::None(_) => Err(HttpError::Unauthorized),
             }
         }
-        .instrument(span)
+        // .instrument(span)
         .await
     }
 }

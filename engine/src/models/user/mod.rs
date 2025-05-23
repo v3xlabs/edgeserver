@@ -1,9 +1,9 @@
 use chrono::{DateTime, Utc};
-use opentelemetry::Context;
+use opentelemetry::{global, trace::Tracer, Context};
 use poem_openapi::Object;
 use serde::{Deserialize, Serialize};
 use sqlx::{query_as, query_scalar};
-use tracing::info_span;
+use tracing::{info_span, Instrument};
 use tracing_opentelemetry::OpenTelemetrySpanExt;
 
 use crate::{
@@ -122,9 +122,14 @@ impl User {
         // span.set_parent(Context::current());
         let _guard = span.enter();
 
-        query_as!(UserMinimal, "SELECT user_id, name, avatar_url, admin FROM users")
-            .fetch_all(&db.pool)
-            .await
+        let tracer = global::tracer("edgeserver");
+        // let result = tracer.in_span("get_minimal_user", |cx| async move {
+            query_as!(UserMinimal, "SELECT user_id, name, avatar_url, admin FROM users")
+                .fetch_all(&db.pool)
+                .await
+        // }).await?;
+
+        // Ok(result)
     }
 
     pub async fn can_bootstrap(db: &Database) -> Result<bool, sqlx::Error> {
