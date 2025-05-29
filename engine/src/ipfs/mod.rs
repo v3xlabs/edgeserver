@@ -5,7 +5,11 @@ pub struct IPFSModule {
 }
 
 impl IPFSModule {
-    pub fn new(cluster_url: String, public_cluster_url: String) -> Self {
-        Self { cluster_url, public_cluster_url }
+    #[must_use]
+    pub const fn new(cluster_url: String, public_cluster_url: String) -> Self {
+        Self {
+            cluster_url,
+            public_cluster_url,
+        }
     }
 }

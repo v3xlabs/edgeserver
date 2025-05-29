@@ -1,8 +1,8 @@
+use crate::routes::ApiTags;
 use crate::state::State;
-use crate::utils::build_info::{BuildInformation, build_build_information};
+use crate::utils::build_info::{build_build_information, BuildInformation};
 use poem::web::Data;
 use poem_openapi::{payload::Json, ApiResponse, Object, OpenApi};
-use crate::routes::ApiTags;
 
 pub struct SystemApi;
 
@@ -29,12 +29,14 @@ pub enum BuildInfoResponse {
 impl SystemApi {
     #[oai(path = "/system/ipfs", method = "get", tag = "ApiTags::System")]
     async fn status(&self, state: Data<&State>) -> IPFSStatusResponse {
-        match &state.ipfs {
-            Some(ipfs) => IPFSStatusResponse::Ok(Json(IPFSStatus {
-                public_cluster_url: ipfs.public_cluster_url.clone(),
-            })),
-            None => IPFSStatusResponse::FeatureDisabled(Json("IPFS is not enabled".to_string())),
-        }
+        state.ipfs.as_ref().map_or_else(
+            || IPFSStatusResponse::FeatureDisabled(Json("IPFS is not enabled".to_string())),
+            |ipfs| {
+                IPFSStatusResponse::Ok(Json(IPFSStatus {
+                    public_cluster_url: ipfs.public_cluster_url.clone(),
+                }))
+            },
+        )
     }
 
     #[oai(path = "/system/build", method = "get", tag = "ApiTags::System")]
@@ -42,4 +44,3 @@ impl SystemApi {
         BuildInfoResponse::Ok(Json(build_build_information()))
     }
 }
-

@@ -1,4 +1,9 @@
-use lapin::{options::{BasicPublishOptions, QueueDeclareOptions}, publisher_confirm::Confirmation, types::FieldTable, BasicProperties, Channel, Connection};
+use lapin::{
+    options::{BasicPublishOptions, QueueDeclareOptions},
+    publisher_confirm::Confirmation,
+    types::FieldTable,
+    BasicProperties, Channel, Connection,
+};
 use serde::{Deserialize, Serialize};
 use tracing::info;
 
@@ -39,11 +44,9 @@ impl PreviewHandler {
             .await
             .unwrap();
 
-        Some(PreviewHandler { channel, queue_key })
+        Some(Self { channel, queue_key })
     }
 
-    /// 
-    
     pub async fn queue_bunshot(&self, site_id: &str, deployment_id: &str, domain: &str) {
         let payload = serde_json::to_string(&BunshotPayload {
             site_id: site_id.to_string(),

@@ -49,9 +49,13 @@ impl Session {
 
     #[tracing::instrument(name = "get_session_by_id", skip(db))]
     pub async fn get_by_id(db: &Database, session_id: &str) -> Result<Option<Self>, sqlx::Error> {
-        let session = query_as!(Session, "SELECT * FROM sessions WHERE session_id = $1", session_id)
-            .fetch_optional(&db.pool)
-            .await?;
+        let session = query_as!(
+            Session,
+            "SELECT * FROM sessions WHERE session_id = $1",
+            session_id
+        )
+        .fetch_optional(&db.pool)
+        .await?;
 
         Ok(session)
     }
@@ -139,10 +143,7 @@ impl Session {
         state: &State,
         resource: &impl AccessibleResource,
     ) -> Result<(), HttpError> {
-        resource
-            .has_access(state, "user", &self.user_id)
-            .await
-            .map_err(HttpError::from)?;
+        resource.has_access(state, "user", &self.user_id).await?;
         Ok(())
     }
 }

@@ -1,11 +1,9 @@
 use async_zip::base::read::mem::ZipFileReader;
 use chrono::{DateTime, Utc};
-use opentelemetry::Context;
 use poem_openapi::{types::Example, Object};
 use serde::{Deserialize, Serialize};
 use sqlx::{query, query_as};
 use tracing::{info, info_span};
-use tracing_opentelemetry::OpenTelemetrySpanExt;
 
 use crate::{
     assets::AssetFile,
@@ -188,7 +186,7 @@ impl Deployment {
 
         tracing::info!("Found {} unused files", files.len());
 
-        if files.len() > 0 {
+        if !files.is_empty() {
             tracing::info!("Deleting {} unused files", files.len());
 
             // delete file from s3
@@ -306,7 +304,11 @@ impl DeploymentFile {
         .await
     }
 
-    pub async fn get_file_by_path(db: &Database, deployment_id: &str, path: &str) -> Result<DeploymentFileEntry, sqlx::Error> {
+    pub async fn get_file_by_path(
+        db: &Database,
+        deployment_id: &str,
+        path: &str,
+    ) -> Result<DeploymentFileEntry, sqlx::Error> {
         let span = info_span!("DeploymentFile::get_file_by_path");
         let _guard = span.enter();
 

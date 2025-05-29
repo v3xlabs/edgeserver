@@ -1,5 +1,5 @@
 use chrono::{DateTime, Utc};
-use std::io::{Error as IoError, ErrorKind};
+use std::io::Error as IoError;
 use std::sync::Arc;
 
 use futures::StreamExt;
@@ -17,7 +17,6 @@ use crate::models::domain::Domain;
 use crate::models::site::Site;
 use crate::routes::error::HttpError;
 use crate::state::State;
-use opentelemetry::metrics::Meter;
 use opentelemetry::KeyValue;
 
 const HTML_CACHE_SIZE_LIMIT: u64 = 1024 * 1024 * 5; // 5MB threshold
@@ -35,7 +34,7 @@ pub async fn serve(state: State) {
 
     let listener = TcpListener::bind("0.0.0.0:3001");
 
-    Server::new(listener).run(app).await.unwrap()
+    Server::new(listener).run(app).await.unwrap();
 }
 
 /// Attempt an SPA fallback by serving `index.html` from the same deployment.
@@ -45,7 +44,7 @@ async fn spa_fallback(
     cid: Option<String>,
     state: &State,
 ) -> Response {
-    let spa_key = format!("{}:index.html", deployment_id);
+    let spa_key = format!("{deployment_id}:index.html");
     let deployment_str = deployment_id.to_string();
     let spa_entry: Option<DeploymentFileEntry> = state
         .cache
@@ -84,10 +83,13 @@ async fn resolve_http(request: &Request, state: Data<&State>) -> impl IntoRespon
         .u64_counter("http_requests_total")
         .with_description("Count of HTTP requests by domain and path")
         .build();
-    request_counter.add(1, &[
-        KeyValue::new("domain", host.to_string()),
-        KeyValue::new("path", path.clone()),
-    ]);
+    request_counter.add(
+        1,
+        &[
+            KeyValue::new("domain", host.to_string()),
+            KeyValue::new("path", path.clone()),
+        ],
+    );
 
     info!("Router request at: {} {}", host, path);
 
@@ -101,9 +103,7 @@ async fn resolve_http(request: &Request, state: Data<&State>) -> impl IntoRespon
             get_last_deployment(host, &state_for_domain).await.ok()
         })
         .await;
-    let deployment = if let Some(dep) = maybe_dep {
-        dep
-    } else {
+    let Some(deployment) = maybe_dep else {
         return Response::builder()
             .status(StatusCode::NOT_FOUND)
             .body(Body::from_string(include_str!("./404.html").to_string()));
@@ -123,9 +123,13 @@ async fn resolve_http(request: &Request, state: Data<&State>) -> impl IntoRespon
         .cache
         .file_entry
         .get_with(entry_key.clone(), async move {
-            DeploymentFile::get_file_by_path(&state_for_file_str.database, &deployment_str, &path_str)
-                .await
-                .ok()
+            DeploymentFile::get_file_by_path(
+                &state_for_file_str.database,
+                &deployment_str,
+                &path_str,
+            )
+            .await
+            .ok()
         })
         .await;
     if let Some(deployment_file) = maybe_file {
@@ -134,17 +138,21 @@ async fn resolve_http(request: &Request, state: Data<&State>) -> impl IntoRespon
 
     // 2b) if path is a directory, try <path>/index.html
     if !path.is_empty() {
-        let index_path = format!("{}/index.html", path);
-        let index_key = format!("{}:{}", deployment_id, index_path);
+        let index_path = format!("{path}/index.html");
+        let index_key = format!("{deployment_id}:{index_path}");
         let state_for_index = state_ref.clone();
         let deployment_id_index = deployment_id.clone();
         let maybe_index = state_ref
             .cache
             .file_entry
             .get_with(index_key.clone(), async move {
-                DeploymentFile::get_file_by_path(&state_for_index.database, &deployment_id_index, &index_path)
-                    .await
-                    .ok()
+                DeploymentFile::get_file_by_path(
+                    &state_for_index.database,
+                    &deployment_id_index,
+                    &index_path,
+                )
+                .await
+                .ok()
             })
             .await;
         if let Some(deployment_file) = maybe_index {
@@ -153,7 +161,7 @@ async fn resolve_http(request: &Request, state: Data<&State>) -> impl IntoRespon
     }
 
     // 3) SPA fallback -> index.html
-    let spa_key = format!("{}:index.html", deployment_id);
+    let spa_key = format!("{deployment_id}:index.html");
     let maybe_spa = state_ref
         .cache
         .file_entry
@@ -211,7 +219,10 @@ async fn serve_deployment_file(
     cid: Option<String>,
     state: &State,
 ) -> Response {
-    let mime = polyfill_mime_type(&deployment_file.deployment_file_mime_type.clone(), &deployment_file.deployment_file_file_path);
+    let mime = polyfill_mime_type(
+        &deployment_file.deployment_file_mime_type.clone(),
+        &deployment_file.deployment_file_file_path,
+    );
     let file_key = deployment_file.file_hash.clone();
     // let cid_path = format!("{}/{}", cid.unwrap_or("".to_string()), deployment_file.deployment_file_file_path);
 
@@ -221,7 +232,7 @@ async fn serve_deployment_file(
             &deployment_file
                 .deployment_file_file_path
                 .split('.')
-                .last()
+                .next_back()
                 .unwrap_or(""),
         ))
         && deployment_file.file_size.unwrap_or(0) <= HTML_CACHE_SIZE_LIMIT as i64
@@ -232,7 +243,7 @@ async fn serve_deployment_file(
             let mut resp = Response::builder()
                 .status(StatusCode::OK)
                 .header("content-type", mime.clone())
-                .header("ETag", format!("\"{}\"", file_key))
+                .header("ETag", format!("\"{file_key}\""))
                 .header("Last-Modified", last_modified.to_rfc2822())
                 .header("Cache-Control", "max-age=300");
             // optionally include IPFS path
@@ -243,19 +254,22 @@ async fn serve_deployment_file(
                 );
                 resp = resp.header("x-ipfs-path", ipfs_path);
             }
-            return resp.body(Body::from_bytes(bytes.clone()));
+            return resp.body(Body::from_bytes(bytes));
         }
         // fetch and cache
         if let Ok(data) = state.storage.bucket.get_object(&file_key).await {
             let bytes = data.into_bytes();
+
             state
                 .cache
                 .file_bytes
-                .insert(file_key.clone(), bytes.clone());
+                .insert(file_key.clone(), bytes.clone())
+                .await;
+
             let mut resp = Response::builder()
                 .status(StatusCode::OK)
                 .header("content-type", mime.clone())
-                .header("ETag", format!("\"{}\"", file_key))
+                .header("ETag", format!("\"{file_key}\""))
                 .header("Last-Modified", last_modified.to_rfc2822())
                 .header("Cache-Control", "max-age=300");
             if let Some(cid_val) = &cid {
@@ -279,14 +293,14 @@ async fn serve_deployment_file(
             let stream = s3_data.bytes.map(|chunk| {
                 chunk.map_err(|e| {
                     info!("Error streaming file: {}", e);
-                    IoError::new(ErrorKind::Other, e)
+                    IoError::other(e)
                 })
             });
             let body = Body::from_bytes_stream(stream);
             let mut resp = Response::builder()
                 .status(StatusCode::OK)
                 .header("content-type", mime)
-                .header("ETag", format!("\"{}\"", file_key))
+                .header("ETag", format!("\"{file_key}\""))
                 .header("Last-Modified", last_modified.to_rfc2822())
                 .header("Cache-Control", "max-age=300");
             if let Some(cid_val) = &cid {
@@ -299,16 +313,14 @@ async fn serve_deployment_file(
 
             resp.body(body)
         }
-        Err(_) => {
-            Response::builder()
-                .status(StatusCode::INTERNAL_SERVER_ERROR)
-                .body(Body::from_string("Failed to stream file".to_string()))
-        }
+        Err(_) => Response::builder()
+            .status(StatusCode::INTERNAL_SERVER_ERROR)
+            .body(Body::from_string("Failed to stream file".to_string())),
     }
 }
 
 fn polyfill_mime_type(mime: &str, file_name: &str) -> String {
-    let extension = file_name.split('.').last().unwrap_or("");
+    let extension = file_name.split('.').next_back().unwrap_or("");
 
     if mime == "text/xml" && extension == "svg" {
         "image/svg+xml".to_string()

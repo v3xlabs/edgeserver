@@ -35,17 +35,17 @@ impl ResponseError for HttpError {
     }
     fn status(&self) -> StatusCode {
         match self {
-            HttpError::AlreadyExists => StatusCode::CONFLICT,
-            HttpError::NotFound => StatusCode::NOT_FOUND,
-            HttpError::AnyhowError(_) => {
+            Self::AlreadyExists => StatusCode::CONFLICT,
+            Self::NotFound => StatusCode::NOT_FOUND,
+            Self::AnyhowError(_) => {
                 error!("Anyhow error: {:?}", self);
                 StatusCode::INTERNAL_SERVER_ERROR
-            },
-            HttpError::DatabaseError(_) => {
+            }
+            Self::DatabaseError(_) => {
                 error!("Database error: {:?}", self);
                 StatusCode::INTERNAL_SERVER_ERROR
-            },
-            HttpError::Unauthorized => StatusCode::UNAUTHORIZED,
+            }
+            Self::Unauthorized => StatusCode::UNAUTHORIZED,
             other => {
                 error!("Unknown error: {:?}", other);
                 StatusCode::BAD_REQUEST

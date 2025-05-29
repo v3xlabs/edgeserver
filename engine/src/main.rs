@@ -13,15 +13,15 @@ use tracing::{error, info};
 pub mod assets;
 pub mod cache;
 pub mod database;
+pub mod handlers;
+pub mod ipfs;
 pub mod middlewares;
 pub mod models;
 pub mod routes;
+pub mod server;
 pub mod state;
 pub mod storage;
 pub mod utils;
-pub mod handlers;
-pub mod ipfs;
-pub mod server;
 
 use tracing_subscriber::prelude::*;
 
@@ -33,7 +33,7 @@ async fn main() {
 
     if let Some(endpoint) = otlp_endpoint {
         info!("Starting Edgerouter with OTLP tracing");
-        
+
         // Set up propagator for trace context
         opentelemetry::global::set_text_map_propagator(TraceContextPropagator::new());
 
@@ -61,25 +61,23 @@ async fn main() {
         let tracer = trace_provider.tracer("edgeserver");
 
         // Simple telemetry layer
-        let telemetry_layer = tracing_opentelemetry::layer()
-            .with_tracer(tracer);
+        let telemetry_layer = tracing_opentelemetry::layer().with_tracer(tracer);
 
         // Create a formatting layer with span closure events
         let fmt_layer = tracing_subscriber::fmt::layer()
             .with_span_events(tracing_subscriber::fmt::format::FmtSpan::CLOSE);
-        
+
         // Set up filter for relevant components
         let filter = tracing_subscriber::EnvFilter::from_default_env()
             .add_directive("poem=info".parse().unwrap())
             .add_directive("edgeserver=debug".parse().unwrap());
-            
+
         // Register layers with the subscriber
         tracing_subscriber::registry()
             .with(filter)
             .with(fmt_layer)
             .with(telemetry_layer)
             .init();
-
     } else {
         info!("Starting Edgerouter without OTLP tracing, provide OTLP_ENDPOINT to enable tracing");
         tracing_subscriber::fmt::init();

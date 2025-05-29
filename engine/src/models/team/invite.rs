@@ -1,9 +1,7 @@
 use chrono::{DateTime, Utc};
-use opentelemetry::Context;
 use poem_openapi::Object;
 use serde::{Deserialize, Serialize};
 use tracing::info_span;
-use tracing_opentelemetry::OpenTelemetrySpanExt;
 
 use crate::{
     database::Database,
@@ -39,7 +37,7 @@ impl UserTeamInvite {
             "INSERT INTO user_team_invites (invite_id, team_id, user_id, sender_id) VALUES ($1, $2, $3, $4) RETURNING *",
             invite_id,
             team_id.as_ref(),
-            user_id.as_ref().map(|s| s.as_ref()),
+            user_id.as_ref().map(std::convert::AsRef::as_ref),
             sender_id.as_ref()
         )
         .fetch_one(&db.pool)

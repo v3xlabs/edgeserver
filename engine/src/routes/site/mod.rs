@@ -49,6 +49,7 @@ pub struct CreateSiteDomainRequest {
 
 pub struct SiteApi;
 
+#[must_use]
 pub fn api_routes() -> impl OpenApi {
     (
         SiteApi,
