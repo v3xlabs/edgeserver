@@ -3,5 +3,5 @@ fn main() {
     let y = x.build();
 
     let git_info = y.version_control.map(|v| v.git().cloned());
-    println!("Git information: {:?}", git_info);
+    println!("Git information: {git_info:?}");
 }

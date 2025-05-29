@@ -1,10 +1,8 @@
 use chrono::{DateTime, Utc};
-use opentelemetry::Context;
-use serde::{Deserialize, Serialize};
 use poem_openapi::Object;
+use serde::{Deserialize, Serialize};
 use sqlx::FromRow;
 use tracing::{info, info_span};
-use tracing_opentelemetry::OpenTelemetrySpanExt;
 
 use crate::{database::Database, state::State};
 #[derive(Debug, Serialize, Deserialize, Object, FromRow)]
@@ -19,7 +17,11 @@ pub struct DeploymentPreview {
 }
 
 impl DeploymentPreview {
-    pub async fn get_by_deployment_id(db: &Database, site_id: &str, deployment_id: &str) -> Result<Vec<Self>, sqlx::Error> {
+    pub async fn get_by_deployment_id(
+        db: &Database,
+        site_id: &str,
+        deployment_id: &str,
+    ) -> Result<Vec<Self>, sqlx::Error> {
         let span = info_span!("DeploymentPreview::get_by_deployment_id");
         // span.set_parent(Context::current());
         let _guard = span.enter();
@@ -36,39 +38,52 @@ impl DeploymentPreview {
         Ok(rows)
     }
 
-    pub async fn get_by_deployment_id_public(state: &State, site_id: &str, deployment_id: &str) -> Result<Vec<Self>, sqlx::Error> {
+    pub async fn get_by_deployment_id_public(
+        state: &State,
+        site_id: &str,
+        deployment_id: &str,
+    ) -> Result<Vec<Self>, sqlx::Error> {
         let span = info_span!("DeploymentPreview::get_by_deployment_id_public");
         // span.set_parent(Context::current());
         let _guard = span.enter();
 
-        let mut rows = DeploymentPreview::get_by_deployment_id(&state.database, site_id, deployment_id).await?;
+        let mut rows = Self::get_by_deployment_id(&state.database, site_id, deployment_id).await?;
 
         // let s3_prefix_url = format!("{}/{}", state.config.s3_previews.as_ref().unwrap().endpoint_url, state.config.s3_previews.as_ref().unwrap().bucket_name);
 
-        for row in rows.iter_mut() {
+        for row in &mut rows {
             info!("Presigning URL for: {:?}", row.preview_path);
-            let form = state.storage.previews_bucket.as_ref().unwrap().presign_get(
-                format!("/{}", row.preview_path.clone()), 
-                60*60,
-                None
-            ).await.unwrap();
+            let form = state
+                .storage
+                .previews_bucket
+                .as_ref()
+                .unwrap()
+                .presign_get(format!("/{}", row.preview_path.clone()), 60 * 60, None)
+                .await
+                .unwrap();
             row.preview_path = form;
             info!("Presigning URL for: {:?}", row.full_preview_path);
             if let Some(full_preview_path) = row.full_preview_path.clone() {
-                let form = state.storage.previews_bucket.as_ref().unwrap().presign_get(
-                    format!("/{}", full_preview_path), 
-                    60*60,
-                    None
-                ).await.unwrap();
+                let form = state
+                    .storage
+                    .previews_bucket
+                    .as_ref()
+                    .unwrap()
+                    .presign_get(format!("/{full_preview_path}"), 60 * 60, None)
+                    .await
+                    .unwrap();
                 row.full_preview_path = Some(form);
             }
             info!("Presigning URL for: {:?}", row.favicon_path);
             if let Some(favicon_path) = row.favicon_path.clone() {
-                let form = state.storage.previews_bucket.as_ref().unwrap().presign_get(
-                    format!("/{}", favicon_path), 
-                    60*60,
-                    None
-                ).await.unwrap();   
+                let form = state
+                    .storage
+                    .previews_bucket
+                    .as_ref()
+                    .unwrap()
+                    .presign_get(format!("/{favicon_path}"), 60 * 60, None)
+                    .await
+                    .unwrap();
                 row.favicon_path = Some(form);
             }
         }

@@ -68,10 +68,10 @@ impl Key {
         let key_id = hash_session(&key_raw);
 
         // trim the last 8 chars of the string
-        let vanity = key_raw.split("_").last().unwrap();
+        let vanity = key_raw.split('_').next_back().unwrap();
         let vanity_pre = vanity[0..4].to_string();
         let vanity_post = vanity[vanity.len() - 4..].to_string();
-        let vanity = format!("{}***{}", vanity_pre, vanity_post);
+        let vanity = format!("{vanity_pre}***{vanity_post}");
 
         let object = sqlx::query_as!(
             Key,
@@ -112,20 +112,14 @@ impl Key {
         Ok(key)
     }
 
-    pub async fn delete(
-        database: &Database,
-        key_id: &str,
-    ) -> Result<(), sqlx::Error> {
+    pub async fn delete(database: &Database, key_id: &str) -> Result<(), sqlx::Error> {
         sqlx::query!("DELETE FROM keys WHERE key_id = $1", key_id)
             .execute(&database.pool)
             .await?;
         Ok(())
     }
 
-    pub async fn get_by_id(
-        database: &Database,
-        key_id: &str,
-    ) -> Result<Option<Self>, sqlx::Error> {
+    pub async fn get_by_id(database: &Database, key_id: &str) -> Result<Option<Self>, sqlx::Error> {
         let key = sqlx::query_as!(Self, "SELECT * FROM keys WHERE key_id = $1", key_id)
             .fetch_optional(&database.pool)
             .await?;

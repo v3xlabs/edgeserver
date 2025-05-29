@@ -1,9 +1,7 @@
 use chrono::{DateTime, Utc};
-use opentelemetry::Context;
 use poem_openapi::Object;
 use serde::{Deserialize, Serialize};
 use sqlx::{query, query_as, query_scalar};
-use tracing_opentelemetry::OpenTelemetrySpanExt;
 
 use crate::{
     database::Database,
@@ -150,7 +148,7 @@ impl Site {
 #[derive(Debug)]
 pub struct SiteId<'a>(pub &'a str);
 
-impl<'a> AccessibleResource for SiteId<'a> {
+impl AccessibleResource for SiteId<'_> {
     #[tracing::instrument(name = "has_access", skip(state))]
     async fn has_access(
         &self,
@@ -184,8 +182,7 @@ impl<'a> AccessibleResource for SiteId<'a> {
                 let site = Site::get_by_id(&state.database, resource_id).await.map_err(HttpError::from).ok();
 
                 let site_has_access = site
-                    .map(|s| s.team_id == resource_id)
-                    .unwrap_or(false);
+                    .is_some_and(|s| s.team_id == resource_id);
 
                 serde_json::to_value(site_has_access).unwrap()
             } else {

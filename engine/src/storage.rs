@@ -12,6 +12,7 @@ pub struct Storage {
 }
 
 impl Storage {
+    #[must_use]
     pub fn from_config(config: &AppConfig) -> Self {
         let credentials = Credentials::new(
             Some(&config.s3.access_key),
@@ -29,51 +30,61 @@ impl Storage {
             .unwrap()
             .with_path_style();
 
-        let previews_bucket = if let Some(previews_config) = &config.s3_previews {
-            let preview_region = Region::Custom {
-                region: previews_config.region.clone(),
-                endpoint: previews_config.endpoint_url.clone(),
-            };
-            let preview_credentials = Credentials::new(
-                Some(&previews_config.access_key),
-                Some(&previews_config.secret_key),
-                None,
-                None,
-                None,
-            )
-            .unwrap();  
-            let previews_bucket = Bucket::new(&previews_config.bucket_name, preview_region, preview_credentials)
+        let previews_bucket = config.s3_previews.as_ref().map_or_else(
+            || None,
+            |previews_config| {
+                let preview_region = Region::Custom {
+                    region: previews_config.region.clone(),
+                    endpoint: previews_config.endpoint_url.clone(),
+                };
+                let preview_credentials = Credentials::new(
+                    Some(&previews_config.access_key),
+                    Some(&previews_config.secret_key),
+                    None,
+                    None,
+                    None,
+                )
+                .unwrap();
+                let previews_bucket = Bucket::new(
+                    &previews_config.bucket_name,
+                    preview_region,
+                    preview_credentials,
+                )
                 .unwrap()
                 .with_path_style();
 
-            Some(previews_bucket)
-        } else {
-            None
-        };
+                Some(previews_bucket)
+            },
+        );
 
-        let car_bucket = if let Some(car_config) = &config.s3_car {
-            let car_region = Region::Custom {
-                region: car_config.region.clone(),
-                endpoint: car_config.endpoint_url.clone(),
-            };
-            let car_credentials = Credentials::new(
-                Some(&car_config.access_key),
-                Some(&car_config.secret_key),
-                None,
-                None,
-                None,
-            )
-            .unwrap();
-            let car_bucket = Bucket::new(&car_config.bucket_name, car_region, car_credentials)
-                .unwrap()
-                .with_path_style();
+        let car_bucket = config.s3_car.as_ref().map_or_else(
+            || None,
+            |car_config| {
+                let car_region = Region::Custom {
+                    region: car_config.region.clone(),
+                    endpoint: car_config.endpoint_url.clone(),
+                };
+                let car_credentials = Credentials::new(
+                    Some(&car_config.access_key),
+                    Some(&car_config.secret_key),
+                    None,
+                    None,
+                    None,
+                )
+                .unwrap();
+                let car_bucket = Bucket::new(&car_config.bucket_name, car_region, car_credentials)
+                    .unwrap()
+                    .with_path_style();
 
-            Some(car_bucket)
-        } else {
-            None
-        };
+                Some(car_bucket)
+            },
+        );
 
-        Self { bucket, previews_bucket, car_bucket }
+        Self {
+            bucket,
+            previews_bucket,
+            car_bucket,
+        }
     }
 
     pub async fn upload(

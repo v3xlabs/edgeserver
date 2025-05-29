@@ -1,6 +1,9 @@
 use async_std::stream::StreamExt;
 use lapin::{
-    options::{BasicAckOptions, BasicConsumeOptions, BasicNackOptions, BasicPublishOptions, QueueDeclareOptions},
+    options::{
+        BasicAckOptions, BasicConsumeOptions, BasicNackOptions, BasicPublishOptions,
+        QueueDeclareOptions,
+    },
     publisher_confirm::Confirmation,
     types::FieldTable,
     BasicProperties, Channel, Connection,
@@ -8,7 +11,10 @@ use lapin::{
 use serde::{Deserialize, Serialize};
 use tracing::info;
 
-use crate::{models::deployment::Deployment, state::{AMQPConfig, AppState}};
+use crate::{
+    models::deployment::Deployment,
+    state::{AMQPConfig, AppState},
+};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct CarRequest {
@@ -37,7 +43,7 @@ pub struct CarHandler {
 }
 
 impl CarHandler {
-    pub async fn init(config: &AMQPConfig, connection: &Connection) -> Option<CarHandler> {
+    pub async fn init(config: &AMQPConfig, connection: &Connection) -> Option<Self> {
         let channel = connection.create_channel().await.unwrap();
 
         let generation_key = config.car_queue.as_deref().unwrap_or("car").to_string();
@@ -72,7 +78,7 @@ impl CarHandler {
             .await
             .unwrap();
 
-        Some(CarHandler {
+        Some(Self {
             channel,
             generation_key,
             result_key,
@@ -106,7 +112,7 @@ impl CarHandler {
             if let Some(ipfs_cid) = payload.cid {
                 Deployment::update_ipfs_cid(&state.database, &payload.deployment_id, &ipfs_cid)
                     .await
-                    .ok(); 
+                    .ok();
             }
 
             // if let Some(file_path) = payload.file_path {
@@ -117,7 +123,7 @@ impl CarHandler {
             //     // download from ipfs
 
             //     // POST /add?local=true&format=car
-            //     // form-data, file: deploy.car                
+            //     // form-data, file: deploy.car
             // }
 
             delivery.ack(BasicAckOptions::default()).await.unwrap();

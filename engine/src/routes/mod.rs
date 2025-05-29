@@ -22,12 +22,19 @@ pub mod auth;
 pub mod error;
 pub mod invite;
 pub mod site;
+pub mod system;
 pub mod team;
 pub mod user;
-pub mod system;
 
 fn get_api() -> impl OpenApi {
-    (site::api_routes(), UserApi, AuthApi, team::api_routes(), invite::api_routes(), system::SystemApi)
+    (
+        site::api_routes(),
+        UserApi,
+        AuthApi,
+        team::api_routes(),
+        invite::api_routes(),
+        system::SystemApi,
+    )
 }
 
 #[derive(Tags)]
@@ -54,7 +61,7 @@ pub struct OpenApiSpec {
     pub spec: String,
 }
 
-/// Reorders the tags in the OpenAPI spec according to the specified order without
+/// Reorders the tags in the `OpenAPI` spec according to the specified order without
 /// parsing the entire JSON. Only the tags array is modified.
 /// Tags not in the order list will be placed at the end.
 fn reorder_openapi_tags(json: &str, tag_order: &[&str]) -> String {
@@ -196,22 +203,22 @@ pub async fn serve(state: State) {
 
     let listener = TcpListener::bind("0.0.0.0:3000");
 
-    Server::new(listener).run(app).await.unwrap()
+    Server::new(listener).run(app).await.unwrap();
 }
 
 #[handler]
-async fn get_openapi_docs() -> Html<&'static str> {
+const fn get_openapi_docs() -> Html<&'static str> {
     Html(include_str!("./index.html"))
 }
 
 #[handler]
-async fn not_found() -> Html<&'static str> {
+const fn not_found() -> Html<&'static str> {
     // inline 404 template
     Html(include_str!("./404.html"))
 }
 
 #[handler]
-async fn get_openapi_spec(payload: Data<&Arc<OpenApiSpec>>) -> Response {
+fn get_openapi_spec(payload: Data<&Arc<OpenApiSpec>>) -> Response {
     let spec = payload.spec.clone();
     Response::builder()
         .header("Content-Type", "application/json")

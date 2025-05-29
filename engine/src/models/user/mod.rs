@@ -1,13 +1,12 @@
 use chrono::{DateTime, Utc};
-use opentelemetry::Context;
 use poem_openapi::Object;
 use serde::{Deserialize, Serialize};
 use sqlx::{query_as, query_scalar};
 use tracing::info_span;
-use tracing_opentelemetry::OpenTelemetrySpanExt;
 
 use crate::{
-    database::Database, utils::id::{generate_id, IdType}
+    database::Database,
+    utils::id::{generate_id, IdType},
 };
 
 use super::team::Team;
@@ -48,14 +47,11 @@ impl User {
         let password = password.as_ref();
 
         // check if no user with this name already exists
-        let exists = query_scalar!(
-            "SELECT COUNT(*) FROM users WHERE name = $1",
-            name
-        )
-        .fetch_one(&db.pool)
-        .await?
-        .unwrap_or(0)
-        > 0;
+        let exists = query_scalar!("SELECT COUNT(*) FROM users WHERE name = $1", name)
+            .fetch_one(&db.pool)
+            .await?
+            .unwrap_or(0)
+            > 0;
 
         if exists {
             // TODO: nicer `Username taken` error
@@ -78,7 +74,7 @@ impl User {
             Team::add_member(db, &team.team_id, &user_id).await?;
             Ok((user, team))
         } else {
-            let team_name = format!("{}'s Team", name);
+            let team_name = format!("{name}'s Team");
             let user_team = Team::new(db, team_name, user_id).await?;
             Ok((user, user_team))
         }
@@ -122,9 +118,12 @@ impl User {
         // span.set_parent(Context::current());
         let _guard = span.enter();
 
-        query_as!(UserMinimal, "SELECT user_id, name, avatar_url, admin FROM users")
-            .fetch_all(&db.pool)
-            .await
+        query_as!(
+            UserMinimal,
+            "SELECT user_id, name, avatar_url, admin FROM users"
+        )
+        .fetch_all(&db.pool)
+        .await
     }
 
     pub async fn can_bootstrap(db: &Database) -> Result<bool, sqlx::Error> {

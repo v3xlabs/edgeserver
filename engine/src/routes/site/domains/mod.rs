@@ -18,7 +18,7 @@ use super::CreateSiteDomainRequest;
 pub struct SiteDomainsApi;
 
 #[derive(ApiResponse)]
-enum DomainPreflightResponse {
+pub enum DomainPreflightResponse {
     #[oai(status = 200)]
     Result(Json<DomainPreflightResponseData>),
 
@@ -27,7 +27,7 @@ enum DomainPreflightResponse {
 }
 
 #[derive(Deserialize, Object)]
-struct MalformattedInputResponse {
+pub struct MalformattedInputResponse {
     message: String,
 }
 
@@ -37,7 +37,7 @@ struct DomainPreflightResponseConflicts {
 }
 
 #[derive(Deserialize, Object)]
-struct DomainPreflightResponseData {
+pub struct DomainPreflightResponseData {
     overrides: Vec<Domain>,
     invalidates: Vec<Domain>,
 }
@@ -86,7 +86,7 @@ impl SiteDomainsApi {
 
         let corrected_domain = payload.domain.trim();
 
-        let domain = Domain::create_for_site(&site_id, &corrected_domain, &state)
+        let domain = Domain::create_for_site(&site_id, corrected_domain, &state)
             .await
             .map_err(HttpError::from)
             .map(Json)
@@ -174,11 +174,11 @@ impl SiteDomainsApi {
 
         let domain = domain.trim();
 
-        let invalidates = Domain::get_soft_overlap(&domain, &state)
+        let invalidates = Domain::get_soft_overlap(domain, &state)
             .await
             .map_err(HttpError::from)?;
 
-        let overrides = Domain::get_hard_overlap(&domain, &state)
+        let overrides = Domain::get_hard_overlap(domain, &state)
             .await
             .map_err(HttpError::from)?;
 

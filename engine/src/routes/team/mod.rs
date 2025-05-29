@@ -1,19 +1,26 @@
 use keys::TeamKeysApi;
 use poem::{web::Data, Result};
-use poem_openapi::{param::Path, payload::Json, types::multipart::Upload, Multipart, Object, OpenApi};
+use poem_openapi::{
+    param::Path, payload::Json, types::multipart::Upload, Multipart, Object, OpenApi,
+};
 use serde::{Deserialize, Serialize};
 use tracing::info;
 
 use crate::{
-    assets::AssetFile, middlewares::auth::UserAuth, models::{
+    assets::AssetFile,
+    middlewares::auth::UserAuth,
+    models::{
         site::Site,
         team::{invite::UserTeamInvite, Team, TeamId},
         user::User,
-    }, routes::{error::HttpError, ApiTags}, state::State
+    },
+    routes::{error::HttpError, ApiTags},
+    state::State,
 };
 
 pub mod keys;
 
+#[must_use]
 pub fn api_routes() -> impl OpenApi {
     (TeamApi, TeamKeysApi)
 }
@@ -49,7 +56,7 @@ impl TeamApi {
     }
 
     /// Create a team
-    /// 
+    ///
     /// (user-only)
     #[oai(path = "/team", method = "post", tag = "ApiTags::Team")]
     pub async fn create_team(
@@ -74,8 +81,7 @@ impl TeamApi {
         &self,
         user: UserAuth,
         state: Data<&State>,
-        #[oai(name = "team_id", style = "simple")]
-        team_id: Path<String>,
+        #[oai(name = "team_id", style = "simple")] team_id: Path<String>,
     ) -> Result<Json<Team>> {
         user.verify_access_to(&TeamId(&team_id.0)).await?;
 
@@ -96,8 +102,7 @@ impl TeamApi {
         &self,
         user: UserAuth,
         state: Data<&State>,
-        #[oai(name = "team_id", style = "simple")]
-        team_id: Path<String>,
+        #[oai(name = "team_id", style = "simple")] team_id: Path<String>,
     ) -> Result<Json<Vec<UserTeamInvite>>> {
         user.verify_access_to(&TeamId(&team_id.0)).await?;
 
@@ -114,15 +119,18 @@ impl TeamApi {
     }
 
     /// Invite a user to a team
-    /// 
+    ///
     /// (user-only) (due to team-owner overwrite)
-    #[oai(path = "/team/:team_id/invites", method = "post", tag = "ApiTags::Team")]
+    #[oai(
+        path = "/team/:team_id/invites",
+        method = "post",
+        tag = "ApiTags::Team"
+    )]
     pub async fn invite_user_to_team(
         &self,
         user: UserAuth,
         state: Data<&State>,
-        #[oai(name = "team_id", style = "simple")]
-        team_id: Path<String>,
+        #[oai(name = "team_id", style = "simple")] team_id: Path<String>,
         body: Json<InviteUserToTeamRequest>,
     ) -> Result<Json<UserTeamInvite>> {
         user.verify_access_to(&TeamId(&team_id.0)).await?;
@@ -160,7 +168,7 @@ impl TeamApi {
     }
 
     /// Delete a team invite
-    /// 
+    ///
     /// (user-only) (due to team-owner overwrite)
     #[oai(
         path = "/team/:team_id/invite/:invite_id",
@@ -171,10 +179,8 @@ impl TeamApi {
         &self,
         user: UserAuth,
         state: Data<&State>,
-        #[oai(name = "team_id", style = "simple")]
-        team_id: Path<String>,
-        #[oai(name = "invite_id", style = "simple")]
-        invite_id: Path<String>,
+        #[oai(name = "team_id", style = "simple")] team_id: Path<String>,
+        #[oai(name = "invite_id", style = "simple")] invite_id: Path<String>,
     ) -> Result<()> {
         user.verify_access_to(&TeamId(&team_id.0)).await?;
 
@@ -207,8 +213,7 @@ impl TeamApi {
         &self,
         user: UserAuth,
         state: Data<&State>,
-        #[oai(name = "team_id", style = "simple")]
-        team_id: Path<String>,
+        #[oai(name = "team_id", style = "simple")] team_id: Path<String>,
     ) -> Result<Json<Vec<Site>>> {
         user.verify_access_to(&TeamId(&team_id.0)).await?;
 
@@ -232,8 +237,7 @@ impl TeamApi {
         &self,
         user: UserAuth,
         state: Data<&State>,
-        #[oai(name = "team_id", style = "simple")]
-        team_id: Path<String>,
+        #[oai(name = "team_id", style = "simple")] team_id: Path<String>,
     ) -> Result<Json<Vec<User>>> {
         user.verify_access_to(&TeamId(&team_id.0)).await?;
 
@@ -253,11 +257,10 @@ impl TeamApi {
         &self,
         user: UserAuth,
         state: Data<&State>,
-        #[oai(name = "team_id", style = "simple")]
-        team_id: Path<String>,
+        #[oai(name = "team_id", style = "simple")] team_id: Path<String>,
     ) -> Result<Json<Team>> {
         user.verify_access_to(&TeamId(&team_id.0)).await?;
-        
+
         info!("Updating team: {:?} for user: {:?}", team_id.0, user);
 
         let user = user.required_session()?;
@@ -281,11 +284,10 @@ impl TeamApi {
         &self,
         user: UserAuth,
         state: Data<&State>,
-        #[oai(name = "team_id", style = "simple")]
-        team_id: Path<String>,
+        #[oai(name = "team_id", style = "simple")] team_id: Path<String>,
     ) -> Result<()> {
         let user = user.required_session()?;
-        
+
         info!("Deleting team: {:?} for user: {:?}", team_id.0, user);
 
         if !Team::is_owner(&state.0.database, &team_id.0, &user.user_id)
@@ -311,8 +313,7 @@ impl TeamApi {
         &self,
         user: UserAuth,
         state: Data<&State>,
-        #[oai(name = "team_id", style = "simple")]
-        team_id: Path<String>,
+        #[oai(name = "team_id", style = "simple")] team_id: Path<String>,
         body: UploadTeamAvatarRequest,
     ) -> Result<Json<Team>> {
         user.verify_access_to(&TeamId(&team_id.0)).await?;
@@ -332,9 +333,13 @@ impl TeamApi {
         // Load into memory
         let file = x.into_vec().await.unwrap();
 
-        let (_file, _, file_hash, _, _) = AssetFile::from_buffer(&state, &file, file_name).await.unwrap();
+        let (_file, _, file_hash, _, _) = AssetFile::from_buffer(&state, &file, file_name)
+            .await
+            .unwrap();
 
-        let team = Team::update_avatar(&state.0.database, &team_id.0, &file_hash).await.unwrap();
+        let team = Team::update_avatar(&state.0.database, &team_id.0, &file_hash)
+            .await
+            .unwrap();
 
         Ok(Json(team))
     }

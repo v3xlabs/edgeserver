@@ -14,8 +14,7 @@ use poem::{
     },
     Endpoint, FromRequest, IntoResponse, PathPattern, Request, Response, Result,
 };
-use tracing::{info_span, Instrument};
-
+use tracing::info_span;
 
 /// Middleware that injects the OpenTelemetry trace ID into the response headers.
 #[derive(Default)]
@@ -24,7 +23,7 @@ pub struct TraceId<T> {
 }
 
 impl<T> TraceId<T> {
-    pub fn new(tracer: Arc<T>) -> Self {
+    pub const fn new(tracer: Arc<T>) -> Self {
         Self { tracer }
     }
 }
@@ -45,7 +44,7 @@ where
     }
 }
 
-/// The endpoint wrapper produced by the TraceId middleware.
+/// The endpoint wrapper produced by the `TraceId` middleware.
 pub struct TraceIdEndpoint<T, E> {
     inner: E,
     tracer: Arc<T>,
@@ -65,8 +64,7 @@ where
             .await
             .ok()
             .and_then(|real_ip| real_ip.0)
-            .map(|addr| addr.to_string())
-            .unwrap_or_else(|| req.remote_addr().to_string());
+            .map_or_else(|| req.remote_addr().to_string(), |addr| addr.to_string());
 
         // Prepare span attributes
         let mut attributes = Vec::new();
@@ -95,7 +93,7 @@ where
 
         // Get method for span name
         let method = req.method().to_string();
-        
+
         // Create a completely new span for this request
         let mut span = self
             .tracer
@@ -109,21 +107,21 @@ where
         let tracing_span = info_span!("request", method = method, uri = uri);
         // tracing_span.set_parent(span.span_context());
         let _guard = tracing_span.enter();
-            
+
         // Record request start event
         span.add_event("request.started".to_string(), vec![]);
-        
+
         // Get trace ID for response header
         let trace_id = span.span_context().trace_id().to_string();
 
         // Process the request with the inner endpoint
         let res = self.inner.call(req).await;
-        
+
         // Process the response
         match res {
             Ok(resp) => {
                 let mut resp = resp.into_response();
-                
+
                 // Update span with path pattern if available
                 if let Some(path_pattern) = resp.data::<PathPattern>() {
                     const HTTP_PATH_PATTERN: Key = Key::from_static_str("http.path_pattern");
@@ -133,16 +131,16 @@ where
                         path_pattern.0.to_string(),
                     ));
                 }
-                
+
                 // Record successful completion
                 span.add_event("request.completed".to_string(), vec![]);
-                
+
                 // Set response status
                 span.set_attribute(KeyValue::new(
                     attribute::HTTP_RESPONSE_STATUS_CODE,
-                    resp.status().as_u16() as i64,
+                    i64::from(resp.status().as_u16()),
                 ));
-                
+
                 // Track content length if available
                 if let Some(content_length) = resp.headers().typed_get::<headers::ContentLength>() {
                     span.set_attribute(KeyValue::new(
@@ -150,17 +148,17 @@ where
                         content_length.0 as i64,
                     ));
                 }
-                
+
                 // Add trace ID to response headers
                 resp.headers_mut().insert(
                     "X-Trace-Id",
                     HeaderValue::from_str(&trace_id)
                         .unwrap_or_else(|_| HeaderValue::from_static("unknown")),
                 );
-                
+
                 // End the span
                 span.end();
-                
+
                 Ok(resp)
             }
             Err(err) => {
@@ -173,22 +171,22 @@ where
                         path_pattern.0.to_string(),
                     ));
                 }
-                
+
                 // Set error status code
                 span.set_attribute(KeyValue::new(
                     attribute::HTTP_RESPONSE_STATUS_CODE,
-                    err.status().as_u16() as i64,
+                    i64::from(err.status().as_u16()),
                 ));
-                
+
                 // Record error event
                 span.add_event(
                     "request.error".to_string(),
                     vec![KeyValue::new(attribute::EXCEPTION_MESSAGE, err.to_string())],
                 );
-                
+
                 // End the span
                 span.end();
-                
+
                 Err(err)
             }
         }

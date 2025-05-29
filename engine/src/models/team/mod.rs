@@ -1,12 +1,10 @@
 use std::fmt::Debug;
 
 use chrono::{DateTime, Utc};
-use opentelemetry::Context;
 use poem_openapi::Object;
 use serde::{Deserialize, Serialize};
 use sqlx::{query, query_as, query_scalar};
 use tracing::info_span;
-use tracing_opentelemetry::OpenTelemetrySpanExt;
 
 use crate::{
     database::Database,
@@ -87,7 +85,10 @@ impl Team {
     }
 
     #[tracing::instrument(name = "delete_by_id", skip(db))]
-    pub async fn delete_by_id(db: &Database, team_id: impl AsRef<str> + Debug) -> Result<(), sqlx::Error> {
+    pub async fn delete_by_id(
+        db: &Database,
+        team_id: impl AsRef<str> + Debug,
+    ) -> Result<(), sqlx::Error> {
         let span = info_span!("Team::delete_by_id");
         let _guard = span.enter();
 
@@ -221,7 +222,7 @@ impl Team {
         db: &Database,
         team_id: impl AsRef<str>,
         avatar_url: impl AsRef<str>,
-    ) -> Result<Team, sqlx::Error> {
+    ) -> Result<Self, sqlx::Error> {
         let span = info_span!("Team::update_avatar");
         let _guard = span.enter();
 
@@ -239,7 +240,7 @@ impl Team {
 #[derive(Debug)]
 pub struct TeamId<'a>(pub &'a str);
 
-impl<'a> AccessibleResource for TeamId<'a> {
+impl AccessibleResource for TeamId<'_> {
     async fn has_access(
         &self,
         state: &State,
@@ -247,7 +248,7 @@ impl<'a> AccessibleResource for TeamId<'a> {
         resource_id: &str,
     ) -> Result<bool, HttpError> {
         if resource == "user" {
-            let x = Team::is_member(&state, self.0, resource_id)
+            let x = Team::is_member(state, self.0, resource_id)
                 .await
                 .map_err(HttpError::from)?;
 

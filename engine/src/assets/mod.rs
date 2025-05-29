@@ -21,18 +21,22 @@ impl From<String> for AssetFile {
 
 impl AssetFile {
     #[tracing::instrument(name = "from_buffer", skip(state, buffer))]
-    pub async fn from_buffer(state: &State, buffer: &[u8], path: impl AsRef<str> + Debug) -> Result<(Self, NewlyCreatedFile, String, String, i64), sqlx::Error> {
-        let file_hash = hash_file(&buffer);
-        let content_type = infer::get(&buffer)
-            .map(|t| t.mime_type().to_string()).unwrap_or_else(|| {
-                content_type_from_file_name(path.as_ref())
-            });
+    pub async fn from_buffer(
+        state: &State,
+        buffer: &[u8],
+        path: impl AsRef<str> + Debug,
+    ) -> Result<(Self, NewlyCreatedFile, String, String, i64), sqlx::Error> {
+        let file_hash = hash_file(buffer);
+        let content_type = infer::get(buffer).map_or_else(
+            || content_type_from_file_name(path.as_ref()),
+            |t| t.mime_type().to_string(),
+        );
 
         let file_size = buffer.len() as i64;
 
         let newly_created_file = query_as!(
-                NewlyCreatedFile,
-                r#"
+            NewlyCreatedFile,
+            r#"
                 WITH ins AS (
       INSERT INTO files (file_hash, file_size)
       VALUES ($1, $2)
@@ -47,16 +51,16 @@ impl AssetFile {
     WHERE file_hash = $1
     LIMIT 1;
                 "#,
-                &file_hash,
-                file_size
-            )
-            .fetch_one(&state.database.pool)
-            .await?;
-    
+            &file_hash,
+            file_size
+        )
+        .fetch_one(&state.database.pool)
+        .await?;
+
         tracing::info!("File: {:?}", newly_created_file);
 
         let file = AssetFile {
-            path: file_hash.to_string()
+            path: file_hash.to_string(),
         };
 
         Ok((file, newly_created_file, file_hash, content_type, file_size))
@@ -68,11 +72,11 @@ fn hash_file(file: &[u8]) -> String {
     let mut hasher = Sha256::new();
     hasher.update(file);
     let hash = hasher.finalize();
-    format!("{:x}", hash)
+    format!("{hash:x}")
 }
 
 fn content_type_from_file_name(file_name: &str) -> String {
-    let extension = file_name.split('.').last().unwrap_or_default();
+    let extension = file_name.split('.').next_back().unwrap_or_default();
 
     info!("Content type from file name: {:?}", extension);
 
@@ -90,10 +94,10 @@ fn content_type_from_file_name(file_name: &str) -> String {
         "woff" => "font/woff".to_string(),
         "woff2" => "font/woff2".to_string(),
         "ttf" => "font/ttf".to_string(),
-        "otf" => "font/otf".to_string(),        
+        "otf" => "font/otf".to_string(),
         _ => {
             info!("Unknown file extension: {:?}", extension);
             "application/octet-stream".to_string()
-        },
+        }
     }
 }

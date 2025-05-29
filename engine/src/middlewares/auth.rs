@@ -1,6 +1,5 @@
 use std::fmt::Debug;
 
-use opentelemetry::Context;
 use poem::{web::Data, FromRequest, Request, RequestBody, Result};
 use poem_openapi::{
     registry::{MetaSecurityScheme, Registry},
@@ -38,7 +37,7 @@ impl<'a> ApiExtractor<'a> for UserAuth {
         _param_opts: ExtractParamOptions<Self::ParamType>,
     ) -> Result<Self> {
         let span = info_span!("auth");
-        
+
         // Use instrument to track the auth span
         async {
             let state = <Data<&State> as FromRequest>::from_request(req, body).await?;
@@ -57,12 +56,12 @@ impl<'a> ApiExtractor<'a> for UserAuth {
             // Token could either be a session token or a pat token
             let token = match token {
                 Some(token) => token,
-                None => return Ok(UserAuth::None(state.clone())),
+                None => return Ok(Self::None(state.clone())),
             };
 
             // check the token
             if token.starts_with("se_") {
-                let cache_key = format!("session:{}", token);
+                let cache_key = format!("session:{token}");
 
                 let is_user = state
                     .cache
@@ -88,27 +87,31 @@ impl<'a> ApiExtractor<'a> for UserAuth {
                 let session: Option<Session> = serde_json::from_value(is_user).ok();
 
                 if let Some(session) = session {
-                    return Ok(UserAuth::User(session, state.clone()));
+                    return Ok(Self::User(session, state.clone()));
                 }
             } else if token.starts_with("k_") {
-                let cache_key = format!("key:{}", token);
+                let cache_key = format!("key:{token}");
 
-                let is_key = state.cache.raw.get_with(cache_key, async {
-                    let hash = hash_session(&token);
+                let is_key = state
+                    .cache
+                    .raw
+                    .get_with(cache_key, async {
+                        let hash = hash_session(&token);
 
-                    let key = Key::get_by_id(&state.database, hash.as_ref())
-                        .await
-                        .unwrap()
-                        .ok_or(HttpError::Unauthorized)
-                        .unwrap();
+                        let key = Key::get_by_id(&state.database, hash.as_ref())
+                            .await
+                            .unwrap()
+                            .ok_or(HttpError::Unauthorized)
+                            .unwrap();
 
-                    serde_json::to_value(key).unwrap()
-                }).await;
+                        serde_json::to_value(key).unwrap()
+                    })
+                    .await;
 
                 let key: Option<Key> = serde_json::from_value(is_key).ok();
 
                 if let Some(key) = key {
-                    return Ok(UserAuth::Key(key, state.clone()));
+                    return Ok(Self::Key(key, state.clone()));
                 }
             }
 
@@ -140,28 +143,30 @@ impl<'a> ApiExtractor<'a> for UserAuth {
 
 impl UserAuth {
     /// @deprecated
-    pub fn ok_session(&self) -> Option<&Session> {
+    #[must_use]
+    pub const fn ok_session(&self) -> Option<&Session> {
         match self {
-            UserAuth::User(session, _) => Some(session),
-            UserAuth::Key(_, _) => None,
-            UserAuth::None(_) => None,
+            Self::User(session, _) => Some(session),
+            Self::Key(_, _) => None,
+            Self::None(_) => None,
         }
     }
 
     /// @deprecated
     pub fn required_session(&self) -> Result<&Session> {
         match self {
-            UserAuth::User(session, _) => Ok(session),
-            UserAuth::Key(_, _) => Err(HttpError::Unauthorized.into()),
-            UserAuth::None(_) => Err(HttpError::Unauthorized.into()),
+            Self::User(session, _) => Ok(session),
+            Self::Key(_, _) => Err(HttpError::Unauthorized.into()),
+            Self::None(_) => Err(HttpError::Unauthorized.into()),
         }
     }
 
+    #[must_use]
     pub fn user_id(&self) -> Option<&str> {
         match self {
-            UserAuth::User(session, _) => Some(&session.user_id),
-            UserAuth::Key(_, __) => None,
-            UserAuth::None(_) => None,
+            Self::User(session, _) => Some(&session.user_id),
+            Self::Key(_, _) => None,
+            Self::None(_) => None,
         }
     }
 
@@ -170,12 +175,12 @@ impl UserAuth {
         team_id: impl AsRef<str> + Debug,
     ) -> Result<(), HttpError> {
         let span = info_span!("required_member_of", team_id = ?team_id);
-        
+
         // Use instrument to track the span
         async {
             match self {
-                UserAuth::User(session, state) => {
-                    if !Team::is_member(&state, &team_id, &session.user_id)
+                Self::User(session, state) => {
+                    if !Team::is_member(state, &team_id, &session.user_id)
                         .await
                         .map_err(HttpError::from)?
                     {
@@ -183,11 +188,9 @@ impl UserAuth {
                     }
 
                     Ok(())
-                },
-                UserAuth::Key(_key, _) => {
-                    Err(HttpError::Forbidden)
-                },
-                UserAuth::None(_) => Err(HttpError::Unauthorized),
+                }
+                Self::Key(_key, _) => Err(HttpError::Forbidden),
+                Self::None(_) => Err(HttpError::Unauthorized),
             }
         }
         .instrument(span)
@@ -199,29 +202,26 @@ impl UserAuth {
         resource: &impl AccessibleResource,
     ) -> Result<(), HttpError> {
         let span = info_span!("verify_access_to", resource = ?resource);
-        
+
         // Use instrument to track the span
         async {
             match self {
-                UserAuth::User(session, state) => match resource
-                    .has_access(state, "user", &session.user_id)
-                    .await
-                    .map_err(HttpError::from)
-                {
-                    Ok(true) => Ok(()),
-                    Ok(false) => Err(HttpError::Forbidden),
-                    Err(e) => Err(e),
-                },
-                UserAuth::Key(key, state) => match resource
+                Self::User(session, state) => {
+                    match resource.has_access(state, "user", &session.user_id).await {
+                        Ok(true) => Ok(()),
+                        Ok(false) => Err(HttpError::Forbidden),
+                        Err(e) => Err(e),
+                    }
+                }
+                Self::Key(key, state) => match resource
                     .has_access(state, &key.key_type, &key.key_resource)
                     .await
-                    .map_err(HttpError::from)
                 {
                     Ok(true) => Ok(()),
                     Ok(false) => Err(HttpError::Forbidden),
                     Err(e) => Err(e),
                 },
-                UserAuth::None(_) => Err(HttpError::Unauthorized),
+                Self::None(_) => Err(HttpError::Unauthorized),
             }
         }
         .instrument(span)

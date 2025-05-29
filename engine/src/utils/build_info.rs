@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 // This enables the crate to collect build information at compile time
 build_info::build_info!(fn build_info);
 
-/// BuildInformation contains metadata about the build
+/// `BuildInformation` contains metadata about the build
 #[derive(Debug, Clone, Serialize, Deserialize, Object)]
 pub struct BuildInformation {
     pub version: String,
@@ -16,21 +16,23 @@ pub struct BuildInformation {
     pub rust_version: String,
 }
 
-/// Builds a BuildInformation struct from environment variables
+/// Builds a `BuildInformation` struct from environment variables
+#[must_use]
 pub fn build_build_information() -> BuildInformation {
     let info = build_info();
 
-    let (git_commit, git_branch, git_tags, git_dirty) =
-        if let Some(git_info) = info.version_control.as_ref().and_then(|v| v.git()) {
+    let (git_commit, git_branch, git_tags, git_dirty) = info
+        .version_control
+        .as_ref()
+        .and_then(|v| v.git())
+        .map_or((None, None, None, false), |git_info| {
             (
                 Some(git_info.commit_id.clone()),
                 git_info.branch.clone(),
                 Some(git_info.tags.clone()),
                 git_info.dirty,
             )
-        } else {
-            (None, None, None, false)
-        };
+        });
 
     BuildInformation {
         version: info.crate_info.version.to_string(),
