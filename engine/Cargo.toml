@@ -38,7 +38,7 @@ poem-openapi = { version = "5.1.8", git = "https://github.com/poem-web/poem", br
     "static-files",
 ] }
 serde = "1.0.217"
-tracing-subscriber = { version = "0.3.19", features = ["env-filter", "fmt"] }
+tracing-subscriber = { version = "0.3.20", features = ["env-filter", "fmt"] }
 url = { version = "2.5.2", features = ["serde"] }
 thiserror = "2.0.3"
 rustls = "0.23.19"
