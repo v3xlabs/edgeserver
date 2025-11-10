@@ -106,10 +106,8 @@ where
 
         // Luc testing tracing compat
         let uri = req.uri().to_string();
-        let tracing_span = info_span!("request", method = method, uri = uri);
-        // tracing_span.set_parent(span.span_context());
-        let _guard = tracing_span.enter();
-            
+        let tracing_span = info_span!("request", method = method.as_str(), uri = uri.as_str());
+
         // Record request start event
         span.add_event("request.started".to_string(), vec![]);
         
@@ -117,7 +115,11 @@ where
         let trace_id = span.span_context().trace_id().to_string();
 
         // Process the request with the inner endpoint
-        let res = self.inner.call(req).await;
+        let res = self
+            .inner
+            .call(req)
+            .instrument(tracing_span.clone())
+            .await;
         
         // Process the response
         match res {

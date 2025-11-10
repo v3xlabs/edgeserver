@@ -4,7 +4,7 @@ use opentelemetry::Context;
 use poem_openapi::{types::Example, Object};
 use serde::{Deserialize, Serialize};
 use sqlx::{query, query_as};
-use tracing::{info, info_span};
+use tracing::{info, info_span, Instrument};
 use tracing_opentelemetry::OpenTelemetrySpanExt;
 
 use crate::{
@@ -62,18 +62,20 @@ impl Deployment {
         context: Option<String>,
     ) -> Result<Self, sqlx::Error> {
         let span = info_span!("Deployment::new");
-        let _guard = span.enter();
+        async move {
+            let deployment_id: String = generate_id(IdType::DEPLOYMENT);
 
-        let deployment_id: String = generate_id(IdType::DEPLOYMENT);
-
-        query_as!(
-            Deployment,
-            "INSERT INTO deployments (deployment_id, site_id, context) VALUES ($1, $2, $3) RETURNING *",
-            deployment_id,
-            site_id,
-            context
-        )
-        .fetch_one(&db.pool)
+            query_as!(
+                Deployment,
+                "INSERT INTO deployments (deployment_id, site_id, context) VALUES ($1, $2, $3) RETURNING *",
+                deployment_id,
+                site_id,
+                context
+            )
+            .fetch_one(&db.pool)
+            .await
+        }
+        .instrument(span)
         .await
     }
 
@@ -89,9 +91,6 @@ impl Deployment {
 
     #[tracing::instrument(name = "upload_files", skip(self, state, file))]
     pub async fn upload_files(&self, state: &State, file: Vec<u8>) -> Result<(), sqlx::Error> {
-        let span = info_span!("Deployment::upload_files");
-        let _guard = span.enter();
-
         // TODO: Read file stream, extract zip file (contains multiple files), upload each file to s3 at the correct relevant path relative to deployment.deployment_id + '/'
 
         let zip = ZipFileReader::new(file).await.unwrap();
@@ -122,8 +121,6 @@ impl Deployment {
                 "cataloging_metadata",
                 file_path = path
             );
-            let _enter = s.enter();
-
             let _deployment_file = query_as!(
                  DeploymentFile,
                 "INSERT INTO deployment_files (deployment_id, file_id, file_path, mime_type) VALUES ($1, $2, $3, $4) RETURNING *",
@@ -131,24 +128,22 @@ impl Deployment {
                 newly_created_file.file_id,
                 path,
                 content_type
-            ).fetch_one(&state.database.pool).await?;
-
-            drop(_enter);
+            )
+            .fetch_one(&state.database.pool)
+            .instrument(s)
+            .await?;
 
             if newly_created_file.is_new.unwrap_or_default() {
                 info!("Uploading file: {:?}", path);
                 let s = tracing::span!(tracing::Level::INFO, "uploading_file", file_path = path);
-                let _enter = s.enter();
-
                 let s3_path = file_hash.to_string();
                 state
                     .storage
                     .bucket
                     .put_object_with_content_type(&s3_path, &buf, &content_type)
+                    .instrument(s)
                     .await
                     .unwrap();
-
-                drop(_enter);
 
                 info!("Upload complete");
             } else {
@@ -166,59 +161,63 @@ impl Deployment {
         cutoff_date: DateTime<Utc>,
     ) -> Result<Vec<File>, sqlx::Error> {
         let span = info_span!("Deployment::cleanup_old_files");
-        let _guard = span.enter();
+        async move {
+            tracing::info!("Checking for unused files before: {:?}", cutoff_date);
+            let files = query_as!(
+                File,
+                r#"
+                SELECT DISTINCT f.* 
+                FROM files f
+                WHERE NOT EXISTS (
+                    SELECT 1 
+                    FROM deployment_files df
+                    JOIN deployments d ON df.deployment_id = d.deployment_id
+                    WHERE df.file_id = f.file_id 
+                    AND d.created_at > $1
+                ) AND f.file_deleted = FALSE"#,
+                cutoff_date
+            )
+            .fetch_all(&state.database.pool)
+            .await?;
 
-        tracing::info!("Checking for unused files before: {:?}", cutoff_date);
-        let files = query_as!(
-            File,
-            r#"
-            SELECT DISTINCT f.* 
-            FROM files f
-            WHERE NOT EXISTS (
-                SELECT 1 
-                FROM deployment_files df
-                JOIN deployments d ON df.deployment_id = d.deployment_id
-                WHERE df.file_id = f.file_id 
-                AND d.created_at > $1
-            ) AND f.file_deleted = FALSE"#,
-            cutoff_date
-        )
-        .fetch_all(&state.database.pool)
-        .await?;
+            tracing::info!("Found {} unused files", files.len());
 
-        tracing::info!("Found {} unused files", files.len());
+            if !files.is_empty() {
+                tracing::info!("Deleting {} unused files", files.len());
 
-        if files.len() > 0 {
-            tracing::info!("Deleting {} unused files", files.len());
+                // delete file from s3
+                for file in &files {
+                    let s3_path = format!("sites/{}", file.file_hash);
+                    state.storage.bucket.delete_object(&s3_path).await.unwrap();
+                }
 
-            // delete file from s3
-            for file in &files {
-                let s3_path = format!("sites/{}", file.file_hash);
-                state.storage.bucket.delete_object(&s3_path).await.unwrap();
+                // delete the files from the `files` table
+                query!(
+                    "UPDATE files SET file_deleted = TRUE WHERE file_id = ANY($1)",
+                    &files.iter().map(|f| f.file_id).collect::<Vec<i64>>()
+                )
+                .execute(&state.database.pool)
+                .await?;
             }
 
-            // delete the files from the `files` table
-            query!(
-                "UPDATE files SET file_deleted = TRUE WHERE file_id = ANY($1)",
-                &files.iter().map(|f| f.file_id).collect::<Vec<i64>>()
-            )
-            .execute(&state.database.pool)
-            .await?;
+            Ok(files)
         }
-
-        Ok(files)
+        .instrument(span)
+        .await
     }
 
     pub async fn get_by_id(db: &Database, deployment_id: &str) -> Result<Self, sqlx::Error> {
         let span = info_span!("Deployment::get_by_id");
-        let _guard = span.enter();
-
-        query_as!(
-            Deployment,
-            "SELECT * FROM deployments WHERE deployment_id = $1",
-            deployment_id
-        )
-        .fetch_one(&db.pool)
+        async move {
+            query_as!(
+                Deployment,
+                "SELECT * FROM deployments WHERE deployment_id = $1",
+                deployment_id
+            )
+            .fetch_one(&db.pool)
+            .await
+        }
+        .instrument(span)
         .await
     }
 
@@ -228,17 +227,19 @@ impl Deployment {
         context: &str,
     ) -> Result<(), sqlx::Error> {
         let span = info_span!("Deployment::update_context");
-        let _guard = span.enter();
+        async move {
+            query!(
+                "UPDATE deployments SET context = $1 WHERE deployment_id = $2",
+                context,
+                deployment_id
+            )
+            .execute(&db.pool)
+            .await?;
 
-        query!(
-            "UPDATE deployments SET context = $1 WHERE deployment_id = $2",
-            context,
-            deployment_id
-        )
-        .execute(&db.pool)
-        .await?;
-
-        Ok(())
+            Ok(())
+        }
+        .instrument(span)
+        .await
     }
 
     pub async fn update_ipfs_cid(
@@ -259,14 +260,16 @@ impl Deployment {
 
     pub async fn get_last_by_site_id(db: &Database, site_id: &str) -> Result<Self, sqlx::Error> {
         let span = info_span!("Deployment::get_last_by_site_id");
-        let _guard = span.enter();
-
-        query_as!(
-            Deployment,
-            "SELECT * FROM deployments WHERE site_id = $1 ORDER BY created_at DESC LIMIT 1",
-            site_id
-        )
-        .fetch_one(&db.pool)
+        async move {
+            query_as!(
+                Deployment,
+                "SELECT * FROM deployments WHERE site_id = $1 ORDER BY created_at DESC LIMIT 1",
+                site_id
+            )
+            .fetch_one(&db.pool)
+            .await
+        }
+        .instrument(span)
         .await
     }
 }
@@ -283,52 +286,56 @@ impl DeploymentFile {
         deployment_id: &str,
     ) -> Result<Vec<DeploymentFileEntry>, sqlx::Error> {
         let span = info_span!("DeploymentFile::get_deployment_files");
-        let _guard = span.enter();
-
-        query_as!(
-            DeploymentFileEntry,
-            r#"
-            SELECT
-                df.deployment_id as "deployment_file_deployment_id!",
-                df.file_id as "deployment_file_file_id!",
-                df.file_path as "deployment_file_file_path!",
-                df.mime_type as "deployment_file_mime_type!",
-                f.file_hash as "file_hash!",
-                f.file_size,
-                f.file_deleted
-            FROM deployment_files df
-            JOIN files f ON df.file_id = f.file_id
-            WHERE df.deployment_id = $1
-            "#,
-            deployment_id
-        )
-        .fetch_all(&db.pool)
+        async move {
+            query_as!(
+                DeploymentFileEntry,
+                r#"
+                SELECT
+                    df.deployment_id as "deployment_file_deployment_id!",
+                    df.file_id as "deployment_file_file_id!",
+                    df.file_path as "deployment_file_file_path!",
+                    df.mime_type as "deployment_file_mime_type!",
+                    f.file_hash as "file_hash!",
+                    f.file_size,
+                    f.file_deleted
+                FROM deployment_files df
+                JOIN files f ON df.file_id = f.file_id
+                WHERE df.deployment_id = $1
+                "#,
+                deployment_id
+            )
+            .fetch_all(&db.pool)
+            .await
+        }
+        .instrument(span)
         .await
     }
 
     pub async fn get_file_by_path(db: &Database, deployment_id: &str, path: &str) -> Result<DeploymentFileEntry, sqlx::Error> {
         let span = info_span!("DeploymentFile::get_file_by_path");
-        let _guard = span.enter();
-
-        query_as!(
-            DeploymentFileEntry,
-            r#"
-            SELECT
-                df.deployment_id as "deployment_file_deployment_id!",
-                df.file_id as "deployment_file_file_id!",
-                df.file_path as "deployment_file_file_path!",
-                df.mime_type as "deployment_file_mime_type!",
-                f.file_hash as "file_hash!",
-                f.file_size,
-                f.file_deleted
-            FROM deployment_files df
-            JOIN files f ON df.file_id = f.file_id
-            WHERE df.deployment_id = $1 AND df.file_path = $2
-            "#,
-            deployment_id,
-            path
-        )
-        .fetch_one(&db.pool)
+        async move {
+            query_as!(
+                DeploymentFileEntry,
+                r#"
+                SELECT
+                    df.deployment_id as "deployment_file_deployment_id!",
+                    df.file_id as "deployment_file_file_id!",
+                    df.file_path as "deployment_file_file_path!",
+                    df.mime_type as "deployment_file_mime_type!",
+                    f.file_hash as "file_hash!",
+                    f.file_size,
+                    f.file_deleted
+                FROM deployment_files df
+                JOIN files f ON df.file_id = f.file_id
+                WHERE df.deployment_id = $1 AND df.file_path = $2
+                "#,
+                deployment_id,
+                path
+            )
+            .fetch_one(&db.pool)
+            .await
+        }
+        .instrument(span)
         .await
     }
 }

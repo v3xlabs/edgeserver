@@ -14,7 +14,7 @@ use crate::{
     utils::id::{generate_id, IdType},
 };
 
-use tracing::info_span;
+use tracing::{info_span, Instrument};
 
 #[derive(Debug, Serialize, Deserialize, Object)]
 pub struct Site {
@@ -31,33 +31,35 @@ impl Site {
         team_id: impl AsRef<str>,
     ) -> Result<Self, sqlx::Error> {
         let span = info_span!("Site::new");
-        // span.set_parent(Context::current());
-        let _guard = span.enter();
+        async move {
+            let site_id = generate_id(IdType::SITE);
 
-        let site_id = generate_id(IdType::SITE);
-
-        query_as!(
-            Site,
-            "INSERT INTO sites (site_id, team_id, name) VALUES ($1, $2, $3) RETURNING *",
-            site_id,
-            team_id.as_ref(),
-            name.as_ref()
-        )
-        .fetch_one(&db.pool)
+            query_as!(
+                Site,
+                "INSERT INTO sites (site_id, team_id, name) VALUES ($1, $2, $3) RETURNING *",
+                site_id,
+                team_id.as_ref(),
+                name.as_ref()
+            )
+            .fetch_one(&db.pool)
+            .await
+        }
+        .instrument(span)
         .await
     }
 
     pub async fn get_by_id(db: &Database, site_id: impl AsRef<str>) -> Result<Self, sqlx::Error> {
         let span = info_span!("Site::get_by_id");
-        // span.set_parent(Context::current());
-        let _guard = span.enter();
-
-        query_as!(
-            Site,
-            "SELECT * FROM sites WHERE site_id = $1",
-            site_id.as_ref()
-        )
-        .fetch_one(&db.pool)
+        async move {
+            query_as!(
+                Site,
+                "SELECT * FROM sites WHERE site_id = $1",
+                site_id.as_ref()
+            )
+            .fetch_one(&db.pool)
+            .await
+        }
+        .instrument(span)
         .await
     }
 
@@ -66,22 +68,23 @@ impl Site {
         team_id: impl AsRef<str>,
     ) -> Result<Vec<Self>, sqlx::Error> {
         let span = info_span!("Site::get_by_team_id");
-        // span.set_parent(Context::current());
-        let _guard = span.enter();
-
-        query_as!(
-            Site,
-            "SELECT s.* FROM sites s
-            LEFT JOIN (
-                SELECT site_id, MAX(created_at) as latest_deploy
-                FROM deployments
-                GROUP BY site_id
-            ) d ON s.site_id = d.site_id
-            WHERE s.team_id = $1
-            ORDER BY d.latest_deploy DESC NULLS LAST, s.created_at DESC",
-            team_id.as_ref()
-        )
-        .fetch_all(&db.pool)
+        async move {
+            query_as!(
+                Site,
+                "SELECT s.* FROM sites s
+                LEFT JOIN (
+                    SELECT site_id, MAX(created_at) as latest_deploy
+                    FROM deployments
+                    GROUP BY site_id
+                ) d ON s.site_id = d.site_id
+                WHERE s.team_id = $1
+                ORDER BY d.latest_deploy DESC NULLS LAST, s.created_at DESC",
+                team_id.as_ref()
+            )
+            .fetch_all(&db.pool)
+            .await
+        }
+        .instrument(span)
         .await
     }
 
@@ -91,23 +94,24 @@ impl Site {
         user_id: impl AsRef<str>,
     ) -> Result<Vec<Self>, sqlx::Error> {
         let span = info_span!("Site::get_by_user_id");
-        // span.set_parent(Context::current());
-        let _guard = span.enter();
-
-        query_as!(
-            Site,
-            "SELECT s.* FROM sites s
-            LEFT JOIN (
-                SELECT site_id, MAX(created_at) as latest_deploy
-                FROM deployments
-                GROUP BY site_id
-            ) d ON s.site_id = d.site_id
-            WHERE s.team_id IN (SELECT team_id FROM user_teams WHERE user_id = $1)
-            OR s.team_id IN (SELECT team_id FROM teams WHERE owner_id = $1)
-            ORDER BY d.latest_deploy DESC NULLS LAST, s.created_at DESC",
-            user_id.as_ref()
-        )
-        .fetch_all(&db.pool)
+        async move {
+            query_as!(
+                Site,
+                "SELECT s.* FROM sites s
+                LEFT JOIN (
+                    SELECT site_id, MAX(created_at) as latest_deploy
+                    FROM deployments
+                    GROUP BY site_id
+                ) d ON s.site_id = d.site_id
+                WHERE s.team_id IN (SELECT team_id FROM user_teams WHERE user_id = $1)
+                OR s.team_id IN (SELECT team_id FROM teams WHERE owner_id = $1)
+                ORDER BY d.latest_deploy DESC NULLS LAST, s.created_at DESC",
+                user_id.as_ref()
+            )
+            .fetch_all(&db.pool)
+            .await
+        }
+        .instrument(span)
         .await
     }
 
@@ -116,15 +120,16 @@ impl Site {
         site_id: impl AsRef<str>,
     ) -> Result<Vec<Deployment>, sqlx::Error> {
         let span = info_span!("Site::get_deployments");
-        // span.set_parent(Context::current());
-        let _guard = span.enter();
-
-        query_as!(
-            Deployment,
-            "SELECT * FROM deployments WHERE site_id = $1 ORDER BY created_at DESC",
-            site_id.as_ref()
-        )
-        .fetch_all(&db.pool)
+        async move {
+            query_as!(
+                Deployment,
+                "SELECT * FROM deployments WHERE site_id = $1 ORDER BY created_at DESC",
+                site_id.as_ref()
+            )
+            .fetch_all(&db.pool)
+            .await
+        }
+        .instrument(span)
         .await
     }
 
@@ -134,17 +139,18 @@ impl Site {
         team_id: impl AsRef<str>,
     ) -> Result<(), sqlx::Error> {
         let span = info_span!("Site::update_team");
-        // span.set_parent(Context::current());
-        let _guard = span.enter();
-
-        query!(
-            "UPDATE sites SET team_id = $1 WHERE site_id = $2",
-            team_id.as_ref(),
-            site_id.as_ref()
-        )
-        .execute(&db.pool)
+        async move {
+            query!(
+                "UPDATE sites SET team_id = $1 WHERE site_id = $2",
+                team_id.as_ref(),
+                site_id.as_ref()
+            )
+            .execute(&db.pool)
+            .await
+            .map(|_| ())
+        }
+        .instrument(span)
         .await
-        .map(|_| ())
     }
 }
 #[derive(Debug)]

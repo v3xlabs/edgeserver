@@ -5,7 +5,7 @@ use opentelemetry::Context;
 use poem_openapi::Object;
 use serde::{Deserialize, Serialize};
 use sqlx::{query, query_as, query_scalar};
-use tracing::info_span;
+use tracing::{info_span, Instrument};
 use tracing_opentelemetry::OpenTelemetrySpanExt;
 
 use crate::{
@@ -35,18 +35,20 @@ impl Team {
         owner_id: impl AsRef<str>,
     ) -> Result<Self, sqlx::Error> {
         let span = info_span!("Team::new");
-        let _guard = span.enter();
+        async move {
+            let team_id = generate_id(IdType::TEAM);
 
-        let team_id = generate_id(IdType::TEAM);
-
-        query_as!(
-            Team,
-            "INSERT INTO teams (team_id, name, owner_id) VALUES ($1, $2, $3) RETURNING *",
-            team_id,
-            name.as_ref(),
-            owner_id.as_ref()
-        )
-        .fetch_one(&db.pool)
+            query_as!(
+                Team,
+                "INSERT INTO teams (team_id, name, owner_id) VALUES ($1, $2, $3) RETURNING *",
+                team_id,
+                name.as_ref(),
+                owner_id.as_ref()
+            )
+            .fetch_one(&db.pool)
+            .await
+        }
+        .instrument(span)
         .await
     }
 
@@ -56,14 +58,16 @@ impl Team {
         team_id: impl AsRef<str> + Debug,
     ) -> Result<Self, sqlx::Error> {
         let span = info_span!("Team::get_by_id");
-        let _guard = span.enter();
-
-        query_as!(
-            Team,
-            "SELECT * FROM teams WHERE team_id = $1",
-            team_id.as_ref()
-        )
-        .fetch_one(&db.pool)
+        async move {
+            query_as!(
+                Team,
+                "SELECT * FROM teams WHERE team_id = $1",
+                team_id.as_ref()
+            )
+            .fetch_one(&db.pool)
+            .await
+        }
+        .instrument(span)
         .await
     }
 
@@ -73,29 +77,33 @@ impl Team {
         user_id: impl AsRef<str> + Debug,
     ) -> Result<Vec<Self>, sqlx::Error> {
         let span = info_span!("Team::get_by_user_id");
-        let _guard = span.enter();
-
-        // query for teams where the user_id is the team owner_id,
-        // also include teams where the user_id is in the user_teams table
-        query_as!(
-            Team,
-            "SELECT * FROM teams WHERE owner_id = $1 OR team_id IN (SELECT team_id FROM user_teams WHERE user_id = $1)",
-            user_id.as_ref()
-        )
-        .fetch_all(&db.pool)
+        async move {
+            // query for teams where the user_id is the team owner_id,
+            // also include teams where the user_id is in the user_teams table
+            query_as!(
+                Team,
+                "SELECT * FROM teams WHERE owner_id = $1 OR team_id IN (SELECT team_id FROM user_teams WHERE user_id = $1)",
+                user_id.as_ref()
+            )
+            .fetch_all(&db.pool)
+            .await
+        }
+        .instrument(span)
         .await
     }
 
     #[tracing::instrument(name = "delete_by_id", skip(db))]
     pub async fn delete_by_id(db: &Database, team_id: impl AsRef<str> + Debug) -> Result<(), sqlx::Error> {
         let span = info_span!("Team::delete_by_id");
-        let _guard = span.enter();
+        async move {
+            query!("DELETE FROM teams WHERE team_id = $1", team_id.as_ref())
+                .execute(&db.pool)
+                .await?;
 
-        query!("DELETE FROM teams WHERE team_id = $1", team_id.as_ref())
-            .execute(&db.pool)
-            .await?;
-
-        Ok(())
+            Ok(())
+        }
+        .instrument(span)
+        .await
     }
 
     #[tracing::instrument(name = "is_owner", skip(db))]
@@ -105,17 +113,19 @@ impl Team {
         user_id: impl AsRef<str> + Debug,
     ) -> Result<bool, sqlx::Error> {
         let span = info_span!("Team::is_owner");
-        let _guard = span.enter();
-
-        Ok(query_as!(
-            Team,
-            "SELECT * FROM teams WHERE team_id = $1 AND owner_id = $2",
-            team_id.as_ref(),
-            user_id.as_ref()
-        )
-        .fetch_optional(&db.pool)
-        .await?
-        .is_some())
+        async move {
+            Ok(query_as!(
+                Team,
+                "SELECT * FROM teams WHERE team_id = $1 AND owner_id = $2",
+                team_id.as_ref(),
+                user_id.as_ref()
+            )
+            .fetch_optional(&db.pool)
+            .await?
+            .is_some())
+        }
+        .instrument(span)
+        .await
     }
 
     #[tracing::instrument(name = "is_member", skip(state))]
@@ -151,15 +161,18 @@ impl Team {
         user_id: impl AsRef<str> + Debug,
     ) -> Result<bool, sqlx::Error> {
         let span = info_span!("Team::_is_member");
-        let _guard = span.enter();
-
-        query_scalar!(
-            "SELECT EXISTS (SELECT 1 FROM user_teams WHERE team_id = $1 AND user_id = $2) OR EXISTS (SELECT 1 FROM teams WHERE team_id = $1 AND owner_id = $2)",
-            team_id.as_ref(),
-            user_id.as_ref()
-        )
-        .fetch_one(&state.database.pool)
-        .await.map(|x| x.unwrap_or(false))
+        async move {
+            query_scalar!(
+                "SELECT EXISTS (SELECT 1 FROM user_teams WHERE team_id = $1 AND user_id = $2) OR EXISTS (SELECT 1 FROM teams WHERE team_id = $1 AND owner_id = $2)",
+                team_id.as_ref(),
+                user_id.as_ref()
+            )
+            .fetch_one(&state.database.pool)
+            .await
+            .map(|x| x.unwrap_or(false))
+        }
+        .instrument(span)
+        .await
     }
 
     #[tracing::instrument(name = "get_members", skip(db))]
@@ -168,14 +181,16 @@ impl Team {
         team_id: impl AsRef<str> + Debug,
     ) -> Result<Vec<User>, sqlx::Error> {
         let span = info_span!("Team::get_members");
-        let _guard = span.enter();
-
-        query_as!(
-            User,
-            "SELECT * FROM users WHERE user_id IN (SELECT user_id FROM user_teams WHERE team_id = $1) OR user_id = (SELECT owner_id FROM teams WHERE team_id = $1)",
-            team_id.as_ref()
-        )
-        .fetch_all(&db.pool)
+        async move {
+            query_as!(
+                User,
+                "SELECT * FROM users WHERE user_id IN (SELECT user_id FROM user_teams WHERE team_id = $1) OR user_id = (SELECT owner_id FROM teams WHERE team_id = $1)",
+                team_id.as_ref()
+            )
+            .fetch_all(&db.pool)
+            .await
+        }
+        .instrument(span)
         .await
     }
 
@@ -185,17 +200,19 @@ impl Team {
         user_id: impl AsRef<str>,
     ) -> Result<(), sqlx::Error> {
         let span = info_span!("Team::add_member");
-        let _guard = span.enter();
+        async move {
+            query!(
+                "INSERT INTO user_teams (team_id, user_id) VALUES ($1, $2)",
+                team_id.as_ref(),
+                user_id.as_ref()
+            )
+            .execute(&db.pool)
+            .await?;
 
-        query!(
-            "INSERT INTO user_teams (team_id, user_id) VALUES ($1, $2)",
-            team_id.as_ref(),
-            user_id.as_ref()
-        )
-        .execute(&db.pool)
-        .await?;
-
-        Ok(())
+            Ok(())
+        }
+        .instrument(span)
+        .await
     }
 
     pub async fn update_name(
@@ -204,17 +221,19 @@ impl Team {
         name: impl AsRef<str>,
     ) -> Result<(), sqlx::Error> {
         let span = info_span!("Team::update_name");
-        let _guard = span.enter();
+        async move {
+            query!(
+                "UPDATE teams SET name = $2 WHERE team_id = $1",
+                team_id.as_ref(),
+                name.as_ref()
+            )
+            .execute(&db.pool)
+            .await?;
 
-        query!(
-            "UPDATE teams SET name = $2 WHERE team_id = $1",
-            team_id.as_ref(),
-            name.as_ref()
-        )
-        .execute(&db.pool)
-        .await?;
-
-        Ok(())
+            Ok(())
+        }
+        .instrument(span)
+        .await
     }
 
     pub async fn update_avatar(
@@ -223,15 +242,17 @@ impl Team {
         avatar_url: impl AsRef<str>,
     ) -> Result<Team, sqlx::Error> {
         let span = info_span!("Team::update_avatar");
-        let _guard = span.enter();
-
-        query_as!(
-            Team,
-            "UPDATE teams SET avatar_url = $2 WHERE team_id = $1 RETURNING *",
-            team_id.as_ref(),
-            avatar_url.as_ref()
-        )
-        .fetch_one(&db.pool)
+        async move {
+            query_as!(
+                Team,
+                "UPDATE teams SET avatar_url = $2 WHERE team_id = $1 RETURNING *",
+                team_id.as_ref(),
+                avatar_url.as_ref()
+            )
+            .fetch_one(&db.pool)
+            .await
+        }
+        .instrument(span)
         .await
     }
 }

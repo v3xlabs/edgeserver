@@ -3,7 +3,7 @@ use opentelemetry::Context;
 use poem_openapi::{Object, Union};
 use serde::{Deserialize, Serialize};
 use sqlx::{Error, FromRow};
-use tracing::{info, info_span};
+use tracing::{info, info_span, Instrument};
 use tracing_opentelemetry::OpenTelemetrySpanExt;
 
 use crate::state::State;
@@ -23,18 +23,20 @@ impl Domain {
         state: &State,
     ) -> Result<Vec<Domain>, Error> {
         let span = info_span!("Domain::get_soft_overlap");
-        let _guard = span.enter();
+        async move {
+            let overlap = if domain.starts_with("*.") {
+                Domain::existing_wildcard_overlap_by_name(domain, state).await?
+            } else {
+                Domain::existing_domain_by_name(domain, state)
+                    .await?
+                    .map(|x| vec![x])
+                    .unwrap_or_default()
+            };
 
-        let overlap = if domain.starts_with("*.") {
-            Domain::existing_wildcard_overlap_by_name(domain, state).await?
-        } else {
-            Domain::existing_domain_by_name(domain, state)
-                .await?
-                .map(|x| vec![x])
-                .unwrap_or_default()
-        };
-
-        Ok(overlap)
+            Ok(overlap)
+        }
+        .instrument(span)
+        .await
     }
 
     pub async fn get_hard_overlap(
@@ -50,30 +52,32 @@ impl Domain {
         state: &State,
     ) -> Result<Vec<DomainSubmission>, Error> {
         let span = info_span!("Domain::get_by_site_id");
-        let _guard = span.enter();
+        async move {
+            let mut domains: Vec<Domain> =
+                sqlx::query_as!(Domain, "SELECT * FROM domains WHERE site_id = $1", site_id)
+                    .fetch_all(&state.database.pool)
+                    .await?;
 
-        let mut domains: Vec<Domain> =
-            sqlx::query_as!(Domain, "SELECT * FROM domains WHERE site_id = $1", site_id)
-                .fetch_all(&state.database.pool)
-                .await?;
+            domains.sort_by(|a, b| sort_domains_by_reversed_parts(&a.domain, &b.domain));
 
-        domains.sort_by(|a, b| sort_domains_by_reversed_parts(&a.domain, &b.domain));
+            let mut pending_domains: Vec<DomainPending> = sqlx::query_as!(
+                DomainPending,
+                "SELECT * FROM domains_pending WHERE site_id = $1",
+                site_id
+            )
+            .fetch_all(&state.database.pool)
+            .await?;
 
-        let mut pending_domains: Vec<DomainPending> = sqlx::query_as!(
-            DomainPending,
-            "SELECT * FROM domains_pending WHERE site_id = $1",
-            site_id
-        )
-        .fetch_all(&state.database.pool)
-        .await?;
+            pending_domains.sort_by(|a, b| sort_domains_by_reversed_parts(&a.domain, &b.domain));
 
-        pending_domains.sort_by(|a, b| sort_domains_by_reversed_parts(&a.domain, &b.domain));
-
-        Ok(domains
-            .into_iter()
-            .map(|domain| domain.into())
-            .chain(pending_domains.into_iter().map(|pending| pending.into()))
-            .collect())
+            Ok(domains
+                .into_iter()
+                .map(|domain| domain.into())
+                .chain(pending_domains.into_iter().map(|pending| pending.into()))
+                .collect())
+        }
+        .instrument(span)
+        .await
     }
 
     pub async fn get_by_site_id_and_domain(
@@ -82,18 +86,20 @@ impl Domain {
         state: &State,
     ) -> Result<Option<Domain>, Error> {
         let span = info_span!("Domain::get_by_site_id_and_domain");
-        let _guard = span.enter();
+        async move {
+            let domain = sqlx::query_as!(
+                Domain,
+                "SELECT * FROM domains WHERE site_id = $1 AND domain = $2",
+                site_id,
+                domain
+            )
+            .fetch_optional(&state.database.pool)
+            .await?;
 
-        let domain = sqlx::query_as!(
-            Domain,
-            "SELECT * FROM domains WHERE site_id = $1 AND domain = $2",
-            site_id,
-            domain
-        )
-        .fetch_optional(&state.database.pool)
-        .await?;
-
-        Ok(domain)
+            Ok(domain)
+        }
+        .instrument(span)
+        .await
     }
 
     pub async fn delete_by_site_id_and_domain(
@@ -102,17 +108,19 @@ impl Domain {
         state: &State,
     ) -> Result<(), Error> {
         let span = info_span!("Domain::delete_by_site_id_and_domain");
-        let _guard = span.enter();
+        async move {
+            sqlx::query!(
+                "DELETE FROM domains WHERE site_id = $1 AND domain = $2",
+                site_id,
+                domain
+            )
+            .execute(&state.database.pool)
+            .await?;
 
-        sqlx::query!(
-            "DELETE FROM domains WHERE site_id = $1 AND domain = $2",
-            site_id,
-            domain
-        )
-        .execute(&state.database.pool)
-        .await?;
-
-        Ok(())
+            Ok(())
+        }
+        .instrument(span)
+        .await
     }
 
     pub async fn create_for_site(
@@ -121,57 +129,59 @@ impl Domain {
         state: &State,
     ) -> Result<DomainSubmission, Error> {
         let span = info_span!("Domain::create_for_site");
-        let _guard = span.enter();
+        async move {
+            // check if domain exist by name, the domains from initial overlap are to be overwritten if this gets validated
+            let mut overlap = Domain::get_soft_overlap(domain, state).await?;
 
-        // check if domain exist by name, the domains from initial overlap are to be overwritten if this gets validated
-        let mut overlap = Domain::get_soft_overlap(domain, state).await?;
+            // reverse overlap (any domains that might overlap with this domain)
+            // these domains wont get overwritten if this gets validated, however will be out-prioritized
+            overlap.extend(Domain::overlap_upwards_wildcard(domain.clone(), state).await?);
 
-        // reverse overlap (any domains that might overlap with this domain)
-        // these domains wont get overwritten if this gets validated, however will be out-prioritized
-        overlap.extend(Domain::overlap_upwards_wildcard(domain.clone(), state).await?);
+            // remove duplicates
+            overlap.sort_by_key(|x| x.domain.clone());
+            overlap.dedup_by_key(|x| x.domain.clone());
 
-        // remove duplicates
-        overlap.sort_by_key(|x| x.domain.clone());
-        overlap.dedup_by_key(|x| x.domain.clone());
+            if !overlap.is_empty() {
+                for existing_domain in overlap {
+                    info!(
+                        "Domain already exists, creating domain pending: {}",
+                        existing_domain.domain
+                    );
 
-        if !overlap.is_empty() {
-            for existing_domain in overlap {
-                info!(
-                    "Domain already exists, creating domain pending: {}",
-                    existing_domain.domain
-                );
+                    if existing_domain.site_id == site_id && existing_domain.domain == domain {
+                        // if already exists as domain on this site
+                        return Ok(existing_domain.into());
+                    }
 
-                if existing_domain.site_id == site_id && existing_domain.domain == domain {
-                    // if already exists as domain on this site
-                    return Ok(existing_domain.into());
+                    let domain_pending_exists = DomainPending::get_by_site_id_and_domain(
+                        &existing_domain.site_id,
+                        &existing_domain.domain,
+                        state,
+                    )
+                    .await?;
+
+                    if let Some(domain_pending) = domain_pending_exists {
+                        // already exists as pending on this site
+                        return Ok(domain_pending.into());
+                    }
                 }
 
-                let domain_pending_exists = DomainPending::get_by_site_id_and_domain(
-                    &existing_domain.site_id,
-                    &existing_domain.domain,
-                    state,
-                )
-                .await?;
-
-                if let Some(domain_pending) = domain_pending_exists {
-                    // already exists as pending on this site
-                    return Ok(domain_pending.into());
-                }
+                return Ok(DomainPending::create(site_id, domain, state).await?.into());
             }
 
-            return Ok(DomainPending::create(site_id, domain, state).await?.into());
+            let domain = sqlx::query_as!(
+                Domain,
+                "INSERT INTO domains (site_id, domain) VALUES ($1, $2) RETURNING *",
+                site_id,
+                domain
+            )
+            .fetch_one(&state.database.pool)
+            .await?;
+
+            Ok(domain.into())
         }
-
-        let domain = sqlx::query_as!(
-            Domain,
-            "INSERT INTO domains (site_id, domain) VALUES ($1, $2) RETURNING *",
-            site_id,
-            domain
-        )
-        .fetch_one(&state.database.pool)
-        .await?;
-
-        Ok(domain.into())
+        .instrument(span)
+        .await
     }
 
     pub async fn create_for_site_superceded(
@@ -180,13 +190,15 @@ impl Domain {
         state: &State,
     ) -> Result<Domain, Error> {
         let span = info_span!("Domain::create_for_site_superceded");
-        let _guard = span.enter();
+        async move {
+            let domain = sqlx::query_as!(Domain, "INSERT INTO domains (site_id, domain) VALUES ($1, $2) RETURNING *", site_id, domain)
+                .fetch_one(&state.database.pool)
+                .await?;
 
-        let domain = sqlx::query_as!(Domain, "INSERT INTO domains (site_id, domain) VALUES ($1, $2) RETURNING *", site_id, domain)
-            .fetch_one(&state.database.pool)
-            .await?;
-
-        Ok(domain)
+            Ok(domain)
+        }
+        .instrument(span)
+        .await
     }
 
     pub async fn existing_domain_by_name(
@@ -194,13 +206,15 @@ impl Domain {
         state: &State,
     ) -> Result<Option<Domain>, Error> {
         let span = info_span!("Domain::existing_domain_by_name");
-        let _guard = span.enter();
+        async move {
+            let domain = sqlx::query_as!(Domain, "SELECT * FROM domains WHERE domain = $1", domain)
+                .fetch_optional(&state.database.pool)
+                .await?;
 
-        let domain = sqlx::query_as!(Domain, "SELECT * FROM domains WHERE domain = $1", domain)
-            .fetch_optional(&state.database.pool)
-            .await?;
-
-        Ok(domain)
+            Ok(domain)
+        }
+        .instrument(span)
+        .await
     }
 
     /// Given a wildcard domain `*.luc.computer` it will return all downwards overlapping domains
@@ -211,24 +225,26 @@ impl Domain {
         state: &State,
     ) -> Result<Vec<Domain>, Error> {
         let span = info_span!("Domain::existing_wildcard_overlap_by_name");
-        let _guard = span.enter();
+        async move {
+            // require that the domain starts with `*.`
+            if !domain.starts_with("*.") {
+                return Err(Error::RowNotFound);
+            }
+            let domain = domain[2..].to_string();
 
-        // require that the domain starts with `*.`
-        if !domain.starts_with("*.") {
-            return Err(Error::RowNotFound);
+            let domains = sqlx::query_as!(
+                Domain,
+                "SELECT * FROM domains WHERE domain = $1 OR domain LIKE '%.' || $2",
+                format!("*.{}", domain),
+                domain
+            )
+            .fetch_all(&state.database.pool)
+            .await?;
+
+            Ok(domains)
         }
-        let domain = domain[2..].to_string();
-
-        let domains = sqlx::query_as!(
-            Domain,
-            "SELECT * FROM domains WHERE domain = $1 OR domain LIKE '%.' || $2",
-            format!("*.{}", domain),
-            domain
-        )
-        .fetch_all(&state.database.pool)
-        .await?;
-
-        Ok(domains)
+        .instrument(span)
+        .await
     }
 
     /// Checks what wildcard domains overlap with this entry (aka would need be replaced by this domain) (upwards)
@@ -241,19 +257,21 @@ impl Domain {
         state: &State,
     ) -> Result<Vec<Domain>, Error> {
         let span = info_span!("Domain::overlap_upwards_wildcard");
-        let _guard = span.enter();
+        async move {
+            let domain = domain[2..].to_string();
 
-        let domain = domain[2..].to_string();
+            let domains = sqlx::query_as!(
+                Domain,
+                "SELECT * FROM domains WHERE domain LIKE '*.%' AND $1 LIKE REPLACE(domain, '*.', '%.');",
+                domain
+            )
+            .fetch_all(&state.database.pool)
+            .await?;
 
-        let domains = sqlx::query_as!(
-            Domain,
-            "SELECT * FROM domains WHERE domain LIKE '*.%' AND $1 LIKE REPLACE(domain, '*.', '%.');",
-            domain
-        )
-        .fetch_all(&state.database.pool)
-        .await?;
-
-        Ok(domains)
+            Ok(domains)
+        }
+        .instrument(span)
+        .await
     }
 }
 
@@ -276,23 +294,25 @@ impl DomainPending {
         state: &State,
     ) -> Result<DomainPending, Error> {
         let span = info_span!("DomainPending::create");
-        let _guard = span.enter();
+        async move {
+            let challenge = uuid::Uuid::new_v4().to_string();
+            let status = "pending".to_string();
 
-        let challenge = uuid::Uuid::new_v4().to_string();
-        let status = "pending".to_string();
+            let domain_pending = sqlx::query_as!(
+                DomainPending,
+                "INSERT INTO domains_pending (site_id, domain, challenge, status) VALUES ($1, $2, $3, $4) RETURNING *",
+                site_id,
+                domain,
+                challenge,
+                status
+            )
+            .fetch_one(&state.database.pool)
+            .await?;
 
-        let domain_pending = sqlx::query_as!(
-            DomainPending,
-            "INSERT INTO domains_pending (site_id, domain, challenge, status) VALUES ($1, $2, $3, $4) RETURNING *",
-            site_id,
-            domain,
-            challenge,
-            status
-        )
-        .fetch_one(&state.database.pool)
-        .await?;
-
-        Ok(domain_pending)
+            Ok(domain_pending)
+        }
+        .instrument(span)
+        .await
     }
 
     pub async fn get_by_site_id_and_domain(
@@ -301,18 +321,20 @@ impl DomainPending {
         state: &State,
     ) -> Result<Option<DomainPending>, Error> {
         let span = info_span!("DomainPending::get_by_site_id_and_domain");
-        let _guard = span.enter();
+        async move {
+            let domain_pending = sqlx::query_as!(
+                DomainPending,
+                "SELECT * FROM domains_pending WHERE site_id = $1 AND domain = $2",
+                site_id,
+                domain
+            )
+            .fetch_optional(&state.database.pool)
+            .await?;
 
-        let domain_pending = sqlx::query_as!(
-            DomainPending,
-            "SELECT * FROM domains_pending WHERE site_id = $1 AND domain = $2",
-            site_id,
-            domain
-        )
-        .fetch_optional(&state.database.pool)
-        .await?;
-
-        Ok(domain_pending)
+            Ok(domain_pending)
+        }
+        .instrument(span)
+        .await
     }
 
     pub async fn delete_by_site_id_and_domain(
@@ -321,54 +343,58 @@ impl DomainPending {
         state: &State,
     ) -> Result<(), Error> {
         let span = info_span!("DomainPending::delete_by_site_id_and_domain");
-        let _guard = span.enter();
+        async move {
+            sqlx::query!(
+                "DELETE FROM domains_pending WHERE site_id = $1 AND domain = $2",
+                site_id,
+                domain
+            )
+            .execute(&state.database.pool)
+            .await?;
 
-        sqlx::query!(
-            "DELETE FROM domains_pending WHERE site_id = $1 AND domain = $2",
-            site_id,
-            domain
-        )
-        .execute(&state.database.pool)
-        .await?;
-
-        Ok(())
+            Ok(())
+        }
+        .instrument(span)
+        .await
     }
     pub async fn do_challenge(&self, state: &State) -> Result<(), Error> {
         let span = info_span!("DomainPending::do_challenge");
-        let _guard = span.enter();
+        async move {
+            // get the dns txt record `_edgeserver-challenge` and if its equal to the challenge, update the status to verified
 
-        // get the dns txt record `_edgeserver-challenge` and if its equal to the challenge, update the status to verified
+            // if a site exists for this domain delete it and generate a challenge in its place
+            let existing_domain = Domain::existing_domain_by_name(&self.domain, state).await;
 
-        // if a site exists for this domain delete it and generate a challenge in its place
-        let existing_domain = Domain::existing_domain_by_name(&self.domain, state).await;
+            if existing_domain.is_ok() {
+                let domain = sqlx::query_as!(
+                    Domain,
+                    "DELETE FROM domains WHERE domain = $1 RETURNING *",
+                    self.domain
+                )
+                .fetch_one(&state.database.pool)
+                .await?;
 
-        if existing_domain.is_ok() {
-            let domain = sqlx::query_as!(
-                Domain,
-                "DELETE FROM domains WHERE domain = $1 RETURNING *",
+                DomainPending::create(&domain.site_id, &domain.domain, state).await?;
+
+                info!("Updated the superseded domain and created a new challenge for it");
+            }
+
+            sqlx::query!(
+                "UPDATE domains_pending SET status = 'pending' WHERE site_id = $1 AND domain = $2",
+                self.site_id,
                 self.domain
             )
-            .fetch_one(&state.database.pool)
+            .execute(&state.database.pool)
             .await?;
 
-            DomainPending::create(&domain.site_id, &domain.domain, state).await?;
+            // mark this domainpending as verified and create a new domain in its place
+            let _domain =
+                Domain::create_for_site(&self.site_id, &self.domain, state).await?;
 
-            info!("Updated the superseded domain and created a new challenge for it");
+            Ok(())
         }
-
-        sqlx::query!(
-            "UPDATE domains_pending SET status = 'pending' WHERE site_id = $1 AND domain = $2",
-            self.site_id,
-            self.domain
-        )
-        .execute(&state.database.pool)
-        .await?;
-
-        // mark this domainpending as verified and create a new domain in its place
-        let _domain =
-            Domain::create_for_site(&self.site_id, &self.domain, state).await?;
-
-        Ok(())
+        .instrument(span)
+        .await
     }
 }
 
