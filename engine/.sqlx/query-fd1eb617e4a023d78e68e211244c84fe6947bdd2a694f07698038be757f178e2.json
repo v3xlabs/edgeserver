@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            SELECT\n                df.deployment_id as \"deployment_file_deployment_id!\",\n                df.file_id as \"deployment_file_file_id!\",\n                df.file_path as \"deployment_file_file_path!\",\n                df.mime_type as \"deployment_file_mime_type!\",\n                f.file_hash as \"file_hash!\",\n                f.file_size,\n                f.file_deleted\n            FROM deployment_files df\n            JOIN files f ON df.file_id = f.file_id\n            WHERE df.deployment_id = $1\n            ",
+  "query": "\n                SELECT\n                    df.deployment_id as \"deployment_file_deployment_id!\",\n                    df.file_id as \"deployment_file_file_id!\",\n                    df.file_path as \"deployment_file_file_path!\",\n                    df.mime_type as \"deployment_file_mime_type!\",\n                    f.file_hash as \"file_hash!\",\n                    f.file_size,\n                    f.file_deleted\n                FROM deployment_files df\n                JOIN files f ON df.file_id = f.file_id\n                WHERE df.deployment_id = $1\n                ",
   "describe": {
     "columns": [
       {
@@ -54,5 +54,5 @@
       false
     ]
   },
-  "hash": "b2e5c995c61c0ff87fb41ba266fcbe564743d8d8619472aa9035f220bd665fd8"
+  "hash": "fd1eb617e4a023d78e68e211244c84fe6947bdd2a694f07698038be757f178e2"
 }
