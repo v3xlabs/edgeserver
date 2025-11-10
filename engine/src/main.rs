@@ -99,14 +99,14 @@ async fn main() {
 
     // Concurrently run HTTP routes, router, and optionally RabbitMQ consumer
     if let Some(rabbit) = &app_state.clone().rabbit {
-        let x = join!(
+        join!(
             rabbit.do_consume(&app_state),
             routes::serve(app_state.clone()),
             server::serve(app_state.clone())
         );
     } else {
         info!("No RabbitMQ connection found, running without RabbitMQ");
-        let x = join!(
+        join!(
             routes::serve(app_state.clone()),
             server::serve(app_state.clone())
         );
