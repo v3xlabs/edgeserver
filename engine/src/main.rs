@@ -1,9 +1,7 @@
 use std::env;
-use futures::future::join;
 use futures::join;
 use std::sync::Arc;
 
-use async_std::prelude::FutureExt;
 use opentelemetry::KeyValue;
 use opentelemetry::{global, trace::TracerProvider};
 use opentelemetry_otlp::WithExportConfig;

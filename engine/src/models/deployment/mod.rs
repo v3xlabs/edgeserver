@@ -1,6 +1,5 @@
 use async_zip::base::read::mem::ZipFileReader;
 use chrono::{DateTime, Utc};
-use opentelemetry::Context;
 use poem_openapi::{types::Example, Object};
 use serde::{Deserialize, Serialize};
 use sqlx::{query, query_as};

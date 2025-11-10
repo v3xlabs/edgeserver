@@ -1,10 +1,8 @@
 use chrono::{DateTime, Utc};
-use opentelemetry::Context;
 use serde::{Deserialize, Serialize};
 use poem_openapi::Object;
 use sqlx::FromRow;
 use tracing::{info, info_span, Instrument};
-use tracing_opentelemetry::OpenTelemetrySpanExt;
 
 use crate::{database::Database, state::State};
 #[derive(Debug, Serialize, Deserialize, Object, FromRow)]

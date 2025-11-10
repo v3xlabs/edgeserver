@@ -67,6 +67,7 @@ where
             .and_then(|real_ip| real_ip.0)
             .map(|addr| addr.to_string())
             .unwrap_or_else(|| req.remote_addr().to_string());
+        let addr = remote_addr.clone();
 
         // Prepare span attributes
         let mut attributes = Vec::new();
@@ -87,7 +88,7 @@ where
             attribute::URL_FULL,
             req.original_uri().to_string(),
         ));
-        attributes.push(KeyValue::new(attribute::CLIENT_ADDRESS, remote_addr));
+        attributes.push(KeyValue::new(attribute::CLIENT_ADDRESS, addr));
         attributes.push(KeyValue::new(
             attribute::NETWORK_PROTOCOL_VERSION,
             format!("{:?}", req.version()),
@@ -105,8 +106,9 @@ where
             .start_with_context(&*self.tracer, &Context::new()); // Use a new blank context
 
         // Luc testing tracing compat
+        let host = req.headers().get("host").and_then(|h| h.to_str().ok()).unwrap_or("unknown");
         let uri = req.uri().to_string();
-        let tracing_span = info_span!("request", method = method.as_str(), uri = uri.as_str());
+        let tracing_span = info_span!("request", method = method.as_str(), host = host, uri = uri.as_str(), remote_addr = remote_addr );
 
         // Record request start event
         span.add_event("request.started".to_string(), vec![]);

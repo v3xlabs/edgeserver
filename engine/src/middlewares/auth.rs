@@ -1,6 +1,5 @@
 use std::fmt::Debug;
 
-use opentelemetry::Context;
 use poem::{web::Data, FromRequest, Request, RequestBody, Result};
 use poem_openapi::{
     registry::{MetaSecurityScheme, Registry},
