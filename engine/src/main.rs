@@ -1,4 +1,6 @@
 use std::env;
+use futures::future::join;
+use futures::join;
 use std::sync::Arc;
 
 use async_std::prelude::FutureExt;
@@ -97,15 +99,16 @@ async fn main() {
 
     // Concurrently run HTTP routes, router, and optionally RabbitMQ consumer
     if let Some(rabbit) = &app_state.clone().rabbit {
-        rabbit
-            .do_consume(&app_state.clone())
-            .join(routes::serve(app_state.clone()))
-            .join(server::serve(app_state.clone()))
-            .await;
+        let x = join!(
+            rabbit.do_consume(&app_state),
+            routes::serve(app_state.clone()),
+            server::serve(app_state.clone())
+        );
     } else {
         info!("No RabbitMQ connection found, running without RabbitMQ");
-        routes::serve(app_state.clone())
-            .join(server::serve(app_state.clone()))
-            .await;
+        let x = join!(
+            routes::serve(app_state.clone()),
+            server::serve(app_state.clone())
+        );
     }
 }
