@@ -4,13 +4,14 @@ use async_std::path::Path;
 use auth::AuthApi;
 use opentelemetry::global;
 use poem::middleware::OpenTelemetryMetrics;
-use poem::web::Data;
-use poem::Response;
+use poem::web::{Data, WithStatus};
+use poem::{IntoResponse, Response};
 use poem::{
     endpoint::StaticFilesEndpoint, get, handler, listener::TcpListener, middleware::Cors,
     web::Html, EndpointExt, Route, Server,
 };
 use poem_openapi::{OpenApi, OpenApiService, Tags};
+use reqwest::StatusCode;
 use serde_json::{self, Value};
 use tracing::info;
 use user::UserApi;
@@ -205,9 +206,9 @@ async fn get_openapi_docs() -> Html<&'static str> {
 }
 
 #[handler]
-async fn not_found() -> Html<&'static str> {
+async fn not_found() -> WithStatus<Html<&'static str>> {
     // inline 404 template
-    Html(include_str!("./404.html"))
+    Html(include_str!("./404.html")).with_status(StatusCode::NOT_FOUND)
 }
 
 #[handler]

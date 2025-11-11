@@ -1,8 +1,7 @@
 use std::sync::Arc;
 
 use opentelemetry::{
-    trace::{Span, SpanKind, Tracer},
-    Context, Key, KeyValue,
+    Context, Key, KeyValue, trace::{Span, SpanKind, TraceContextExt, Tracer}
 };
 use opentelemetry_semantic_conventions::{attribute, resource};
 use poem::{
@@ -15,6 +14,7 @@ use poem::{
     Endpoint, FromRequest, IntoResponse, PathPattern, Request, Response, Result,
 };
 use tracing::{info_span, Instrument};
+use tracing_opentelemetry::OpenTelemetrySpanExt;
 
 
 /// Middleware that injects the OpenTelemetry trace ID into the response headers.
@@ -67,6 +67,12 @@ where
             .and_then(|real_ip| real_ip.0)
             .map(|addr| addr.to_string())
             .unwrap_or_else(|| req.remote_addr().to_string());
+        // let remote_addr = req
+        //     .headers()
+        //     .get("x-forwarded-for")
+        //     .and_then(|h| h.to_str().ok())
+        //     .map(|s| s.to_string())
+        //     .unwrap_or_else(|| req.remote_addr().to_string());
         let addr = remote_addr.clone();
 
         // Prepare span attributes
@@ -109,6 +115,8 @@ where
         let host = req.headers().get("host").and_then(|h| h.to_str().ok()).unwrap_or("unknown");
         let uri = req.uri().to_string();
         let tracing_span = info_span!("request", method = method.as_str(), host = host, uri = uri.as_str(), remote_addr = remote_addr );
+
+        span.add_link(tracing_span.context().span().span_context().clone(), Vec::new());
 
         // Record request start event
         span.add_event("request.started".to_string(), vec![]);
