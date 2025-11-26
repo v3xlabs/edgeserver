@@ -1,7 +1,7 @@
 use std::sync::Arc;
 
 use opentelemetry::{
-    Context, Key, KeyValue, trace::{Span, SpanKind, Tracer}
+    Context, Key, KeyValue, trace::{Span, SpanKind, TraceContextExt, Tracer}
 };
 use opentelemetry_semantic_conventions::{attribute, resource};
 use poem::{
@@ -106,16 +106,19 @@ where
         let host = req.headers().get("host").and_then(|h| h.to_str().ok()).unwrap_or("unknown");
         let uri = req.uri().to_string();
         // let tracing_span = info_span!("request", method = method.as_str(), host = host, uri = uri.as_str(), remote_addr = remote_addr );
-        let context = Context::new();
+        let tracing_span = info_span!("traced_request", method = &method.as_str(), host = &host, uri = &uri.as_str(), remote_addr = &remote_addr );
+        tracing_span.set_attribute(attribute::HTTP_REQUEST_METHOD, method.clone());
+        tracing_span.set_attribute(attribute::URL_FULL, uri);
+        tracing_span.set_attribute(attribute::CLIENT_ADDRESS, remote_addr);
+        tracing_span.set_attribute(attribute::NETWORK_PROTOCOL_VERSION, format!("{:?}", req.version()));
         let mut span = self
             .tracer
             .span_builder(format!("{} {}", method, req.uri()))
             .with_kind(SpanKind::Server)
             .with_attributes(attributes)
-            .start_with_context(&*self.tracer, &context); // Use a new blank context
+            .start_with_context(&*self.tracer, &tracing_span.context()); // Use a new blank context
 
         let trace_id = span.span_context().trace_id().to_string();
-        // let tracing_span = info_span!("traced_request", method = method.as_str(), host = host, uri = uri.as_str(), remote_addr = remote_addr );
         // span.add_link(tracing_span.context().span().span_context().clone(), Vec::new());
 
         // Record request start event
@@ -129,7 +132,7 @@ where
         let res = self
             .inner
             .call(req).in_current_span()
-            // .instrument(tracing_span)
+            .instrument(tracing_span)
             .await;
         
         // Process the response
