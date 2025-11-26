@@ -115,7 +115,7 @@ where
             .start_with_context(&*self.tracer, &context); // Use a new blank context
 
         let trace_id = span.span_context().trace_id().to_string();
-        let tracing_span = info_span!("request", method = method.as_str(), host = host, uri = uri.as_str(), remote_addr = remote_addr );
+        let tracing_span = info_span!("traced_request", method = method.as_str(), host = host, uri = uri.as_str(), remote_addr = remote_addr );
         tracing_span.set_parent(context).ok();
         // span.add_link(tracing_span.context().span().span_context().clone(), Vec::new());
 
