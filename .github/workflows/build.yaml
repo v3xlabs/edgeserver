@@ -26,7 +26,7 @@ jobs:
                   run_install: false
                   standalone: true
                   package_json_file: web/package.json
-                  version: 10
+                  version: 10.10.0
 
             - name: Setup Node
               uses: actions/setup-node@main
