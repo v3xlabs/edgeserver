@@ -15,7 +15,7 @@ use poem::{
 };
 use tracing::{info_span, Instrument};
 use tracing_opentelemetry::OpenTelemetrySpanExt;
-
+use opentelemetry::Context as OtelContext;
 
 /// Middleware that injects the OpenTelemetry trace ID into the response headers.
 #[derive(Default)]
@@ -103,32 +103,31 @@ where
         // Get method for span name
         let method = req.method().to_string();
         
-        // Create a completely new span for this request
+        // Luc testing tracing compat
+        let host = req.headers().get("host").and_then(|h| h.to_str().ok()).unwrap_or("unknown");
+        let uri = req.uri().to_string();
+        let tracing_span = info_span!("request", method = method.as_str(), host = host, uri = uri.as_str(), remote_addr = remote_addr );
         let mut span = self
             .tracer
             .span_builder(format!("{} {}", method, req.uri()))
             .with_kind(SpanKind::Server)
             .with_attributes(attributes)
-            .start_with_context(&*self.tracer, &Context::new()); // Use a new blank context
+            .start_with_context(&*self.tracer, &tracing_span.context()); // Use a new blank context
 
-        // Luc testing tracing compat
-        let host = req.headers().get("host").and_then(|h| h.to_str().ok()).unwrap_or("unknown");
-        let uri = req.uri().to_string();
-        let tracing_span = info_span!("request", method = method.as_str(), host = host, uri = uri.as_str(), remote_addr = remote_addr );
-
-        span.add_link(tracing_span.context().span().span_context().clone(), Vec::new());
+        let trace_id = span.span_context().trace_id().to_string();
+        // span.add_link(tracing_span.context().span().span_context().clone(), Vec::new());
 
         // Record request start event
-        span.add_event("request.started".to_string(), vec![]);
+        // span.add_event("request.started".to_string(), vec![]);
         
         // Get trace ID for response header
-        let trace_id = span.span_context().trace_id().to_string();
+        // let trace_id = span.span_context().trace_id().to_string();
 
         // Process the request with the inner endpoint
         let res = self
             .inner
             .call(req)
-            .instrument(tracing_span.clone())
+            .instrument(tracing_span)
             .await;
         
         // Process the response
