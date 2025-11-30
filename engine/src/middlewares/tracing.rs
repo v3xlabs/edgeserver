@@ -174,6 +174,9 @@ where
                 );
                 tracing_span.set_attribute("http.status_code", err.status().as_u16() as i64);
 
+                tracing_span.set_attribute(attribute::EXCEPTION_MESSAGE, err.to_string());
+                tracing_span.set_attribute(attribute::EXCEPTION_TYPE, err.to_string());
+
                 // Record error event
                 tracing_span.add_event(
                     "request.error".to_string(),

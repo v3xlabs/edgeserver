@@ -4,9 +4,31 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Not Found</title>
+    <style>
+        .box {
+            margin: 1rem auto;
+            border: 1px solid #e2e8f0;
+            padding: 0.5rem 1rem;
+            max-width: 420px;
+        }
+        .center {
+            text-align: center;
+            margin: 0 auto;
+        }
+        .items {
+            display: flex;
+            gap: 0.5rem;
+        }
+    </style>
 </head>
 <body>
-    <pre>404 Not Found</pre>
-    <pre>edgeserver alpha</pre>
+    <div class="box">
+        <pre>404 Not Found</pre>
+        <pre class="items">
+            <a href="https://github.com/v3xlabs/edgeserver">edgeserver</a>
+            <a href="https://v3x.company/">v3x.company</a>
+        </pre>
+    </div>
+    <pre class="center">Trace ID: {{TRACE_ID}}</pre>
 </body>
 </html>

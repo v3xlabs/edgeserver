@@ -20,6 +20,8 @@ use crate::state::State;
 use opentelemetry::metrics::Meter;
 use opentelemetry::KeyValue;
 
+pub mod not_found;
+
 const HTML_CACHE_SIZE_LIMIT: u64 = 1024 * 1024 * 5; // 5MB threshold
 const HTML_CACHE_FILE_EXTENSIONS: [&str; 6] = ["html", "htm", "json", "xml", "css", "svg"];
 
@@ -61,9 +63,7 @@ async fn spa_fallback(
     }
     // default 404
     info!("SPA fallback failed for deployment {}", deployment_id);
-    Response::builder()
-        .status(StatusCode::NOT_FOUND)
-        .body(Body::from_string(include_str!("./404.html").to_string()))
+    not_found::not_found()
 }
 
 #[handler]
@@ -106,9 +106,8 @@ async fn resolve_http(request: &Request, state: Data<&State>) -> impl IntoRespon
     let deployment = if let Some(dep) = maybe_dep {
         dep
     } else {
-        return Response::builder()
-            .status(StatusCode::NOT_FOUND)
-            .body(Body::from_string(include_str!("./404.html").to_string()));
+        tracing::error!("Deployment not found");
+        return not_found::not_found();
     };
     let cid = deployment.ipfs_cid;
     let deployment_id = deployment.deployment_id;
@@ -169,10 +168,10 @@ async fn resolve_http(request: &Request, state: Data<&State>) -> impl IntoRespon
         return serve_deployment_file(deployment_file, last_modified, cid, state_ref).await;
     }
 
+    tracing::error!("404 Not Found");
+
     // 4) 404
-    Response::builder()
-        .status(StatusCode::NOT_FOUND)
-        .body(Body::from_string(include_str!("./404.html").to_string()))
+    not_found::not_found()
 }
 
 async fn get_last_deployment(host: &str, state: &State) -> Result<Deployment, HttpError> {
