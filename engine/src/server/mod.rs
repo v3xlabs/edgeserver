@@ -78,6 +78,9 @@ async fn resolve_http(request: &Request, state: Data<&State>) -> impl IntoRespon
     let path = raw_path.trim_start_matches('/').to_string();
     let state_ref = *state;
 
+    let span = tracing::info_span!("resolve_http", host = host, path = path);
+    let _guard = span.enter();
+
     // Record metrics for domain and path
     let meter = global::meter("edgeserver");
     let request_counter = meter
@@ -205,6 +208,7 @@ async fn get_last_deployment(host: &str, state: &State) -> Result<Deployment, Ht
 }
 
 /// Serve a deployment file entry, using full in-memory cache for eligible files or streaming otherwise.
+#[tracing::instrument(name = "serve_deployment_file", skip(deployment_file, last_modified, cid, state))]
 async fn serve_deployment_file(
     deployment_file: DeploymentFileEntry,
     last_modified: DateTime<Utc>,
@@ -272,6 +276,10 @@ async fn serve_deployment_file(
             .status(StatusCode::INTERNAL_SERVER_ERROR)
             .body(Body::from_string("Failed to load file".to_string()));
     }
+
+    let span = tracing::info_span!("streaming_file");
+    let _guard_streaming = span.enter();
+
     // streaming fallback (clone key so we can still use file_key afterwards)
     let s3_key = file_key.clone();
     match state.storage.bucket.get_object_stream(s3_key).await {
