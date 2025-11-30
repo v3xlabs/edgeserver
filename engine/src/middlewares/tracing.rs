@@ -1,7 +1,7 @@
 use std::sync::Arc;
 
 use opentelemetry::{
-    Context, Key, KeyValue, trace::{FutureExt, Span, SpanKind, TraceContextExt, Tracer}
+    Context, Key, KeyValue, trace::{FutureExt, Span, SpanKind, Status, TraceContextExt, Tracer}
 };
 use opentelemetry_semantic_conventions::{attribute, resource};
 use poem::{
@@ -168,6 +168,7 @@ where
                 }
 
                 // Set error status code
+                tracing_span.set_status(Status::Error { description: err.to_string().into() });
                 tracing_span.set_attribute(
                     attribute::HTTP_RESPONSE_STATUS_CODE,
                     err.status().as_u16() as i64,
