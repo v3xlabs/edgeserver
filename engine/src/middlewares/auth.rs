@@ -1,11 +1,13 @@
 use std::fmt::Debug;
 
+use opentelemetry_semantic_conventions::attribute;
 use poem::{web::Data, FromRequest, Request, RequestBody, Result};
 use poem_openapi::{
     registry::{MetaSecurityScheme, Registry},
     ApiExtractor, ApiExtractorType, ExtractParamOptions,
 };
 use tracing::{info, info_span, Instrument};
+use tracing_opentelemetry::OpenTelemetrySpanExt;
 
 use crate::{
     models::{keys::Key, session::Session, team::Team},
