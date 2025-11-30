@@ -1,7 +1,7 @@
 use std::sync::Arc;
 
 use opentelemetry::{
-    Context, Key, KeyValue, trace::{Span, SpanKind, TraceContextExt, Tracer}
+    Context, Key, KeyValue, trace::{FutureExt, Span, SpanKind, TraceContextExt, Tracer}
 };
 use opentelemetry_semantic_conventions::{attribute, resource};
 use poem::{
@@ -14,7 +14,7 @@ use poem::{
     Endpoint, FromRequest, IntoResponse, PathPattern, Request, Response, Result,
 };
 use reqwest::StatusCode;
-use tracing::{Instrument, field, info_span};
+use tracing::{Instrument, field, info, info_span, span};
 use tracing_opentelemetry::OpenTelemetrySpanExt;
 
 /// Middleware that injects the OpenTelemetry trace ID into the response headers.
@@ -67,68 +67,31 @@ where
             .and_then(|real_ip| real_ip.0)
             .map(|addr| addr.to_string())
             .unwrap_or_else(|| req.remote_addr().to_string());
-        // let remote_addr = req
-        //     .headers()
-        //     .get("x-forwarded-for")
-        //     .and_then(|h| h.to_str().ok())
-        //     .map(|s| s.to_string())
-        //     .unwrap_or_else(|| req.remote_addr().to_string());
+
         let addr = remote_addr.clone();
-
-        // Prepare span attributes
-        let mut attributes = Vec::new();
-        attributes.push(KeyValue::new(
-            resource::TELEMETRY_SDK_NAME,
-            env!("CARGO_CRATE_NAME"),
-        ));
-        attributes.push(KeyValue::new(
-            resource::TELEMETRY_SDK_VERSION,
-            env!("CARGO_PKG_VERSION"),
-        ));
-        attributes.push(KeyValue::new(resource::TELEMETRY_SDK_LANGUAGE, "rust"));
-        attributes.push(KeyValue::new(
-            attribute::HTTP_REQUEST_METHOD,
-            req.method().to_string(),
-        ));
-        attributes.push(KeyValue::new(
-            attribute::URL_FULL,
-            req.original_uri().to_string(),
-        ));
-        attributes.push(KeyValue::new(attribute::CLIENT_ADDRESS, addr));
-        attributes.push(KeyValue::new(
-            attribute::NETWORK_PROTOCOL_VERSION,
-            format!("{:?}", req.version()),
-        ));
-
-        // Get method for span name
-        let method = req.method().to_string();
-        
-        // Luc testing tracing compat
-        let host = req.headers().get("host").and_then(|h| h.to_str().ok()).unwrap_or("unknown");
+        let host = req.headers().get("host").and_then(|h| h.to_str().ok()).unwrap_or("unknown").to_string();
         let uri = req.uri().to_string();
-        // let tracing_span = info_span!("request", method = method.as_str(), host = host, uri = uri.as_str(), remote_addr = remote_addr );
+        let method = req.method().to_string();
 
-        let tracing_span = info_span!("http", host = &host, uri = &uri.as_str(), remote_addr = &remote_addr );
-        tracing_span.set_attribute(attribute::SERVICE_NAME, "http_server");
+        let tracing_span = span!(tracing::Level::INFO, "request", method = method, host = host, uri = uri);
+
+        tracing_span.set_attribute(attribute::TELEMETRY_SDK_NAME, env!("CARGO_CRATE_NAME"));
+        tracing_span.set_attribute(attribute::TELEMETRY_SDK_VERSION, env!("CARGO_PKG_VERSION"));
+        tracing_span.set_attribute(attribute::TELEMETRY_SDK_LANGUAGE, "rust");
         tracing_span.set_attribute(attribute::HTTP_REQUEST_METHOD, method.clone());
-        tracing_span.set_attribute(attribute::HTTP_RESPONSE_STATUS_CODE, "");
-        tracing_span.set_attribute(attribute::URL_PATH, uri.clone());
-        tracing_span.set_attribute(attribute::URL_FULL, uri);
+        tracing_span.set_attribute("http.method", method.clone());
+        tracing_span.set_attribute("http.host", host);
+        tracing_span.set_attribute("http.target", uri);
+        // tracing_span.set_attribute(attribute::URL_FULL, uri);
         tracing_span.set_attribute(attribute::CLIENT_ADDRESS, remote_addr);
         tracing_span.set_attribute(attribute::NETWORK_PROTOCOL_VERSION, format!("{:?}", req.version()));
-        let mut span = self
-            .tracer
-            .span_builder(format!("{} {}", method, req.uri()))
-            .with_kind(SpanKind::Server)
-            .with_attributes(attributes)
-            .start_with_context(&*self.tracer, &tracing_span.context()); // Use a new blank context
 
-        let trace_id = span.span_context().trace_id().to_string();
-        // span.add_link(tracing_span.context().span().span_context().clone(), Vec::new());
+        let trace_id = tracing_span.context().span().span_context().trace_id().to_string();
 
         // Record request start event
-        span.add_event("request.started".to_string(), vec![]);
-        
+        // span.add_event("request.started".to_string(), vec![]);
+        // info!("request.started");
+
         // Get trace ID for response header
         // let trace_id = span.span_context().trace_id().to_string();
         // tracing_span.set_parent(context);
@@ -136,84 +99,87 @@ where
         // Process the request with the inner endpoint
         let res = self
             .inner
-            .call(req).in_current_span()
-            .instrument(tracing_span)
+            .call(req)
+            .instrument(tracing_span.clone())
             .await;
-        
+
         // Process the response
         match res {
             Ok(resp) => {
                 let mut resp = resp.into_response();
-                
+
                 // Update span with path pattern if available
                 if let Some(path_pattern) = resp.data::<PathPattern>() {
                     const HTTP_PATH_PATTERN: Key = Key::from_static_str("http.path_pattern");
-                    span.update_name(format!("{} {}", method, path_pattern.0));
-                    span.set_attribute(KeyValue::new(
-                        HTTP_PATH_PATTERN,
-                        path_pattern.0.to_string(),
-                    ));
+                    tracing_span.set_attribute(HTTP_PATH_PATTERN, path_pattern.0.to_string());
+                    // span.update_name(format!("{} {}", method, path_pattern.0));
+                    // span.set_attribute(KeyValue::new(
+                    //     HTTP_PATH_PATTERN,
+                    //     path_pattern.0.to_string(),
+                    // ));
                 }
-                
+
                 // Record successful completion
-                span.add_event("request.completed".to_string(), vec![]);
-                
+                info!("request.completed");
+                // span.add_event("request.completed".to_string(), vec![]);
+
                 // Set response status
-                span.set_attribute(KeyValue::new(
+                tracing_span.set_attribute(
                     attribute::HTTP_RESPONSE_STATUS_CODE,
                     resp.status().as_u16() as i64,
-                ));
-                span.set_attribute(KeyValue::new(
+                );
+
+                tracing_span.set_attribute(
                     attribute::OTEL_STATUS_CODE,
                     resp.status().as_u16() as i64,
-                ));
-                
+                );
+                tracing_span.set_attribute("http.status_code", resp.status().as_u16() as i64);
+
                 // Track content length if available
                 if let Some(content_length) = resp.headers().typed_get::<headers::ContentLength>() {
-                    span.set_attribute(KeyValue::new(
+                    tracing_span.set_attribute(
                         "http.response_body_size",
                         content_length.0 as i64,
-                    ));
+                    );
                 }
-                
+
                 // Add trace ID to response headers
                 resp.headers_mut().insert(
                     "X-Trace-Id",
                     HeaderValue::from_str(&trace_id)
                         .unwrap_or_else(|_| HeaderValue::from_static("unknown")),
                 );
-                
+
                 // End the span
-                span.end();
-                
+
                 Ok(resp)
             }
             Err(err) => {
                 // Update span with path pattern if error has it
                 if let Some(path_pattern) = err.data::<PathPattern>() {
                     const HTTP_PATH_PATTERN: Key = Key::from_static_str("http.path_pattern");
-                    span.update_name(format!("{} {}", method, path_pattern.0));
-                    span.set_attribute(KeyValue::new(
-                        HTTP_PATH_PATTERN,
-                        path_pattern.0.to_string(),
-                    ));
+                    // span.update_name(format!("{} {}", method, path_pattern.0));
+                    // span.set_attribute(KeyValue::new(
+                        // HTTP_PATH_PATTERN,
+                        // path_pattern.0.to_string(),
+                    // ));
                 }
-                
+
                 // Set error status code
-                span.set_attribute(KeyValue::new(
+                tracing_span.set_attribute(
                     attribute::HTTP_RESPONSE_STATUS_CODE,
                     err.status().as_u16() as i64,
-                ));
-                
+                );
+                tracing_span.set_attribute("http.status_code", err.status().as_u16() as i64);
+
                 // Record error event
-                span.add_event(
+                tracing_span.add_event(
                     "request.error".to_string(),
                     vec![KeyValue::new(attribute::EXCEPTION_MESSAGE, err.to_string())],
                 );
-                
+
                 // End the span
-                span.end();
-                
+
                 Err(err)
             }
         }

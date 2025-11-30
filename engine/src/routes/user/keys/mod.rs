@@ -82,7 +82,7 @@ impl UserKeysApi {
         }
 
         let key = key.unwrap();
-        
+
         if key.key_type != "user" || key.key_resource != user.user_id {
             return Err(poem::Error::from_status(StatusCode::FORBIDDEN));
         }

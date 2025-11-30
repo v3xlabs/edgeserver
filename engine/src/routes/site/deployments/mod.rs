@@ -117,7 +117,7 @@ impl SiteDeploymentsApi {
             if let Some(car_bucket) = &state.storage.car_bucket {
                 let path = format!("{}/car.zip", deployment.deployment_id);
                 let _ = car_bucket.put_object(&path, &data).await.unwrap();
-                
+
                 info!("Car uploaded to: {:?}", path);
 
                 if let Some(rabbit) = &state.rabbit {

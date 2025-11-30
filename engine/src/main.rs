@@ -33,7 +33,7 @@ async fn main() {
 
     if let Some(endpoint) = otlp_endpoint {
         info!("Starting Edgerouter with OTLP tracing");
-        
+
         // Set up propagator for trace context
         opentelemetry::global::set_text_map_propagator(TraceContextPropagator::new());
 
@@ -45,14 +45,13 @@ async fn main() {
 
         let hostname = std::env::var("HOSTNAME").unwrap_or_else(|_| "unknown".to_string());
 
-        let resource = Resource::builder()
+        let resource_http = Resource::builder()
             .with_service_name("edgeserver")
             .with_attribute(KeyValue::new("host.name", hostname))
             .build();
 
-        // Use a simple tracer provider configuration
         let trace_provider = opentelemetry_sdk::trace::SdkTracerProvider::builder()
-            .with_resource(resource)
+            .with_resource(resource_http)
             .with_batch_exporter(exporter)
             .build();
 
@@ -67,12 +66,12 @@ async fn main() {
         // Create a formatting layer with span closure events
         let fmt_layer = tracing_subscriber::fmt::layer()
             .with_span_events(tracing_subscriber::fmt::format::FmtSpan::CLOSE);
-        
+
         // Set up filter for relevant components
         let filter = tracing_subscriber::EnvFilter::from_default_env()
             .add_directive("poem=info".parse().unwrap())
             .add_directive("edgeserver=debug".parse().unwrap());
-            
+
         // Register layers with the subscriber
         tracing_subscriber::registry()
             .with(filter)

@@ -52,7 +52,7 @@ impl AssetFile {
             )
             .fetch_one(&state.database.pool)
             .await?;
-    
+
         tracing::info!("File: {:?}", newly_created_file);
 
         let file = AssetFile {
@@ -90,7 +90,7 @@ fn content_type_from_file_name(file_name: &str) -> String {
         "woff" => "font/woff".to_string(),
         "woff2" => "font/woff2".to_string(),
         "ttf" => "font/ttf".to_string(),
-        "otf" => "font/otf".to_string(),        
+        "otf" => "font/otf".to_string(),
         _ => {
             info!("Unknown file extension: {:?}", extension);
             "application/octet-stream".to_string()

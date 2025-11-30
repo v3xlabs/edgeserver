@@ -41,7 +41,7 @@ impl Storage {
                 None,
                 None,
             )
-            .unwrap();  
+            .unwrap();
             let previews_bucket = Bucket::new(&previews_config.bucket_name, preview_region, preview_credentials)
                 .unwrap()
                 .with_path_style();

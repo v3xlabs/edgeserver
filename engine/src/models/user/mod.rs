@@ -1,8 +1,10 @@
 use chrono::{DateTime, Utc};
+use opentelemetry_semantic_conventions::attribute;
 use poem_openapi::Object;
 use serde::{Deserialize, Serialize};
 use sqlx::{query_as, query_scalar};
 use tracing::{info_span, Instrument};
+use tracing_opentelemetry::OpenTelemetrySpanExt;
 
 use crate::{
     database::Database, utils::id::{generate_id, IdType}
@@ -131,6 +133,8 @@ impl User {
 
     pub async fn can_bootstrap(db: &Database) -> Result<bool, sqlx::Error> {
         let span = info_span!("User::can_bootstrap");
+        span.set_attribute(attribute::OTEL_SCOPE_NAME, "user");
+        span.set_attribute("span.kind", "database");
         async move {
             Ok(query_scalar!("SELECT COUNT(*) FROM users")
                 .fetch_one(&db.pool)

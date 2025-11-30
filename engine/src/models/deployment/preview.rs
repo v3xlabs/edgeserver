@@ -45,7 +45,7 @@ impl DeploymentPreview {
             for row in rows.iter_mut() {
                 info!("Presigning URL for: {:?}", row.preview_path);
                 let form = state.storage.previews_bucket.as_ref().unwrap().presign_get(
-                    format!("/{}", row.preview_path.clone()), 
+                    format!("/{}", row.preview_path.clone()),
                     60*60,
                     None
                 ).await.unwrap();
@@ -53,7 +53,7 @@ impl DeploymentPreview {
                 info!("Presigning URL for: {:?}", row.full_preview_path);
                 if let Some(full_preview_path) = row.full_preview_path.clone() {
                     let form = state.storage.previews_bucket.as_ref().unwrap().presign_get(
-                        format!("/{}", full_preview_path), 
+                        format!("/{}", full_preview_path),
                         60*60,
                         None
                     ).await.unwrap();
@@ -62,10 +62,10 @@ impl DeploymentPreview {
                 info!("Presigning URL for: {:?}", row.favicon_path);
                 if let Some(favicon_path) = row.favicon_path.clone() {
                     let form = state.storage.previews_bucket.as_ref().unwrap().presign_get(
-                        format!("/{}", favicon_path), 
+                        format!("/{}", favicon_path),
                         60*60,
                         None
-                    ).await.unwrap();   
+                    ).await.unwrap();
                     row.favicon_path = Some(form);
                 }
             }

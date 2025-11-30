@@ -66,13 +66,13 @@ pub struct AMQPConfig {
 }
 
 /// Github App Config
-/// 
+///
 /// Setup your app with Callback URL
 /// /api/github/oauth
-/// 
+///
 /// Setup URL (optional)
 /// /github/setup
-/// 
+///
 /// Webhook URL (optional)
 /// /api/github/webhook
 #[derive(Deserialize, Debug)]

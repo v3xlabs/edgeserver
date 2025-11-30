@@ -42,8 +42,8 @@ impl PreviewHandler {
         Some(PreviewHandler { channel, queue_key })
     }
 
-    /// 
-    
+    ///
+
     pub async fn queue_bunshot(&self, site_id: &str, deployment_id: &str, domain: &str) {
         let payload = serde_json::to_string(&BunshotPayload {
             site_id: site_id.to_string(),

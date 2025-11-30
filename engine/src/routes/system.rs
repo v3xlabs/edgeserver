@@ -42,4 +42,3 @@ impl SystemApi {
         BuildInfoResponse::Ok(Json(build_build_information()))
     }
 }
-

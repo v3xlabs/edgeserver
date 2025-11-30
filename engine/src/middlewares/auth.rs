@@ -40,7 +40,9 @@ impl<'a> ApiExtractor<'a> for UserAuth {
     ) -> Result<Self> {
         let span = info_span!("auth");
         span.set_attribute(attribute::SERVICE_NAME, "auth");
-        
+        // span.set_attribute("span.kind", "client");
+        span.set_attribute("otel.kind", "client");
+
         // Use instrument to track the auth span
         async {
             let state = <Data<&State> as FromRequest>::from_request(req, body).await?;
@@ -172,7 +174,7 @@ impl UserAuth {
         team_id: impl AsRef<str> + Debug,
     ) -> Result<(), HttpError> {
         let span = info_span!("required_member_of", team_id = ?team_id);
-        
+
         // Use instrument to track the span
         async {
             match self {
@@ -201,7 +203,7 @@ impl UserAuth {
         resource: &impl AccessibleResource,
     ) -> Result<(), HttpError> {
         let span = info_span!("verify_access_to", resource = ?resource);
-        
+
         // Use instrument to track the span
         async {
             match self {

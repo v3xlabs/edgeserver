@@ -173,7 +173,7 @@ where
                         elapsed_secs = %visitor.elapsed_secs.unwrap_or_else(|| "N/A".into())
                     ),
                 };
-                
+
                 // let _enter = synthetic_span.enter();
                 tracing::trace!(parent: &synthetic_span, "Converted sqlx event to span (without timing data)");
             }

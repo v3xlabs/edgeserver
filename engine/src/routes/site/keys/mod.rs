@@ -38,7 +38,7 @@ impl SiteKeysApi {
     }
 
     /// Create a site key
-    /// 
+    ///
     /// (user-only)
     #[oai(path = "/site/:site_id/keys", method = "post", tag = "ApiTags::Site")]
     pub async fn create_site_key(
@@ -69,7 +69,7 @@ impl SiteKeysApi {
     }
 
     /// Delete a site key
-    /// 
+    ///
     /// (user-only)
     #[oai(path = "/site/:site_id/keys/:key_id", method = "delete", tag = "ApiTags::Site")]
     pub async fn delete_site_key(

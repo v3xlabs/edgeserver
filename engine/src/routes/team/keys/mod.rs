@@ -38,7 +38,7 @@ impl TeamKeysApi {
     }
 
     /// Create a team key
-    /// 
+    ///
     /// (user-only)
     #[oai(path = "/team/:team_id/keys", method = "post", tag = "ApiTags::Team")]
     pub async fn create_team_key(

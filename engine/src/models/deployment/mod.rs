@@ -166,13 +166,13 @@ impl Deployment {
             let files = query_as!(
                 File,
                 r#"
-                SELECT DISTINCT f.* 
+                SELECT DISTINCT f.*
                 FROM files f
                 WHERE NOT EXISTS (
-                    SELECT 1 
+                    SELECT 1
                     FROM deployment_files df
                     JOIN deployments d ON df.deployment_id = d.deployment_id
-                    WHERE df.file_id = f.file_id 
+                    WHERE df.file_id = f.file_id
                     AND d.created_at > $1
                 ) AND f.file_deleted = FALSE"#,
                 cutoff_date
@@ -286,6 +286,7 @@ impl DeploymentFile {
         deployment_id: &str,
     ) -> Result<Vec<DeploymentFileEntry>, sqlx::Error> {
         let span = info_span!("DeploymentFile::get_deployment_files");
+        span.set_attribute("span.kind", "database");
         async move {
             query_as!(
                 DeploymentFileEntry,

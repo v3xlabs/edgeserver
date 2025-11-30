@@ -429,26 +429,26 @@ fn sort_domains_by_reversed_parts(a: &str, b: &str) -> std::cmp::Ordering {
     // Split domains by dots and reverse the parts
     let a_parts: Vec<&str> = a.split('.').collect::<Vec<&str>>().into_iter().rev().collect();
     let b_parts: Vec<&str> = b.split('.').collect::<Vec<&str>>().into_iter().rev().collect();
-    
+
     // Compare parts one by one
     for i in 0..std::cmp::min(a_parts.len(), b_parts.len()) {
         let a_part = a_parts[i];
         let b_part = b_parts[i];
-        
+
         // Special handling for "*"
         if a_part == "*" && b_part != "*" {
             return std::cmp::Ordering::Greater;
         } else if a_part != "*" && b_part == "*" {
             return std::cmp::Ordering::Less;
         }
-        
+
         // Normal string comparison if neither is "*"
         let part_cmp = a_part.cmp(b_part);
         if part_cmp != std::cmp::Ordering::Equal {
             return part_cmp;
         }
     }
-    
+
     // If all compared parts are equal, the shorter domain comes first
     a_parts.len().cmp(&b_parts.len())
 }
