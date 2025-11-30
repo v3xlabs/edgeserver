@@ -13,7 +13,8 @@ use poem::{
     },
     Endpoint, FromRequest, IntoResponse, PathPattern, Request, Response, Result,
 };
-use tracing::{info_span, Instrument};
+use reqwest::StatusCode;
+use tracing::{Instrument, field, info_span};
 use tracing_opentelemetry::OpenTelemetrySpanExt;
 
 /// Middleware that injects the OpenTelemetry trace ID into the response headers.
@@ -106,9 +107,12 @@ where
         let host = req.headers().get("host").and_then(|h| h.to_str().ok()).unwrap_or("unknown");
         let uri = req.uri().to_string();
         // let tracing_span = info_span!("request", method = method.as_str(), host = host, uri = uri.as_str(), remote_addr = remote_addr );
-        let tracing_span = info_span!("traced_request {method} {host} {uri}", method = &method.as_str(), host = &host, uri = &uri.as_str(), remote_addr = &remote_addr );
+
+        let tracing_span = info_span!("http", host = &host, uri = &uri.as_str(), remote_addr = &remote_addr );
         tracing_span.set_attribute(attribute::SERVICE_NAME, "http_server");
         tracing_span.set_attribute(attribute::HTTP_REQUEST_METHOD, method.clone());
+        tracing_span.set_attribute(attribute::HTTP_RESPONSE_STATUS_CODE, "");
+        tracing_span.set_attribute(attribute::URL_PATH, uri.clone());
         tracing_span.set_attribute(attribute::URL_FULL, uri);
         tracing_span.set_attribute(attribute::CLIENT_ADDRESS, remote_addr);
         tracing_span.set_attribute(attribute::NETWORK_PROTOCOL_VERSION, format!("{:?}", req.version()));
@@ -123,7 +127,7 @@ where
         // span.add_link(tracing_span.context().span().span_context().clone(), Vec::new());
 
         // Record request start event
-        // span.add_event("request.started".to_string(), vec![]);
+        span.add_event("request.started".to_string(), vec![]);
         
         // Get trace ID for response header
         // let trace_id = span.span_context().trace_id().to_string();
@@ -157,6 +161,10 @@ where
                 // Set response status
                 span.set_attribute(KeyValue::new(
                     attribute::HTTP_RESPONSE_STATUS_CODE,
+                    resp.status().as_u16() as i64,
+                ));
+                span.set_attribute(KeyValue::new(
+                    attribute::OTEL_STATUS_CODE,
                     resp.status().as_u16() as i64,
                 ));
                 

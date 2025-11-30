@@ -37,6 +37,7 @@ impl<'a> ApiExtractor<'a> for UserAuth {
         _param_opts: ExtractParamOptions<Self::ParamType>,
     ) -> Result<Self> {
         let span = info_span!("auth");
+        span.set_attribute(attribute::SERVICE_NAME, "auth");
         
         // Use instrument to track the auth span
         async {
