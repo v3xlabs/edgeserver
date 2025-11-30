@@ -1,5 +1,6 @@
 use async_zip::base::read::mem::ZipFileReader;
 use chrono::{DateTime, Utc};
+use opentelemetry_semantic_conventions::attribute;
 use poem_openapi::{types::Example, Object};
 use serde::{Deserialize, Serialize};
 use sqlx::{query, query_as};
@@ -312,6 +313,7 @@ impl DeploymentFile {
 
     pub async fn get_file_by_path(db: &Database, deployment_id: &str, path: &str) -> Result<DeploymentFileEntry, sqlx::Error> {
         let span = info_span!("DeploymentFile::get_file_by_path");
+        span.set_attribute(attribute::SERVICE_NAME, "database");
         async move {
             query_as!(
                 DeploymentFileEntry,

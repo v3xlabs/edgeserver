@@ -106,7 +106,8 @@ where
         let host = req.headers().get("host").and_then(|h| h.to_str().ok()).unwrap_or("unknown");
         let uri = req.uri().to_string();
         // let tracing_span = info_span!("request", method = method.as_str(), host = host, uri = uri.as_str(), remote_addr = remote_addr );
-        let tracing_span = info_span!("traced_request", method = &method.as_str(), host = &host, uri = &uri.as_str(), remote_addr = &remote_addr );
+        let tracing_span = info_span!("traced_request {method} {host} {uri}", method = &method.as_str(), host = &host, uri = &uri.as_str(), remote_addr = &remote_addr );
+        tracing_span.set_attribute(attribute::SERVICE_NAME, "http_server");
         tracing_span.set_attribute(attribute::HTTP_REQUEST_METHOD, method.clone());
         tracing_span.set_attribute(attribute::URL_FULL, uri);
         tracing_span.set_attribute(attribute::CLIENT_ADDRESS, remote_addr);
