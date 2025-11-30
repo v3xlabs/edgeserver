@@ -1,9 +1,12 @@
 use std::net::IpAddr;
 
 use chrono::{DateTime, Utc};
+use opentelemetry_semantic_conventions::attribute;
 use poem_openapi::Object;
 use serde::{Deserialize, Serialize};
 use sqlx::query_as;
+use tracing::info_span;
+use tracing_opentelemetry::OpenTelemetrySpanExt;
 
 use crate::{
     database::Database,
@@ -49,6 +52,7 @@ impl Session {
 
     #[tracing::instrument(name = "get_session_by_id", skip(db))]
     pub async fn get_by_id(db: &Database, session_id: &str) -> Result<Option<Self>, sqlx::Error> {
+        info_span!("get_by_id", "session" = session_id);
         let session = query_as!(Session, "SELECT * FROM sessions WHERE session_id = $1", session_id)
             .fetch_optional(&db.pool)
             .await?;
@@ -58,6 +62,8 @@ impl Session {
 
     #[tracing::instrument(name = "try_access", skip(db))]
     pub async fn try_access(db: &Database, session_id: &str) -> Result<Option<Self>, sqlx::Error> {
+        let span = info_span!("try_access", "session" = session_id);
+        span.set_attribute(attribute::DB_SYSTEM_NAME, "database");
         let session = query_as!(
             Session,
             "UPDATE sessions SET updated_at = NOW() WHERE session_id = $1 AND valid = TRUE RETURNING *",
@@ -71,6 +77,7 @@ impl Session {
 
     /// Get all sessions for a user that are valid
     pub async fn get_by_user_id(db: &Database, user_id: &str) -> Result<Vec<Self>, sqlx::Error> {
+        info_span!("get_by_user_id", "user_id" = user_id);
         let sessions = query_as!(
             Session,
             "SELECT * FROM sessions WHERE user_id = $1",
@@ -87,6 +94,7 @@ impl Session {
         db: &Database,
         user_id: &str,
     ) -> Result<Vec<Self>, sqlx::Error> {
+        info_span!("invalidate_by_user_id", "user_id" = user_id);
         let sessions = query_as!(
             Session,
             "UPDATE sessions SET valid = FALSE WHERE user_id = $1 RETURNING *",
@@ -104,6 +112,7 @@ impl Session {
         user_id: &str,
         session_id: &str,
     ) -> Result<Vec<Self>, sqlx::Error> {
+        info_span!("invalidate_by_id", "user_id" = user_id, "session_id" = session_id);
         let sessions = query_as!(
             Session,
             "UPDATE sessions SET valid = FALSE WHERE user_id = $1 AND session_id = $2 RETURNING *",
@@ -122,7 +131,8 @@ impl Session {
         user_id: &str,
         invalidate_before: DateTime<Utc>,
     ) -> Result<Vec<Self>, sqlx::Error> {
-        let sessions = query_as!(
+        info_span!("invalidate_by_user_id_by_time", "user_id" = user_id);
+            let sessions = query_as!(
             Session,
             "UPDATE sessions SET valid = FALSE WHERE user_id = $1 AND updated_at < $2 RETURNING *",
             user_id,
@@ -139,6 +149,7 @@ impl Session {
         state: &State,
         resource: &impl AccessibleResource,
     ) -> Result<(), HttpError> {
+        info_span!("verify_access_to", "user_id" = self.user_id);
         resource
             .has_access(state, "user", &self.user_id)
             .await

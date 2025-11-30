@@ -48,17 +48,27 @@ services:
       - RABBITMQ_DEFAULT_USER=user
       - RABBITMQ_DEFAULT_PASS=password
 
+  alloy:
+    image: grafana/alloy:latest
+    command: ["run", "/etc/alloy/config.alloy"]
+    ports:
+      - "4317:4317"   # OTLP gRPC (receives traces from apps)
+      - "4318:4318"   # OTLP HTTP (receives traces from apps)
+      - "12345:12345" # Alloy UI
+    volumes:
+      - ../.github/.build/alloy-config.alloy:/etc/alloy/config.alloy:ro
+    depends_on:
+      - tempo
+
   tempo:
-    image: grafana/tempo:2.6.1
+    image: grafana/tempo:latest
     command: ["-config.file=/etc/tempo/tempo.yaml"]
     ports:
       - "3200:3200"   # Tempo query API
-      - "4317:4317"   # OTLP gRPC
-      - "4318:4318"   # OTLP HTTP
     volumes:
       - ../.github/.build/tempo-config.yaml:/etc/tempo/tempo.yaml:ro
   grafana:
-    image: grafana/grafana:11.0.0
+    image: grafana/grafana:latest
     ports:
       - "3002:3000"
     environment:

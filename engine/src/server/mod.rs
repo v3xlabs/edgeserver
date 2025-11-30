@@ -17,7 +17,6 @@ use crate::models::domain::Domain;
 use crate::models::site::Site;
 use crate::routes::error::HttpError;
 use crate::state::State;
-use opentelemetry::metrics::Meter;
 use opentelemetry::KeyValue;
 
 pub mod not_found;

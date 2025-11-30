@@ -1,7 +1,9 @@
 use chrono::{DateTime, Utc};
+use opentelemetry_semantic_conventions::attribute;
 use poem_openapi::Object;
 use serde::{Deserialize, Serialize};
 use sqlx::{query, query_as, query_scalar};
+use tracing_opentelemetry::OpenTelemetrySpanExt;
 
 use crate::{
     database::Database,
@@ -29,6 +31,7 @@ impl Site {
         team_id: impl AsRef<str>,
     ) -> Result<Self, sqlx::Error> {
         let span = info_span!("Site::new");
+        span.set_attribute(attribute::DB_SYSTEM_NAME, "database");
         async move {
             let site_id = generate_id(IdType::SITE);
 
@@ -48,6 +51,7 @@ impl Site {
 
     pub async fn get_by_id(db: &Database, site_id: impl AsRef<str>) -> Result<Self, sqlx::Error> {
         let span = info_span!("Site::get_by_id");
+        span.set_attribute(attribute::DB_SYSTEM_NAME, "database");
         async move {
             query_as!(
                 Site,
@@ -66,6 +70,7 @@ impl Site {
         team_id: impl AsRef<str>,
     ) -> Result<Vec<Self>, sqlx::Error> {
         let span = info_span!("Site::get_by_team_id");
+        span.set_attribute(attribute::DB_SYSTEM_NAME, "database");
         async move {
             query_as!(
                 Site,
@@ -92,6 +97,7 @@ impl Site {
         user_id: impl AsRef<str>,
     ) -> Result<Vec<Self>, sqlx::Error> {
         let span = info_span!("Site::get_by_user_id");
+        span.set_attribute(attribute::DB_SYSTEM_NAME, "database");
         async move {
             query_as!(
                 Site,
@@ -118,6 +124,7 @@ impl Site {
         site_id: impl AsRef<str>,
     ) -> Result<Vec<Deployment>, sqlx::Error> {
         let span = info_span!("Site::get_deployments");
+        span.set_attribute(attribute::DB_SYSTEM_NAME, "database");
         async move {
             query_as!(
                 Deployment,
@@ -137,6 +144,7 @@ impl Site {
         team_id: impl AsRef<str>,
     ) -> Result<(), sqlx::Error> {
         let span = info_span!("Site::update_team");
+        span.set_attribute(attribute::DB_SYSTEM_NAME, "database");
         async move {
             query!(
                 "UPDATE sites SET team_id = $1 WHERE site_id = $2",

@@ -62,6 +62,7 @@ impl Deployment {
         context: Option<String>,
     ) -> Result<Self, sqlx::Error> {
         let span = info_span!("Deployment::new");
+        span.set_attribute(attribute::DB_SYSTEM_NAME, "database");
         async move {
             let deployment_id: String = generate_id(IdType::DEPLOYMENT);
 
@@ -208,6 +209,7 @@ impl Deployment {
 
     pub async fn get_by_id(db: &Database, deployment_id: &str) -> Result<Self, sqlx::Error> {
         let span = info_span!("Deployment::get_by_id");
+        span.set_attribute(attribute::DB_SYSTEM_NAME, "database");
         async move {
             query_as!(
                 Deployment,
@@ -227,6 +229,7 @@ impl Deployment {
         context: &str,
     ) -> Result<(), sqlx::Error> {
         let span = info_span!("Deployment::update_context");
+        span.set_attribute(attribute::DB_SYSTEM_NAME, "database");
         async move {
             query!(
                 "UPDATE deployments SET context = $1 WHERE deployment_id = $2",
@@ -247,6 +250,8 @@ impl Deployment {
         deployment_id: &str,
         ipfs_cid: &str,
     ) -> Result<(), sqlx::Error> {
+        let span = info_span!("Deployment::update_ipfs_cid");
+        span.set_attribute(attribute::DB_SYSTEM_NAME, "database");
         query!(
             "UPDATE deployments SET ipfs_cid = $1 WHERE deployment_id = $2",
             ipfs_cid,
@@ -260,6 +265,7 @@ impl Deployment {
 
     pub async fn get_last_by_site_id(db: &Database, site_id: &str) -> Result<Self, sqlx::Error> {
         let span = info_span!("Deployment::get_last_by_site_id");
+        span.set_attribute(attribute::DB_SYSTEM_NAME, "database");
         async move {
             query_as!(
                 Deployment,
@@ -286,7 +292,7 @@ impl DeploymentFile {
         deployment_id: &str,
     ) -> Result<Vec<DeploymentFileEntry>, sqlx::Error> {
         let span = info_span!("DeploymentFile::get_deployment_files");
-        span.set_attribute("span.kind", "database");
+        span.set_attribute(attribute::DB_SYSTEM_NAME, "database");
         async move {
             query_as!(
                 DeploymentFileEntry,
@@ -314,7 +320,7 @@ impl DeploymentFile {
 
     pub async fn get_file_by_path(db: &Database, deployment_id: &str, path: &str) -> Result<DeploymentFileEntry, sqlx::Error> {
         let span = info_span!("DeploymentFile::get_file_by_path");
-        span.set_attribute(attribute::SERVICE_NAME, "database");
+        span.set_attribute(attribute::DB_SYSTEM_NAME, "database");
         async move {
             query_as!(
                 DeploymentFileEntry,

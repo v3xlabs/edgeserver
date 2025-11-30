@@ -1,0 +1,68 @@
+// OTLP receiver - accepts traces from applications
+otelcol.receiver.otlp "default" {
+  grpc {
+    endpoint = "0.0.0.0:4317"
+  }
+  http {
+    endpoint = "0.0.0.0:4318"
+  }
+  output {
+    traces = [otelcol.processor.transform.prepare_grouping.input]
+  }
+}
+
+// Step 1: Add a SPAN attribute to mark db spans (not resource attribute!)
+otelcol.processor.transform "prepare_grouping" {
+  error_mode = "ignore"
+
+  trace_statements {
+    context = "span"
+    statements = [
+      // Set a span-level attribute for spans that have db.system.name
+      `set(attributes["__db_span_group"], "database") where attributes["db.system.name"] != nil`,
+    ]
+  }
+
+  output {
+    traces = [otelcol.processor.groupbyattrs.split_db_spans.input]
+  }
+}
+
+// Step 2: Group spans by __db_span_group
+// This moves the span attribute to resource and creates separate resource scopes
+// Spans WITH __db_span_group get their own resource scope
+// Spans WITHOUT it stay in their original resource scope
+otelcol.processor.groupbyattrs "split_db_spans" {
+  keys = ["__db_span_group"]
+
+  output {
+    traces = [otelcol.processor.transform.rewrite_service.input]
+  }
+}
+
+// Step 3: Rewrite service.name only for resources that have __db_span_group
+otelcol.processor.transform "rewrite_service" {
+  error_mode = "ignore"
+
+  trace_statements {
+    context = "resource"
+    statements = [
+      `set(attributes["service.name"], "database") where attributes["__db_span_group"] == "database"`,
+      `delete_key(attributes, "__db_span_group")`,
+    ]
+  }
+
+  output {
+    traces = [otelcol.exporter.otlp.tempo.input]
+  }
+}
+
+// OTLP exporter - forwards traces to Tempo
+otelcol.exporter.otlp "tempo" {
+  client {
+    endpoint = "tempo:4317"
+    tls {
+      insecure = true
+    }
+  }
+}

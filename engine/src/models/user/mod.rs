@@ -134,7 +134,7 @@ impl User {
     pub async fn can_bootstrap(db: &Database) -> Result<bool, sqlx::Error> {
         let span = info_span!("User::can_bootstrap");
         span.set_attribute(attribute::OTEL_SCOPE_NAME, "user");
-        span.set_attribute("span.kind", "database");
+        span.set_attribute(attribute::DB_SYSTEM_NAME, "database");
         async move {
             Ok(query_scalar!("SELECT COUNT(*) FROM users")
                 .fetch_one(&db.pool)

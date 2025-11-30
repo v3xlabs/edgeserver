@@ -1,9 +1,9 @@
 use std::sync::Arc;
 
 use opentelemetry::{
-    Context, Key, KeyValue, trace::{FutureExt, Span, SpanKind, Status, TraceContextExt, Tracer}
+    Key, KeyValue, trace::{Status, TraceContextExt, Tracer}
 };
-use opentelemetry_semantic_conventions::{attribute, resource};
+use opentelemetry_semantic_conventions::attribute;
 use poem::{
     http::HeaderValue,
     middleware::Middleware,
@@ -13,8 +13,7 @@ use poem::{
     },
     Endpoint, FromRequest, IntoResponse, PathPattern, Request, Response, Result,
 };
-use reqwest::StatusCode;
-use tracing::{Instrument, field, info, info_span, span};
+use tracing::{Instrument, info, span};
 use tracing_opentelemetry::OpenTelemetrySpanExt;
 
 /// Middleware that injects the OpenTelemetry trace ID into the response headers.
@@ -76,6 +75,7 @@ where
 
         let tracing_span = span!(tracing::Level::INFO, "request", method = method, host = host, uri = uri, "otel.name" = span_name);
 
+        tracing_span.set_attribute(attribute::CLIENT_ADDRESS, addr);
         tracing_span.set_attribute("otel.name", format!("{} {} {}", method, host, uri));
         tracing_span.set_attribute(attribute::TELEMETRY_SDK_NAME, env!("CARGO_CRATE_NAME"));
         tracing_span.set_attribute(attribute::TELEMETRY_SDK_VERSION, env!("CARGO_PKG_VERSION"));

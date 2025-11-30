@@ -1,10 +1,12 @@
 use std::fmt::Debug;
 
 use chrono::{DateTime, Utc};
+use opentelemetry_semantic_conventions::attribute;
 use poem_openapi::Object;
 use serde::{Deserialize, Serialize};
 use sqlx::{query, query_as, query_scalar};
 use tracing::{info_span, Instrument};
+use tracing_opentelemetry::OpenTelemetrySpanExt;
 
 use crate::{
     database::Database,
@@ -56,6 +58,7 @@ impl Team {
         team_id: impl AsRef<str> + Debug,
     ) -> Result<Self, sqlx::Error> {
         let span = info_span!("Team::get_by_id");
+        span.set_attribute(attribute::DB_SYSTEM_NAME, "database");
         async move {
             query_as!(
                 Team,
@@ -75,6 +78,7 @@ impl Team {
         user_id: impl AsRef<str> + Debug,
     ) -> Result<Vec<Self>, sqlx::Error> {
         let span = info_span!("Team::get_by_user_id");
+        span.set_attribute(attribute::DB_SYSTEM_NAME, "database");
         async move {
             // query for teams where the user_id is the team owner_id,
             // also include teams where the user_id is in the user_teams table
@@ -93,6 +97,7 @@ impl Team {
     #[tracing::instrument(name = "delete_by_id", skip(db))]
     pub async fn delete_by_id(db: &Database, team_id: impl AsRef<str> + Debug) -> Result<(), sqlx::Error> {
         let span = info_span!("Team::delete_by_id");
+        span.set_attribute(attribute::DB_SYSTEM_NAME, "database");
         async move {
             query!("DELETE FROM teams WHERE team_id = $1", team_id.as_ref())
                 .execute(&db.pool)
@@ -111,6 +116,7 @@ impl Team {
         user_id: impl AsRef<str> + Debug,
     ) -> Result<bool, sqlx::Error> {
         let span = info_span!("Team::is_owner");
+        span.set_attribute(attribute::DB_SYSTEM_NAME, "database");
         async move {
             Ok(query_as!(
                 Team,
@@ -159,6 +165,7 @@ impl Team {
         user_id: impl AsRef<str> + Debug,
     ) -> Result<bool, sqlx::Error> {
         let span = info_span!("Team::_is_member");
+        span.set_attribute(attribute::DB_SYSTEM_NAME, "database");
         async move {
             query_scalar!(
                 "SELECT EXISTS (SELECT 1 FROM user_teams WHERE team_id = $1 AND user_id = $2) OR EXISTS (SELECT 1 FROM teams WHERE team_id = $1 AND owner_id = $2)",
@@ -179,6 +186,7 @@ impl Team {
         team_id: impl AsRef<str> + Debug,
     ) -> Result<Vec<User>, sqlx::Error> {
         let span = info_span!("Team::get_members");
+        span.set_attribute(attribute::DB_SYSTEM_NAME, "database");
         async move {
             query_as!(
                 User,
@@ -198,6 +206,7 @@ impl Team {
         user_id: impl AsRef<str>,
     ) -> Result<(), sqlx::Error> {
         let span = info_span!("Team::add_member");
+        span.set_attribute(attribute::DB_SYSTEM_NAME, "database");
         async move {
             query!(
                 "INSERT INTO user_teams (team_id, user_id) VALUES ($1, $2)",
@@ -219,6 +228,7 @@ impl Team {
         name: impl AsRef<str>,
     ) -> Result<(), sqlx::Error> {
         let span = info_span!("Team::update_name");
+        span.set_attribute(attribute::DB_SYSTEM_NAME, "database");
         async move {
             query!(
                 "UPDATE teams SET name = $2 WHERE team_id = $1",
@@ -240,6 +250,7 @@ impl Team {
         avatar_url: impl AsRef<str>,
     ) -> Result<Team, sqlx::Error> {
         let span = info_span!("Team::update_avatar");
+        span.set_attribute(attribute::DB_SYSTEM_NAME, "database");
         async move {
             query_as!(
                 Team,

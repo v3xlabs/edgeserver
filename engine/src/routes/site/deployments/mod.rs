@@ -5,7 +5,7 @@ use tracing::info;
 use crate::{
     handlers::car::CarRequest, middlewares::auth::UserAuth, models::{
         deployment::{preview::DeploymentPreview, Deployment, DeploymentFile, DeploymentFileEntry},
-        domain::{Domain, DomainSubmission},
+        domain::Domain,
         site::{Site, SiteId},
     }, routes::{error::HttpError, ApiTags}, state::State
 };
