@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n                SELECT DISTINCT f.* \n                FROM files f\n                WHERE NOT EXISTS (\n                    SELECT 1 \n                    FROM deployment_files df\n                    JOIN deployments d ON df.deployment_id = d.deployment_id\n                    WHERE df.file_id = f.file_id \n                    AND d.created_at > $1\n                ) AND f.file_deleted = FALSE",
+  "query": "\n                SELECT DISTINCT f.*\n                FROM files f\n                WHERE NOT EXISTS (\n                    SELECT 1\n                    FROM deployment_files df\n                    JOIN deployments d ON df.deployment_id = d.deployment_id\n                    WHERE df.file_id = f.file_id\n                    AND d.created_at > $1\n                ) AND f.file_deleted = FALSE",
   "describe": {
     "columns": [
       {
@@ -36,5 +36,5 @@
       false
     ]
   },
-  "hash": "8df82ecd87202684415c528142fbb2a1f94fa6eabb08e6f15e728861c2706b45"
+  "hash": "759839243c383e09c46d43588d10c4a6195a55d44d060be324b860ec5a4c1398"
 }
