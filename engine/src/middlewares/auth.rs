@@ -42,6 +42,8 @@ impl<'a> ApiExtractor<'a> for UserAuth {
         span.set_attribute(attribute::SERVICE_NAME, "auth");
         // span.set_attribute("span.kind", "client");
         span.set_attribute("otel.kind", "client");
+        span.set_attribute(attribute::DB_SYSTEM_NAME, "database");
+        span.set_attribute(attribute::DB_OPERATION_NAME, "auth");
 
         // Use instrument to track the auth span
         async {

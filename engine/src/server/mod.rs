@@ -79,7 +79,6 @@ async fn resolve_http(request: &Request, state: Data<&State>) -> impl IntoRespon
     let state_ref = *state;
 
     let span = tracing::info_span!("resolve_http", host = host, path = path);
-    let _guard = span.enter();
 
     // Record metrics for domain and path
     let meter = global::meter("edgeserver");
@@ -278,7 +277,6 @@ async fn serve_deployment_file(
     }
 
     let span = tracing::info_span!("streaming_file");
-    let _guard_streaming = span.enter();
 
     // streaming fallback (clone key so we can still use file_key afterwards)
     let s3_key = file_key.clone();
