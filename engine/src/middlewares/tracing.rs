@@ -72,9 +72,11 @@ where
         let host = req.headers().get("host").and_then(|h| h.to_str().ok()).unwrap_or("unknown").to_string();
         let uri = req.uri().to_string();
         let method = req.method().to_string();
+        let span_name = format!("{} {} {}", method, host, uri);
 
-        let tracing_span = span!(tracing::Level::INFO, "request", method = method, host = host, uri = uri);
+        let tracing_span = span!(tracing::Level::INFO, "request", method = method, host = host, uri = uri, "otel.name" = span_name);
 
+        tracing_span.set_attribute("otel.name", format!("{} {} {}", method, host, uri));
         tracing_span.set_attribute(attribute::TELEMETRY_SDK_NAME, env!("CARGO_CRATE_NAME"));
         tracing_span.set_attribute(attribute::TELEMETRY_SDK_VERSION, env!("CARGO_PKG_VERSION"));
         tracing_span.set_attribute(attribute::TELEMETRY_SDK_LANGUAGE, "rust");
