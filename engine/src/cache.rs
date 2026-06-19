@@ -44,7 +44,7 @@ impl Default for Cache {
 
 impl Cache {
     /// Invalidate cached deployment for this domain.
-    pub fn bump_domain(&self, domain: &str) {
-        self.domain.invalidate(domain);
+    pub async fn bump_domain(&self, domain: &str) {
+        self.domain.invalidate(domain).await;
     }
 }

@@ -152,7 +152,7 @@ impl SiteDeploymentsApi {
                         .await
                         .unwrap();
                     }
-                    state.cache.bump_domain(&ds.domain());
+                    state.cache.bump_domain(&ds.domain()).await;
                 }
             }
         }
@@ -232,7 +232,7 @@ impl SiteDeploymentsApi {
                         .await
                         .unwrap();
                     }
-                    state.cache.bump_domain(&ds.domain());
+                    state.cache.bump_domain(&ds.domain()).await;
                 }
             }
         }
