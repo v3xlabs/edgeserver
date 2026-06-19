@@ -94,6 +94,10 @@ impl Deployment {
     pub async fn upload_files(&self, state: &State, file: Vec<u8>) -> Result<(), sqlx::Error> {
         // TODO: Read file stream, extract zip file (contains multiple files), upload each file to s3 at the correct relevant path relative to deployment.deployment_id + '/'
 
+        // size of file in bytes
+        let file_size = file.len() as i64;
+        info!("File size: {:?}", file_size);
+
         let zip = ZipFileReader::new(file).await.unwrap();
 
         for index in 0..zip.file().entries().len() {

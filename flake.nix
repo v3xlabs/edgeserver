@@ -1,0 +1,38 @@
+{
+  description = "edgeserver devshell";
+
+  inputs = {
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    flake-utils.url = "github:numtide/flake-utils";
+  };
+
+  outputs = {
+    self,
+    nixpkgs,
+    flake-utils,
+  }:
+    flake-utils.lib.eachDefaultSystem (system: let
+      pkgs = import nixpkgs {
+        inherit system;
+      };
+    in {
+      devShells.default = pkgs.mkShell {
+        packages = with pkgs; [
+          just
+          cargo
+          rustc
+          rustfmt
+          clippy
+          nodejs_24
+          pnpm_11
+          pkg-config
+        ];
+
+        shellHook = ''
+          export pnpm_config_auto_install_peers=false
+          export pnpm_config_ignore_scripts=true
+          just
+        '';
+      };
+    });
+}
