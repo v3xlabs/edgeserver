@@ -26,6 +26,9 @@
           nodejs_24
           pnpm_11
           pkg-config
+          docker
+          docker-compose
+          sqlx-cli
         ];
 
         shellHook = ''

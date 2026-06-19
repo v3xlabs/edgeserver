@@ -12,6 +12,7 @@ use crate::state::State;
 pub struct Domain {
     pub site_id: String,
     pub domain: String,
+    pub active_deployment_id: Option<String>,
     pub created_at: DateTime<Utc>,
 }
 
@@ -210,6 +211,27 @@ impl Domain {
                 .await?;
 
             Ok(domain)
+        }
+        .instrument(span)
+        .await
+    }
+
+    pub async fn set_active_deployment(
+        state: &State,
+        domain: &str,
+        deployment_id: &str,
+    ) -> Result<(), Error> {
+        let span = info_span!("Domain::set_active_deployment");
+        async move {
+            sqlx::query!(
+                "UPDATE domains SET active_deployment_id = $1 WHERE domain = $2",
+                deployment_id,
+                domain
+            )
+            .execute(&state.database.pool)
+            .await?;
+
+            Ok(())
         }
         .instrument(span)
         .await

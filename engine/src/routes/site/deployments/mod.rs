@@ -5,7 +5,7 @@ use tracing::info;
 use crate::{
     handlers::car::CarRequest, middlewares::auth::UserAuth, models::{
         deployment::{preview::DeploymentPreview, Deployment, DeploymentFile, DeploymentFileEntry},
-        domain::Domain,
+        domain::{Domain, DomainSubmission},
         site::{Site, SiteId},
     }, routes::{error::HttpError, ApiTags}, state::State
 };
@@ -138,6 +138,11 @@ impl SiteDeploymentsApi {
             let site_id = site_id.clone();
             if let Ok(domains) = Domain::get_by_site_id(&site_id, &*state).await {
                 for ds in domains.into_iter() {
+                    if let DomainSubmission::Verified(domain) = &ds {
+                        Domain::set_active_deployment(&state, &domain.domain, &deployment.deployment_id)
+                            .await
+                            .unwrap();
+                    }
                     state.cache.bump_domain(&ds.domain());
                 }
             }
@@ -208,6 +213,11 @@ impl SiteDeploymentsApi {
             // Invalidate cache for verified domains on file update
             if let Ok(domains) = Domain::get_by_site_id(&site_id.0, &*state).await {
                 for ds in domains.into_iter() {
+                    if let DomainSubmission::Verified(domain) = &ds {
+                        Domain::set_active_deployment(&state, &domain.domain, &deployment.deployment_id)
+                            .await
+                            .unwrap();
+                    }
                     state.cache.bump_domain(&ds.domain());
                 }
             }

@@ -183,8 +183,16 @@ async fn get_last_deployment(host: &str, state: &State) -> Result<Deployment, Ht
         .await
         .ok()
         .flatten();
-
+    
     if let Some(domain) = domain {
+        if let Some(ref dep_id) = domain.active_deployment_id {
+            if let Ok(dep) = Deployment::get_by_id(&state.database, dep_id).await {
+                return Ok(dep);
+            }
+        }
+
+        // Fallback to getting the latest deployment by site_id
+
         let site = Site::get_by_id(&state.clone().database, &domain.site_id)
             .await
             .ok();
