@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE domains SET active_deployment_id = $1 WHERE domain = $2",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Text",
+        "Text"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "a72af941237c3340ae52fa78c0e068eb31668e263c98ddb7d4fd6449a62b4cd6"
+}

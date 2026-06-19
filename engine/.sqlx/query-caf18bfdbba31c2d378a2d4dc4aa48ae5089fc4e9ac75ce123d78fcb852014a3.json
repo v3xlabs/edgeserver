@@ -17,6 +17,11 @@
         "ordinal": 2,
         "name": "created_at",
         "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 3,
+        "name": "active_deployment_id",
+        "type_info": "Text"
       }
     ],
     "parameters": {
@@ -27,7 +32,8 @@
     "nullable": [
       false,
       false,
-      false
+      false,
+      true
     ]
   },
   "hash": "caf18bfdbba31c2d378a2d4dc4aa48ae5089fc4e9ac75ce123d78fcb852014a3"
