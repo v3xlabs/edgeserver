@@ -6,7 +6,10 @@ use serde::{Deserialize, Serialize};
 
 use crate::{
     middlewares::auth::UserAuth,
-    models::{keys::{Key, NewKey}, site::SiteId},
+    models::{
+        keys::{Key, NewKey},
+        site::SiteId,
+    },
     routes::{error::HttpError, ApiTags},
     state::State,
 };
@@ -71,7 +74,11 @@ impl SiteKeysApi {
     /// Delete a site key
     ///
     /// (user-only)
-    #[oai(path = "/site/:site_id/keys/:key_id", method = "delete", tag = "ApiTags::Site")]
+    #[oai(
+        path = "/site/:site_id/keys/:key_id",
+        method = "delete",
+        tag = "ApiTags::Site"
+    )]
     pub async fn delete_site_key(
         &self,
         user: UserAuth,

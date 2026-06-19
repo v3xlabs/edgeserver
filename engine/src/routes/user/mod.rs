@@ -57,8 +57,7 @@ impl UserApi {
     pub async fn get_user_by_id(
         &self,
         user: UserAuth,
-        #[oai(name = "user_id", style = "simple")]
-        user_id: Path<String>,
+        #[oai(name = "user_id", style = "simple")] user_id: Path<String>,
         state: Data<&State>,
     ) -> Result<Json<User>> {
         user.required_session()?;

@@ -97,17 +97,21 @@ impl<'a> ApiExtractor<'a> for UserAuth {
             } else if token.starts_with("k_") {
                 let cache_key = format!("key:{}", token);
 
-                let is_key = state.cache.raw.get_with(cache_key, async {
-                    let hash = hash_session(&token);
+                let is_key = state
+                    .cache
+                    .raw
+                    .get_with(cache_key, async {
+                        let hash = hash_session(&token);
 
-                    let key = Key::get_by_id(&state.database, hash.as_ref())
-                        .await
-                        .unwrap()
-                        .ok_or(HttpError::Unauthorized)
-                        .unwrap();
+                        let key = Key::get_by_id(&state.database, hash.as_ref())
+                            .await
+                            .unwrap()
+                            .ok_or(HttpError::Unauthorized)
+                            .unwrap();
 
-                    serde_json::to_value(key).unwrap()
-                }).await;
+                        serde_json::to_value(key).unwrap()
+                    })
+                    .await;
 
                 let key: Option<Key> = serde_json::from_value(is_key).ok();
 
@@ -187,10 +191,8 @@ impl UserAuth {
                     }
 
                     Ok(())
-                },
-                UserAuth::Key(_key, _) => {
-                    Err(HttpError::Forbidden)
-                },
+                }
+                UserAuth::Key(_key, _) => Err(HttpError::Forbidden),
                 UserAuth::None(_) => Err(HttpError::Unauthorized),
             }
         }

@@ -1,8 +1,8 @@
+use crate::routes::ApiTags;
 use crate::state::State;
-use crate::utils::build_info::{BuildInformation, build_build_information};
+use crate::utils::build_info::{build_build_information, BuildInformation};
 use poem::web::Data;
 use poem_openapi::{payload::Json, ApiResponse, Object, OpenApi};
-use crate::routes::ApiTags;
 
 pub struct SystemApi;
 

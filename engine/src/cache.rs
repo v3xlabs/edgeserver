@@ -1,7 +1,7 @@
-use std::time::Duration;
+use crate::models::deployment::{Deployment, DeploymentFileEntry};
 use bytes::Bytes;
 use serde_json::Value;
-use crate::models::deployment::{Deployment, DeploymentFileEntry};
+use std::time::Duration;
 
 #[derive(Debug)]
 pub struct Cache {
@@ -33,7 +33,12 @@ impl Default for Cache {
             .max_capacity(1000)
             .time_to_live(Duration::from_secs(60 * 60))
             .build();
-        Self { raw, domain, file_entry, file_bytes }
+        Self {
+            raw,
+            domain,
+            file_entry,
+            file_bytes,
+        }
     }
 }
 

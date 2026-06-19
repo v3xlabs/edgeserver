@@ -95,7 +95,10 @@ impl Team {
     }
 
     #[tracing::instrument(name = "delete_by_id", skip(db))]
-    pub async fn delete_by_id(db: &Database, team_id: impl AsRef<str> + Debug) -> Result<(), sqlx::Error> {
+    pub async fn delete_by_id(
+        db: &Database,
+        team_id: impl AsRef<str> + Debug,
+    ) -> Result<(), sqlx::Error> {
         let span = info_span!("Team::delete_by_id");
         span.set_attribute(attribute::DB_SYSTEM_NAME, "database");
         async move {

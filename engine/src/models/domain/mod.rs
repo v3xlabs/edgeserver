@@ -17,10 +17,7 @@ pub struct Domain {
 }
 
 impl Domain {
-    pub async fn get_soft_overlap(
-        domain: &str,
-        state: &State,
-    ) -> Result<Vec<Domain>, Error> {
+    pub async fn get_soft_overlap(domain: &str, state: &State) -> Result<Vec<Domain>, Error> {
         let span = info_span!("Domain::get_soft_overlap");
         async move {
             let overlap = if domain.starts_with("*.") {
@@ -38,10 +35,7 @@ impl Domain {
         .await
     }
 
-    pub async fn get_hard_overlap(
-        domain: &str,
-        state: &State,
-    ) -> Result<Vec<Domain>, Error> {
+    pub async fn get_hard_overlap(domain: &str, state: &State) -> Result<Vec<Domain>, Error> {
         let overlap = Domain::overlap_upwards_wildcard(domain.clone(), state).await?;
         Ok(overlap)
     }
@@ -190,9 +184,14 @@ impl Domain {
     ) -> Result<Domain, Error> {
         let span = info_span!("Domain::create_for_site_superceded");
         async move {
-            let domain = sqlx::query_as!(Domain, "INSERT INTO domains (site_id, domain) VALUES ($1, $2) RETURNING *", site_id, domain)
-                .fetch_one(&state.database.pool)
-                .await?;
+            let domain = sqlx::query_as!(
+                Domain,
+                "INSERT INTO domains (site_id, domain) VALUES ($1, $2) RETURNING *",
+                site_id,
+                domain
+            )
+            .fetch_one(&state.database.pool)
+            .await?;
 
             Ok(domain)
         }
@@ -408,8 +407,7 @@ impl DomainPending {
             .await?;
 
             // mark this domainpending as verified and create a new domain in its place
-            let _domain =
-                Domain::create_for_site(&self.site_id, &self.domain, state).await?;
+            let _domain = Domain::create_for_site(&self.site_id, &self.domain, state).await?;
 
             Ok(())
         }
@@ -447,8 +445,18 @@ impl DomainSubmission {
 /// Sorts domains in reverse order (TLD first), with "*" treated as coming last
 fn sort_domains_by_reversed_parts(a: &str, b: &str) -> std::cmp::Ordering {
     // Split domains by dots and reverse the parts
-    let a_parts: Vec<&str> = a.split('.').collect::<Vec<&str>>().into_iter().rev().collect();
-    let b_parts: Vec<&str> = b.split('.').collect::<Vec<&str>>().into_iter().rev().collect();
+    let a_parts: Vec<&str> = a
+        .split('.')
+        .collect::<Vec<&str>>()
+        .into_iter()
+        .rev()
+        .collect();
+    let b_parts: Vec<&str> = b
+        .split('.')
+        .collect::<Vec<&str>>()
+        .into_iter()
+        .rev()
+        .collect();
 
     // Compare parts one by one
     for i in 0..std::cmp::min(a_parts.len(), b_parts.len()) {

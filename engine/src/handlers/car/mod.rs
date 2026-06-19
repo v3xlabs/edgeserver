@@ -1,6 +1,9 @@
 use async_std::stream::StreamExt;
 use lapin::{
-    options::{BasicAckOptions, BasicConsumeOptions, BasicNackOptions, BasicPublishOptions, QueueDeclareOptions},
+    options::{
+        BasicAckOptions, BasicConsumeOptions, BasicNackOptions, BasicPublishOptions,
+        QueueDeclareOptions,
+    },
     publisher_confirm::Confirmation,
     types::FieldTable,
     BasicProperties, Channel, Connection,
@@ -8,7 +11,10 @@ use lapin::{
 use serde::{Deserialize, Serialize};
 use tracing::info;
 
-use crate::{models::deployment::Deployment, state::{AMQPConfig, AppState}};
+use crate::{
+    models::deployment::Deployment,
+    state::{AMQPConfig, AppState},
+};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct CarRequest {

@@ -322,7 +322,11 @@ impl DeploymentFile {
         .await
     }
 
-    pub async fn get_file_by_path(db: &Database, deployment_id: &str, path: &str) -> Result<DeploymentFileEntry, sqlx::Error> {
+    pub async fn get_file_by_path(
+        db: &Database,
+        deployment_id: &str,
+        path: &str,
+    ) -> Result<DeploymentFileEntry, sqlx::Error> {
         let span = info_span!("DeploymentFile::get_file_by_path");
         span.set_attribute(attribute::DB_SYSTEM_NAME, "database");
         async move {

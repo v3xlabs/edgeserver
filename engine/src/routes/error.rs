@@ -40,11 +40,11 @@ impl ResponseError for HttpError {
             HttpError::AnyhowError(_) => {
                 error!("Anyhow error: {:?}", self);
                 StatusCode::INTERNAL_SERVER_ERROR
-            },
+            }
             HttpError::DatabaseError(_) => {
                 error!("Database error: {:?}", self);
                 StatusCode::INTERNAL_SERVER_ERROR
-            },
+            }
             HttpError::Forbidden => StatusCode::FORBIDDEN,
             HttpError::Unauthorized => StatusCode::UNAUTHORIZED,
             other => {

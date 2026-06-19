@@ -6,7 +6,10 @@ use serde::{Deserialize, Serialize};
 
 use crate::{
     middlewares::auth::UserAuth,
-    models::{keys::{Key, NewKey}, team::TeamId},
+    models::{
+        keys::{Key, NewKey},
+        team::TeamId,
+    },
     routes::{error::HttpError, ApiTags},
     state::State,
 };
@@ -69,7 +72,11 @@ impl TeamKeysApi {
     }
 
     /// Delete a team key
-    #[oai(path = "/team/:team_id/keys/:key_id", method = "delete", tag = "ApiTags::Team")]
+    #[oai(
+        path = "/team/:team_id/keys/:key_id",
+        method = "delete",
+        tag = "ApiTags::Team"
+    )]
     pub async fn delete_team_key(
         &self,
         user: UserAuth,

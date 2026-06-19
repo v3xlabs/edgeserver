@@ -5,11 +5,11 @@ use auth::AuthApi;
 use opentelemetry::global;
 use poem::middleware::OpenTelemetryMetrics;
 use poem::web::{Data, WithStatus};
-use poem::{IntoResponse, Response};
 use poem::{
     endpoint::StaticFilesEndpoint, get, handler, listener::TcpListener, middleware::Cors,
     web::Html, EndpointExt, Route, Server,
 };
+use poem::{IntoResponse, Response};
 use poem_openapi::{OpenApi, OpenApiService, Tags};
 use reqwest::StatusCode;
 use serde_json::{self, Value};
@@ -23,12 +23,19 @@ pub mod auth;
 pub mod error;
 pub mod invite;
 pub mod site;
+pub mod system;
 pub mod team;
 pub mod user;
-pub mod system;
 
 fn get_api() -> impl OpenApi {
-    (site::api_routes(), UserApi, AuthApi, team::api_routes(), invite::api_routes(), system::SystemApi)
+    (
+        site::api_routes(),
+        UserApi,
+        AuthApi,
+        team::api_routes(),
+        invite::api_routes(),
+        system::SystemApi,
+    )
 }
 
 #[derive(Tags)]

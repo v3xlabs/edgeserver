@@ -3,11 +3,15 @@ use poem_openapi::{param::Path, payload::Json, OpenApi};
 use tracing::info;
 
 use crate::{
-    handlers::car::CarRequest, middlewares::auth::UserAuth, models::{
+    handlers::car::CarRequest,
+    middlewares::auth::UserAuth,
+    models::{
         deployment::{preview::DeploymentPreview, Deployment, DeploymentFile, DeploymentFileEntry},
         domain::{Domain, DomainSubmission},
         site::{Site, SiteId},
-    }, routes::{error::HttpError, ApiTags}, state::State
+    },
+    routes::{error::HttpError, ApiTags},
+    state::State,
 };
 
 use super::UploadPayload;
@@ -125,7 +129,8 @@ impl SiteDeploymentsApi {
                         car.queue_car(CarRequest {
                             deployment_id: deployment.deployment_id.clone(),
                             file_path: path.clone(),
-                        }).await;
+                        })
+                        .await;
                     }
                 }
             }
@@ -139,9 +144,13 @@ impl SiteDeploymentsApi {
             if let Ok(domains) = Domain::get_by_site_id(&site_id, &*state).await {
                 for ds in domains.into_iter() {
                     if let DomainSubmission::Verified(domain) = &ds {
-                        Domain::set_active_deployment(&state, &domain.domain, &deployment.deployment_id)
-                            .await
-                            .unwrap();
+                        Domain::set_active_deployment(
+                            &state,
+                            &domain.domain,
+                            &deployment.deployment_id,
+                        )
+                        .await
+                        .unwrap();
                     }
                     state.cache.bump_domain(&ds.domain());
                 }
@@ -199,7 +208,8 @@ impl SiteDeploymentsApi {
                         car.queue_car(CarRequest {
                             deployment_id: deployment_id.clone(),
                             file_path: path.clone(),
-                        }).await;
+                        })
+                        .await;
                     }
                 }
 
@@ -214,9 +224,13 @@ impl SiteDeploymentsApi {
             if let Ok(domains) = Domain::get_by_site_id(&site_id.0, &*state).await {
                 for ds in domains.into_iter() {
                     if let DomainSubmission::Verified(domain) = &ds {
-                        Domain::set_active_deployment(&state, &domain.domain, &deployment.deployment_id)
-                            .await
-                            .unwrap();
+                        Domain::set_active_deployment(
+                            &state,
+                            &domain.domain,
+                            &deployment.deployment_id,
+                        )
+                        .await
+                        .unwrap();
                     }
                     state.cache.bump_domain(&ds.domain());
                 }
@@ -243,7 +257,8 @@ impl SiteDeploymentsApi {
                 info!("Queueing bunshot for domain: {:?}", domain);
                 let domain = domain.domain();
                 if let Some(previews) = &rabbit.previews {
-                    previews.queue_bunshot(&site_id.0, &deployment_id, &domain)
+                    previews
+                        .queue_bunshot(&site_id.0, &deployment_id, &domain)
                         .await;
                 }
             }
@@ -310,7 +325,8 @@ impl SiteDeploymentsApi {
             if let Some(domain) = domain {
                 info!("Queueing bunshot for domain: {:?}", domain.domain());
                 if let Some(previews) = &rabbit.previews {
-                    previews.queue_bunshot(&site_id.0, &deployment_id.0, &domain.domain())
+                    previews
+                        .queue_bunshot(&site_id.0, &deployment_id.0, &domain.domain())
                         .await;
                 }
             } else {

@@ -42,9 +42,13 @@ impl Storage {
                 None,
             )
             .unwrap();
-            let previews_bucket = Bucket::new(&previews_config.bucket_name, preview_region, preview_credentials)
-                .unwrap()
-                .with_path_style();
+            let previews_bucket = Bucket::new(
+                &previews_config.bucket_name,
+                preview_region,
+                preview_credentials,
+            )
+            .unwrap()
+            .with_path_style();
 
             Some(previews_bucket)
         } else {
@@ -73,7 +77,11 @@ impl Storage {
             None
         };
 
-        Self { bucket, previews_bucket, car_bucket }
+        Self {
+            bucket,
+            previews_bucket,
+            car_bucket,
+        }
     }
 
     pub async fn upload(

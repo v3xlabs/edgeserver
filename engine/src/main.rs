@@ -1,5 +1,5 @@
-use std::env;
 use futures::join;
+use std::env;
 use std::sync::Arc;
 
 use opentelemetry::KeyValue;
@@ -13,15 +13,15 @@ use tracing::{error, info};
 pub mod assets;
 pub mod cache;
 pub mod database;
+pub mod handlers;
+pub mod ipfs;
 pub mod middlewares;
 pub mod models;
 pub mod routes;
+pub mod server;
 pub mod state;
 pub mod storage;
 pub mod utils;
-pub mod handlers;
-pub mod ipfs;
-pub mod server;
 
 use tracing_subscriber::prelude::*;
 
@@ -60,8 +60,7 @@ async fn main() {
         let tracer = trace_provider.tracer("edgeserver");
 
         // Simple telemetry layer
-        let telemetry_layer = tracing_opentelemetry::layer()
-            .with_tracer(tracer);
+        let telemetry_layer = tracing_opentelemetry::layer().with_tracer(tracer);
 
         // Create a formatting layer with span closure events
         let fmt_layer = tracing_subscriber::fmt::layer()
@@ -78,7 +77,6 @@ async fn main() {
             .with(fmt_layer)
             .with(telemetry_layer)
             .init();
-
     } else {
         info!("Starting Edgerouter without OTLP tracing, provide OTLP_ENDPOINT to enable tracing");
         tracing_subscriber::fmt::init();

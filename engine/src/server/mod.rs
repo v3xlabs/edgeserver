@@ -85,10 +85,13 @@ async fn resolve_http(request: &Request, state: Data<&State>) -> impl IntoRespon
         .u64_counter("http_requests_total")
         .with_description("Count of HTTP requests by domain and path")
         .build();
-    request_counter.add(1, &[
-        KeyValue::new("domain", host.to_string()),
-        KeyValue::new("path", path.clone()),
-    ]);
+    request_counter.add(
+        1,
+        &[
+            KeyValue::new("domain", host.to_string()),
+            KeyValue::new("path", path.clone()),
+        ],
+    );
 
     info!("Router request at: {} {}", host, path);
 
@@ -123,9 +126,13 @@ async fn resolve_http(request: &Request, state: Data<&State>) -> impl IntoRespon
         .cache
         .file_entry
         .get_with(entry_key.clone(), async move {
-            DeploymentFile::get_file_by_path(&state_for_file_str.database, &deployment_str, &path_str)
-                .await
-                .ok()
+            DeploymentFile::get_file_by_path(
+                &state_for_file_str.database,
+                &deployment_str,
+                &path_str,
+            )
+            .await
+            .ok()
         })
         .await;
     if let Some(deployment_file) = maybe_file {
@@ -142,9 +149,13 @@ async fn resolve_http(request: &Request, state: Data<&State>) -> impl IntoRespon
             .cache
             .file_entry
             .get_with(index_key.clone(), async move {
-                DeploymentFile::get_file_by_path(&state_for_index.database, &deployment_id_index, &index_path)
-                    .await
-                    .ok()
+                DeploymentFile::get_file_by_path(
+                    &state_for_index.database,
+                    &deployment_id_index,
+                    &index_path,
+                )
+                .await
+                .ok()
             })
             .await;
         if let Some(deployment_file) = maybe_index {
@@ -183,7 +194,7 @@ async fn get_last_deployment(host: &str, state: &State) -> Result<Deployment, Ht
         .await
         .ok()
         .flatten();
-    
+
     if let Some(domain) = domain {
         if let Some(ref dep_id) = domain.active_deployment_id {
             if let Ok(dep) = Deployment::get_by_id(&state.database, dep_id).await {
@@ -213,14 +224,20 @@ async fn get_last_deployment(host: &str, state: &State) -> Result<Deployment, Ht
 }
 
 /// Serve a deployment file entry, using full in-memory cache for eligible files or streaming otherwise.
-#[tracing::instrument(name = "serve_deployment_file", skip(deployment_file, last_modified, cid, state))]
+#[tracing::instrument(
+    name = "serve_deployment_file",
+    skip(deployment_file, last_modified, cid, state)
+)]
 async fn serve_deployment_file(
     deployment_file: DeploymentFileEntry,
     last_modified: DateTime<Utc>,
     cid: Option<String>,
     state: &State,
 ) -> Response {
-    let mime = polyfill_mime_type(&deployment_file.deployment_file_mime_type.clone(), &deployment_file.deployment_file_file_path);
+    let mime = polyfill_mime_type(
+        &deployment_file.deployment_file_mime_type.clone(),
+        &deployment_file.deployment_file_file_path,
+    );
     let file_key = deployment_file.file_hash.clone();
     // let cid_path = format!("{}/{}", cid.unwrap_or("".to_string()), deployment_file.deployment_file_file_path);
 
@@ -311,11 +328,9 @@ async fn serve_deployment_file(
 
             resp.body(body)
         }
-        Err(_) => {
-            Response::builder()
-                .status(StatusCode::INTERNAL_SERVER_ERROR)
-                .body(Body::from_string("Failed to stream file".to_string()))
-        }
+        Err(_) => Response::builder()
+            .status(StatusCode::INTERNAL_SERVER_ERROR)
+            .body(Body::from_string("Failed to stream file".to_string())),
     }
 }
 

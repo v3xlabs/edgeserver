@@ -1,7 +1,8 @@
 use std::sync::Arc;
 
 use opentelemetry::{
-    Key, KeyValue, trace::{Status, TraceContextExt, Tracer}
+    trace::{Status, TraceContextExt, Tracer},
+    Key, KeyValue,
 };
 use opentelemetry_semantic_conventions::attribute;
 use poem::{
@@ -13,7 +14,7 @@ use poem::{
     },
     Endpoint, FromRequest, IntoResponse, PathPattern, Request, Response, Result,
 };
-use tracing::{Instrument, info, span};
+use tracing::{info, span, Instrument};
 use tracing_opentelemetry::OpenTelemetrySpanExt;
 
 /// Middleware that injects the OpenTelemetry trace ID into the response headers.
@@ -68,12 +69,24 @@ where
             .unwrap_or_else(|| req.remote_addr().to_string());
 
         let addr = remote_addr.clone();
-        let host = req.headers().get("host").and_then(|h| h.to_str().ok()).unwrap_or("unknown").to_string();
+        let host = req
+            .headers()
+            .get("host")
+            .and_then(|h| h.to_str().ok())
+            .unwrap_or("unknown")
+            .to_string();
         let uri = req.uri().to_string();
         let method = req.method().to_string();
         let span_name = format!("{} {} {}", method, host, uri);
 
-        let tracing_span = span!(tracing::Level::INFO, "request", method = method, host = host, uri = uri, "otel.name" = span_name);
+        let tracing_span = span!(
+            tracing::Level::INFO,
+            "request",
+            method = method,
+            host = host,
+            uri = uri,
+            "otel.name" = span_name
+        );
 
         tracing_span.set_attribute(attribute::CLIENT_ADDRESS, addr);
         tracing_span.set_attribute("otel.name", format!("{} {} {}", method, host, uri));
@@ -86,9 +99,17 @@ where
         tracing_span.set_attribute("http.target", uri);
         // tracing_span.set_attribute(attribute::URL_FULL, uri);
         tracing_span.set_attribute(attribute::CLIENT_ADDRESS, remote_addr);
-        tracing_span.set_attribute(attribute::NETWORK_PROTOCOL_VERSION, format!("{:?}", req.version()));
+        tracing_span.set_attribute(
+            attribute::NETWORK_PROTOCOL_VERSION,
+            format!("{:?}", req.version()),
+        );
 
-        let trace_id = tracing_span.context().span().span_context().trace_id().to_string();
+        let trace_id = tracing_span
+            .context()
+            .span()
+            .span_context()
+            .trace_id()
+            .to_string();
 
         // Record request start event
         // span.add_event("request.started".to_string(), vec![]);
@@ -99,11 +120,7 @@ where
         // tracing_span.set_parent(context);
 
         // Process the request with the inner endpoint
-        let res = self
-            .inner
-            .call(req)
-            .instrument(tracing_span.clone())
-            .await;
+        let res = self.inner.call(req).instrument(tracing_span.clone()).await;
 
         // Process the response
         match res {
@@ -131,18 +148,13 @@ where
                     resp.status().as_u16() as i64,
                 );
 
-                tracing_span.set_attribute(
-                    attribute::OTEL_STATUS_CODE,
-                    resp.status().as_u16() as i64,
-                );
+                tracing_span
+                    .set_attribute(attribute::OTEL_STATUS_CODE, resp.status().as_u16() as i64);
                 tracing_span.set_attribute("http.status_code", resp.status().as_u16() as i64);
 
                 // Track content length if available
                 if let Some(content_length) = resp.headers().typed_get::<headers::ContentLength>() {
-                    tracing_span.set_attribute(
-                        "http.response_body_size",
-                        content_length.0 as i64,
-                    );
+                    tracing_span.set_attribute("http.response_body_size", content_length.0 as i64);
                 }
 
                 // Add trace ID to response headers
@@ -162,13 +174,15 @@ where
                     const HTTP_PATH_PATTERN: Key = Key::from_static_str("http.path_pattern");
                     // span.update_name(format!("{} {}", method, path_pattern.0));
                     // span.set_attribute(KeyValue::new(
-                        // HTTP_PATH_PATTERN,
-                        // path_pattern.0.to_string(),
+                    // HTTP_PATH_PATTERN,
+                    // path_pattern.0.to_string(),
                     // ));
                 }
 
                 // Set error status code
-                tracing_span.set_status(Status::Error { description: err.to_string().into() });
+                tracing_span.set_status(Status::Error {
+                    description: err.to_string().into(),
+                });
                 tracing_span.set_attribute(
                     attribute::HTTP_RESPONSE_STATUS_CODE,
                     err.status().as_u16() as i64,

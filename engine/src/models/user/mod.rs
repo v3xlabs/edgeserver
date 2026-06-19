@@ -7,7 +7,8 @@ use tracing::{info_span, Instrument};
 use tracing_opentelemetry::OpenTelemetrySpanExt;
 
 use crate::{
-    database::Database, utils::id::{generate_id, IdType}
+    database::Database,
+    utils::id::{generate_id, IdType},
 };
 
 use super::team::Team;
@@ -123,9 +124,12 @@ impl User {
     pub async fn get_all_minimal(db: &Database) -> Result<Vec<UserMinimal>, sqlx::Error> {
         let span = info_span!("User::get_all_minimal");
         async move {
-            query_as!(UserMinimal, "SELECT user_id, name, avatar_url, admin FROM users")
-                .fetch_all(&db.pool)
-                .await
+            query_as!(
+                UserMinimal,
+                "SELECT user_id, name, avatar_url, admin FROM users"
+            )
+            .fetch_all(&db.pool)
+            .await
         }
         .instrument(span)
         .await

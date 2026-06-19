@@ -21,18 +21,21 @@ impl From<String> for AssetFile {
 
 impl AssetFile {
     #[tracing::instrument(name = "from_buffer", skip(state, buffer))]
-    pub async fn from_buffer(state: &State, buffer: &[u8], path: impl AsRef<str> + Debug) -> Result<(Self, NewlyCreatedFile, String, String, i64), sqlx::Error> {
+    pub async fn from_buffer(
+        state: &State,
+        buffer: &[u8],
+        path: impl AsRef<str> + Debug,
+    ) -> Result<(Self, NewlyCreatedFile, String, String, i64), sqlx::Error> {
         let file_hash = hash_file(&buffer);
         let content_type = infer::get(&buffer)
-            .map(|t| t.mime_type().to_string()).unwrap_or_else(|| {
-                content_type_from_file_name(path.as_ref())
-            });
+            .map(|t| t.mime_type().to_string())
+            .unwrap_or_else(|| content_type_from_file_name(path.as_ref()));
 
         let file_size = buffer.len() as i64;
 
         let newly_created_file = query_as!(
-                NewlyCreatedFile,
-                r#"
+            NewlyCreatedFile,
+            r#"
                 WITH ins AS (
       INSERT INTO files (file_hash, file_size)
       VALUES ($1, $2)
@@ -47,16 +50,16 @@ impl AssetFile {
     WHERE file_hash = $1
     LIMIT 1;
                 "#,
-                &file_hash,
-                file_size
-            )
-            .fetch_one(&state.database.pool)
-            .await?;
+            &file_hash,
+            file_size
+        )
+        .fetch_one(&state.database.pool)
+        .await?;
 
         tracing::info!("File: {:?}", newly_created_file);
 
         let file = AssetFile {
-            path: file_hash.to_string()
+            path: file_hash.to_string(),
         };
 
         Ok((file, newly_created_file, file_hash, content_type, file_size))
@@ -94,6 +97,6 @@ fn content_type_from_file_name(file_name: &str) -> String {
         _ => {
             info!("Unknown file extension: {:?}", extension);
             "application/octet-stream".to_string()
-        },
+        }
     }
 }

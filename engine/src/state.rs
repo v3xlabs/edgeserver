@@ -1,10 +1,12 @@
 use std::sync::Arc;
 
 use color_eyre::eyre::Result;
-use figment::{Figment, providers::Env};
+use figment::{providers::Env, Figment};
 use serde::Deserialize;
 
-use crate::{cache::Cache, database::Database, handlers::TaskRabbit, ipfs::IPFSModule, storage::Storage};
+use crate::{
+    cache::Cache, database::Database, handlers::TaskRabbit, ipfs::IPFSModule, storage::Storage,
+};
 
 pub type State = Arc<AppState>;
 
@@ -97,19 +99,34 @@ impl AppState {
         // let config: AppConfig = config.try_deserialize()?;
 
         let config = Figment::new()
-            .merge(Env::prefixed("DATABASE_").map(|key| format!("database_{}", key.as_str().to_lowercase()).into()))
-            .merge(Env::prefixed("S3_")
-                .map(|key| format!("s3.{}", key.as_str().to_lowercase()).into()))
-            .merge(Env::prefixed("S3_PREVIEWS_")
-                .map(|key| format!("s3_previews.{}", key.as_str().to_lowercase()).into()))
-            .merge(Env::prefixed("S3_CAR_")
-                .map(|key| format!("s3_car.{}", key.as_str().to_lowercase()).into()))
-            .merge(Env::prefixed("GITHUB_APP_")
-                .map(|key| format!("github_app.{}", key.as_str().to_lowercase()).into()))
-            .merge(Env::prefixed("AMQP_")
-                .map(|key| format!("amqp.{}", key.as_str().to_lowercase()).into()))
-            .merge(Env::prefixed("IPFS_")
-                .map(|key| format!("ipfs.{}", key.as_str().to_lowercase()).into()))
+            .merge(
+                Env::prefixed("DATABASE_")
+                    .map(|key| format!("database_{}", key.as_str().to_lowercase()).into()),
+            )
+            .merge(
+                Env::prefixed("S3_")
+                    .map(|key| format!("s3.{}", key.as_str().to_lowercase()).into()),
+            )
+            .merge(
+                Env::prefixed("S3_PREVIEWS_")
+                    .map(|key| format!("s3_previews.{}", key.as_str().to_lowercase()).into()),
+            )
+            .merge(
+                Env::prefixed("S3_CAR_")
+                    .map(|key| format!("s3_car.{}", key.as_str().to_lowercase()).into()),
+            )
+            .merge(
+                Env::prefixed("GITHUB_APP_")
+                    .map(|key| format!("github_app.{}", key.as_str().to_lowercase()).into()),
+            )
+            .merge(
+                Env::prefixed("AMQP_")
+                    .map(|key| format!("amqp.{}", key.as_str().to_lowercase()).into()),
+            )
+            .merge(
+                Env::prefixed("IPFS_")
+                    .map(|key| format!("ipfs.{}", key.as_str().to_lowercase()).into()),
+            )
             .extract::<AppConfig>()
             .expect("Failed to load AppConfig configuration");
 
@@ -126,7 +143,10 @@ impl AppState {
         };
 
         let ipfs = if let Some(ipfs) = &config.ipfs {
-            Some(IPFSModule::new(ipfs.cluster_url.clone(), ipfs.public_cluster_url.clone()))
+            Some(IPFSModule::new(
+                ipfs.cluster_url.clone(),
+                ipfs.public_cluster_url.clone(),
+            ))
         } else {
             None
         };

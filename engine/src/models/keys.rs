@@ -60,7 +60,11 @@ impl Key {
         last_used: Option<DateTime<Utc>>,
         expires_at: Option<DateTime<Utc>>,
     ) -> Result<NewKey, sqlx::Error> {
-        info_span!("Key::new", "key_type" = key_type, "key_resource" = key_resource);
+        info_span!(
+            "Key::new",
+            "key_type" = key_type,
+            "key_resource" = key_resource
+        );
         let id_type = match key_type.as_str() {
             "user" => IdType::KEY_USER,
             "team" => IdType::KEY_TEAM,
@@ -104,7 +108,11 @@ impl Key {
         key_type: &str,
         key_resource: &str,
     ) -> Result<Vec<Self>, sqlx::Error> {
-        info_span!("Key::get_for_resource", "key_type" = key_type, "key_resource" = key_resource);
+        info_span!(
+            "Key::get_for_resource",
+            "key_type" = key_type,
+            "key_resource" = key_resource
+        );
         let key = sqlx::query_as!(
             Self,
             "SELECT * FROM keys WHERE key_type = $1 AND key_resource = $2",
@@ -117,20 +125,14 @@ impl Key {
         Ok(key)
     }
 
-    pub async fn delete(
-        database: &Database,
-        key_id: &str,
-    ) -> Result<(), sqlx::Error> {
+    pub async fn delete(database: &Database, key_id: &str) -> Result<(), sqlx::Error> {
         sqlx::query!("DELETE FROM keys WHERE key_id = $1", key_id)
             .execute(&database.pool)
             .await?;
         Ok(())
     }
 
-    pub async fn get_by_id(
-        database: &Database,
-        key_id: &str,
-    ) -> Result<Option<Self>, sqlx::Error> {
+    pub async fn get_by_id(database: &Database, key_id: &str) -> Result<Option<Self>, sqlx::Error> {
         let span = info_span!("Key::get_by_id", "key_id" = key_id);
         span.set_attribute(attribute::DB_SYSTEM_NAME, "database");
         let key = sqlx::query_as!(Self, "SELECT * FROM keys WHERE key_id = $1", key_id)

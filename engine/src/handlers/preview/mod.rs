@@ -1,4 +1,9 @@
-use lapin::{options::{BasicPublishOptions, QueueDeclareOptions}, publisher_confirm::Confirmation, types::FieldTable, BasicProperties, Channel, Connection};
+use lapin::{
+    options::{BasicPublishOptions, QueueDeclareOptions},
+    publisher_confirm::Confirmation,
+    types::FieldTable,
+    BasicProperties, Channel, Connection,
+};
 use serde::{Deserialize, Serialize};
 use tracing::info;
 
