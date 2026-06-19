@@ -68,7 +68,7 @@ fn hash_file(file: &[u8]) -> String {
     let mut hasher = Sha256::new();
     hasher.update(file);
     let hash = hasher.finalize();
-    format!("{:x}", hash)
+    hex::encode(hash)
 }
 
 fn content_type_from_file_name(file_name: &str) -> String {

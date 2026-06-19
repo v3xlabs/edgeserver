@@ -13,13 +13,13 @@ sqlx = { git = "https://github.com/launchbadge/sqlx.git", features = [
     "json",
     "ipnetwork",
 ] }
-tracing = "0.1.41"
+tracing = "0.1.44"
 # anyhow = "1.0.95"
-color-eyre = "0.6.1"
+color-eyre = "0.6.5"
 async-std = { version = "1", features = ["attributes", "tokio1"] }
-config = "0.15.4"
+config = "0.15.24"
 dotenvy = "0.15.7"
-futures = "0.3.31"
+futures = "0.3.32"
 poem = { version = "3.1.6", git = "https://github.com/poem-web/poem", branch = "master", features = [
     "rustls",
     "sse",
@@ -37,58 +37,58 @@ poem-openapi = { version = "5.1.8", git = "https://github.com/poem-web/poem", br
     "redoc",
     "static-files",
 ] }
-serde = "1.0.217"
-tracing-subscriber = { version = "0.3.20", features = ["env-filter", "fmt"] }
-url = { version = "2.5.2", features = ["serde"] }
-thiserror = "2.0.3"
-rustls = "0.23.19"
-bigdecimal = { version = "0.4.5", features = ["serde"] }
-reqwest = { version = "0.12.5", features = [
-    "rustls-tls",
+serde = "1.0.228"
+tracing-subscriber = { version = "0.3.23", features = ["env-filter", "fmt"] }
+url = { version = "2.5.8", features = ["serde"] }
+thiserror = "2.0.18"
+rustls = "0.23.40"
+bigdecimal = { version = "0.4.10", features = ["serde"] }
+reqwest = { version = "0.13.4", features = [
+    "rustls",
     # Add back the default features excluding native-tls
     "charset",
     "http2",
-    "macos-system-configuration",
+    # "macos-system-configuration",
 ], default-features = false }
-chrono = "0.4.39"
-serde_with = { version = "3.9.0", features = ["json", "chrono"] }
-uuid = { version = "1.11.0", features = ["v4"] }
-sha2 = "0.10.8"
+chrono = "0.4.45"
+serde_with = { version = "3.21.0", features = ["json", "chrono"] }
+uuid = { version = "1.23.3", features = ["v4"] }
+sha2 = "0.11.0"
 hex = "0.4.3"
-ipnetwork = "0.20.0"
+ipnetwork = "0.21.1"
 rust-s3 = { version = "0.36.0-beta.2", default-features = false, features = [
     "async-std-rustls-tls",
 ] }
-aws-sdk-s3 = "1.64.0"
+aws-sdk-s3 = "1.64.0" # migrate to 1.137.0?
 aws-config = "1.5.10"
 async_zip = { version = "0.0.18", features = ["bzip2", "lzma", "zstd", "xz", "deflate"] }
-dashmap = { version = "6.1.0", features = ["serde"] }
-serde_json = "1.0.138"
-moka = { version = "0.12.10", features = ["future"] }
+dashmap = { version = "6.2.1", features = ["serde"] }
+serde_json = "1.0.150"
+moka = { version = "0.12.15", features = ["future"] }
 infer = "0.19.0"
 # tokio = { version = "1.39.0", features = [""], default-features = false}
-tracing-opentelemetry = "0.32.0"
-opentelemetry-otlp = { version = "0.31.0", features = ["trace", "metrics", "grpc-tonic"] }
-opentelemetry_sdk = {version = "0.31.0", features = ["trace"]}
-opentelemetry = { version = "0.31.0", features = ["trace"]}
-opentelemetry-stdout = "0.31.0"
-opentelemetry-http = "0.31.0"
-opentelemetry-semantic-conventions = "0.31.0"
-regex = "1.11.1"
+tracing-opentelemetry = "0.33.0"
+opentelemetry-otlp = { version = "0.32.0", features = ["trace", "metrics", "grpc-tonic"] }
+opentelemetry_sdk = {version = "0.32.1", features = ["trace"]}
+opentelemetry = { version = "0.32.0", features = ["trace"]}
+opentelemetry-stdout = "0.32.0"
+opentelemetry-http = "0.32.0"
+opentelemetry-semantic-conventions = "0.32.0"
+regex = "1.12.4"
 figment = { version = "0.10.19", features = ["env", "json"] }
-lapin = "2.5.1"
+lapin = "2.5.1" # migrate to 4.x.x?
 log = "0.4.27"
 tracing-log = "0.2.0"
-ipld-core = { version = "0.4.2", features = ["serde"] }
+ipld-core = { version = "0.4.3", features = ["serde"] }
 serde_cbor = "0.11.2"
 multihash = { version = "0.19.3", features = ["serde"] }
 rust-car = "0.1.4"
-cid = "0.11.1"
-walkdir = "2.4.0"
+cid = "0.11.3"
+walkdir = "2.5.0"
 rand = "0.9.0"
-build-info = "0.0.33"
-bytes = { version = "1.10.1", features = ["serde"] }
+build-info = "0.0.44"
+bytes = { version = "1.12.0", features = ["serde"] }
 
 [build-dependencies]
-build-info-build = "0.0.33"
-build-info = "0.0.33"
+build-info-build = "0.0.44"
+build-info = "0.0.44"

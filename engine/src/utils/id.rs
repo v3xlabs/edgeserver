@@ -28,7 +28,7 @@ impl IdType {
 }
 
 pub fn generate_id(id_type: IdType) -> String {
-    let hash = (0..id_type.length()).map(|_| rand::rng().gen_range(0..=9)).collect::<Vec<_>>().iter().map(|c| c.to_string()).collect::<String>();
+    let hash = (0..id_type.length()).map(|_| rand::rng().random_range(0..=9)).collect::<Vec<_>>().iter().map(|c| c.to_string()).collect::<String>();
 
     format!("{}_{}", id_type.prefix(), hash)
 }
