@@ -1,5 +1,6 @@
 use async_zip::base::read::mem::ZipFileReader;
 use chrono::{DateTime, Utc};
+use color_eyre::eyre::{eyre, Result};
 use opentelemetry_semantic_conventions::attribute;
 use poem_openapi::{types::Example, Object};
 use serde::{Deserialize, Serialize};
@@ -91,29 +92,29 @@ impl Deployment {
     // }
 
     #[tracing::instrument(name = "upload_files", skip(self, state, file))]
-    pub async fn upload_files(&self, state: &State, file: Vec<u8>) -> Result<(), sqlx::Error> {
+    pub async fn upload_files(&self, state: &State, file: Vec<u8>) -> Result<()> {
         // TODO: Read file stream, extract zip file (contains multiple files), upload each file to s3 at the correct relevant path relative to deployment.deployment_id + '/'
 
         // size of file in bytes
         let file_size = file.len() as i64;
         info!("File size: {:?}", file_size);
 
-        let zip = ZipFileReader::new(file).await.unwrap();
+        let zip = ZipFileReader::new(file).await?;
 
         for index in 0..zip.file().entries().len() {
-            let file = zip.file().entries().get(index).unwrap();
-            let path = file.filename().as_str().unwrap();
-            let entry_is_dir = file.dir().unwrap();
+            let file = zip.file().entries().get(index).ok_or_else(|| eyre!("missing zip entry at index {index}"))?;
+            let path = file.filename().as_str()?;
+            let entry_is_dir = file.dir()?;
 
             if entry_is_dir {
                 info!("Skipping directory: {:?}", path);
                 continue;
             }
 
-            let mut file_content = zip.reader_with_entry(index).await.unwrap();
+            let mut file_content = zip.reader_with_entry(index).await?;
 
             let mut buf = Vec::new();
-            file_content.read_to_end_checked(&mut buf).await.unwrap();
+            file_content.read_to_end_checked(&mut buf).await?;
 
             // hash the file
             let (_file, newly_created_file, file_hash, content_type, _file_size) =
@@ -147,8 +148,7 @@ impl Deployment {
                     .bucket
                     .put_object_with_content_type(&s3_path, &buf, &content_type)
                     .instrument(s)
-                    .await
-                    .unwrap();
+                    .await?;
 
                 info!("Upload complete");
             } else {

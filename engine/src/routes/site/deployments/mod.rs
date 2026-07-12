@@ -137,9 +137,7 @@ impl SiteDeploymentsApi {
 
             Deployment::upload_files(&deployment, &state, data)
                 .await
-                .unwrap();
-
-            // Invalidate cache for all verified domains of this site
+                .map_err(HttpError::from)?;
             let site_id = site_id.clone();
             if let Ok(domains) = Domain::get_by_site_id(&site_id, &*state).await {
                 for ds in domains.into_iter() {
@@ -218,7 +216,7 @@ impl SiteDeploymentsApi {
 
             Deployment::upload_files(&deployment, &state, data)
                 .await
-                .unwrap();
+                .map_err(HttpError::from)?;
 
             // Invalidate cache for verified domains on file update
             if let Ok(domains) = Domain::get_by_site_id(&site_id.0, &*state).await {
