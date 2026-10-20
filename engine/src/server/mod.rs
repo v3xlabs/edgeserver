@@ -7,7 +7,7 @@ use opentelemetry::global;
 use poem::middleware::OpenTelemetryMetrics;
 use poem::web::Data;
 use poem::{get, handler, listener::TcpListener, middleware::Cors, Route, Server};
-use poem::{Body, EndpointExt, IntoResponse, Request, Response};
+use poem::{Body, EndpointExt, Request, Response};
 use reqwest::StatusCode;
 use tracing::info;
 
@@ -66,7 +66,7 @@ async fn spa_fallback(
 }
 
 #[handler]
-async fn resolve_http(request: &Request, state: Data<&State>) -> impl IntoResponse {
+async fn resolve_http(request: &Request, state: Data<&State>) -> Result<Response, HttpError> {
     // extract host and path
     let headers = request.headers();
     let host = headers
@@ -101,126 +101,92 @@ async fn resolve_http(request: &Request, state: Data<&State>) -> impl IntoRespon
     let maybe_dep = state_ref
         .cache
         .domain
-        .get_with(domain_key.clone(), async move {
-            get_last_deployment(host, &state_for_domain).await.ok()
+        .try_get_with(domain_key.clone(), async move {
+            get_last_deployment(host, &state_for_domain).await
         })
-        .await;
+        .await?;
     let deployment = if let Some(dep) = maybe_dep {
         dep
     } else {
         tracing::error!("Deployment not found");
-        return not_found::not_found();
+        return Ok(not_found::not_found());
     };
     let cid = deployment.ipfs_cid;
     let deployment_id = deployment.deployment_id;
     // record Last-Modified header value from this deployment
     let last_modified = deployment.created_at;
 
-    // 2) deployment_id + path -> DeploymentFileEntry
-    let entry_key = format!("{}:{}", &deployment_id, path);
-    let state_for_file = state_ref.clone();
-    let deployment_str = deployment_id.to_string();
-    let state_for_file_str = state_for_file.clone();
-    let path_str = path.clone();
-    let maybe_file = state_ref
-        .cache
-        .file_entry
-        .get_with(entry_key.clone(), async move {
-            DeploymentFile::get_file_by_path(
-                &state_for_file_str.database,
-                &deployment_str,
-                &path_str,
-            )
-            .await
-            .ok()
-        })
-        .await;
-    if let Some(deployment_file) = maybe_file {
-        return serve_deployment_file(deployment_file, last_modified, cid, state_ref).await;
-    }
-
-    // 2b) if path is a directory, try <path>/index.html
-    if !path.is_empty() {
-        let index_path = format!("{}/index.html", path);
-        let index_key = format!("{}:{}", deployment_id, index_path);
-        let state_for_index = state_ref.clone();
-        let deployment_id_index = deployment_id.clone();
-        let maybe_index = state_ref
+    let directory_index = (!path.is_empty()).then(|| format!("{}/index.html", path));
+    for candidate in [
+        Some(path.as_str()),
+        directory_index.as_deref(),
+        Some("index.html"),
+    ]
+    .into_iter()
+    .flatten()
+    {
+        let entry_key = format!("{}:{}", deployment_id, candidate);
+        let maybe_file = state_ref
             .cache
             .file_entry
-            .get_with(index_key.clone(), async move {
-                DeploymentFile::get_file_by_path(
-                    &state_for_index.database,
-                    &deployment_id_index,
-                    &index_path,
+            .try_get_with(entry_key, async {
+                match DeploymentFile::get_file_by_path(
+                    &state_ref.database,
+                    &deployment_id,
+                    candidate,
                 )
                 .await
-                .ok()
+                {
+                    Ok(file) => Ok(Some(file)),
+                    Err(sqlx::Error::RowNotFound) => Ok(None),
+                    Err(error) => Err(error),
+                }
             })
-            .await;
-        if let Some(deployment_file) = maybe_index {
-            return serve_deployment_file(deployment_file, last_modified, cid, state_ref).await;
+            .await?;
+        if let Some(deployment_file) = maybe_file {
+            return Ok(serve_deployment_file(deployment_file, last_modified, cid, state_ref).await);
         }
-    }
-
-    // 3) SPA fallback -> index.html
-    let spa_key = format!("{}:index.html", deployment_id);
-    let maybe_spa = state_ref
-        .cache
-        .file_entry
-        .get_with(spa_key.clone(), async move {
-            DeploymentFile::get_file_by_path(&state_for_file.database, &deployment_id, "index.html")
-                .await
-                .ok()
-        })
-        .await;
-    if let Some(deployment_file) = maybe_spa {
-        return serve_deployment_file(deployment_file, last_modified, cid, state_ref).await;
     }
 
     tracing::error!("404 Not Found");
 
     // 4) 404
-    not_found::not_found()
+    Ok(not_found::not_found())
 }
 
-async fn get_last_deployment(host: &str, state: &State) -> Result<Deployment, HttpError> {
+async fn get_last_deployment(host: &str, state: &State) -> Result<Option<Deployment>, sqlx::Error> {
     // get domain
     // get site
     // get last deployment
     // get file at path in deployment
     // otherwise return default /index.html if exists
-    let domain = Domain::existing_domain_by_name(host, &state.clone())
-        .await
-        .ok()
-        .flatten();
+    let domain = Domain::existing_domain_by_name(host, &state.clone()).await?;
 
     if let Some(domain) = domain {
         if let Some(ref dep_id) = domain.active_deployment_id {
-            if let Ok(dep) = Deployment::get_by_id(&state.database, dep_id).await {
-                return Ok(dep);
+            match Deployment::get_by_id(&state.database, dep_id).await {
+                Ok(dep) => return Ok(Some(dep)),
+                Err(sqlx::Error::RowNotFound) => {}
+                Err(error) => return Err(error),
             }
         }
 
         // Fallback to getting the latest deployment by site_id
 
-        let site = Site::get_by_id(&state.clone().database, &domain.site_id)
-            .await
-            .ok();
+        let site = match Site::get_by_id(&state.clone().database, &domain.site_id).await {
+            Ok(site) => site,
+            Err(sqlx::Error::RowNotFound) => return Ok(None),
+            Err(error) => return Err(error),
+        };
 
-        if let Some(site) = site {
-            let deployment =
-                Deployment::get_last_by_site_id(&state.clone().database, &site.site_id)
-                    .await
-                    .ok();
-
-            if let Some(deployment) = deployment {
-                return Ok(deployment);
-            }
+        match Deployment::get_last_by_site_id(&state.clone().database, &site.site_id).await {
+            Ok(deployment) => return Ok(Some(deployment)),
+            Err(sqlx::Error::RowNotFound) => {}
+            Err(error) => return Err(error),
         }
     }
 
-    Err(HttpError::NotFound)
+    Ok(None)
 }
 
 /// Serve a deployment file entry, using full in-memory cache for eligible files or streaming otherwise.
@@ -341,5 +307,95 @@ fn polyfill_mime_type(mime: &str, file_name: &str) -> String {
         "image/svg+xml".to_string()
     } else {
         mime.to_string()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use std::{sync::Arc, time::Duration};
+
+    use chrono::Utc;
+    use poem::{get, http::StatusCode, Endpoint, EndpointExt, Request, Response, Route};
+    use sqlx::postgres::PgPoolOptions;
+
+    use super::resolve_http;
+    use crate::{
+        cache::Cache,
+        database::Database,
+        models::deployment::Deployment,
+        state::{AppConfig, AppState, S3Config, State},
+        storage::Storage,
+    };
+
+    fn state_without_postgres() -> State {
+        let config = AppConfig {
+            database_url: String::new(),
+            s3: S3Config {
+                endpoint_url: "http://127.0.0.1:1".into(),
+                region: "us-east-1".into(),
+                bucket_name: "edgeserver".into(),
+                access_key: "access".into(),
+                secret_key: "secret".into(),
+            },
+            s3_previews: None,
+            s3_car: None,
+            github_app: None,
+            amqp: None,
+            ipfs: None,
+        };
+        let pool = PgPoolOptions::new()
+            .acquire_timeout(Duration::from_millis(200))
+            .connect_lazy("postgres://edgeserver@127.0.0.1:1/edgeserver")
+            .unwrap();
+        Arc::new(AppState {
+            storage: Storage::from_config(&config),
+            config,
+            database: Database { pool },
+            cache: Cache::default(),
+            rabbit: None,
+            ipfs: None,
+        })
+    }
+
+    async fn fetch(state: &State, path: &str) -> Response {
+        let app = Route::new().at("*", get(resolve_http)).data(state.clone());
+        let request = Request::builder()
+            .uri(path.parse().unwrap())
+            .header("host", "site.test")
+            .finish();
+        app.get_response(request).await
+    }
+
+    fn assert_unavailable(response: &Response) {
+        assert_eq!(response.status(), StatusCode::SERVICE_UNAVAILABLE);
+        assert_eq!(response.headers()["cache-control"], "no-store");
+    }
+
+    #[async_std::test]
+    async fn failed_domain_lookup_is_not_cached_as_missing_site() {
+        let state = state_without_postgres();
+
+        assert_unavailable(&fetch(&state, "/").await);
+        assert!(!state.cache.domain.contains_key("site.test"));
+    }
+
+    #[async_std::test]
+    async fn failed_file_lookup_is_not_cached_as_missing_file() {
+        let state = state_without_postgres();
+        let deployment = Deployment {
+            deployment_id: "d".into(),
+            site_id: "s".into(),
+            context: None,
+            ipfs_cid: None,
+            created_at: Utc::now(),
+        };
+        state
+            .cache
+            .domain
+            .insert("site.test".into(), Some(deployment))
+            .await;
+
+        assert_unavailable(&fetch(&state, "/about.html").await);
+        assert!(!state.cache.file_entry.contains_key("d:about.html"));
     }
 }
